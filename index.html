@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+
+<html lang="sv">
+<head>
+<meta charset="utf-8"/>
+<title>Musikquiz</title>
+<style>
+    body {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  padding: 2rem;
+
+  background-image: url('norrsken.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;}
+    img {
+      max-width: 210px;
+      margin-bottom: 1rem;
+    }
+    
+    .year {
+      font-weight: bold;
+      font-size: 4.5em;
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffff;
+      margin: 0.5rem 0;
+    }
+    button, select {
+      padding: 0.6rem 1.2rem;
+      margin: 0.5rem;
+      font-size: 1rem;
+    
+  border-radius: 12px;
+  border-radius: 8px;
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background-color: #222;
+  color: #fff;
+  border: none;}
+    #showBtn[disabled], #nextBtn[disabled] {
+      opacity: 0.5;
+    }
+    #endMessage, #missingQR {
+      margin-top: 2rem;
+      font-weight: bold;
+      color: #ff5252;
+    }
+  
+    h1 {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 300;
+      font-size: 2.4rem;
+      color: #ffffff;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 300;
+      font-size: 2.4rem;
+      color: #ffffff;
+      margin-bottom: 2rem;
+    }
+    
+    #artist, #title {
+      font-size: 1.4em;
+    }
+
+    button:hover, select:hover {
+      background-color: #66fcf1;
+      color: #000;
+      text-shadow: none;
+    }
+    
+    #qr {
+      filter: invert(1);
+    }
+    
+    #qr {
+      border-radius: 8px;
+    }
+    
+    
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    
+
+    
+    
+    
+
+    
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    
+
+    
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    
+
+    
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    
+
+    #footer.show {
+      display: flex;
+    }
+
+    
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    #footer button {
+      background-color: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    
+    
+    #answer {
+      min-height: 6rem;
+      transition: all 0.3s ease;
+    }
+    
+    #footer button {
+      background-color: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+
+    #answer {
+      min-height: 6rem;
+    }
+    
+    
+
+    #footer button {
+      background-color: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    #footer {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+
+    #footer button {
+      background-color: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    #footer button:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    
+    #googleBtn {
+      background-color: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    #googleBtn:hover {
+      background-color: #00ffff;
+      color: #000;
+    }
+    </style>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;700&amp;display=swap" rel="stylesheet"/></head>
+<body>
+<h1>MUSIKQUIZ</h1>
+<div>
+<label for="sourceSelect">Spellista:</label>
+<select id="sourceSelect">
+<option value="ALL">Alla listor</option>
+<option value="1000 bästa">1000 bästa</option>
+<option value="Afterski Klassiker">Afterski Klassiker</option>
+<option value="GPSN">GPSN</option>
+</select>
+<label for="yearFrom">Från år:</label>
+<select id="yearFrom"></select>
+<label for="yearTo">Till år:</label>
+<select id="yearTo"></select>
+<button onclick="applyFilters()">Starta spel</button>
+</div>
+<div id="quiz" style="display:none; margin-top: 2rem;">
+<img alt="QR-kod" id="qr" onerror="handleMissingQR()" src=""/>
+<div>
+<button disabled="" id="showBtn">Visa svar</button>
+<button id="nextBtn">Nästa låt</button>
+<button id="restartBtn" style="display:none">Starta om</button>
+</div>
+<div id="answer">
+<p> <span id="artist"></span></p>
+<p> <span id="title"></span></p>
+<p class="year" id="year"></p>
+<p><em id="sourceInfo"></em></p>
+</div>
+<div id="endMessage" style="display:none">Alla låtar har spelats!</div>
+<div id="missingQR" style="display:none">QR-kod saknas!</div>
+</div>
+<script>
+    let songs = [];
+fetch('songs.json')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("HTTP-fel " + response.status);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("✅ songs.json laddades:", data.length, "låtar");
+    songs = data;
+    if (typeof initGame === "function") {
+      initGame();
+    } else {
+      console.error("❌ initGame() är inte definierad");
+    }
+  })
+  .catch(error => {
+    console.error("❌ Fel vid laddning av songs.json:", error);
+    alert("Kunde inte ladda songs.json. Se konsolen för detaljer.");
+  });
+    let filteredSongs = [];
+    let remainingSongs = [];
+    let currentSong = null;
+
+    function populateYearDropdowns(min, max) {
+      const yearFrom = document.getElementById("yearFrom");
+      const yearTo = document.getElementById("yearTo");
+      for (let y = min; y <= max; y++) {
+        yearFrom.appendChild(new Option(y, y));
+        yearTo.appendChild(new Option(y, y));
+      }
+      yearFrom.value = min;
+      yearTo.value = max;
+    }
+
+    function applyFilters() {
+      const selectedSource = document.getElementById("sourceSelect").value;
+      const from = parseInt(document.getElementById("yearFrom").value);
+      const to = parseInt(document.getElementById("yearTo").value);
+      filteredSongs = songs.filter(s => (selectedSource === "ALL" || s.source === selectedSource) && s.year >= from && s.year <= to);
+      remainingSongs = [...filteredSongs];
+      document.getElementById("quiz").style.display = "block";
+      document.getElementById("restartBtn").style.display = "none";
+      document.getElementById("endMessage").style.display = "none";
+      document.getElementById("missingQR").style.display = "none";
+      pickRandomSong();
+    }
+
+    function restartGame() {
+      remainingSongs = [...filteredSongs];
+      document.getElementById("restartBtn").style.display = "none";
+      document.getElementById("endMessage").style.display = "none";
+      document.getElementById("missingQR").style.display = "none";
+      document.getElementById("nextBtn").disabled = false;
+      pickRandomSong();
+    }
+
+    function pickRandomSong() {
+      if (remainingSongs.length === 0) {
+        document.getElementById('qr').src = '';
+        document.getElementById('answer').style.display = 'none';
+        document.getElementById('showBtn').disabled = true;
+        document.getElementById('nextBtn').disabled = true;
+        document.getElementById('endMessage').style.display = 'block';
+        document.getElementById('restartBtn').style.display = 'inline-block';
+        return;
+      }
+      const index = Math.floor(Math.random() * remainingSongs.length);
+      const song = remainingSongs.splice(index, 1)[0];
+      currentSong = song;
+      document.getElementById('qr').src = 'qr_koder/' + song.qr + '.png';
+      document.getElementById('answer').style.display = 'none';
+      document.getElementById('missingQR').style.display = 'none';
+      document.getElementById('showBtn').disabled = true;
+      setTimeout(() => {
+        document.getElementById('showBtn').disabled = false;
+      }, 1000);
+    }
+
+    function handleMissingQR() {
+      document.getElementById('missingQR').style.display = 'block';
+    }
+
+    document.getElementById('showBtn').addEventListener('click', () => {
+      if (!currentSong) return;
+      document.getElementById('artist').textContent = currentSong.artist;
+      document.getElementById('title').textContent = currentSong.title;
+      document.getElementById('year').textContent = currentSong.year;
+      document.getElementById('answer').style.display = 'block';
+document.getElementById('sourceInfo').textContent = "Spellista: " + currentSong.source;
+      document.getElementById("editYearBtn").style.display = "inline-block";
+    });
+
+    
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (document.getElementById('answer').style.display === 'none') {
+        document.getElementById('showBtn').click();
+      } else {
+        pickRandomSong();
+      }
+    });
+    
+    document.getElementById('restartBtn').addEventListener('click', restartGame);
+
+    populateYearDropdowns(1954, 2024);
+  
+    function hideFilters() {
+      document.getElementById("sourceSelect").parentElement.style.display = "none";
+      document.getElementById("yearFrom").parentElement.style.display = "none";
+      document.getElementById("yearTo").parentElement.style.display = "none";
+    }
+
+    document.querySelector('button[onclick="applyFilters()"]').addEventListener('click', hideFilters);
+    
+    document.querySelector('button[onclick="applyFilters()"]').addEventListener('click', () => {
+      document.getElementById("footer").classList.add("show");
+    });
+    
+    document.querySelector('button[onclick="applyFilters()"]').addEventListener('click', () => {
+      document.getElementById("footer").style.display = "block";
+    });
+    
+    document.querySelector('button[onclick="applyFilters()"]').addEventListener('click', () => {
+      document.getElementById("footer").style.display = "block";
+    });
+    
+    document.getElementById("googleBtn").addEventListener("click", () => {
+      const query = encodeURIComponent(document.getElementById("googleBtn").getAttribute("data-query"));
+      window.open("https://www.google.com/search?q=" + query, "_blank");
+    });
+    
+function showYearEditor() {
+  document.getElementById("editYearSection").style.display = "block";
+  document.getElementById("newYearInput").value = currentSong?.year || '';
+}
+
+function saveNewYear() {
+  const newYear = parseInt(document.getElementById("newYearInput").value);
+  if (!isNaN(newYear) && currentSong) {
+    currentSong.year = newYear;
+    document.getElementById("year").textContent = newYear;
+    alert("Årtal uppdaterat.");
+  } else {
+    alert("Ogiltigt årtal.");
+  }
+}
+
+
+function exportUpdatedSongs() {
+  const blob = new Blob([JSON.stringify(songs, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "songs-export.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function googleCurrentSong() {
+  if (!currentSong) return;
+  const query = encodeURIComponent(currentSong.artist + " " + currentSong.title);
+  window.open("https://www.google.com/search?q=" + query, "_blank");
+}
+
+function toggleEditYear() {
+  const section = document.getElementById("editYearSection");
+  section.style.display = section.style.display === "none" ? "block" : "none";
+}
+
+const originalNextSong = nextSong;
+nextSong = function() {
+  document.getElementById("editYearSection").style.display = "none";
+  originalNextSong();
+};
+
+const originalInitGame = initGame;
+initGame = function() {
+  document.getElementById("editYearSection").style.display = "none";
+  originalInitGame();
+};
+</script>
+
+
+
+<div id="footer" style=""><button id="googleBtn" style="display:none; margin-bottom: 0.5rem;">Sök på Google</button><button id="startPageBtn" onclick="location.reload();">Startsida</button>
+<button onclick="exportUpdatedSongs()">Exportera JSON</button>
+<button onclick="googleCurrentSong()">Googla låt</button>
+<button onclick="toggleEditYear()">Ändra årtal</button></div>
+<div id="editYearSection" style="margin-top:10px;">
+  <input type="number" id="newYearInput" placeholder="Ange nytt år" style="width:100px;" />
+  <button onclick="saveNewYear()">Spara</button>
+</div>
+
+</body>
+</html>
