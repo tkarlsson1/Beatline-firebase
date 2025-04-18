@@ -63,8 +63,8 @@
             const minYear = Math.min(...years);
             const maxYear = Math.max(...years);
 
-            const startYearDropdown = document.getElementById("startYear");
-            const endYearDropdown = document.getElementById("endYear");
+            const startYearDropdown = document.getElementById("fromYear");
+            const endYearDropdown = document.getElementById("toYear");
 
             startYearDropdown.innerHTML = "";
             endYearDropdown.innerHTML = "";
@@ -80,16 +80,19 @@
                 optionEnd.textContent = year;
                 endYearDropdown.appendChild(optionEnd);
             }
+
+            startYearDropdown.value = minYear; // Förvalt minsta år
+            endYearDropdown.value = maxYear; // Förvalt största år
         };
 
         window.filterSongs = function() {
             const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
-            const startYear = parseInt(document.getElementById("startYear").value);
-            const endYear = parseInt(document.getElementById("endYear").value);
+            const fromYear = parseInt(document.getElementById("fromYear").value);
+            const toYear = parseInt(document.getElementById("toYear").value);
 
             let filteredSongs = songs.filter(song => 
                 (selectedSources.includes("alla") || selectedSources.includes(song.source)) &&
-                song.year >= startYear && song.year <= endYear
+                song.year >= fromYear && song.year <= toYear
             );
 
             displaySongs(filteredSongs);
@@ -126,11 +129,11 @@
     <label for="source">Välj källa:</label>
     <select id="source" multiple onchange="updateYearSelection()"></select>
 
-    <label for="startYear">Välj lägsta år:</label>
-    <select id="startYear" onchange="filterSongs()"></select>
+    <label for="fromYear">Från år:</label>
+    <select id="fromYear" onchange="filterSongs()"></select>
 
-    <label for="endYear">Välj högsta år:</label>
-    <select id="endYear" onchange="filterSongs()"></select>
+    <label for="toYear">Till år:</label>
+    <select id="toYear" onchange="filterSongs()"></select>
 
     <ul id="song-list"></ul>
 </body>
