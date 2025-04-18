@@ -105,19 +105,18 @@
       }
     });
 
-    // Generera kryssrutorna för källor (spellistor)
+    // Generera kryssrutorna för källor (spellistor) – inga alternativ är förvalt
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = ""; // Rensa tidigare innehåll
 
-      // Lägg till en checkbox för "Alla källor" – markerad som standard
+      // Lägg till en checkbox för "Alla källor" – ej markerad som standard
       const labelAll = document.createElement("label");
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
       checkboxAll.value = "alla";
-      checkboxAll.checked = true;
-      // Uppdatera årtalsvalen när en checkbox ändras
+      // checkboxAll.checked = false;  // Ej nödvändigt eftersom standard är false
       checkboxAll.addEventListener("change", updateYearSelection);
       labelAll.appendChild(checkboxAll);
       labelAll.appendChild(document.createTextNode(" Alla källor"));
@@ -133,7 +132,7 @@
         checkbox.type = "checkbox";
         checkbox.name = "source";
         checkbox.value = source;
-        checkbox.checked = false;
+        // Checkboxar är false som standard
         checkbox.addEventListener("change", updateYearSelection);
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(" " + source));
@@ -143,10 +142,8 @@
     }
 
     // Uppdatera årtalsdropdown baserat på de markerade kryssrutorna  
-    // Här sätter vi ett fast årsspann: från 1950 till 2025
-    // Standardvärde för högsta år (endYear) sätts till 2025
+    // Använder ett fast årsspann: 1950 till 2025, med "Till år" = 2025 som standard
     window.updateYearSelection = function() {
-      // Hämta alla kryssade checkboxar med name "source"
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
       // Om "alla" är markerat används alla unika källor
@@ -155,7 +152,6 @@
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
       
-      // Fyll årtalsdropdownsen med ett fast intervall: från 1950 till 2025
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
@@ -164,7 +160,6 @@
         const optionStart = document.createElement("option");
         optionStart.value = year;
         optionStart.textContent = year;
-        // Standardvärde för lägsta år kan vara 1950
         if (year === 1950) {
           optionStart.selected = true;
         }
@@ -173,7 +168,6 @@
         const optionEnd = document.createElement("option");
         optionEnd.value = year;
         optionEnd.textContent = year;
-        // Sätt standardvärde för högsta år till 2025
         if (year === 2025) {
           optionEnd.selected = true;
         }
@@ -219,8 +213,8 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtuppgifter.
-    // Nu visas årtalet i dubbelt så stor text på en egen rad ovanför titel och artist.
+    // Visa vald låt med genererad QR-kod, "Visa svar"-knapp och dolda låtuppgifter.
+    // Årtalet visas i dubbelt så stor text på en egen rad ovanför titel och artist.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
