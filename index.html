@@ -2,8 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spel: Gissa Låten</title>
+  <title>Visa låtar och QR-koder</title>
   <!-- Inkludera QRCodeJS-biblioteket -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module">
@@ -11,7 +10,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    // Din Firebase-konfiguration (byt ut mot dina värden)
+    // Din Firebase-konfiguration – byt ut dessa värden mot dina egna
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -22,36 +21,35 @@
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
 
-    // Initiera Firebase
+    // Initiera Firebase och databasen
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Globala variabler
-    let songs = [];        // Alla låtar från Firebase
-    let gameSongs = [];    // Låtar som används i spelet (efter filtrering)
-    let currentSong = null; // Den aktuella låten i spelet
+    let songs = []; // Alla låtar från Firebase
 
-    // Hämta data från Firebase under noden "songs"
+    // Hämtar data från Firebase (nod: "songs")
     const songsRef = ref(db, 'songs');
     onValue(songsRef, (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        // Konvertera objekt till array
+        // Vi omvandlar objekten till en array
         songs = Object.values(rawSongs);
         console.log("Hämtade låtar:", songs.length);
         populateSourceDropdown();
-        updateYearSelection();
+        updateYearDropdowns();
+        // Om du vill visa alla låtar direkt efter hämtning, kan du anropa:
+        // filterSongs();
       } else {
         console.error("❌ Inga låtar hittades i Firebase.");
       }
     });
 
-    // Skapar dropdown för "källa" med möjlighet att välja flera
+    // Skapar dropdownen för "källa" (spellista) med möjlighet att välja flera
     function populateSourceDropdown() {
       const sourceDropdown = document.getElementById("source");
       sourceDropdown.innerHTML = "";
       const sources = [...new Set(songs.map(song => song.source))];
-
+      
       // Alternativet "Alla källor"
       const optionAll = document.createElement("option");
       optionAll.value = "alla";
@@ -68,8 +66,8 @@
       });
     }
 
-    // Uppdaterar dropdownsen för "Från år" och "Till år" baserat på valda källor
-    window.updateYearSelection = function() {
+    // Uppdatera dropdownsen för "Från år" och "Till år" baserat på de låtar som hör till de valda källorna
+    function updateYearDropdowns() {
       const selectedSources = Array.from(document.getElementById("source").selectedOptions)
                                    .map(option => option.value);
       const filteredSongs = songs.filter(song =>
@@ -81,7 +79,9 @@
       fromYearDropdown.innerHTML = "";
       toYearDropdown.innerHTML = "";
 
-      if (filteredSongs.length === 0) return;
+      if (filteredSongs.length === 0) {
+        return;
+      }
 
       const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
       const minYear = Math.min(...years);
@@ -98,91 +98,63 @@
         optionTo.textContent = year;
         toYearDropdown.appendChild(optionTo);
       }
-
-      // Förvalda värden
+      
+      // Sätt förvalda värden
       fromYearDropdown.value = minYear;
       toYearDropdown.value = maxYear;
-    };
+    }
 
-    /* SPELLOGIK */
-
-    // Startar spelet genom att filtrera låtar baserat på källa och årtal
-    window.startGame = function() {
+    // Filtreringsfunktion som hämtar ut låtar baserat på valda källa/årtal
+    window.filterSongs = function() {
       const selectedSources = Array.from(document.getElementById("source").selectedOptions)
                                    .map(option => option.value);
       const fromYear = parseInt(document.getElementById("fromYear").value);
       const toYear = parseInt(document.getElementById("toYear").value);
 
-      // Filtrera ut låtar
-      gameSongs = songs.filter(song =>
+      const filteredSongs = songs.filter(song =>
         (selectedSources.includes("alla") || selectedSources.includes(song.source)) &&
         (song.year >= fromYear && song.year <= toYear)
       );
 
-      if (gameSongs.length === 0) {
-        alert("Inga låtar matchar de valda filtren.");
-        return;
-      }
-
-      // Göm svarsdelen
-      document.getElementById("answerArea").style.display = "none";
-      nextSong();  // Visa första låten i spelet
+      displaySongs(filteredSongs);
     };
 
-    // Väljer en slumpmässig låt ur gameSongs och visar QR-koden
-    function nextSong() {
-      if (gameSongs.length === 0) {
-        document.getElementById("gameArea").innerHTML = "<p>Inga fler låtar i spelet!</p>";
-        return;
-      }
+    // Visar alla låtar i en lista med QR-koder och tillhörande information
+    function displaySongs(filteredSongs) {
+      const songList = document.getElementById("song-list");
+      songList.innerHTML = "";
+      filteredSongs.forEach(song => {
+        // Skapa ett listobjekt för varje låt
+        const li = document.createElement("li");
+        li.style.marginBottom = "20px";
 
-      // Slumpa fram en index och ta bort den låten från arrayen
-      const randomIndex = Math.floor(Math.random() * gameSongs.length);
-      currentSong = gameSongs.splice(randomIndex, 1)[0];
-      console.log("Vald låt:", currentSong); // Debug: kontrollera att qr är unikt
+        li.innerHTML = `<strong>${song.title}</strong> - ${song.artist} (${song.year})<br>
+          <div id="qrcode-${song.qr}"></div>`;
 
-      // Rensa QR-området och dölj svarsdelen
-      const qrArea = document.getElementById("qrArea");
-      qrArea.innerHTML = "";
-      document.getElementById("answerArea").style.display = "none";
+        songList.appendChild(li);
 
-      // Generera en ny QR-kod med alternativobjekt
-      generateQRCode(currentSong.qr);
-    }
-
-    // Funktion för att visa låtens detaljer efter att QR-koden visas
-    window.showAnswer = function() {
-      const answerDiv = document.getElementById("answerArea");
-      answerDiv.innerHTML = `<p>${currentSong.title} - ${currentSong.artist} (${currentSong.year})</p>`;
-      answerDiv.style.display = "block";
-    };
-
-    // Går vidare till nästa låt
-    window.nextButton = function() {
-      nextSong();
-    };
-
-    // Genererar QR-kod med hjälp av QRCodeJS med ett optionsobjekt
-    window.generateQRCode = function(qr) {
-      const qrElement = document.getElementById("qrArea");
-      qrElement.innerHTML = "";
-      new QRCode(qrElement, {
-        text: `https://open.spotify.com/track/${qr}`,
-        width: 128,
-        height: 128,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
+        // Generera QR-kod endast om song.qr finns
+        if (song.qr) {
+          new QRCode(document.getElementById(`qrcode-${song.qr}`), {
+            text: `https://open.spotify.com/track/${song.qr}`,
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        } else {
+          document.getElementById(`qrcode-${song.qr}`).innerText = "Ingen QR tillgänglig";
+        }
       });
-    };
-    
+    }
   </script>
 </head>
 <body>
-  <h1>Spel: Gissa Låten</h1>
+  <h1>Visa låtar och QR-koder</h1>
   
   <label for="source">Välj källa:</label>
-  <select id="source" multiple onchange="updateYearSelection()"></select>
+  <select id="source" multiple onchange="updateYearDropdowns()"></select>
   <br><br>
   
   <label for="fromYear">Från år:</label>
@@ -193,16 +165,9 @@
   <select id="toYear"></select>
   <br><br>
   
-  <!-- Knapp för att starta spelet -->
-  <button onclick="startGame()">Starta spel</button>
+  <button onclick="filterSongs()">Filtrera låtar</button>
   <br><br>
   
-  <!-- Spelområdet -->
-  <div id="gameArea">
-    <div id="qrArea"></div>
-    <div id="answerArea" style="display: none;"></div>
-    <button onclick="showAnswer()">Visa svar</button>
-    <button onclick="nextButton()">Nästa låt</button>
-  </div>
+  <ul id="song-list"></ul>
 </body>
 </html>
