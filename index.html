@@ -24,8 +24,9 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let filteredSongs = [];
-    let shownSongs = [];
+    let sourceFilteredSongs = [];   // Låtar filtrerade på källa
+    let currentFilteredSongs = [];  // Låtar filtrerade på både källa och år
+    let shownSongs = [];            // Låtar som redan visats under nuvarande filter
     let currentSong = null;
 
     // Hämta data från Firebase
@@ -42,8 +43,8 @@
 
     function populateSourceDropdown() {
       const sourceDropdown = document.getElementById("source");
-      sourceDropdown.innerHTML = ""; 
-      const sources = [...new Set(songs.map(song => song.source))];
+      sourceDropdown.innerHTML = ""; // Rensa tidigare val
+      const sources = [...new Set(songs.map(song => song.source))]; // Unika källor
 
       const optionAll = document.createElement("option");
       optionAll.value = "alla";
@@ -58,14 +59,23 @@
       });
     }
 
+    // Uppdatera årtalsdropdown baserat på det valda källfiltret
     window.updateYearSelection = function() {
-      const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
+      const selectedSources = Array.from(document.getElementById("source").selectedOptions)
+                                  .map(option => option.value);
+      // Filtrera låtar utifrån vald källa
+      sourceFilteredSongs = songs.filter(song =>
+        selectedSources.includes("alla") || selectedSources.includes(song.source)
+      );
       
-      // Filtrera efter vald källa
-      filteredSongs = songs.filter(song => selectedSources.includes("alla") || selectedSources.includes(song.source));
-
-      // Uppdatera årtalsvalen
-      const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
+      if (sourceFilteredSongs.length === 0) {
+        document.getElementById("startYear").innerHTML = "";
+        document.getElementById("endYear").innerHTML = "";
+        return;
+      }
+      
+      // Hämta årtalen baserat på de filtrerade låtarna
+      const years = sourceFilteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
       const minYear = Math.min(...years);
       const maxYear = Math.max(...years);
 
@@ -88,16 +98,17 @@
       }
     };
 
+    // Filtrera låtar baserat på vald källa (i sourceFilteredSongs) och årtal
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
 
-      // Filtrera redan efter vald källa med årtalsintervallet
-      let yearFiltered = filteredSongs.filter(song => song.year >= startYear && song.year <= endYear);
-      shownSongs = [];
-      filteredSongs = yearFiltered;
+      currentFilteredSongs = sourceFilteredSongs.filter(song =>
+        parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
+      );
+      shownSongs = []; // Töm tidigare visade låtar
 
-      if (filteredSongs.length > 0) {
+      if (currentFilteredSongs.length > 0) {
         nextSong();
       } else {
         alert("Inga låtar hittades i den valda perioden.");
@@ -105,8 +116,9 @@
       }
     };
 
+    // Visa en slumpad låt (som inte visats tidigare under nuvarande filter)
     window.nextSong = function() {
-      const remainingSongs = filteredSongs.filter(song => !shownSongs.includes(song));
+      const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
 
       if (remainingSongs.length === 0) {
         alert("Inga fler låtar, tryck på Startsida för att börja om.");
@@ -120,12 +132,14 @@
       displaySong(currentSong);
     };
 
+    // Återställ filter-sessionen (tömmer den visade låtlistan)
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
       document.getElementById("song-display").innerHTML = "";
     };
 
+    // Visa en låt: generera QR-kod direkt, samt en knapp för att visa detaljer
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -139,6 +153,7 @@
       generateQRCode(song.qr);
     }
 
+    // Generera QR-kod för en specifik låt
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -146,6 +161,7 @@
       new QRCode(qrElement, spotifyUrl);
     };
 
+    // Visa låtdetaljer (artist, titel, år)
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
