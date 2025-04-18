@@ -116,7 +116,7 @@
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
       checkboxAll.value = "alla";
-      // checkboxAll.checked = false;  // Ej nödvändigt eftersom standard är false
+      // Ej markerad som standard
       checkboxAll.addEventListener("change", updateYearSelection);
       labelAll.appendChild(checkboxAll);
       labelAll.appendChild(document.createTextNode(" Alla källor"));
@@ -132,7 +132,6 @@
         checkbox.type = "checkbox";
         checkbox.name = "source";
         checkbox.value = source;
-        // Checkboxar är false som standard
         checkbox.addEventListener("change", updateYearSelection);
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(" " + source));
@@ -146,12 +145,12 @@
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
-      // Om "alla" är markerat används alla unika källor
       if (selectedSources.includes("alla")) {
         selectedSources = [...new Set(songs.map(song => song.source))];
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
       
+      // Fyll årtalsdropdownsen med ett fast intervall: från 1950 till 2025
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
@@ -213,12 +212,13 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med genererad QR-kod, "Visa svar"-knapp och dolda låtuppgifter.
+    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtuppgifter.
     // Årtalet visas i dubbelt så stor text på en egen rad ovanför titel och artist.
+    // Jag har här lagt in en margin-bottom på 1rem på div:en med QR-koden.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
-        <div id="qrcode-${song.qr}"></div>
+        <div id="qrcode-${song.qr}" style="margin-bottom: 1rem;"></div>
         <button onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
           <div class="year" style="font-size: 2em;">${song.year}</div>
