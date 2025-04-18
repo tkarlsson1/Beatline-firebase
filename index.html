@@ -55,14 +55,32 @@
             });
         }
 
+        window.updateYearSelection = function() {
+            const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
+            const filteredSongs = songs.filter(song => selectedSources.includes("alla") || selectedSources.includes(song.source));
+
+            const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
+            const minYear = Math.min(...years);
+            const maxYear = Math.max(...years);
+
+            const yearDropdown = document.getElementById("yearFilter");
+            yearDropdown.innerHTML = ""; // Rensa tidigare val
+
+            for (let year = minYear; year <= maxYear; year++) {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = year;
+                yearDropdown.appendChild(option);
+            }
+        };
+
         window.filterSongs = function() {
             const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
-            const startYear = parseInt(document.getElementById("startYear").value);
-            const endYear = parseInt(document.getElementById("endYear").value);
+            const selectedYear = parseInt(document.getElementById("yearFilter").value);
 
             let filteredSongs = songs.filter(song => 
                 (selectedSources.includes("alla") || selectedSources.includes(song.source)) &&
-                song.year >= startYear && song.year <= endYear
+                song.year === selectedYear
             );
 
             displaySongs(filteredSongs);
@@ -96,14 +114,10 @@
     <h1>Välj Källa & Generera QR-kod</h1>
 
     <label for="source">Välj källa:</label>
-    <select id="source" multiple onchange="filterSongs()">
-    </select>
+    <select id="source" multiple onchange="updateYearSelection()"></select>
 
-    <label for="startYear">Startår:</label>
-    <input type="number" id="startYear" onchange="filterSongs()">
-
-    <label for="endYear">Slutår:</label>
-    <input type="number" id="endYear" onchange="filterSongs()">
+    <label for="yearFilter">Välj år:</label>
+    <select id="yearFilter" onchange="filterSongs()"></select>
 
     <ul id="song-list"></ul>
 </body>
