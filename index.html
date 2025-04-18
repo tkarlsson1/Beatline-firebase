@@ -17,14 +17,14 @@
       align-items: start;
       min-height: 100vh;
     }
-    /* Containern används enbart för centrering med lite padding */
+    /* Containern används nu enbart för centrering med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
       width: 100%;
       margin: 2rem 1rem;
     }
-    /* Ersätt rubrik med en centrerad logga */
+    /* Ersätter rubriken med den centrerade loggan */
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
@@ -39,7 +39,7 @@
     input[type="checkbox"] {
       margin-right: 0.5rem;
     }
-    /* Ändrad bredd och färg på både knappar och dropdownlistor */
+    /* Både knappar och dropdown-listor är nu 25% breda med mörkgrå bakgrund och vit text */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -57,7 +57,7 @@
       text-align: center;
       margin: 1.5rem 0;
     }
-    /* Se till att canvas eller img (skapat av QRCode-biblioteket) centrerats */
+    /* Se till att QRCode (canvas eller img) centrerats */
     #song-display canvas,
     #song-display img {
       display: block;
@@ -139,8 +139,8 @@
       });
     }
 
-    // Uppdatera årtalsdropdown baserat på de markerade kryssrutorna  
-    // Fast årsspann: 1950 till 2025, med standardvärdet för "Till år" satt till 2025
+    // Uppdatera årtalsdropdown baserat på markerade kryssrutor  
+    // Fast årsspann: 1950 till 2025, med "Till år" = 2025 som standard
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -148,7 +148,7 @@
         selectedSources = [...new Set(songs.map(song => song.source))];
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
-      
+
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
@@ -161,7 +161,7 @@
           optionStart.selected = true;
         }
         startYearDropdown.appendChild(optionStart);
-        
+
         const optionEnd = document.createElement("option");
         optionEnd.value = year;
         optionEnd.textContent = year;
@@ -172,16 +172,14 @@
       }
     };
 
-    // Filtrera låtar utifrån de markerade källorna och valt årtal
+    // Filtrera låtar utifrån markerade källor och valt årtal
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
-      
       currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
       );
       shownSongs = [];
-      
       if (currentFilteredSongs.length > 0) {
         nextSong();
       } else {
@@ -190,7 +188,7 @@
       }
     };
 
-    // Välj en slumpad låt (som inte redan visats)
+    // Välj en slumpad låt (som inte redan har visats)
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -203,7 +201,7 @@
       displaySong(currentSong);
     };
 
-    // Återställ sessionen för visade låtar
+    // Återställ sessionen för visade låtar (utan omladdning)
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
@@ -231,10 +229,10 @@
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
       qrElement.innerHTML = "";
-      new QRCode(qrElement, { text: spotifyUrl, width: 256, height: 256 });
+      new QRCode(qrElement, { text: spotifyUrl, width: 180, height: 180 });
     };
 
-    // Avslöja låtuppgifterna (Visa svar)
+    // Avslöja låtuppgifterna ("Visa svar")
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
@@ -247,7 +245,7 @@
     };
 
     // Gå tillbaka till filter-/startsidan och återställ sessionen.
-    // Nollställer även alla kryssrutorna.
+    // Knappval blir nollställda.
     window.goToFilter = function() {
       const checkboxes = document.querySelectorAll('input[name="source"]');
       checkboxes.forEach(checkbox => {
@@ -264,7 +262,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- Logga (ersätter rubriktitel) -->
+    <!-- Ersätt rubriken med en logga -->
     <img src="logga.png" alt="Notestream-beta logo" class="logo">
     
     <!-- Filter-/Startsida -->
@@ -278,15 +276,17 @@
       <label for="endYear">Till år:</label>
       <select id="endYear"></select>
       
-      <!-- Knappen byter namn till "Starta spel" och centreras med inline-stil -->
+      <!-- Ändrad knapptext till "Starta spel", centrerad -->
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
     
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
-      <button onclick="nextSong()">Nästa låt</button>
-      <button onclick="goToFilter()">Startsida</button>
+      <!-- Knappen 'Nästa låt' centrerad med margin-bottom -->
+      <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 1rem;">Nästa låt</button>
+      <!-- Knappen 'Startsida' placeras på en egen rad, centrerad -->
+      <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
     </div>
   </div>
 </body>
