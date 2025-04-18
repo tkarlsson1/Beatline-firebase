@@ -33,7 +33,8 @@
         console.log("✅ Låtar uppdaterade från Firebase:", songs.length);
         populateSourceDropdown();
         updateYearSelection();
-        filterSongs();
+        // Töm låtlistan så att inga låtar visas innan du klickar på "Filtrera låtar"
+        document.getElementById("song-list").innerHTML = "";
       } else {
         console.error("❌ Inga låtar hittades i Firebase.");
       }
@@ -43,7 +44,7 @@
     function populateSourceDropdown() {
       const sourceDropdown = document.getElementById("source");
       sourceDropdown.innerHTML = ""; // Rensa tidigare val
-      const sources = [...new Set(songs.map(song => song.source))]; // Unika källor
+      const sources = [...new Set(songs.map(song => song.source))];
 
       // Lägg till alternativet "Alla källor" med totala antalet låtar
       const optionAll = document.createElement("option");
@@ -63,10 +64,17 @@
 
     // Uppdaterar dropdowns för årtal ("Från år" och "Till år") baserat på valda spellistor
     window.updateYearSelection = function() {
-      const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
+      const selectedSources = Array.from(document.getElementById("source").selectedOptions)
+                                  .map(option => option.value);
       const filteredSongs = songs.filter(song =>
         selectedSources.includes("alla") || selectedSources.includes(song.source)
       );
+
+      if (filteredSongs.length === 0) {
+        document.getElementById("fromYear").innerHTML = "";
+        document.getElementById("toYear").innerHTML = "";
+        return;
+      }
 
       const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
       const minYear = Math.min(...years);
@@ -97,7 +105,8 @@
 
     // Filtrerar låtar baserat på valda källor och årintervall
     window.filterSongs = function() {
-      const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
+      const selectedSources = Array.from(document.getElementById("source").selectedOptions)
+                                  .map(option => option.value);
       const fromYear = parseInt(document.getElementById("fromYear").value);
       const toYear = parseInt(document.getElementById("toYear").value);
 
@@ -130,7 +139,7 @@
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
-      qrElement.innerHTML = ""; // Rensa tidigare QR-kod
+      qrElement.innerHTML = ""; // Rensa tidigare QR-kod, om någon finns
       new QRCode(qrElement, spotifyUrl);
     };
   </script>
@@ -140,15 +149,18 @@
   <h1>Välj Källa & Generera QR-kod</h1>
 
   <label for="source">Välj källa:</label>
-  <select id="source" multiple onchange="updateYearSelection(); filterSongs();"></select>
+  <select id="source" multiple onchange="updateYearSelection()"></select>
   <br><br>
 
   <label for="fromYear">Från år:</label>
-  <select id="fromYear" onchange="filterSongs()"></select>
+  <select id="fromYear"></select>
   <br><br>
 
   <label for="toYear">Till år:</label>
-  <select id="toYear" onchange="filterSongs()"></select>
+  <select id="toYear"></select>
+  <br><br>
+
+  <button onclick="filterSongs()">Filtrera låtar</button>
   <br><br>
 
   <ul id="song-list"></ul>
