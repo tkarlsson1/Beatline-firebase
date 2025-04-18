@@ -24,7 +24,7 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade enligt vald spellista/källa (nu kan flera väljas)
+    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån de valda källorna (kan vara flera)
     let currentFilteredSongs = [];  // Låtar filtrerade på både källa och årtal
     let shownSongs = [];            // Låtar som redan visats under nuvarande filter
     let currentSong = null;
@@ -51,6 +51,8 @@
       const optionAll = document.createElement("option");
       optionAll.value = "alla";
       optionAll.textContent = "Alla källor";
+      // Förvalda värdet "alla" kan vara markerat om du önskar
+      optionAll.selected = true;
       sourceDropdown.appendChild(optionAll);
 
       sources.forEach(source => {
@@ -63,12 +65,18 @@
 
     // Uppdatera årtalsvalen baserat på de valda spellistorna (flera kan väljas)
     window.updateYearSelection = function() {
-      const selectedSources = Array.from(document.getElementById("source").selectedOptions)
-                                  .map(option => option.value);
-      // Filtrera låtar utifrån vald källa. Om "alla" finns med väljs alla låtar.
-      sourceFilteredSongs = songs.filter(song =>
-        selectedSources.includes("alla") || selectedSources.includes(song.source)
-      );
+      const selectedSources = Array.from(
+        document.getElementById("source").selectedOptions
+      ).map(option => option.value);
+      
+      // Om "alla" är markerat används hela songs-arrayen
+      if (selectedSources.includes("alla")) {
+        sourceFilteredSongs = [...songs];
+      } else {
+        sourceFilteredSongs = songs.filter(song =>
+          selectedSources.includes(song.source)
+        );
+      }
       
       // Om inga låtar finns, töm dropdownsen
       if (sourceFilteredSongs.length === 0) {
