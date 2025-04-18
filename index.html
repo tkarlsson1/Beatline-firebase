@@ -57,7 +57,7 @@
       text-align: center;
       margin: 1.5rem 0;
     }
-    /* Se till att canvas eller img, som skapas av QRCode-biblioteket, centreras */
+    /* Se till att canvas eller img centrerats */
     #song-display canvas,
     #song-display img {
       display: block;
@@ -89,8 +89,8 @@
 
     let songs = [];
     let sourceFilteredSongs = [];   // Låtar filtrerade utifrån valda källor (kryssrutor)
-    let currentFilteredSongs = [];  // Låtar filtrerade på både källa och årtal
-    let shownSongs = [];            // Låtar som redan har visats under sessionen
+    let currentFilteredSongs = [];    // Låtar filtrerade på både källa och årtal
+    let shownSongs = [];              // Låtar som redan har visats under sessionen
     let currentSong = null;
 
     // Hämta data från Firebase
@@ -143,7 +143,8 @@
     }
 
     // Uppdatera årtalsdropdown baserat på de markerade kryssrutorna  
-    // Här sätter vi istället ett fast årsspann: 1950 till 2025
+    // Här sätter vi ett fast årsspann: från 1950 till 2025
+    // Standardvärde för högsta år (endYear) sätts till 2025
     window.updateYearSelection = function() {
       // Hämta alla kryssade checkboxar med name "source"
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
@@ -163,11 +164,19 @@
         const optionStart = document.createElement("option");
         optionStart.value = year;
         optionStart.textContent = year;
+        // Standardvärde för lägsta år kan vara 1950
+        if (year === 1950) {
+          optionStart.selected = true;
+        }
         startYearDropdown.appendChild(optionStart);
         
         const optionEnd = document.createElement("option");
         optionEnd.value = year;
         optionEnd.textContent = year;
+        // Sätt standardvärde för högsta år till 2025
+        if (year === 2025) {
+          optionEnd.selected = true;
+        }
         endYearDropdown.appendChild(optionEnd);
       }
     };
@@ -211,7 +220,7 @@
     };
 
     // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtuppgifter.
-    // Nu visas årtalet i dubbelt så stor text på en egen rad ovanför titel - artist.
+    // Nu visas årtalet i dubbelt så stor text på en egen rad ovanför titel och artist.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -264,10 +273,10 @@
       <label>Välj spellista/källa (kryssa för de du vill ha):</label>
       <div id="source-checkbox-container"></div>
       
-      <label for="startYear">Välj lägsta år:</label>
+      <label for="startYear">Från år:</label>
       <select id="startYear"></select>
       
-      <label for="endYear">Välj högsta år:</label>
+      <label for="endYear">Till år:</label>
       <select id="endYear"></select>
       
       <button onclick="applyFilter()">Filtrera låtar</button>
