@@ -57,7 +57,7 @@
       text-align: center;
       margin: 1.5rem 0;
     }
-    /* Se till att canvas eller bild, som skapas av QRCode-biblioteket, är centrerad */
+    /* Se till att canvas eller img, som skapas av QRCode-biblioteket, centreras */
     #song-display canvas,
     #song-display img {
       display: block;
@@ -88,9 +88,9 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån de markerade källorna
+    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån valda källor (kryssrutor)
     let currentFilteredSongs = [];  // Låtar filtrerade på både källa och årtal
-    let shownSongs = [];            // Låtar som redan visats i nuvarande filter-session
+    let shownSongs = [];            // Låtar som redan har visats under sessionen
     let currentSong = null;
 
     // Hämta data från Firebase
@@ -105,7 +105,7 @@
       }
     });
 
-    // Fyll "källor"-området med kryssrutor
+    // Generera kryssrutorna för källor (spellistor)
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = ""; // Rensa tidigare innehåll
@@ -124,15 +124,15 @@
       container.appendChild(labelAll);
       container.appendChild(document.createElement("br"));
 
-      // Lägg till kryssrutor för varje unik källa
-      const uniqueSources = [...new Set(songs.map(song => song.source))];
+      // Hämta unika källor och sortera dem alfabetiskt
+      let uniqueSources = [...new Set(songs.map(song => song.source))];
+      uniqueSources.sort();
       uniqueSources.forEach(source => {
         const label = document.createElement("label");
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.name = "source";
         checkbox.value = source;
-        // Förvald ej, men du kan ändra om du vill ha dem markerade
         checkbox.checked = false;
         checkbox.addEventListener("change", updateYearSelection);
         label.appendChild(checkbox);
@@ -142,36 +142,24 @@
       });
     }
 
-    // Uppdatera årtalsdropdown baserat på vilka källor som är markerade
+    // Uppdatera årtalsdropdown baserat på de markerade kryssrutorna  
+    // Här sätter vi istället ett fast årsspann: 1950 till 2025
     window.updateYearSelection = function() {
+      // Hämta alla kryssade checkboxar med name "source"
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
-      // Om "alla" är markerat så används alla unika källor
+      // Om "alla" är markerat används alla unika källor
       if (selectedSources.includes("alla")) {
         selectedSources = [...new Set(songs.map(song => song.source))];
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
       
-      // Uppdatera årtalsdropdownsen
-      if (sourceFilteredSongs.length === 0) {
-        document.getElementById("startYear").innerHTML = "";
-        document.getElementById("endYear").innerHTML = "";
-        return;
-      }
-      
-      const years = sourceFilteredSongs
-                      .map(song => parseInt(song.year))
-                      .filter(year => !isNaN(year))
-                      .sort((a, b) => a - b);
-      const minYear = Math.min(...years);
-      const maxYear = Math.max(...years);
-      
+      // Fyll årtalsdropdownsen med ett fast intervall: från 1950 till 2025
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
       endYearDropdown.innerHTML = "";
-      
-      for (let year = minYear; year <= maxYear; year++) {
+      for (let year = 1950; year <= 2025; year++) {
         const optionStart = document.createElement("option");
         optionStart.value = year;
         optionStart.textContent = year;
@@ -184,7 +172,7 @@
       }
     };
 
-    // Filtrera låtar utifrån markerade källor och valt årtal
+    // Filtrera låtar utifrån de markerade källorna och valt årtal
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -202,7 +190,7 @@
       }
     };
 
-    // Välj en slumpad låt som inte redan visats
+    // Välj en slumpad låt (som inte redan visats)
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -222,14 +210,16 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtdetaljer
+    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtuppgifter.
+    // Nu visas årtalet i dubbelt så stor text på en egen rad ovanför titel - artist.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
         <div id="qrcode-${song.qr}"></div>
         <button onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-          ${song.title} - ${song.artist} (${song.year})
+          <div class="year" style="font-size: 2em;">${song.year}</div>
+          <div class="info">${song.title} - ${song.artist}</div>
         </div>
       `;
       generateQRCode(song.qr);
@@ -243,7 +233,7 @@
       new QRCode(qrElement, spotifyUrl);
     };
 
-    // Avslöja låtens detaljer när man trycker på "Visa svar"
+    // Avslöja låtuppgifterna ("Visa svar")
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
