@@ -10,8 +10,8 @@
     // Importera Firebase-moduler
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    
-    // Ange din Firebase-konfiguration
+
+    // Din Firebase-konfiguration (byt ut mot dina värden)
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -22,21 +22,21 @@
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
 
-    // Initiera Firebase-appen och databasen
+    // Initiera Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
     // Globala variabler
-    let songs = [];       // Alla låtar hämtade från Firebase
-    let gameSongs = [];   // Låtar som är med i spelet (baserat på filtrering)
-    let currentSong = null; // Aktuellt slumpat urval
+    let songs = [];        // Alla låtar från Firebase
+    let gameSongs = [];    // Låtar som används i spelet (efter filtrering)
+    let currentSong = null; // Den aktuella låten i spelet
 
-    // Lyssna på ändringar i databasen (noden "songs")
+    // Hämta data från Firebase under noden "songs"
     const songsRef = ref(db, 'songs');
     onValue(songsRef, (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        // Omvandla objektet till en array (vi bryr oss inte om nycklarna i detta exempel)
+        // Konvertera objekt till array
         songs = Object.values(rawSongs);
         console.log("Hämtade låtar:", songs.length);
         populateSourceDropdown();
@@ -46,13 +46,13 @@
       }
     });
 
-    // Fyll i dropdown för källa med möjligheten att välja flera och visa antal låtar per källa
+    // Skapar dropdown för "källa" med möjlighet att välja flera
     function populateSourceDropdown() {
       const sourceDropdown = document.getElementById("source");
       sourceDropdown.innerHTML = "";
       const sources = [...new Set(songs.map(song => song.source))];
 
-      // "Alla källor" med totala antalet låtar
+      // Alternativet "Alla källor"
       const optionAll = document.createElement("option");
       optionAll.value = "alla";
       optionAll.textContent = `Alla källor (${songs.length})`;
@@ -68,7 +68,7 @@
       });
     }
 
-    // Uppdatera dropdownsen för "Från år" och "Till år" baserat på de valda källorna
+    // Uppdaterar dropdownsen för "Från år" och "Till år" baserat på valda källor
     window.updateYearSelection = function() {
       const selectedSources = Array.from(document.getElementById("source").selectedOptions)
                                    .map(option => option.value);
@@ -76,20 +76,16 @@
         selectedSources.includes("alla") || selectedSources.includes(song.source)
       );
 
-      if (filteredSongs.length === 0) {
-        document.getElementById("fromYear").innerHTML = "";
-        document.getElementById("toYear").innerHTML = "";
-        return;
-      }
-
-      const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
-      const minYear = Math.min(...years);
-      const maxYear = Math.max(...years);
-
       const fromYearDropdown = document.getElementById("fromYear");
       const toYearDropdown = document.getElementById("toYear");
       fromYearDropdown.innerHTML = "";
       toYearDropdown.innerHTML = "";
+
+      if (filteredSongs.length === 0) return;
+
+      const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
+      const minYear = Math.min(...years);
+      const maxYear = Math.max(...years);
 
       for (let year = minYear; year <= maxYear; year++) {
         const optionFrom = document.createElement("option");
@@ -108,69 +104,78 @@
       toYearDropdown.value = maxYear;
     };
 
-    /* Spelfunktionalitet */
+    /* SPELLOGIK */
 
-    // Anropas när man trycker "Starta spel"
+    // Startar spelet genom att filtrera låtar baserat på källa och årtal
     window.startGame = function() {
       const selectedSources = Array.from(document.getElementById("source").selectedOptions)
                                    .map(option => option.value);
       const fromYear = parseInt(document.getElementById("fromYear").value);
       const toYear = parseInt(document.getElementById("toYear").value);
-      
-      // Filtrera ut de låtar som matchar valda källor och år
+
+      // Filtrera ut låtar
       gameSongs = songs.filter(song =>
         (selectedSources.includes("alla") || selectedSources.includes(song.source)) &&
         (song.year >= fromYear && song.year <= toYear)
       );
-      
+
       if (gameSongs.length === 0) {
-        alert("Inga låtar hittades för de valda filtren.");
+        alert("Inga låtar matchar de valda filtren.");
         return;
       }
-      
-      // Se till att svarsdelen är dold i början
+
+      // Göm svarsdelen
       document.getElementById("answerArea").style.display = "none";
-      nextSong(); // Visa första låten i spelet
+      nextSong();  // Visa första låten i spelet
     };
 
-    // Väljer en slumpmässig låt från de kvarvarande i spelet
+    // Väljer en slumpmässig låt ur gameSongs och visar QR-koden
     function nextSong() {
       if (gameSongs.length === 0) {
         document.getElementById("gameArea").innerHTML = "<p>Inga fler låtar i spelet!</p>";
         return;
       }
-      
-      // Slumpvisa ut en låt och ta bort den från arrayen
+
+      // Slumpa fram en index och ta bort den låten från arrayen
       const randomIndex = Math.floor(Math.random() * gameSongs.length);
       currentSong = gameSongs.splice(randomIndex, 1)[0];
-      
-      // Rensa tidigare QR-kod och dolda svar
-      document.getElementById("qrArea").innerHTML = "";
+      console.log("Vald låt:", currentSong); // Debug: kontrollera att qr är unikt
+
+      // Rensa QR-området och dölj svarsdelen
+      const qrArea = document.getElementById("qrArea");
+      qrArea.innerHTML = "";
       document.getElementById("answerArea").style.display = "none";
-      
-      // Visa QR-kod baserat på låtens QR (Spotify-ID)
+
+      // Generera en ny QR-kod med alternativobjekt
       generateQRCode(currentSong.qr);
     }
 
-    // När man trycker "Visa svar" – avslöja låtens detaljer
+    // Funktion för att visa låtens detaljer efter att QR-koden visas
     window.showAnswer = function() {
       const answerDiv = document.getElementById("answerArea");
       answerDiv.innerHTML = `<p>${currentSong.title} - ${currentSong.artist} (${currentSong.year})</p>`;
       answerDiv.style.display = "block";
     };
 
-    // Vid klick på "Nästa låt"
+    // Går vidare till nästa låt
     window.nextButton = function() {
       nextSong();
     };
 
-    // Generera QR-kod med hjälp av QRCodeJS
+    // Genererar QR-kod med hjälp av QRCodeJS med ett optionsobjekt
     window.generateQRCode = function(qr) {
       const qrElement = document.getElementById("qrArea");
       qrElement.innerHTML = "";
-      // Länken byggs ut med Spotify-formatet. Justera om nödvändigt.
-      new QRCode(qrElement, `https://open.spotify.com/track/${qr}`);
+      new QRCode(qrElement, {
+        text: `https://open.spotify.com/track/${qr}`,
+        width: 128,
+        height: 128,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
     };
+    
   </script>
 </head>
 <body>
@@ -179,17 +184,20 @@
   <label for="source">Välj källa:</label>
   <select id="source" multiple onchange="updateYearSelection()"></select>
   <br><br>
+  
   <label for="fromYear">Från år:</label>
   <select id="fromYear"></select>
   <br><br>
+  
   <label for="toYear">Till år:</label>
   <select id="toYear"></select>
   <br><br>
-  <!-- Knapp för att starta spelet (filtrera ut låtarna och visa ett slumpmässigt QR-kodurval) -->
+  
+  <!-- Knapp för att starta spelet -->
   <button onclick="startGame()">Starta spel</button>
   <br><br>
   
-  <!-- Spelområdet där QR-koden och svaren visas -->
+  <!-- Spelområdet -->
   <div id="gameArea">
     <div id="qrArea"></div>
     <div id="answerArea" style="display: none;"></div>
