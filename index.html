@@ -1,145 +1,156 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Välj Källa & Generera QR-kod</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Välj Källa & Generera QR-kod</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        // Firebase-konfiguration
-        const firebaseConfig = {
-            apiKey: "DIN_API_KEY",
-            authDomain: "beatlinefirebase.firebaseapp.com",
-            databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "beatlinefirebase",
-            storageBucket: "beatlinefirebase.firebasestorage.app",
-            messagingSenderId: "196231817325",
-            appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-        };
+    // Firebase-konfiguration
+    const firebaseConfig = {
+      apiKey: "DIN_API_KEY",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      storageBucket: "beatlinefirebase.firebasestorage.app",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const songsRef = ref(db, 'songs');
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const songsRef = ref(db, 'songs');
 
-        let songs = [];
+    let songs = [];
 
-        // Hämta data från Firebase
-        onValue(songsRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const rawSongs = snapshot.val();
-                songs = Object.entries(rawSongs).map(([qr, data]) => ({ qr, ...data }));
-                console.log("✅ Låtar uppdaterade från Firebase:", songs.length);
-                populateSourceDropdown();
-            } else {
-                console.error("❌ Inga låtar hittades i Firebase.");
-            }
-        });
+    // Hämta data från Firebase
+    onValue(songsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const rawSongs = snapshot.val();
+        songs = Object.entries(rawSongs).map(([qr, data]) => ({ qr, ...data }));
+        console.log("✅ Låtar uppdaterade från Firebase:", songs.length);
+        populateSourceDropdown();
+        updateYearSelection();
+        filterSongs();
+      } else {
+        console.error("❌ Inga låtar hittades i Firebase.");
+      }
+    });
 
-        function populateSourceDropdown() {
-            const sourceDropdown = document.getElementById("source");
-            sourceDropdown.innerHTML = ""; // Rensa tidigare val
-            const sources = [...new Set(songs.map(song => song.source))]; // Unika källor
+    // Skapar dropdown för källor med möjlighet att välja flera spellistor
+    function populateSourceDropdown() {
+      const sourceDropdown = document.getElementById("source");
+      sourceDropdown.innerHTML = ""; // Rensa tidigare val
+      const sources = [...new Set(songs.map(song => song.source))]; // Unika källor
 
-            const sourceCounts = sources.map(source => ({
-                source,
-                count: songs.filter(song => song.source === source).length
-            }));
+      // Lägg till alternativet "Alla källor" med totala antalet låtar
+      const optionAll = document.createElement("option");
+      optionAll.value = "alla";
+      optionAll.textContent = `Alla källor (${songs.length})`;
+      sourceDropdown.appendChild(optionAll);
 
-            const optionAll = document.createElement("option");
-            optionAll.value = "alla";
-            optionAll.textContent = `Alla källor (${songs.length})`;
-            sourceDropdown.appendChild(optionAll);
+      // Skapa alternativ för varje unik källa med antal låtar inom parentes
+      sources.forEach(source => {
+        const count = songs.filter(song => song.source === source).length;
+        const option = document.createElement("option");
+        option.value = source;
+        option.textContent = `${source} (${count})`;
+        sourceDropdown.appendChild(option);
+      });
+    }
 
-            sourceCounts.forEach(({ source, count }) => {
-                const option = document.createElement("option");
-                option.value = source;
-                option.textContent = `${source} (${count})`;
-                sourceDropdown.appendChild(option);
-            });
-        }
+    // Uppdaterar dropdowns för årtal ("Från år" och "Till år") baserat på valda spellistor
+    window.updateYearSelection = function() {
+      const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
+      const filteredSongs = songs.filter(song =>
+        selectedSources.includes("alla") || selectedSources.includes(song.source)
+      );
 
-        window.updateYearSelection = function() {
-            const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
-            const filteredSongs = songs.filter(song => selectedSources.includes("alla") || selectedSources.includes(song.source));
+      const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
+      const minYear = Math.min(...years);
+      const maxYear = Math.max(...years);
 
-            const years = filteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
-            const minYear = Math.min(...years);
-            const maxYear = Math.max(...years);
+      const fromYearDropdown = document.getElementById("fromYear");
+      const toYearDropdown = document.getElementById("toYear");
 
-            const startYearDropdown = document.getElementById("fromYear");
-            const endYearDropdown = document.getElementById("toYear");
+      fromYearDropdown.innerHTML = "";
+      toYearDropdown.innerHTML = "";
 
-            startYearDropdown.innerHTML = "";
-            endYearDropdown.innerHTML = "";
+      for (let year = minYear; year <= maxYear; year++) {
+        const optionFrom = document.createElement("option");
+        optionFrom.value = year;
+        optionFrom.textContent = year;
+        fromYearDropdown.appendChild(optionFrom);
 
-            for (let year = minYear; year <= maxYear; year++) {
-                const optionStart = document.createElement("option");
-                optionStart.value = year;
-                optionStart.textContent = year;
-                startYearDropdown.appendChild(optionStart);
+        const optionTo = document.createElement("option");
+        optionTo.value = year;
+        optionTo.textContent = year;
+        toYearDropdown.appendChild(optionTo);
+      }
 
-                const optionEnd = document.createElement("option");
-                optionEnd.value = year;
-                optionEnd.textContent = year;
-                endYearDropdown.appendChild(optionEnd);
-            }
+      // Förvalt: lägsta år i "Från år" och högsta år i "Till år"
+      fromYearDropdown.value = minYear;
+      toYearDropdown.value = maxYear;
+    };
 
-            startYearDropdown.value = minYear; // Förvalt minsta år
-            endYearDropdown.value = maxYear; // Förvalt största år
-        };
+    // Filtrerar låtar baserat på valda källor och årintervall
+    window.filterSongs = function() {
+      const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
+      const fromYear = parseInt(document.getElementById("fromYear").value);
+      const toYear = parseInt(document.getElementById("toYear").value);
 
-        window.filterSongs = function() {
-            const selectedSources = Array.from(document.getElementById("source").selectedOptions).map(option => option.value);
-            const fromYear = parseInt(document.getElementById("fromYear").value);
-            const toYear = parseInt(document.getElementById("toYear").value);
+      const filteredSongs = songs.filter(song =>
+        (selectedSources.includes("alla") || selectedSources.includes(song.source)) &&
+        song.year >= fromYear && song.year <= toYear
+      );
 
-            let filteredSongs = songs.filter(song => 
-                (selectedSources.includes("alla") || selectedSources.includes(song.source)) &&
-                song.year >= fromYear && song.year <= toYear
-            );
+      displaySongs(filteredSongs);
+    };
 
-            displaySongs(filteredSongs);
-        };
+    // Visar låtar med QR-kodsknappar i listan
+    function displaySongs(filteredSongs) {
+      const songList = document.getElementById("song-list");
+      songList.innerHTML = "";
 
-        function displaySongs(filteredSongs) {
-            const songList = document.getElementById("song-list");
-            songList.innerHTML = "";
+      filteredSongs.forEach(song => {
+        console.log("Genererar QR-kod för:", song.qr);
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+          ${song.title} - ${song.artist} (${song.year})
+          <div id="qrcode-${song.qr}"></div>
+          <button onclick="generateQRCode('${song.qr}')">Visa QR-kod</button>
+        `;
+        songList.appendChild(listItem);
+      });
+    }
 
-            filteredSongs.forEach(song => {
-                console.log("Genererar QR-kod för:", song.qr);
-                const listItem = document.createElement("li");
-                listItem.innerHTML = `
-                    ${song.title} - ${song.artist} (${song.year}) 
-                    <div id="qrcode-${song.qr}"></div>
-                    <button onclick="generateQRCode('${song.qr}')">Visa QR-kod</button>
-                `;
-                songList.appendChild(listItem);
-            });
-        }
-
-        window.generateQRCode = function(qr) {
-            const spotifyUrl = `https://open.spotify.com/track/${qr}`;
-            const qrElement = document.getElementById(`qrcode-${qr}`);
-            qrElement.innerHTML = ""; // Rensa tidigare QR-kod
-            new QRCode(qrElement, spotifyUrl);
-        };
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    // Genererar QR-kod med länk till Spotify
+    window.generateQRCode = function(qr) {
+      const spotifyUrl = `https://open.spotify.com/track/${qr}`;
+      const qrElement = document.getElementById(`qrcode-${qr}`);
+      qrElement.innerHTML = ""; // Rensa tidigare QR-kod
+      new QRCode(qrElement, spotifyUrl);
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-    <h1>Välj Källa & Generera QR-kod</h1>
+  <h1>Välj Källa & Generera QR-kod</h1>
 
-    <label for="source">Välj källa:</label>
-    <select id="source" multiple onchange="updateYearSelection()"></select>
+  <label for="source">Välj källa:</label>
+  <select id="source" multiple onchange="updateYearSelection(); filterSongs();"></select>
+  <br><br>
 
-    <label for="fromYear">Från år:</label>
-    <select id="fromYear" onchange="filterSongs()"></select>
+  <label for="fromYear">Från år:</label>
+  <select id="fromYear" onchange="filterSongs()"></select>
+  <br><br>
 
-    <label for="toYear">Till år:</label>
-    <select id="toYear" onchange="filterSongs()"></select>
+  <label for="toYear">Till år:</label>
+  <select id="toYear" onchange="filterSongs()"></select>
+  <br><br>
 
-    <ul id="song-list"></ul>
+  <ul id="song-list"></ul>
 </body>
 </html>
