@@ -24,22 +24,27 @@
       width: 100%;
       margin: 2rem 1rem;
     }
-    /* Ersätter rubriken med den centrerade loggan */
+    /* Ersätt textbaserad rubrik med en centrerad logga */
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
       max-width: 80%;
       height: auto;
     }
+    /* Standardlabel, men på filter-/startsidan ändrar vi färgen nedan */
     label {
       font-weight: bold;
       color: #555;
       margin-bottom: 0.3rem;
     }
+    /* På filter-/startsidan ska alla label vara vita */
+    #filter-page label {
+      color: #fff;
+    }
     input[type="checkbox"] {
       margin-right: 0.5rem;
     }
-    /* Både knappar och dropdown-listor är nu 25% breda med mörkgrå bakgrund och vit text */
+    /* Knappar och dropdownlistor: bredd 25%, mörkgrå bakgrund, vit text */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -57,7 +62,7 @@
       text-align: center;
       margin: 1.5rem 0;
     }
-    /* Se till att QRCode (canvas eller img) centrerats */
+    /* Se till att canvas eller img (skapad av QRCode-biblioteket) centrerats */
     #song-display canvas,
     #song-display img {
       display: block;
@@ -148,7 +153,7 @@
         selectedSources = [...new Set(songs.map(song => song.source))];
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
-
+      
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
@@ -161,7 +166,7 @@
           optionStart.selected = true;
         }
         startYearDropdown.appendChild(optionStart);
-
+        
         const optionEnd = document.createElement("option");
         optionEnd.value = year;
         optionEnd.textContent = year;
@@ -176,10 +181,12 @@
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
+      
       currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
       );
       shownSongs = [];
+      
       if (currentFilteredSongs.length > 0) {
         nextSong();
       } else {
@@ -208,8 +215,8 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtuppgifter.
-    // Årtalet visas i dubbelt så stor text ovanför titel och artist.
+    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter.
+    // Årtalet visas nu i 4em och titel/artist i 2em, båda i vit färg.
     // Div:en med QR-koden har en margin-bottom på 1rem.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
@@ -217,19 +224,19 @@
         <div id="qrcode-${song.qr}" style="margin-bottom: 1rem;"></div>
         <button onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-          <div class="year" style="font-size: 2em;">${song.year}</div>
-          <div class="info">${song.title} - ${song.artist}</div>
+          <div class="year" style="font-size: 4em; color: #fff;">${song.year}</div>
+          <div class="info" style="font-size: 2em; color: #fff;">${song.title} - ${song.artist}</div>
         </div>
       `;
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod med specificerad storlek (256x256 pixlar)
+    // Generera QR-kod med specificerad storlek (128x128 pixlar)
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
       qrElement.innerHTML = "";
-      new QRCode(qrElement, { text: spotifyUrl, width: 180, height: 180 });
+      new QRCode(qrElement, { text: spotifyUrl, width: 128, height: 128 });
     };
 
     // Avslöja låtuppgifterna ("Visa svar")
@@ -245,7 +252,7 @@
     };
 
     // Gå tillbaka till filter-/startsidan och återställ sessionen.
-    // Knappval blir nollställda.
+    // Nollställer även alla checkboxar.
     window.goToFilter = function() {
       const checkboxes = document.querySelectorAll('input[name="source"]');
       checkboxes.forEach(checkbox => {
@@ -276,16 +283,16 @@
       <label for="endYear">Till år:</label>
       <select id="endYear"></select>
       
-      <!-- Ändrad knapptext till "Starta spel", centrerad -->
+      <!-- Knappen byter namn till "Starta spel" och centreras -->
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
     
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
-      <!-- Knappen 'Nästa låt' centrerad med margin-bottom -->
-      <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 1rem;">Nästa låt</button>
-      <!-- Knappen 'Startsida' placeras på en egen rad, centrerad -->
+      <!-- "Nästa låt" knappen centreras med margin-bottom 5rem -->
+      <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
+      <!-- "Startsida" knappen placeras på en egen rad, centrerad -->
       <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
     </div>
   </div>
