@@ -24,8 +24,8 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade på källa
-    let currentFilteredSongs = [];  // Låtar filtrerade på både källa och år
+    let sourceFilteredSongs = [];   // Låtar filtrerade enligt vald spellista/källa (nu kan flera väljas)
+    let currentFilteredSongs = [];  // Låtar filtrerade på både källa och årtal
     let shownSongs = [];            // Låtar som redan visats under nuvarande filter
     let currentSong = null;
 
@@ -41,11 +41,13 @@
       }
     });
 
+    // Fyll dropdownen med spellistor (source)
     function populateSourceDropdown() {
       const sourceDropdown = document.getElementById("source");
       sourceDropdown.innerHTML = ""; // Rensa tidigare val
-      const sources = [...new Set(songs.map(song => song.source))]; // Unika källor
+      const sources = [...new Set(songs.map(song => song.source))];
 
+      // Lägg till alternativet "Alla källor" så att hela urvalet kan väljas
       const optionAll = document.createElement("option");
       optionAll.value = "alla";
       optionAll.textContent = "Alla källor";
@@ -59,22 +61,23 @@
       });
     }
 
-    // Uppdatera årtalsdropdown baserat på det valda källfiltret
+    // Uppdatera årtalsvalen baserat på de valda spellistorna (flera kan väljas)
     window.updateYearSelection = function() {
       const selectedSources = Array.from(document.getElementById("source").selectedOptions)
                                   .map(option => option.value);
-      // Filtrera låtar utifrån vald källa
+      // Filtrera låtar utifrån vald källa. Om "alla" finns med väljs alla låtar.
       sourceFilteredSongs = songs.filter(song =>
         selectedSources.includes("alla") || selectedSources.includes(song.source)
       );
       
+      // Om inga låtar finns, töm dropdownsen
       if (sourceFilteredSongs.length === 0) {
         document.getElementById("startYear").innerHTML = "";
         document.getElementById("endYear").innerHTML = "";
         return;
       }
       
-      // Hämta årtalen baserat på de filtrerade låtarna
+      // Hämta årtalen baserat på de filtrerade låtarna (från alla valda källor)
       const years = sourceFilteredSongs.map(song => parseInt(song.year)).sort((a, b) => a - b);
       const minYear = Math.min(...years);
       const maxYear = Math.max(...years);
@@ -98,7 +101,7 @@
       }
     };
 
-    // Filtrera låtar baserat på vald källa (i sourceFilteredSongs) och årtal
+    // Filtrera låtar baserat på de valda spellistorna (sourceFilteredSongs) och årtalsintervallet
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -132,14 +135,14 @@
       displaySong(currentSong);
     };
 
-    // Återställ filter-sessionen (tömmer den visade låtlistan)
+    // Återställ sessionen för visade låtar (utan omladdning)
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa en låt: generera QR-kod direkt, samt en knapp för att visa detaljer
+    // Visa en låt: generera QR-kod direkt, samt en knapp för att visa detaljer (svar)
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -153,7 +156,7 @@
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod för en specifik låt
+    // Generera QR-kod för låten
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -161,7 +164,7 @@
       new QRCode(qrElement, spotifyUrl);
     };
 
-    // Visa låtdetaljer (artist, titel, år)
+    // Visa låtens detaljer (artist, titel, år) när "Visa svar" klickas
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
@@ -171,7 +174,7 @@
 <body>
   <h1>Välj Källa & Generera QR-kod</h1>
 
-  <label for="source">Välj källa:</label>
+  <label for="source">Välj spellista/källa (flera kan väljas):</label>
   <select id="source" multiple onchange="updateYearSelection()"></select>
 
   <label for="startYear">Välj lägsta år:</label>
