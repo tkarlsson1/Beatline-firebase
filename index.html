@@ -29,10 +29,12 @@
       color: #333;
     }
     label {
-      display: block;
-      margin: 1rem 0 0.5rem;
       font-weight: bold;
       color: #555;
+      margin-bottom: 0.3rem;
+    }
+    input[type="checkbox"] {
+      margin-right: 0.5rem;
     }
     select, button {
       width: 100%;
@@ -55,6 +57,12 @@
       text-align: center;
       margin: 1.5rem 0;
     }
+    /* Se till att canvas eller bild, som skapas av QRCode-biblioteket, är centrerad */
+    #song-display canvas,
+    #song-display img {
+      display: block;
+      margin: 0 auto;
+    }
     /* Dölj resultatsidan från början */
     #result-page {
       display: none;
@@ -64,7 +72,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    // Firebase-konfiguration (kom ihåg att ersätta DIN_API_KEY med ditt API-nyckelvärde)
+    // Firebase-konfiguration (ersätt DIN_API_KEY med ditt faktiska värde)
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -80,9 +88,9 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar baserat på valda källor
+    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån de markerade källorna
     let currentFilteredSongs = [];  // Låtar filtrerade på både källa och årtal
-    let shownSongs = [];            // Låtar som redan har visats under nuvarande filter
+    let shownSongs = [];            // Låtar som redan visats i nuvarande filter-session
     let currentSong = null;
 
     // Hämta data från Firebase
@@ -91,45 +99,60 @@
         const rawSongs = snapshot.val();
         songs = Object.entries(rawSongs).map(([qr, data]) => ({ qr, ...data }));
         console.log("✅ Låtar uppdaterade från Firebase:", songs.length);
-        populateSourceDropdown();
+        populateSourceCheckboxes();
       } else {
         console.error("❌ Inga låtar hittades i Firebase.");
       }
     });
 
-    // Fyll dropdownen med spellistor/källor
-    function populateSourceDropdown() {
-      const sourceDropdown = document.getElementById("source");
-      sourceDropdown.innerHTML = "";
-      
-      // Lägg till alternativet "Alla källor" – markerat som standard
-      const optionAll = document.createElement("option");
-      optionAll.value = "alla";
-      optionAll.textContent = "Alla källor";
-      optionAll.selected = true;
-      sourceDropdown.appendChild(optionAll);
-      
-      // Lägg till övriga unika källor
+    // Fyll "källor"-området med kryssrutor
+    function populateSourceCheckboxes() {
+      const container = document.getElementById("source-checkbox-container");
+      container.innerHTML = ""; // Rensa tidigare innehåll
+
+      // Lägg till en checkbox för "Alla källor" – markerad som standard
+      const labelAll = document.createElement("label");
+      const checkboxAll = document.createElement("input");
+      checkboxAll.type = "checkbox";
+      checkboxAll.name = "source";
+      checkboxAll.value = "alla";
+      checkboxAll.checked = true;
+      // Uppdatera årtalsvalen när en checkbox ändras
+      checkboxAll.addEventListener("change", updateYearSelection);
+      labelAll.appendChild(checkboxAll);
+      labelAll.appendChild(document.createTextNode(" Alla källor"));
+      container.appendChild(labelAll);
+      container.appendChild(document.createElement("br"));
+
+      // Lägg till kryssrutor för varje unik källa
       const uniqueSources = [...new Set(songs.map(song => song.source))];
       uniqueSources.forEach(source => {
-        const option = document.createElement("option");
-        option.value = source;
-        option.textContent = source;
-        sourceDropdown.appendChild(option);
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "source";
+        checkbox.value = source;
+        // Förvald ej, men du kan ändra om du vill ha dem markerade
+        checkbox.checked = false;
+        checkbox.addEventListener("change", updateYearSelection);
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(" " + source));
+        container.appendChild(label);
+        container.appendChild(document.createElement("br"));
       });
     }
 
-    // Uppdatera årtalsdropdownen baserat på de valda källorna
+    // Uppdatera årtalsdropdown baserat på vilka källor som är markerade
     window.updateYearSelection = function() {
-      const sourceDropdown = document.getElementById("source");
-      let selectedSources = Array.from(sourceDropdown.selectedOptions)
-                                .map(option => option.value);
+      const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
+      let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
+      // Om "alla" är markerat så används alla unika källor
       if (selectedSources.includes("alla")) {
-        // Om "alla" är markerat, använd alla unika källor
         selectedSources = [...new Set(songs.map(song => song.source))];
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
       
+      // Uppdatera årtalsdropdownsen
       if (sourceFilteredSongs.length === 0) {
         document.getElementById("startYear").innerHTML = "";
         document.getElementById("endYear").innerHTML = "";
@@ -161,7 +184,7 @@
       }
     };
 
-    // Filtrera låtar baserat på valt årtal (vi använder sourceFilteredSongs här)
+    // Filtrera låtar utifrån markerade källor och valt årtal
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -179,7 +202,7 @@
       }
     };
 
-    // Visa en slumpad låt som ännu inte visats
+    // Välj en slumpad låt som inte redan visats
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -192,14 +215,14 @@
       displaySong(currentSong);
     };
 
-    // Återställ sessionen för visade låtar
+    // Återställ sessionen för visade låtar (utan omladdning)
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt – nu med QR-kod, en knapp "Visa svar" och en dolda låtdetaljer
+    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtdetaljer
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -212,7 +235,7 @@
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod direkt för låten
+    // Generera QR-kod för låten direkt
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -220,19 +243,19 @@
       new QRCode(qrElement, spotifyUrl);
     };
 
-    // Avslöjar låtens detaljer (artist, titel, år)
+    // Avslöja låtens detaljer när man trycker på "Visa svar"
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
 
-    // Funktion som applicerar filtret och växlar från filter-sidan till resultatsidan
+    // Applicera filtret och växla från filter-/startsidan till resultatsidan
     window.applyFilter = function() {
       filterSongs();
       document.getElementById("filter-page").style.display = "none";
       document.getElementById("result-page").style.display = "block";
     };
 
-    // Gå tillbaka till filter-sidan ("Startsida") på resultatsidan och återställ sessionen
+    // Gå tillbaka till filter-/startsidan och återställ sessionen
     window.goToFilter = function() {
       restart();
       document.getElementById("result-page").style.display = "none";
@@ -246,10 +269,10 @@
   <div class="container">
     <h1>Välj Källa & Generera QR-kod</h1>
     
-    <!-- Filter-/Start-sida -->
+    <!-- Filter-/Startsida -->
     <div id="filter-page">
-      <label for="source">Välj spellista/källa (flera kan väljas):</label>
-      <select id="source" multiple onchange="updateYearSelection()"></select>
+      <label>Välj spellista/källa (kryssa för de du vill ha):</label>
+      <div id="source-checkbox-container"></div>
       
       <label for="startYear">Välj lägsta år:</label>
       <select id="startYear"></select>
