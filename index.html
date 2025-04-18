@@ -77,13 +77,14 @@
                 listItem.innerHTML = `
                     ${song.title} - ${song.artist} (${song.year}) 
                     <div id="qrcode-${song.qr}"></div>
-                    <button onclick="generateQRCode('${song.qr}', '${song.spotifyUrl}')">Visa QR-kod</button>
+                    <button onclick="generateQRCode('${song.qr}', '${song.spotifyId}')">Visa QR-kod</button>
                 `;
                 songList.appendChild(listItem);
             });
         }
 
-        window.generateQRCode = function(qr, spotifyUrl) {
+        window.generateQRCode = function(qr, spotifyId) {
+            const spotifyUrl = `https://open.spotify.com/track/${spotifyId}`;
             const qrElement = document.getElementById(`qrcode-${qr}`);
             qrElement.innerHTML = ""; // Rensa tidigare QR-kod
             new QRCode(qrElement, spotifyUrl);
