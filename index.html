@@ -91,18 +91,19 @@
             songList.innerHTML = "";
 
             filteredSongs.forEach(song => {
+                console.log("Genererar QR-kod för:", song.qr); // Felsökning
                 const listItem = document.createElement("li");
                 listItem.innerHTML = `
                     ${song.title} - ${song.artist} (${song.year}) 
                     <div id="qrcode-${song.qr}"></div>
-                    <button onclick="generateQRCode('${song.qr}', '${song.spotifyId}')">Visa QR-kod</button>
+                    <button onclick="generateQRCode('${song.qr}')">Visa QR-kod</button>
                 `;
                 songList.appendChild(listItem);
             });
         }
 
-        window.generateQRCode = function(qr, spotifyId) {
-            const spotifyUrl = `https://open.spotify.com/track/${spotifyId}`;
+        window.generateQRCode = function(qr) {
+            const spotifyUrl = `https://open.spotify.com/track/${qr}`;
             const qrElement = document.getElementById(`qrcode-${qr}`);
             qrElement.innerHTML = ""; // Rensa tidigare QR-kod
             new QRCode(qrElement, spotifyUrl);
