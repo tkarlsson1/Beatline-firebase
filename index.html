@@ -42,15 +42,20 @@
             sourceDropdown.innerHTML = ""; // Rensa tidigare val
             const sources = [...new Set(songs.map(song => song.source))]; // Unika källor
 
+            const sourceCounts = sources.map(source => ({
+                source,
+                count: songs.filter(song => song.source === source).length
+            }));
+
             const optionAll = document.createElement("option");
             optionAll.value = "alla";
-            optionAll.textContent = "Alla källor";
+            optionAll.textContent = `Alla källor (${songs.length})`;
             sourceDropdown.appendChild(optionAll);
 
-            sources.forEach(source => {
+            sourceCounts.forEach(({ source, count }) => {
                 const option = document.createElement("option");
                 option.value = source;
-                option.textContent = source;
+                option.textContent = `${source} (${count})`;
                 sourceDropdown.appendChild(option);
             });
         }
