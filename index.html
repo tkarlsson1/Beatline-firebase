@@ -24,7 +24,7 @@
       width: 100%;
       margin: 2rem 1rem;
     }
-    /* Istället för en textbaserad rubrik använder vi en logga. */
+    /* Ersätter textbaserad rubrik med en centrerad logga */
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
@@ -39,28 +39,25 @@
     input[type="checkbox"] {
       margin-right: 0.5rem;
     }
+    /* Ändrad bredd och färg på knappar och dropdownlistor */
     select, button {
-      width: 100%;
+      width: 25%;
       padding: 0.5rem;
       font-size: 1rem;
       margin-bottom: 1rem;
-      border: 1px solid #ccc;
+      background: #333;
+      color: #fff;
+      border: 1px solid #333;
       border-radius: 4px;
     }
-    button {
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
     button:hover {
-      background: #0056b3;
+      background: #555;
     }
     #song-display {
       text-align: center;
       margin: 1.5rem 0;
     }
-    /* Se till att canvas eller img, som skapas av QRCode-biblioteket, centrerats */
+    /* Se till att canvas eller img (från QRCode libraryt) centrerats */
     #song-display canvas,
     #song-display img {
       display: block;
@@ -143,7 +140,7 @@
     }
 
     // Uppdatera årtalsdropdown baserat på de markerade kryssrutorna  
-    // Använder ett fast årsspann: från 1950 till 2025, med "Till år" = 2025 som standard
+    // Använder ett fast årsspann: 1950 till 2025, med "Till år" = 2025 som standard
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -151,7 +148,7 @@
         selectedSources = [...new Set(songs.map(song => song.source))];
       }
       sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
-
+      
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
@@ -164,7 +161,7 @@
           optionStart.selected = true;
         }
         startYearDropdown.appendChild(optionStart);
-
+        
         const optionEnd = document.createElement("option");
         optionEnd.value = year;
         optionEnd.textContent = year;
@@ -179,12 +176,12 @@
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
-
+      
       currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
       );
       shownSongs = [];
-
+      
       if (currentFilteredSongs.length > 0) {
         nextSong();
       } else {
