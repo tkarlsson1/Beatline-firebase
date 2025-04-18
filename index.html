@@ -17,7 +17,7 @@
       align-items: start;
       min-height: 100vh;
     }
-    /* Containern används enbart för centrering med lite padding */
+    /* Containern används nu enbart för centrering med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
@@ -226,7 +226,8 @@
     };
 
     // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter.
-    // Årtalet visas i 4em och titel/artist i 2em, båda i vit färg.
+    // Årtalet visas i 4em (oförändrat) och titel/artist nu i 1.4em (70% av tidigare 2em),
+    // båda i vit färg med svart glow (text-shadow: 0 0 8px #000).
     // Div:en med QR-koden har en margin-bottom på 1rem.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
@@ -234,14 +235,14 @@
         <div id="qrcode-${song.qr}" style="margin-bottom: 1rem;"></div>
         <button onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-          <div class="year" style="font-size: 4em; color: #fff;">${song.year}</div>
-          <div class="info" style="font-size: 2em; color: #fff;">${song.title} - ${song.artist}</div>
+          <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
+          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
         </div>
       `;
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod med specificerad storlek (128x128 pixlar)
+    // Generera QR-kod med specificerad storlek (160x160 pixlar)
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -254,12 +255,11 @@
       document.getElementById("song-details").style.display = "block";
     };
 
-    // Gå tillbaka till filter-/startsidan, återställ sessionen och nollställ checkboxar
+    // Gå tillbaka till filter-/startsidan och återställ sessionen.
+    // Nollställer även alla checkboxar.
     window.goToFilter = function() {
       const checkboxes = document.querySelectorAll('input[name="source"]');
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = false;
-      });
+      checkboxes.forEach(checkbox => { checkbox.checked = false; });
       updateYearSelection();
       restart();
       document.getElementById("result-page").style.display = "none";
@@ -291,9 +291,9 @@
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
-      <!-- "Nästa låt" knappen – centrerad med margin-bottom 5rem -->
+      <!-- "Nästa låt" knappen centreras med margin-bottom 5rem -->
       <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
-      <!-- "Startsida" knappen – placeras på en egen rad, centrerad -->
+      <!-- "Startsida" knappen placeras på en egen rad, centrerad -->
       <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
     </div>
   </div>
