@@ -26,6 +26,7 @@
         let songs = [];
         let filteredSongs = [];
         let shownSongs = [];
+        let currentSong = null;
 
         // Hämta data från Firebase
         onValue(songsRef, (snapshot) => {
@@ -107,23 +108,27 @@
             }
 
             const randomIndex = Math.floor(Math.random() * remainingSongs.length);
-            const selectedSong = remainingSongs[randomIndex];
-            shownSongs.push(selectedSong);
+            currentSong = remainingSongs[randomIndex];
+            shownSongs.push(currentSong);
 
-            displaySong(selectedSong);
+            displaySong(currentSong);
         };
 
         window.restart = function() {
             shownSongs = [];
+            currentSong = null;
             document.getElementById("song-display").innerHTML = "";
         };
 
         function displaySong(song) {
             const songDisplay = document.getElementById("song-display");
             songDisplay.innerHTML = `
-                ${song.title} - ${song.artist} (${song.year}) 
                 <div id="qrcode-${song.qr}"></div>
-                <button onclick="generateQRCode('${song.qr}')">Visa QR-kod</button>
+                <button onclick="generateQRCode('${song.qr}')">Generera QR-kod</button>
+                <button onclick="revealDetails()">Visa svar</button>
+                <div id="song-details" style="display: none;">
+                    ${song.title} - ${song.artist} (${song.year})
+                </div>
             `;
         }
 
@@ -132,6 +137,10 @@
             const qrElement = document.getElementById(`qrcode-${qr}`);
             qrElement.innerHTML = "";
             new QRCode(qrElement, spotifyUrl);
+        };
+
+        window.revealDetails = function() {
+            document.getElementById("song-details").style.display = "block";
         };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
