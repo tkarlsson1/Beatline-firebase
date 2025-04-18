@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      /* Sätter en bakgrundsbild – se till att background.jpg finns i samma mapp */
+      /* Bakgrundsbild – se till att background.jpg finns i samma mapp */
       background: url('background.jpg') no-repeat center center fixed;
       background-size: cover;
       margin: 0;
@@ -17,14 +17,14 @@
       align-items: start;
       min-height: 100vh;
     }
-    /* Container används nu enbart för att centrera innehållet med lite padding */
+    /* Containern används enbart för centrering med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
       width: 100%;
       margin: 2rem 1rem;
     }
-    /* Ersätter textbaserad rubrik med en centrerad logga */
+    /* Ersätt rubrik med en centrerad logga */
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
@@ -39,7 +39,7 @@
     input[type="checkbox"] {
       margin-right: 0.5rem;
     }
-    /* Ändrad bredd och färg på knappar och dropdownlistor */
+    /* Ändrad bredd och färg på både knappar och dropdownlistor */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -57,7 +57,7 @@
       text-align: center;
       margin: 1.5rem 0;
     }
-    /* Se till att canvas eller img (från QRCode libraryt) centrerats */
+    /* Se till att canvas eller img (skapat av QRCode-biblioteket) centrerats */
     #song-display canvas,
     #song-display img {
       display: block;
@@ -140,7 +140,7 @@
     }
 
     // Uppdatera årtalsdropdown baserat på de markerade kryssrutorna  
-    // Använder ett fast årsspann: 1950 till 2025, med "Till år" = 2025 som standard
+    // Fast årsspann: 1950 till 2025, med standardvärdet för "Till år" satt till 2025
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -203,7 +203,7 @@
       displaySong(currentSong);
     };
 
-    // Återställ sessionen för visade låtar (utan omladdning)
+    // Återställ sessionen för visade låtar
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
@@ -211,7 +211,7 @@
     };
 
     // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp och dolda låtuppgifter.
-    // Årtalet visas i dubbelt så stor text på en egen rad ovanför titel och artist.
+    // Årtalet visas i dubbelt så stor text ovanför titel och artist.
     // Div:en med QR-koden har en margin-bottom på 1rem.
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
@@ -226,15 +226,15 @@
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod för låten direkt
+    // Generera QR-kod med specificerad storlek (256x256 pixlar)
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
       qrElement.innerHTML = "";
-      new QRCode(qrElement, spotifyUrl);
+      new QRCode(qrElement, { text: spotifyUrl, width: 256, height: 256 });
     };
 
-    // Avslöja låtuppgifterna ("Visa svar")
+    // Avslöja låtuppgifterna (Visa svar)
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
@@ -247,7 +247,7 @@
     };
 
     // Gå tillbaka till filter-/startsidan och återställ sessionen.
-    // Nollställer även kryssrutorna (inga ska vara markerade).
+    // Nollställer även alla kryssrutorna.
     window.goToFilter = function() {
       const checkboxes = document.querySelectorAll('input[name="source"]');
       checkboxes.forEach(checkbox => {
@@ -264,7 +264,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- Ersätt rubriken med en logga -->
+    <!-- Logga (ersätter rubriktitel) -->
     <img src="logga.png" alt="Notestream-beta logo" class="logo">
     
     <!-- Filter-/Startsida -->
@@ -278,7 +278,8 @@
       <label for="endYear">Till år:</label>
       <select id="endYear"></select>
       
-      <button onclick="applyFilter()">Filtrera låtar</button>
+      <!-- Knappen byter namn till "Starta spel" och centreras med inline-stil -->
+      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
     
     <!-- Resultatsida -->
