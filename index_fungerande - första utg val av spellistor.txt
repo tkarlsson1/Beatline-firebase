@@ -17,21 +17,34 @@
       align-items: start;
       min-height: 100vh;
     }
-    /* Containern används för att centrera innehållet med lite padding */
+    /* Containern används nu enbart för centrering med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
       width: 100%;
       margin: 2rem 1rem;
     }
-    /* Logga – ersätter titeln */
+    /* Ersätt textbaserad rubrik med en centrerad logga */
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
       max-width: 80%;
       height: auto;
     }
-    /* Styling för övriga element (knappar, dropdowns m.m.) */
+    /* Standard label-styling */
+    label {
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 0.3rem;
+    }
+    /* På filter-/startsidan ska alla etiketter vara vita */
+    #filter-page label {
+      color: #fff;
+    }
+    input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
+    /* Knappar och dropdownlistor: 25% breda, mörkgrå bakgrund med vit text */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -49,12 +62,14 @@
       text-align: center;
       margin: 1.5rem 0;
     }
+    /* Se till att canvas eller img (skapad av QRCode-biblioteket) centrerats */
     #song-display canvas,
     #song-display img {
       display: block;
       margin: 0 auto;
     }
-    /* QR-kodens container med fast storlek, 5px svart ram, 10px rundade hörn och centrerad */
+    /* Uppdaterad klass för QR-kodens container:
+       Fast bredd/höjd, 5px svart ram, 10px border-radius, blockelement och centrerat */
     .qrcode {
       width: 160px;
       height: 160px;
@@ -66,37 +81,6 @@
     /* Dölj resultatsidan från början */
     #result-page {
       display: none;
-    }
-    
-    /* --- STYLING FÖR SPELLISTSVAL --- */
-    /* Flex-container för alla spellistsval (checkboxar) */
-    #source-checkbox-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    /* Varje "pill" */
-    .checkbox-pill {
-      position: relative;
-    }
-    .checkbox-pill input[type="checkbox"] {
-      display: none; /* Dölj standard-ckeckboxen */
-    }
-    .checkbox-pill label {
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      border: 2px solid #fff;
-      border-radius: 20px;
-      transition: background 0.3s, color 0.3s;
-      color: #fff;
-      font-size: 1rem;
-      user-select: none;
-    }
-    .checkbox-pill input[type="checkbox"]:checked + label {
-      background-color: #fff;
-      color: #333;
     }
   </style>
   <script type="module">
@@ -119,9 +103,9 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån markerade spellistor
+    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån valda källor (checkboxar)
     let currentFilteredSongs = [];    // Låtar filtrerade på både källa och årtal
-    let shownSongs = [];              // Låtar som redan har visats
+    let shownSongs = [];              // Låtar som redan har visats under sessionen
     let currentSong = null;
 
     // Hämta data från Firebase
@@ -136,51 +120,42 @@
       }
     });
 
-    /* Generera checkboxarna med en "pill"-stil */
+    // Generera checkboxarna för spellistor – inga alternativ är förvalt
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
-      container.innerHTML = "";
-      
-      // "Alla källor" som en pill
-      const allDiv = document.createElement("div");
-      allDiv.classList.add("checkbox-pill");
+      container.innerHTML = ""; // Rensa tidigare innehåll
+
+      // Lägg till en checkbox för "Alla källor" – ej markerad från början
+      const labelAll = document.createElement("label");
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
       checkboxAll.value = "alla";
-      checkboxAll.id = "source-alla";
       checkboxAll.addEventListener("change", updateYearSelection);
-      const labelAll = document.createElement("label");
-      labelAll.setAttribute("for", "source-alla");
-      labelAll.textContent = "Alla källor";
-      allDiv.appendChild(checkboxAll);
-      allDiv.appendChild(labelAll);
-      container.appendChild(allDiv);
-      
-      // Övriga spellistor
+      labelAll.appendChild(checkboxAll);
+      labelAll.appendChild(document.createTextNode(" Alla källor"));
+      container.appendChild(labelAll);
+      container.appendChild(document.createElement("br"));
+
+      // Hämta unika källor och sortera dem alfabetiskt
       let uniqueSources = [...new Set(songs.map(song => song.source))];
       uniqueSources.sort();
       uniqueSources.forEach(source => {
-        const div = document.createElement("div");
-        div.classList.add("checkbox-pill");
+        const label = document.createElement("label");
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.name = "source";
         checkbox.value = source;
-        // Skapa ett unikt id, exempelvis baserat på källans namn
-        let id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
-        checkbox.id = id;
         checkbox.addEventListener("change", updateYearSelection);
-        const label = document.createElement("label");
-        label.setAttribute("for", id);
-        label.textContent = source;
-        div.appendChild(checkbox);
-        div.appendChild(label);
-        container.appendChild(div);
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(" " + source));
+        container.appendChild(label);
+        container.appendChild(document.createElement("br"));
       });
     }
 
-    // Uppdatera årtalsdropdown baserat på markerade checkboxar
+    // Uppdatera årtalsdropdown baserat på markerade checkboxar.
+    // Fast årsspann: 1950 till 2025; "Till år" standard är 2025.
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -213,7 +188,7 @@
       }
     };
 
-    // Filtrera låtar utifrån markerade spellistor och valt årtal
+    // Filtrera låtar utifrån markerade källor och valt årtal
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -233,6 +208,7 @@
       }
     };
 
+    // Applicera filtret och växla endast till resultatsidan om låtar hittas
     window.applyFilter = function() {
       if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
@@ -240,7 +216,7 @@
       }
     };
 
-    // Välj en slumpad låt (som inte visas ännu)
+    // Välj en slumpad låt (som inte redan visas)
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -253,13 +229,16 @@
       displaySong(currentSong);
     };
 
+    // Återställ sessionen för visade låtar utan omladdning
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med QR-kod, "Visa svar"-knapp och dolda låtuppgifter
+    // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter.
+    // Årtalet visas i 4em och titel/artist i 1.4em, båda i vit färg med svart glow.
+    // Div:en för QR-koden använder klassen "qrcode".
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -271,8 +250,9 @@
         </div>
       `;
       generateQRCode(song.qr);
-    };
+    }
 
+    // Generera QR-kod med specificerad storlek (160x160 pixlar)
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -280,10 +260,13 @@
       new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
     };
 
+    // Avslöja låtuppgifterna ("Visa svar")
     window.revealDetails = function() {
       document.getElementById("song-details").style.display = "block";
     };
 
+    // Gå tillbaka till filter-/startsidan och återställ sessionen.
+    // Nollställer även alla checkboxar.
     window.goToFilter = function() {
       const checkboxes = document.querySelectorAll('input[name="source"]');
       checkboxes.forEach(checkbox => { checkbox.checked = false; });
@@ -297,19 +280,30 @@
 </head>
 <body>
   <div class="container">
+    <!-- Ersätt rubriken med en logga -->
     <img src="logga.png" alt="Notestream-beta logo" class="logo">
+    
+    <!-- Filter-/Startsida -->
     <div id="filter-page">
       <label>Välj spellista/källa (kryssa för de du vill ha):</label>
       <div id="source-checkbox-container"></div>
+      
       <label for="startYear">Från år:</label>
       <select id="startYear"></select>
+      
       <label for="endYear">Till år:</label>
       <select id="endYear"></select>
+      
+      <!-- Knappen byter namn till "Starta spel" och centreras -->
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
+    
+    <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
+      <!-- "Nästa låt" knappen, centrerad med 5rem margin-bottom -->
       <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
+      <!-- "Startsida" knappen, placerad på en egen rad, centrerad -->
       <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
     </div>
   </div>
