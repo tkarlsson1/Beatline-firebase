@@ -54,7 +54,7 @@
       display: block;
       margin: 0 auto;
     }
-    /* QR-kodens container med 160px-fas, 5px svart ram, 10px rundade hörn, centrerad */
+    /* QR-kodens container med fast storlek, 5px svart ram, 10px rundade hörn, centrerad */
     .qrcode {
       width: 160px;
       height: 160px;
@@ -69,15 +69,15 @@
     }
     
     /* --- STYLING FÖR SPELLISTSVAL --- */
-    /* Flex-container med ökat gap (1rem) så att "pills" inte ligger tätt ihop */
+    /* Flex-container för checkboxarna med ökat gap */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
+      gap: 2rem;
       margin-bottom: 1rem;
     }
-    /* Varje "pill" som innehåller en checkbox och en label */
+    /* Varje checkbox-pill */
     .checkbox-pill {
       position: relative;
     }
@@ -88,7 +88,7 @@
       cursor: pointer;
       padding: 0.5rem 1rem;
       border: 2px solid #fff;
-      border-radius: 20px;
+      border-radius: 8px; /* Rundade hörn, rektangulär variant */
       transition: background 0.3s, color 0.3s;
       color: #fff;
       font-size: 1rem;
@@ -124,7 +124,7 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade baserat på markerade spellistor
+    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån markerade spellistor
     let currentFilteredSongs = [];    // Låtar filtrerade på både källa och årtal
     let shownSongs = [];              // Låtar som redan har visats
     let currentSong = null;
@@ -141,7 +141,7 @@
       }
     });
 
-    /* Generera checkboxar med pill-stil */
+    /* Generera checkboxarna med pill-stil */
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
@@ -259,7 +259,7 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    /* Visa vald låt med QR-kod, en "Visa svar"-knapp och dolda låtuppgifter */
+    /* Visa vald låt med QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter */
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
