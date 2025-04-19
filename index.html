@@ -44,7 +44,7 @@
     input[type="checkbox"] {
       margin-right: 0.5rem;
     }
-    /* Knappar och dropdownlistor: 25% breda, mörkgrå bakgrund med vit text */
+    /* Knappar och dropdownlistor: 25% breda, mörkgrå bakgrund, vit text */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -67,6 +67,11 @@
     #song-display img {
       display: block;
       margin: 0 auto;
+    }
+    /* Lägger till en klass för QR-kodens container med en tunn svart ram */
+    .qrcode {
+      margin-bottom: 1rem;
+      border: 1px solid black;
     }
     /* Dölj resultatsidan från början */
     #result-page {
@@ -226,13 +231,12 @@
     };
 
     // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter.
-    // Årtalet visas i 4em (oförändrat) och titel/artist nu i 1.4em (70% av tidigare 2em),
-    // båda i vit färg med svart glow (text-shadow: 0 0 8px #000).
-    // Div:en med QR-koden har en margin-bottom på 1rem.
+    // Årtalet visas i 4em och titel/artist i 1.4em, båda i vit färg med svart glow (text-shadow).
+    // Div:en med QR-koden använder klassen "qrcode" (som ger en margin-bottom och en svart ram).
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
-        <div id="qrcode-${song.qr}" style="margin-bottom: 1rem;"></div>
+        <div id="qrcode-${song.qr}" class="qrcode"></div>
         <button onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
           <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
