@@ -68,8 +68,7 @@
       display: none;
     }
     
-    /* --- STYLING FÖR SPELLISTSVAL --- */
-    /* Flex-container för checkboxarna med ökat gap */
+    /* --- STYLING FÖR SPELLISTSVAL (checkbox-pills) --- */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -77,29 +76,29 @@
       gap: 2rem;
       margin-bottom: 1rem;
     }
-    /* Varje checkbox-pill */
     .checkbox-pill {
       position: relative;
     }
     .checkbox-pill input[type="checkbox"] {
-      display: none; /* Dölj standard-checkboxen */
+      display: none;
     }
     .checkbox-pill label {
       cursor: pointer;
       padding: 0.5rem 1rem;
       border: 2px solid #fff;
-      border-radius: 8px; /* Rundade hörn, rektangulär variant */
-      transition: background 0.3s, color 0.3s;
+      border-radius: 8px;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
       color: #fff;
       font-size: 1rem;
       user-select: none;
     }
     .checkbox-pill input[type="checkbox"]:checked + label {
-      background-color: #fff;
-      color: #333;
+      background-color: #337ab7;
+      color: #fff;
+      border-color: #337ab7;
     }
     
-    /* Ändra etikettfärgen på filter-/startsidan */
+    /* Säkerställ att eventuella andra etiketter på filter-/startsidan är vita */
     #filter-page label {
       color: #fff;
     }
@@ -302,7 +301,7 @@
     
     <!-- Filter-/Startsida -->
     <div id="filter-page">
-      <label>Välj spellista/källa (kryssa för de du vill ha):</label>
+      <!-- Den översta texten är nu borttagen -->
       <div id="source-checkbox-container"></div>
       
       <label for="startYear">Från år:</label>
