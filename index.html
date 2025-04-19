@@ -17,7 +17,7 @@
       align-items: start;
       min-height: 100vh;
     }
-    /* Containern används nu enbart för centrering med lite padding */
+    /* Containern används enbart för centrering med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
@@ -44,7 +44,7 @@
     input[type="checkbox"] {
       margin-right: 0.5rem;
     }
-    /* Knappar och dropdownlistor: 25% breda, mörkgrå bakgrund, vit text */
+    /* Knappar och dropdownlistor: 25% breda, mörkgrå bakgrund med vit text */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -68,10 +68,13 @@
       display: block;
       margin: 0 auto;
     }
-    /* Lägger till en klass för QR-kodens container med en tunn svart ram */
+    /* Uppdaterad klass för QR-koden: fast bredd/hojd, inline-block så att ramen omsluter QR-koden */
     .qrcode {
       margin-bottom: 1rem;
       border: 1px solid black;
+      width: 160px;
+      height: 160px;
+      display: inline-block;
     }
     /* Dölj resultatsidan från början */
     #result-page {
@@ -115,7 +118,7 @@
       }
     });
 
-    // Generera kryssrutorna för källor (spellistor) – inga alternativ är förvalt
+    // Generera kryssrutorna för källor (spellistor) – inga alternativ är förvald
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = ""; // Rensa tidigare innehåll
@@ -232,7 +235,7 @@
 
     // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter.
     // Årtalet visas i 4em och titel/artist i 1.4em, båda i vit färg med svart glow (text-shadow).
-    // Div:en med QR-koden använder klassen "qrcode" (som ger en margin-bottom och en svart ram).
+    // Div:en för QR-koden använder klassen "qrcode".
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
