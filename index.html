@@ -17,7 +17,7 @@
       align-items: start;
       min-height: 100vh;
     }
-    /* Containern används enbart för centrering med lite padding */
+    /* Containern används nu enbart för centrering med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
@@ -68,13 +68,14 @@
       display: block;
       margin: 0 auto;
     }
-    /* Uppdaterad klass för QR-koden: fast bredd/hojd, inline-block så att ramen omsluter QR-koden */
+    /* Uppdaterad klass för QR-kodens container:
+       Fast bredd/höjd på 160px, 5px svart ram, blockelement och centrerat med margin: 0 auto */
     .qrcode {
-      margin-bottom: 1rem;
-      border: 1px solid black;
       width: 160px;
       height: 160px;
-      display: inline-block;
+      border: 5px solid black;
+      display: block;
+      margin: 0 auto 1rem auto;
     }
     /* Dölj resultatsidan från början */
     #result-page {
@@ -118,7 +119,7 @@
       }
     });
 
-    // Generera kryssrutorna för källor (spellistor) – inga alternativ är förvald
+    // Generera kryssrutorna för källor (spellistor) – inga alternativ är förvalt
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = ""; // Rensa tidigare innehåll
@@ -240,7 +241,7 @@
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
         <div id="qrcode-${song.qr}" class="qrcode"></div>
-        <button onclick="revealDetails()">Visa svar</button>
+        <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
           <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
           <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
