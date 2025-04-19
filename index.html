@@ -69,11 +69,12 @@
       margin: 0 auto;
     }
     /* Uppdaterad klass för QR-kodens container:
-       Fast bredd/höjd på 160px, 5px svart ram, blockelement och centrerat med margin: 0 auto */
+       Fast bredd/höjd, 5px svart ram, 10px border-radius, blockelement och centrerat */
     .qrcode {
       width: 160px;
       height: 160px;
       border: 5px solid black;
+      border-radius: 10px;
       display: block;
       margin: 0 auto 1rem auto;
     }
@@ -102,7 +103,7 @@
     const songsRef = ref(db, 'songs');
 
     let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån valda källor (kryssrutor)
+    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån valda källor (checkboxar)
     let currentFilteredSongs = [];    // Låtar filtrerade på både källa och årtal
     let shownSongs = [];              // Låtar som redan har visats under sessionen
     let currentSong = null;
@@ -119,7 +120,7 @@
       }
     });
 
-    // Generera kryssrutorna för källor (spellistor) – inga alternativ är förvalt
+    // Generera checkboxarna för spellistor – inga alternativ är förvalt
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = ""; // Rensa tidigare innehåll
@@ -153,8 +154,8 @@
       });
     }
 
-    // Uppdatera årtalsdropdown baserat på markerade kryssrutor  
-    // Fast årsspann: 1950 till 2025, med standardvärdet "Till år" satt till 2025
+    // Uppdatera årtalsdropdown baserat på markerade checkboxar.
+    // Fast årsspann: 1950 till 2025; "Till år" standard är 2025.
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -167,6 +168,7 @@
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
       endYearDropdown.innerHTML = "";
+      
       for (let year = 1950; year <= 2025; year++) {
         const optionStart = document.createElement("option");
         optionStart.value = year;
@@ -214,7 +216,7 @@
       }
     };
 
-    // Välj en slumpad låt (som inte redan har visats)
+    // Välj en slumpad låt (som inte redan visas)
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -227,7 +229,7 @@
       displaySong(currentSong);
     };
 
-    // Återställ sessionen för visade låtar (utan omladdning)
+    // Återställ sessionen för visade låtar utan omladdning
     window.restart = function() {
       shownSongs = [];
       currentSong = null;
@@ -235,7 +237,7 @@
     };
 
     // Visa vald låt med genererad QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter.
-    // Årtalet visas i 4em och titel/artist i 1.4em, båda i vit färg med svart glow (text-shadow).
+    // Årtalet visas i 4em och titel/artist i 1.4em, båda i vit färg med svart glow.
     // Div:en för QR-koden använder klassen "qrcode".
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
@@ -299,9 +301,9 @@
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
-      <!-- "Nästa låt" knappen centreras med margin-bottom 5rem -->
+      <!-- "Nästa låt" knappen, centrerad med 5rem margin-bottom -->
       <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
-      <!-- "Startsida" knappen placeras på en egen rad, centrerad -->
+      <!-- "Startsida" knappen, placerad på en egen rad, centrerad -->
       <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
     </div>
   </div>
