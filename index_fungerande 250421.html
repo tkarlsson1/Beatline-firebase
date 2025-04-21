@@ -7,6 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      /* Bakgrundsbild – se till att background.jpg finns i samma mapp */
       background: url('background.jpg') no-repeat center center fixed;
       background-size: cover;
       margin: 0;
@@ -16,18 +17,21 @@
       align-items: start;
       min-height: 100vh;
     }
+    /* Containern används för att centrera innehållet med lite padding */
     .container {
       padding: 2rem;
       max-width: 500px;
       width: 100%;
       margin: 2rem 1rem;
     }
+    /* Logga – ersätter textbaserad rubrik */
     .logo {
       display: block;
       margin: 0 auto 1.5rem auto;
       max-width: 80%;
       height: auto;
     }
+    /* Övrig standard styling för select och knappar */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -50,6 +54,7 @@
       display: block;
       margin: 0 auto;
     }
+    /* QR-kodens container med fast storlek, 5px svart ram, 10px rundade hörn, centrerad */
     .qrcode {
       width: 160px;
       height: 160px;
@@ -58,10 +63,12 @@
       display: block;
       margin: 0 auto 1rem auto;
     }
+    /* Dölj resultatsidan från början */
     #result-page {
       display: none;
     }
-    /* Styling för spellistsval (checkbox-pills) */
+    
+    /* --- STYLING FÖR SPELLISTSVAL (checkbox-pills) --- */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -90,35 +97,17 @@
       color: #fff;
       border-color: #337ab7;
     }
+    
+    /* Säkerställ att eventuella andra etiketter på filter-/startsidan är vita */
     #filter-page label {
       color: #fff;
     }
-    /* Ny sektion för Spotify-spellisteimport */
-    #spotify-import {
-      margin-bottom: 2rem;
-      text-align: center;
-      background: rgba(255,255,255,0.8);
-      padding: 1rem;
-      border-radius: 8px;
-    }
-    #spotify-import input {
-      width: 80%;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    #spotify-import button {
-      width: 40%;
-      padding: 0.5rem;
-    }
   </style>
-  <!-- Inkludera QRCodeJS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module">
-    // Importera Firebase-moduler
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    // Firebase-konfiguration (ersätt med dina uppgifter)
+    // Firebase-konfiguration (ersätt DIN_API_KEY med ditt faktiska värde)
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -131,15 +120,15 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-
-    // Hämta låtar från noden 'songs'
     const songsRef = ref(db, 'songs');
+
     let songs = [];
     let sourceFilteredSongs = [];   // Låtar filtrerade utifrån markerade spellistor
     let currentFilteredSongs = [];    // Låtar filtrerade på både källa och årtal
     let shownSongs = [];              // Låtar som redan har visats
     let currentSong = null;
 
+    // Hämta data från Firebase
     onValue(songsRef, (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
@@ -151,12 +140,12 @@
       }
     });
 
-    /* Generera checkboxar med pill-stil */
+    /* Generera checkboxarna med pill-stil */
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla källor"-alternativet
+      // Skapa ett "pill" för "Alla källor"
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       const checkboxAll = document.createElement("input");
@@ -172,13 +161,8 @@
       allDiv.appendChild(labelAll);
       container.appendChild(allDiv);
       
-      // Hämta unika källor från låtarna
-      let uniqueSources = songs.map(song => song.source);
-      if (Array.isArray(uniqueSources[0])) { 
-        // Om source är en array på vissa låtar, flattena listan
-        uniqueSources = uniqueSources.flat();
-      }
-      uniqueSources = [...new Set(uniqueSources)];
+      // Skapa pills för övriga spellistor
+      let uniqueSources = [...new Set(songs.map(song => song.source))];
       uniqueSources.sort();
       uniqueSources.forEach(source => {
         const div = document.createElement("div");
@@ -199,20 +183,14 @@
       });
     }
 
-    /* Uppdatera årtals-dropdown baserat på markerade spellistor */
+    /* Uppdatera årtalsdropdown baserat på markerade spellistor */
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
       if (selectedSources.includes("alla")) {
-        const allSources = songs.map(song => Array.isArray(song.source) ? song.source : [song.source]).flat();
-        selectedSources = [...new Set(allSources)];
+        selectedSources = [...new Set(songs.map(song => song.source))];
       }
-      sourceFilteredSongs = songs.filter(song => {
-        if (Array.isArray(song.source)) {
-          return song.source.some(src => selectedSources.includes(src));
-        }
-        return selectedSources.includes(song.source);
-      });
+      sourceFilteredSongs = songs.filter(song => selectedSources.includes(song.source));
       
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
@@ -234,7 +212,7 @@
       }
     };
 
-    /* Filtrera låtar baserat på källor och valt årtal */
+    /* Filtrera låtar utifrån markerade spellistor och valt årtal */
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -261,7 +239,7 @@
       }
     };
 
-    /* Välj en slumpad låt som inte redan visas */
+    /* Välj en slumpad låt (som inte visas ännu) */
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -280,7 +258,7 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    /* Visa vald låt med QR-kod och en 'Visa svar'-knapp */
+    /* Visa vald låt med QR-kod, en "Visa svar"-knapp samt dolda låtuppgifter */
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -294,7 +272,7 @@
       generateQRCode(song.qr);
     };
 
-    /* Generera QR-kod (160x160) som länkar till låtens Spotify-sida */
+    /* Generera QR-kod med storlek 160x160 pixlar */
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -314,84 +292,16 @@
       document.getElementById("result-page").style.display = "none";
       document.getElementById("filter-page").style.display = "block";
     };
-
-    // --- Spotify-spellisteimport -----------------
-
-    // Dessa värden ska ersättas med dina riktiga Spotify-uppgifter (observera säkerheten i en produktionsmiljö)
-    const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
-    const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
-
-    // Hämta en access token från Spotify
-    async function getSpotifyToken() {
-      const response = await fetch("https://accounts.spotify.com/api/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Authorization": "Basic " + btoa(spotifyClientId + ":" + spotifyClientSecret)
-        },
-        body: "grant_type=client_credentials"
-      });
-      const data = await response.json();
-      return data.access_token;
-    }
-
-    // Hämta spellistans låtar från Spotify med filter: title, artist och år (utdraget av release_date)
-    async function fetchSpotifyPlaylist(playlistUrl) {
-      const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
-      const token = await getSpotifyToken();
-      const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      const data = await response.json();
-      return data.items.map(item => ({
-        title: item.track.name,
-        artist: item.track.artists.map(artist => artist.name).join(", "),
-        year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
-      }));
-    }
-
-    // Lägger till en spellista (importerad från Spotify) i Firebase under noden "userPlaylists"
-    async function addPlaylistToFirebase(playlistName, playlistUrl) {
-      try {
-        const tracks = await fetchSpotifyPlaylist(playlistUrl);
-        const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
-        await set(userPlaylistsRef, { songs: tracks });
-        alert(`Spellistan "${playlistName}" har lagts till!`);
-        // Om du vill kan du uppdatera gränssnittet här, eller slå samman låtarna med standardbiblioteket
-      } catch (error) {
-        console.error("Fel vid hämtning av Spotify-spellista:", error);
-        alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
-      }
-    }
-
-    // Eventlistener för knappen för Spotify-import
-    document.getElementById("addPlaylistButton").addEventListener("click", () => {
-      const playlistName = document.getElementById("playlistNameInput").value.trim();
-      const playlistLink = document.getElementById("playlistLinkInput").value.trim();
-      if (playlistName && playlistLink) {
-        addPlaylistToFirebase(playlistName, playlistLink);
-      } else {
-        alert("Fyll i både spellistans namn och länk!");
-      }
-    });
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
   <div class="container">
     <img src="logga.png" alt="Notestream-beta logo" class="logo">
     
-    <!-- Spotify-spellisteimportsektionen -->
-    <div id="spotify-import">
-      <h3>Lägg till Spotify-spellista</h3>
-      <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-      <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-      <button id="addPlaylistButton">Lägg till spellista</button>
-    </div>
-    
     <!-- Filter-/Startsida -->
     <div id="filter-page">
+      <!-- Den översta texten är nu borttagen -->
       <div id="source-checkbox-container"></div>
       
       <label for="startYear">Från år:</label>
