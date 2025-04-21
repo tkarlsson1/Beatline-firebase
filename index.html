@@ -118,7 +118,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    // Firebase-konfiguration (ersätt med dina uppgifter)
+    // Firebase-konfiguration (ersätt med dina värden)
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -129,29 +129,58 @@
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
 
+    // Initiera Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Hämta låtar från noden 'songs'
-    const songsRef = ref(db, 'songs');
-    let songs = [];
-    let sourceFilteredSongs = [];   // Låtar filtrerade utifrån markerade spellistor
-    let currentFilteredSongs = [];    // Låtar filtrerade på både källa och årtal
-    let shownSongs = [];              // Låtar som redan har visats
+    // Globala variabler: standardbibliotek och importerade spellistor
+    let standardSongs = [];
+    let userPlaylistSongs = [];
+    let songs = [];   // Sammankopplad lista (standard + userPlaylists)
+    let sourceFilteredSongs = [];   // Låtar filtrerade på källor
+    let currentFilteredSongs = [];    // Låtar filtrerade på både källa & år
+    let shownSongs = [];              // Låtar som redan visats
     let currentSong = null;
 
-    onValue(songsRef, (snapshot) => {
+    // Lyssna på "songs" noden (standardbiblioteket)
+    onValue(ref(db, 'songs'), (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        songs = Object.entries(rawSongs).map(([qr, data]) => ({ qr, ...data }));
-        console.log("✅ Låtar uppdaterade från Firebase:", songs.length);
-        populateSourceCheckboxes();
+        standardSongs = Object.entries(rawSongs).map(([qr, data]) => ({ qr, ...data }));
+        mergeSongs();
       } else {
-        console.error("❌ Inga låtar hittades i Firebase.");
+        console.error("❌ Inga låtar hittades i 'songs'.");
+        standardSongs = [];
+        mergeSongs();
       }
     });
 
-    /* Generera checkboxar med pill-stil */
+    // Lyssna på "userPlaylists" noden (användarimporterade spellistor)
+    onValue(ref(db, 'userPlaylists'), (snapshot) => {
+      userPlaylistSongs = [];
+      if (snapshot.exists()) {
+        const rawUserPlaylists = snapshot.val();
+        Object.keys(rawUserPlaylists).forEach(playlistName => {
+          const playlistData = rawUserPlaylists[playlistName];
+          if (playlistData.songs) {
+            Object.entries(playlistData.songs).forEach(([songId, songData]) => {
+              // Sätt "source" till spellistans namn.
+              userPlaylistSongs.push({ qr: songId, ...songData, source: playlistName });
+            });
+          }
+        });
+      }
+      mergeSongs();
+    });
+
+    // Slå ihop standardSongs och userPlaylistSongs
+    function mergeSongs() {
+      songs = [...standardSongs, ...userPlaylistSongs];
+      console.log("✅ Totalt antal låtar:", songs.length);
+      populateSourceCheckboxes();
+    }
+
+    // Generera checkboxar baserat på "source" från den sammanslagna listan
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
@@ -172,10 +201,9 @@
       allDiv.appendChild(labelAll);
       container.appendChild(allDiv);
       
-      // Hämta unika källor från låtarna
+      // Hämta unika källor
       let uniqueSources = songs.map(song => song.source);
       if (Array.isArray(uniqueSources[0])) { 
-        // Om source är en array på vissa låtar, flattena listan
         uniqueSources = uniqueSources.flat();
       }
       uniqueSources = [...new Set(uniqueSources)];
@@ -199,7 +227,7 @@
       });
     }
 
-    /* Uppdatera årtals-dropdown baserat på markerade spellistor */
+    // Uppdatera årtals-dropdown baserat på markerade källor
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -234,7 +262,7 @@
       }
     };
 
-    /* Filtrera låtar baserat på källor och valt årtal */
+    // Filtrera låtar baserat på markerade källor och valt årtal
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -261,7 +289,7 @@
       }
     };
 
-    /* Välj en slumpad låt som inte redan visas */
+    // Välj en slumpad låt som ännu inte visats
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -280,7 +308,7 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    /* Visa vald låt med QR-kod och en 'Visa svar'-knapp */
+    // Visa vald låt med QR-kod och dolda detaljer (år, titel, artist)
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -294,7 +322,7 @@
       generateQRCode(song.qr);
     };
 
-    /* Generera QR-kod (160x160) som länkar till låtens Spotify-sida */
+    // Generera QR-kod (160x160) som länkar till låtens Spotify-sida
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -315,9 +343,8 @@
       document.getElementById("filter-page").style.display = "block";
     };
 
-    // --- Spotify-spellisteimport -----------------
-
-    // Dessa värden ska ersättas med dina riktiga Spotify-uppgifter (observera säkerheten i en produktionsmiljö)
+    // --- Spotify-spellisteimport --- 
+    // OBS! Dessa värden ska ersättas med dina riktiga Spotify-uppgifter!
     const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
     const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
 
@@ -335,7 +362,8 @@
       return data.access_token;
     }
 
-    // Hämta spellistans låtar från Spotify med filter: title, artist och år (utdraget av release_date)
+    // ******** Ändrad funktion ********
+    // Hämta spellistans låtar via Spotify och returnera ett objekt där nyckeln är spår-ID:t.
     async function fetchSpotifyPlaylist(playlistUrl) {
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
       const token = await getSpotifyToken();
@@ -345,28 +373,33 @@
         }
       });
       const data = await response.json();
-      return data.items.map(item => ({
-        title: item.track.name,
-        artist: item.track.artists.map(artist => artist.name).join(", "),
-        year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
-      }));
+      // Mappa om resultatet till ett objekt där varje spårnyckel är item.track.id
+      return data.items.reduce((obj, item) => {
+        const trackId = item.track.id; // Används senare både som 'qr' samt i QR-koden
+        obj[trackId] = {
+          title: item.track.name,
+          artist: item.track.artists.map(artist => artist.name).join(", "),
+          year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
+        };
+        return obj;
+      }, {});
     }
+    // **********************************
 
-    // Lägger till en spellista (importerad från Spotify) i Firebase under noden "userPlaylists"
+    // Lägg till en spellista i Firebase under noden "userPlaylists"
     async function addPlaylistToFirebase(playlistName, playlistUrl) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
         const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
         await set(userPlaylistsRef, { songs: tracks });
         alert(`Spellistan "${playlistName}" har lagts till!`);
-        // Om du vill kan du uppdatera gränssnittet här, eller slå samman låtarna med standardbiblioteket
       } catch (error) {
         console.error("Fel vid hämtning av Spotify-spellista:", error);
         alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
       }
     }
 
-    // Eventlistener för knappen för Spotify-import
+    // Koppla eventlistener till knappen för Spotify-import
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
