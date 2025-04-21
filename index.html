@@ -134,19 +134,25 @@
     const db = getDatabase(app);
 
     // Globala variabler: standardbibliotek och importerade spellistor
-    let standardSongs = [];
-    let userPlaylistSongs = [];
-    let songs = [];   // Sammankopplad lista (standard + userPlaylists)
+    let standardSongs = [];    // Data från noden "songs"
+    let userPlaylistSongs = []; // Data från noden "userPlaylists"
+    let songs = [];   // Sammankopplad lista (merged) med unika låtar
     let sourceFilteredSongs = [];   // Låtar filtrerade på källor
     let currentFilteredSongs = [];    // Låtar filtrerade på både källa & år
     let shownSongs = [];              // Låtar som redan visats
     let currentSong = null;
 
-    // Lyssna på "songs" noden (standardbiblioteket)
+    // Hämta standardlåtar (från noden "songs")
     onValue(ref(db, 'songs'), (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        standardSongs = Object.entries(rawSongs).map(([qr, data]) => ({ qr, ...data }));
+        // Anta att standardlåtarna redan har ett unikt "qr" och "source" kan vara en sträng
+        standardSongs = Object.entries(rawSongs).map(([qr, data]) => {
+          if (!Array.isArray(data.source)) {
+            data.source = [data.source]; // Gör om till array om det inte redan är det
+          }
+          return { qr, ...data };
+        });
         mergeSongs();
       } else {
         console.error("❌ Inga låtar hittades i 'songs'.");
@@ -155,7 +161,7 @@
       }
     });
 
-    // Lyssna på "userPlaylists" noden (användarimporterade spellistor)
+    // Hämta importerade låtar (från noden "userPlaylists")
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
       userPlaylistSongs = [];
       if (snapshot.exists()) {
@@ -164,8 +170,9 @@
           const playlistData = rawUserPlaylists[playlistName];
           if (playlistData.songs) {
             Object.entries(playlistData.songs).forEach(([songId, songData]) => {
-              // Sätt "source" till spellistans namn.
-              userPlaylistSongs.push({ qr: songId, ...songData, source: playlistName });
+              // Sätt "source" som en array med spellistans namn
+              const songEntry = { qr: songId, ...songData, source: [playlistName] };
+              userPlaylistSongs.push(songEntry);
             });
           }
         });
@@ -173,19 +180,36 @@
       mergeSongs();
     });
 
-    // Slå ihop standardSongs och userPlaylistSongs
+    // Slå ihop standardSongs och userPlaylistSongs så att varje låt (baserat på "qr") blir unikt.
+    // Om samma låt finns i flera listor, lägg ihop källorna (source arrays)
     function mergeSongs() {
-      songs = [...standardSongs, ...userPlaylistSongs];
-      console.log("✅ Totalt antal låtar:", songs.length);
+      const merged = {};
+      // Gå igenom standardlåtar
+      standardSongs.forEach(song => {
+        merged[song.qr] = song;
+      });
+
+      // Gå igenom importerade låtar
+      userPlaylistSongs.forEach(song => {
+        if (merged[song.qr]) {
+          // Om låten redan finns – slå ihop source-arrayerna (unika värden)
+          merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
+        } else {
+          merged[song.qr] = song;
+        }
+      });
+
+      songs = Object.values(merged);
+      console.log("✅ Sammankopplad låtsamling (unika spår):", songs.length);
       populateSourceCheckboxes();
     }
 
-    // Generera checkboxar baserat på "source" från den sammanslagna listan
+    // Skapa checkboxar utifrån unika "source" från den sammanslagna listan
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla källor"-alternativet
+      // "Alla källor"-alernativ
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       const checkboxAll = document.createElement("input");
@@ -201,11 +225,8 @@
       allDiv.appendChild(labelAll);
       container.appendChild(allDiv);
       
-      // Hämta unika källor
-      let uniqueSources = songs.map(song => song.source);
-      if (Array.isArray(uniqueSources[0])) { 
-        uniqueSources = uniqueSources.flat();
-      }
+      // Hämta unika källor från varje låt
+      let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
       uniqueSources.forEach(source => {
@@ -232,14 +253,12 @@
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
       if (selectedSources.includes("alla")) {
-        const allSources = songs.map(song => Array.isArray(song.source) ? song.source : [song.source]).flat();
+        const allSources = songs.map(song => song.source).flat();
         selectedSources = [...new Set(allSources)];
       }
       sourceFilteredSongs = songs.filter(song => {
-        if (Array.isArray(song.source)) {
-          return song.source.some(src => selectedSources.includes(src));
-        }
-        return selectedSources.includes(song.source);
+        // Eftersom song.source nu är en array, kolla om någon källa matchar
+        return song.source.some(src => selectedSources.includes(src));
       });
       
       const startYearDropdown = document.getElementById("startYear");
@@ -289,7 +308,7 @@
       }
     };
 
-    // Välj en slumpad låt som ännu inte visats
+    // Välj en slumpad låt som inte redan visats
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -308,7 +327,7 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med QR-kod och dolda detaljer (år, titel, artist)
+    // Visa vald låt med QR-kod och dolda detaljer
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -345,8 +364,8 @@
 
     // --- Spotify-spellisteimport --- 
     // OBS! Dessa värden ska ersättas med dina riktiga Spotify-uppgifter!
-    const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
-    const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
+    const spotifyClientId = "DIN_CLIENT_ID";
+    const spotifyClientSecret = "DIN_CLIENT_SECRET";
 
     // Hämta en access token från Spotify
     async function getSpotifyToken() {
@@ -362,7 +381,6 @@
       return data.access_token;
     }
 
-    // ******** Ändrad funktion ********
     // Hämta spellistans låtar via Spotify och returnera ett objekt där nyckeln är spår-ID:t.
     async function fetchSpotifyPlaylist(playlistUrl) {
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
@@ -373,9 +391,9 @@
         }
       });
       const data = await response.json();
-      // Mappa om resultatet till ett objekt där varje spårnyckel är item.track.id
+      // Mappa om resultatet till ett objekt med spår-ID:t som nyckel
       return data.items.reduce((obj, item) => {
-        const trackId = item.track.id; // Används senare både som 'qr' samt i QR-koden
+        const trackId = item.track.id;
         obj[trackId] = {
           title: item.track.name,
           artist: item.track.artists.map(artist => artist.name).join(", "),
@@ -384,7 +402,6 @@
         return obj;
       }, {});
     }
-    // **********************************
 
     // Lägg till en spellista i Firebase under noden "userPlaylists"
     async function addPlaylistToFirebase(playlistName, playlistUrl) {
