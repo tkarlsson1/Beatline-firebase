@@ -213,38 +213,24 @@
 
     // Skapa checkboxar utifrån unika "source" från den sammanslagna listan
     function populateSourceCheckboxes() {
-  const container = document.getElementById("source-checkbox-container");
-  container.innerHTML = "";
-
-  let uniqueSources = songs.map(song => song.source).flat();
-  uniqueSources = [...new Set(uniqueSources)];
-  uniqueSources.sort();
-
-  uniqueSources.forEach(source => {
-    // Filtrera låtar baserat på aktuell källa
-    const songCount = songs.filter(song => song.source.includes(source)).length;
-
-    const div = document.createElement("div");
-    div.classList.add("checkbox-pill");
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.name = "source";
-    checkbox.value = source;
-    let id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
-    checkbox.id = id;
-    checkbox.addEventListener("change", updateYearSelection);
-
-    const label = document.createElement("label");
-    label.setAttribute("for", id);
-    label.textContent = `${source} (${songCount})`; // Lägger till antal låtar i parentes
-
-    div.appendChild(checkbox);
-    div.appendChild(label);
-    container.appendChild(div);
-  });
-}
-
+      const container = document.getElementById("source-checkbox-container");
+      container.innerHTML = "";
+      
+      // "Alla källor"-alernativ
+      const allDiv = document.createElement("div");
+      allDiv.classList.add("checkbox-pill");
+      const checkboxAll = document.createElement("input");
+      checkboxAll.type = "checkbox";
+      checkboxAll.name = "source";
+      checkboxAll.value = "alla";
+      checkboxAll.id = "source-alla";
+      checkboxAll.addEventListener("change", updateYearSelection);
+      const labelAll = document.createElement("label");
+      labelAll.setAttribute("for", "source-alla");
+      labelAll.textContent = "Alla källor";
+      allDiv.appendChild(checkboxAll);
+      allDiv.appendChild(labelAll);
+      container.appendChild(allDiv);
       
       // Hämta unika källor från varje låt
       let uniqueSources = songs.map(song => song.source).flat();
