@@ -66,8 +66,8 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.6rem;
-      margin-bottom: 0.6rem;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
     .checkbox-pill {
       position: relative;
@@ -447,18 +447,21 @@ document.getElementById("addPlaylistButton").addEventListener("click", () => {
       <button id="addPlaylistButton">Lägg till spellista</button>
     </div>
     
-    <!-- Filter-/Startsida -->
-    <div id="filter-page">
-      <div id="source-checkbox-container"></div>
-      
-      <label for="startYear">Från år:</label>
-      <select id="startYear"></select>
-      
-      <label for="endYear">Till år:</label>
-      <select id="endYear"></select>
-      
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
-    </div>
+<!-- Filter-/Startsida -->
+<div id="filter-page">
+  <div id="source-checkbox-container"></div>
+
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <label for="startYear">Från år:</label>
+    <select id="startYear"></select>
+
+    <label for="endYear" style="margin-top: 0.5rem;">Till år:</label>
+    <select id="endYear"></select>
+  </div>
+
+  <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
+</div>
+
     
     <!-- Resultatsida -->
     <div id="result-page">
