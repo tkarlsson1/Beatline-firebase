@@ -470,22 +470,16 @@ document.getElementById("addPlaylistButton").addEventListener("click", () => {
     <select id="endYear"></select>
   </div>
 
-  <!-- Lägg till spellista här -->
-  <div id="spotify-import">
-    <h3>Lägg till Spotify-spellista</h3>
-    <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-    <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-    <button id="addPlaylistButton">Lägg till spellista</button>
-  </div>
-
   <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
 </div>
 
-<!-- Resultatsida -->
-<div id="result-page">
-  <div id="song-display"></div>
-  <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
-  <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
-</div>
+    
+    <!-- Resultatsida -->
+    <div id="result-page">
+      <div id="song-display"></div>
+      <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
+      <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
+    </div>
+  </div>
 </body>
 </html>
