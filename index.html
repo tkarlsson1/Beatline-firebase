@@ -218,9 +218,10 @@
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla källor"-alernativ med eventlistener som ändrar alla checkboxar
+      // "Alla låtar"-alernativ (tidigare "Alla källor") på en egen rad
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
+      allDiv.style.flexBasis = "100%"; // Sätter hela raden
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
@@ -236,7 +237,7 @@
       });
       const labelAll = document.createElement("label");
       labelAll.setAttribute("for", "source-alla");
-      labelAll.textContent = "Alla källor";
+      labelAll.textContent = "Alla låtar";
       allDiv.appendChild(checkboxAll);
       allDiv.appendChild(labelAll);
       container.appendChild(allDiv);
