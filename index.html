@@ -317,7 +317,7 @@
       }
     };
 
-   // Välj en slumpad låt som inte redan visats
+    // Välj en slumpad låt som inte redan visats
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -344,7 +344,7 @@
         <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
           <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
+          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.artist} - ${song.title}</div>
         </div>
       `;
       generateQRCode(song.qr);
@@ -371,7 +371,7 @@
       document.getElementById("filter-page").style.display = "block";
     };
 
-    // --- Spotify-spellisteimport --- 
+    // --- Spotify-spellisteimport ---
     // OBS! Dessa värden ska ersättas med dina riktiga Spotify-uppgifter!
     const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
     const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
