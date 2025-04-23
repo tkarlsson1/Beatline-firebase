@@ -74,7 +74,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 0.6rem;
-      row-gap: 1.5rem; /* Ökar mellanrummet i höjdled */
+      row-gap: 1.5rem;
       margin-bottom: 2rem;
     }
     .checkbox-pill {
@@ -93,7 +93,7 @@
       font-size: 1rem;
       user-select: none;
     }
-    /* Markerad checkbox – använder nu färgen #0b939c */
+    /* Markerad checkbox – använder färgen #0b939c */
     .checkbox-pill input[type="checkbox"]:checked + label {
       background-color: #0b939c;
       color: #fff;
@@ -109,14 +109,14 @@
       text-align: center;
       padding: 1rem;
       border-radius: 8px;
-      color: white; /* Ändrar färgen på texten */
+      color: white;
     }
     #spotify-import input {
-      width: 40%; /* Ändrar bredden till 40% */
+      width: 40%;
       padding: 0.5rem;
       margin-bottom: 0.5rem;
-      background: #333; /* Grå bakgrund */
-      color: #fff;      /* Vit text */
+      background: #333;
+      color: #fff;
       border: 1px solid #333;
       border-radius: 4px;
     }
@@ -124,15 +124,70 @@
       width: 40%;
       padding: 0.5rem;
     }
+    
+    /* Stil för Läs först!-knappen – alltid orange */
+    #lasForstButton {
+      background-color: #ff9800; /* Orange */
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
+    /* Vid hover förblir färgen densamma */
+    #lasForstButton:hover {
+      background-color: #ff9800;
+    }
+    
+    /* Modal styles för readme */
+    #readmeModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    #readmeContent {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .closeBtn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      cursor: pointer;
+    }
+    .closeBtn:hover,
+    .closeBtn:focus {
+      color: black;
+      text-decoration: none;
+    }
   </style>
+  
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
   <script type="module">
     // Importera Firebase-moduler
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    // Firebase-konfiguration (ersätt med dina värden)
+    // Firebase-konfiguration (ersätt med dina riktiga värden)
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -147,20 +202,19 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Globala variabler: standardbibliotek och importerade spellistor
-    let standardSongs = [];    // Data från noden "songs"
-    let userPlaylistSongs = []; // Data från noden "userPlaylists"
-    let songs = [];            // Sammankopplad lista (merged) med unika låtar
-    let sourceFilteredSongs = []; // Låtar filtrerade på källor
-    let currentFilteredSongs = []; // Låtar filtrerade på både källa & år
-    let shownSongs = [];          // Låtar som redan visats
+    // Globala variabler: standardlåtar och importerade spellistor
+    let standardSongs = [];
+    let userPlaylistSongs = [];
+    let songs = [];
+    let sourceFilteredSongs = [];
+    let currentFilteredSongs = [];
+    let shownSongs = [];
     let currentSong = null;
 
     // Hämta standardlåtar (från noden "songs")
     onValue(ref(db, 'songs'), (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        // Anta att standardlåtar redan har ett unikt "qr" och att "source" kan vara en sträng
         standardSongs = Object.entries(rawSongs).map(([qr, data]) => {
           if (!Array.isArray(data.source)) {
             data.source = [data.source];
@@ -193,7 +247,7 @@
       mergeSongs();
     });
 
-    // Slå ihop standardSongs och userPlaylistSongs så att varje låt (baserat på "qr") blir unikt.
+    // Slå ihop standardlåtar och importerade låtar så att varje låt blir unikt
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -211,7 +265,7 @@
       populateSourceCheckboxes();
     }
 
-    // Hjälpfunktion: uppdatera "Alla låtar" checkbox utifrån de övriga checkboxarna
+    // Hjälpfunktion: uppdatera "Alla låtar" checkboxen utifrån de övriga checkboxarna
     function updateAllaCheckbox() {
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
       const allaBox = document.querySelector('input[name="source"][value="alla"]');
@@ -224,17 +278,24 @@
       allaBox.checked = allChecked;
     }
 
-    // Skapa checkboxar utifrån unika "source" från den sammanslagna listan
+    // Skapa checkboxar utifrån unika "source" från låtsamlingen
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla låtar" – ta upp hela raden, centrera innehållet
+      // Skapa en behållare för "Alla låtar" och "Läs först!"-knappen
+      const allHeader = document.createElement("div");
+      allHeader.style.position = "relative";
+      allHeader.style.width = "100%";
+      allHeader.style.marginBottom = "1rem";
+      
+      // "Alla låtar" – centrerad
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
-      allDiv.style.flexBasis = "100%";
-      allDiv.style.display = "flex";
-      allDiv.style.justifyContent = "center";
+      allDiv.style.display = "inline-block";
+      allDiv.style.margin = "0 auto";
+      
+      // Checkbox och label för "Alla låtar"
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
@@ -250,9 +311,27 @@
       const labelAll = document.createElement("label");
       labelAll.setAttribute("for", "source-alla");
       labelAll.textContent = "Alla låtar";
+      
       allDiv.appendChild(checkboxAll);
       allDiv.appendChild(labelAll);
-      container.appendChild(allDiv);
+      
+      // Lägg in "Alla låtar" i allHeader
+      allHeader.appendChild(allDiv);
+      
+      // Skapa "Läs först!"-knappen med egen stil
+      const lasForstButton = document.createElement("button");
+      lasForstButton.id = "lasForstButton";
+      lasForstButton.textContent = "Läs först!";
+      lasForstButton.style.position = "absolute";
+      lasForstButton.style.right = "0";
+      lasForstButton.style.top = "50%";
+      lasForstButton.style.transform = "translateY(-50%)";
+      lasForstButton.addEventListener("click", function() {
+        document.getElementById("readmeModal").style.display = "block";
+      });
+      
+      allHeader.appendChild(lasForstButton);
+      container.appendChild(allHeader);
       
       // Skapa checkboxar för varje unik källa
       let uniqueSources = songs.map(song => song.source).flat();
@@ -339,7 +418,6 @@
       }
     };
 
-    // Välj en slumpad låt som inte redan visats
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -359,7 +437,7 @@
     };
 
     // Visa vald låt med QR-kod och dolda detaljer,
-    // med artist på första raden och titeln på en ny rad
+    // där artist visas på första raden och titeln på en ny rad
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -375,7 +453,6 @@
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod (160x160) som länkar till låtens Spotify-sida
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -397,11 +474,9 @@
     };
 
     // --- Spotify-spellisteimport ---
-    // OBS! Dessa värden ska ersättas med dina riktiga Spotify-uppgifter!
     const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
     const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
 
-    // Hämta en access token från Spotify
     async function getSpotifyToken() {
       const response = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",
@@ -415,7 +490,6 @@
       return data.access_token;
     }
 
-    // Hämta spellistans låtar via Spotify med stöd för paginering
     async function fetchSpotifyPlaylist(playlistUrl) {
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
       const token = await getSpotifyToken();
@@ -444,7 +518,6 @@
       return tracks;
     }
 
-    // Lägg till en spellista i Firebase under noden "userPlaylists"
     async function addPlaylistToFirebase(playlistName, playlistUrl) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -457,7 +530,6 @@
       }
     }
 
-    // Koppla eventlistener till knappen för Spotify-import
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
@@ -472,7 +544,6 @@
 <body>
   <div class="container">
     <img src="logga.png" alt="Notestream-beta logo" class="logo">
-    
     <!-- Filter-/Startsida -->
     <div id="filter-page">
       <div id="source-checkbox-container"></div>
@@ -482,7 +553,6 @@
         <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
         <select id="endYear"></select>
       </div>
-      
       <!-- Spotify-spellisteimportsektionen visas endast på filter-/startsidan -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
@@ -490,10 +560,8 @@
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
         <button id="addPlaylistButton">Lägg till spellista</button>
       </div>
-      
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
-    
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
@@ -501,5 +569,30 @@
       <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
     </div>
   </div>
+  
+  <!-- Readme Modal -->
+  <div id="readmeModal">
+    <div id="readmeContent">
+      <span class="closeBtn">&times;</span>
+      <h2>README</h2>
+      <p>TEXT TEXT TEXT</p>
+    </div>
+  </div>
+  
+  <!-- Modal Event Listeners -->
+  <script>
+    const readmeModal = document.getElementById("readmeModal");
+    const closeBtn = document.querySelector(".closeBtn");
+
+    closeBtn.addEventListener("click", function() {
+      readmeModal.style.display = "none";
+    });
+
+    window.addEventListener("click", function(event) {
+      if (event.target == readmeModal) {
+        readmeModal.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
