@@ -45,9 +45,9 @@
     button:hover {
       background: #555;
     }
-    /* Justera bredden på årtalsfälten till 90px */
+    /* Ändrad bredd på årtalsfälten: 80px */
     #startYear, #endYear {
-      width: 90px;
+      width: 80px;
     }
     #song-display {
       text-align: center;
@@ -70,7 +70,7 @@
       display: none;
     }
     
-    /* Styling för spellistsval (checkbox-pills) */
+    /* Styling för checkbox-pills */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -95,7 +95,7 @@
       font-size: 1rem;
       user-select: none;
     }
-    /* Markerad checkbox – använder färgen #0b939c */
+    /* Markerad checkbox – färg #0b939c */
     .checkbox-pill input[type="checkbox"]:checked + label {
       background-color: #0b939c;
       color: #fff;
@@ -127,19 +127,31 @@
       padding: 0.5rem;
     }
     
-    /* Stil för Läs först!-knappen – alltid orange */
+    /* Stil för ‘Läs först!’-knappen – alltid orange */
     #lasForstButton {
-      background-color: #ff9800; /* Orange */
+      background-color: #ff9800;
       color: #fff;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       padding: 0.4rem 0.8rem;
       font-size: 0.9rem;
+      /* Inga hover-effekter för att hålla den alltid orange */
     }
-    /* Vid hover ska färgen förbli orange */
-    #lasForstButton:hover {
-      background-color: #ff9800;
+    
+    /* Behållare för "Alla låtar" och "Läs först!" */
+    .allHeader {
+      position: relative;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    /* Positionera "Läs först!" till höger utan att påverka centrerad text */
+    .allHeader button#lasForstButton {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
     }
     
     /* Modal-stilar för readme */
@@ -188,7 +200,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.8);
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -228,11 +240,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <script type="module">
-    // Importera Firebase-moduler
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    // Firebase-konfiguration (ersätt med dina riktiga värden)
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
@@ -243,11 +253,9 @@
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
 
-    // Initiera Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Globala variabler: standardlåtar och importerade spellistor
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -256,7 +264,6 @@
     let shownSongs = [];
     let currentSong = null;
 
-    // Hämta standardlåtar (från noden "songs")
     onValue(ref(db, 'songs'), (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
@@ -274,7 +281,6 @@
       }
     });
 
-    // Hämta importerade låtar (från noden "userPlaylists")
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
       userPlaylistSongs = [];
       if (snapshot.exists()) {
@@ -292,7 +298,6 @@
       mergeSongs();
     });
 
-    // Slå ihop låtarna så att varje låt blir unikt
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -310,43 +315,27 @@
       populateSourceCheckboxes();
     }
 
-    // Uppdatera "Alla låtar" checkboxen
     function updateAllaCheckbox() {
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
       const allaBox = document.querySelector('input[name="source"][value="alla"]');
       let allChecked = true;
-      nonAlla.forEach(chk => {
-        if (!chk.checked) { allChecked = false; }
-      });
+      nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
       allaBox.checked = allChecked;
     }
 
-    // Skapa checkboxar för källor – här har vi lagt knappen Läs först! ovanför
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Skapa en behållare (allHeader) med kolumn-layout
+      // Skapa behållare med klass "allHeader" med centrerad text
       const allHeader = document.createElement("div");
-      allHeader.style.display = "flex";
-      allHeader.style.flexDirection = "column";
-      allHeader.style.alignItems = "center";
-      allHeader.style.marginBottom = "1rem";
+      allHeader.className = "allHeader";
       
-      // Första raden: Läs först!-knappen
-      const lasForstButton = document.createElement("button");
-      lasForstButton.id = "lasForstButton";
-      lasForstButton.textContent = "Läs först!";
-      lasForstButton.addEventListener("click", function() {
-        document.getElementById("readmeModal").style.display = "block";
-      });
-      allHeader.appendChild(lasForstButton);
-      
-      // Andra raden: "Alla låtar" checkboxen centrerad
+      // "Alla låtar" checkbox (centrerad)
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
-      allDiv.style.marginTop = "1rem";
       allDiv.style.display = "inline-block";
+      // Skapa checkbox och label för "Alla låtar"
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
@@ -364,9 +353,23 @@
       allDiv.appendChild(labelAll);
       
       allHeader.appendChild(allDiv);
+      
+      // Lägg till "Läs först!"-knappen -- absolut positionerad inom allHeader
+      const lasForstButton = document.createElement("button");
+      lasForstButton.id = "lasForstButton";
+      lasForstButton.textContent = "Läs först!";
+      lasForstButton.style.position = "absolute";
+      lasForstButton.style.right = "0";
+      lasForstButton.style.top = "50%";
+      lasForstButton.style.transform = "translateY(-50%)";
+      lasForstButton.addEventListener("click", function() {
+        document.getElementById("readmeModal").style.display = "block";
+      });
+      allHeader.appendChild(lasForstButton);
+      
       container.appendChild(allHeader);
       
-      // Skapa checkboxar för varje unik källa (spellista)
+      // Checkboxar för varje unik källa (spellista)
       let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
@@ -392,7 +395,6 @@
       });
     }
 
-    // Uppdatera årtals-dropdown
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
@@ -424,7 +426,6 @@
       }
     };
 
-    // Filtrera låtar
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
@@ -449,7 +450,6 @@
       }
     };
 
-    // Välj en slumpad låt
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
@@ -468,7 +468,6 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med QR-kod och dolda detaljer
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -484,7 +483,6 @@
       generateQRCode(song.qr);
     }
 
-    // Generera QR-kod
     window.generateQRCode = function(qr) {
       const spotifyUrl = `https://open.spotify.com/track/${qr}`;
       const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -505,7 +503,6 @@
       document.getElementById("filter-page").style.display = "block";
     };
 
-    // --- Spotify-spellisteimport ---
     const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
     const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
 
@@ -641,7 +638,7 @@
     const loginError = document.getElementById("loginError");
     const loginModal = document.getElementById("loginModal");
     
-    const pagePassword = "test123"; // Exempel-lösenord
+    const pagePassword = "test123";
     loginButton.addEventListener("click", function() {
       if (passwordInput.value === pagePassword) {
         loginModal.style.display = "none";
