@@ -95,7 +95,7 @@
       font-size: 1rem;
       user-select: none;
     }
-    /* Markerad checkbox – färg #0b939c */
+    /* Markerad checkbox – använder färgen #0b939c */
     .checkbox-pill input[type="checkbox"]:checked + label {
       background-color: #0b939c;
       color: #fff;
@@ -127,7 +127,7 @@
       padding: 0.5rem;
     }
     
-    /* Stil för ‘Läs först!’-knappen – alltid orange */
+    /* Stil för Läs först!-knappen – alltid orange */
     #lasForstButton {
       background-color: #ff9800;
       color: #fff;
@@ -136,7 +136,9 @@
       cursor: pointer;
       padding: 0.4rem 0.8rem;
       font-size: 0.9rem;
-      /* Inga hover-effekter för att hålla den alltid orange */
+    }
+    #lasForstButton:hover {
+      background-color: #ff9800;
     }
     
     /* Behållare för "Alla låtar" och "Läs först!" */
@@ -146,7 +148,6 @@
       text-align: center;
       margin-bottom: 1rem;
     }
-    /* Positionera "Läs först!" till höger utan att påverka centrerad text */
     .allHeader button#lasForstButton {
       position: absolute;
       right: 0;
@@ -200,7 +201,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0,0,0,0.8);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -327,15 +328,15 @@
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Skapa behållare med klass "allHeader" med centrerad text
+      // Skapa behållare med klass "allHeader"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
-      // "Alla låtar" checkbox (centrerad)
+      // "Alla låtar" checkbox, centrerad
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
-      // Skapa checkbox och label för "Alla låtar"
+      
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
@@ -354,7 +355,7 @@
       
       allHeader.appendChild(allDiv);
       
-      // Lägg till "Läs först!"-knappen -- absolut positionerad inom allHeader
+      // Lägg till "Läs först!"-knappen absolut placerad inom allHeader
       const lasForstButton = document.createElement("button");
       lasForstButton.id = "lasForstButton";
       lasForstButton.textContent = "Läs först!";
@@ -369,7 +370,6 @@
       
       container.appendChild(allHeader);
       
-      // Checkboxar för varje unik källa (spellista)
       let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
@@ -429,6 +429,7 @@
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
+      
       currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
       );
@@ -632,13 +633,13 @@
       }
     });
     
-    // Enkel inloggningsfunktion
+    // Enkel inloggningsfunktion med nytt lösenord "wutang"
     const passwordInput = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("loginError");
     const loginModal = document.getElementById("loginModal");
     
-    const pagePassword = "test123";
+    const pagePassword = "wutang";  // Nytt lösenord
     loginButton.addEventListener("click", function() {
       if (passwordInput.value === pagePassword) {
         loginModal.style.display = "none";
