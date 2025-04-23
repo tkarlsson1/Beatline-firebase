@@ -12,3 +12,5 @@ Byt typsnitt - och språk till engelska
 Lägg till readme på förstasidan för betatest
 
 Ta bort lägg till spellista från resultatsidan
+
+Byt plats på artist och titel, artist först

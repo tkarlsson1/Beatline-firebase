@@ -107,13 +107,13 @@
       color: white; /* Ändrar färgen på texten */
     }
     #spotify-import input {
-      width: 40%; /* Ändrar bredden till 50% av nuvarande värde */
+      width: 40%; /* Ändrar bredden till 40% */
       padding: 0.5rem;
       margin-bottom: 0.5rem;
-      background: #333; /* Grå bakgrund */
-      color: #fff; /* Vit text */
-      border: 1px solid #333; /* Gör bakgrund och kant lika */
-      border-radius: 4px; /* Rundar hörnen för en konsekvent design */
+      background: #333;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
     }
     #spotify-import button {
       width: 40%;
@@ -318,161 +318,156 @@
     };
 
    // Välj en slumpad låt som inte redan visats
-window.nextSong = function() {
-  const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
-  if (remainingSongs.length === 0) {
-    alert("Inga fler låtar, tryck på Startsida för att börja om.");
-    return;
-  }
-  const randomIndex = Math.floor(Math.random() * remainingSongs.length);
-  currentSong = remainingSongs[randomIndex];
-  shownSongs.push(currentSong);
-  displaySong(currentSong);
-};
+    window.nextSong = function() {
+      const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
+      if (remainingSongs.length === 0) {
+        alert("Inga fler låtar, tryck på Startsida för att börja om.");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * remainingSongs.length);
+      currentSong = remainingSongs[randomIndex];
+      shownSongs.push(currentSong);
+      displaySong(currentSong);
+    };
 
-window.restart = function() {
-  shownSongs = [];
-  currentSong = null;
-  document.getElementById("song-display").innerHTML = "";
-};
+    window.restart = function() {
+      shownSongs = [];
+      currentSong = null;
+      document.getElementById("song-display").innerHTML = "";
+    };
 
-// Visa vald låt med QR-kod och dolda detaljer
-function displaySong(song) {
-  const songDisplay = document.getElementById("song-display");
-  songDisplay.innerHTML = `
-    <div id="qrcode-${song.qr}" class="qrcode"></div>
-    <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
-    <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-      <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-      <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
-    </div>
-  `;
-  generateQRCode(song.qr);
-}
+    // Visa vald låt med QR-kod och dolda detaljer
+    function displaySong(song) {
+      const songDisplay = document.getElementById("song-display");
+      songDisplay.innerHTML = `
+        <div id="qrcode-${song.qr}" class="qrcode"></div>
+        <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
+        <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+          <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
+          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
+        </div>
+      `;
+      generateQRCode(song.qr);
+    }
 
-// Generera QR-kod (160x160) som länkar till låtens Spotify-sida
-window.generateQRCode = function(qr) {
-  const spotifyUrl = `https://open.spotify.com/track/${qr}`;
-  const qrElement = document.getElementById(`qrcode-${qr}`);
-  qrElement.innerHTML = "";
-  new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
-};
+    // Generera QR-kod (160x160) som länkar till låtens Spotify-sida
+    window.generateQRCode = function(qr) {
+      const spotifyUrl = `https://open.spotify.com/track/${qr}`;
+      const qrElement = document.getElementById(`qrcode-${qr}`);
+      qrElement.innerHTML = "";
+      new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
+    };
 
-window.revealDetails = function() {
-  document.getElementById("song-details").style.display = "block";
-};
+    window.revealDetails = function() {
+      document.getElementById("song-details").style.display = "block";
+    };
 
-window.goToFilter = function() {
-  const checkboxes = document.querySelectorAll('input[name="source"]');
-  checkboxes.forEach(checkbox => { checkbox.checked = false; });
-  updateYearSelection();
-  restart();
-  document.getElementById("result-page").style.display = "none";
-  document.getElementById("filter-page").style.display = "block";
-};
+    window.goToFilter = function() {
+      const checkboxes = document.querySelectorAll('input[name="source"]');
+      checkboxes.forEach(checkbox => { checkbox.checked = false; });
+      updateYearSelection();
+      restart();
+      document.getElementById("result-page").style.display = "none";
+      document.getElementById("filter-page").style.display = "block";
+    };
 
+    // --- Spotify-spellisteimport --- 
+    // OBS! Dessa värden ska ersättas med dina riktiga Spotify-uppgifter!
+    const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
+    const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
 
+    // Hämta en access token från Spotify
+    async function getSpotifyToken() {
+      const response = await fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": "Basic " + btoa(spotifyClientId + ":" + spotifyClientSecret)
+        },
+        body: "grant_type=client_credentials"
+      });
+      const data = await response.json();
+      return data.access_token;
+    }
 
-// --- Spotify-spellisteimport --- 
-// OBS! Dessa värden ska ersättas med dina riktiga Spotify-uppgifter!
-const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
-const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
+    // Hämta spellistans låtar via Spotify med stöd för paginering
+    async function fetchSpotifyPlaylist(playlistUrl) {
+      const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
+      const token = await getSpotifyToken();
+      
+      let tracks = {};
+      let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
-// Hämta en access token från Spotify
-async function getSpotifyToken() {
-  const response = await fetch("https://accounts.spotify.com/api/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": "Basic " + btoa(spotifyClientId + ":" + spotifyClientSecret)
-    },
-    body: "grant_type=client_credentials"
-  });
-  const data = await response.json();
-  return data.access_token;
-}
+      while (nextUrl) {
+        const response = await fetch(nextUrl, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await response.json();
 
-// Hämta spellistans låtar via Spotify med stöd för paginering
-async function fetchSpotifyPlaylist(playlistUrl) {
-  const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
-  const token = await getSpotifyToken();
-  
-  let tracks = {};
-  let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+        data.items.forEach(item => {
+          const trackId = item.track.id;
+          tracks[trackId] = {
+            title: item.track.name,
+            artist: item.track.artists.map(artist => artist.name).join(", "),
+            year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
+          };
+        });
 
-  while (nextUrl) {
-    const response = await fetch(nextUrl, {
-      headers: { "Authorization": `Bearer ${token}` }
+        nextUrl = data.next; // Om det finns fler sidor, hämta nästa batch
+      }
+
+      return tracks;
+    }
+
+    // Lägg till en spellista i Firebase under noden "userPlaylists"
+    async function addPlaylistToFirebase(playlistName, playlistUrl) {
+      try {
+        const tracks = await fetchSpotifyPlaylist(playlistUrl);
+        const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
+        await set(userPlaylistsRef, { songs: tracks });
+        alert(`Spellistan "${playlistName}" har lagts till!`);
+      } catch (error) {
+        console.error("Fel vid hämtning av Spotify-spellista:", error);
+        alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
+      }
+    }
+
+    // Koppla eventlistener till knappen för Spotify-import
+    document.getElementById("addPlaylistButton").addEventListener("click", () => {
+      const playlistName = document.getElementById("playlistNameInput").value.trim();
+      const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+      if (playlistName && playlistLink) {
+        addPlaylistToFirebase(playlistName, playlistLink);
+      } else {
+        alert("Fyll i både spellistans namn och länk!");
+      }
     });
-    const data = await response.json();
-
-    data.items.forEach(item => {
-      const trackId = item.track.id;
-      tracks[trackId] = {
-        title: item.track.name,
-        artist: item.track.artists.map(artist => artist.name).join(", "),
-        year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
-      };
-    });
-
-    nextUrl = data.next; // Om det finns fler sidor, hämta nästa batch
-  }
-
-  return tracks;
-}
-
-// Lägg till en spellista i Firebase under noden "userPlaylists"
-async function addPlaylistToFirebase(playlistName, playlistUrl) {
-  try {
-    const tracks = await fetchSpotifyPlaylist(playlistUrl);
-    const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
-    await set(userPlaylistsRef, { songs: tracks });
-    alert(`Spellistan "${playlistName}" har lagts till!`);
-  } catch (error) {
-    console.error("Fel vid hämtning av Spotify-spellista:", error);
-    alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
-  }
-}
-
-// Koppla eventlistener till knappen för Spotify-import
-document.getElementById("addPlaylistButton").addEventListener("click", () => {
-  const playlistName = document.getElementById("playlistNameInput").value.trim();
-  const playlistLink = document.getElementById("playlistLinkInput").value.trim();
-  if (playlistName && playlistLink) {
-    addPlaylistToFirebase(playlistName, playlistLink);
-  } else {
-    alert("Fyll i både spellistans namn och länk!");
-  }
-});
   </script>
 </head>
 <body>
   <div class="container">
     <img src="logga.png" alt="Notestream-beta logo" class="logo">
     
-    <!-- Spotify-spellisteimportsektionen -->
-    <div id="spotify-import">
-      <h3>Lägg till Spotify-spellista</h3>
-      <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-      <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-      <button id="addPlaylistButton">Lägg till spellista</button>
+    <!-- Filter-/Startsida -->
+    <div id="filter-page">
+      <div id="source-checkbox-container"></div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <label for="startYear">Från år:</label>
+        <select id="startYear"></select>
+        <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
+        <select id="endYear"></select>
+      </div>
+      
+      <!-- Spotify-spellisteimportsektionen visas endast på filter-/startsidan -->
+      <div id="spotify-import">
+        <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+        <button id="addPlaylistButton">Lägg till spellista</button>
+      </div>
+      
+      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
-    
-<!-- Filter-/Startsida -->
-<div id="filter-page">
-  <div id="source-checkbox-container"></div>
-
-  <div style="display: flex; flex-direction: column; align-items: center;">
-    <label for="startYear">Från år:</label>
-    <select id="startYear"></select>
-
-    <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
-    <select id="endYear"></select>
-  </div>
-
-  <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
-</div>
-
     
     <!-- Resultatsida -->
     <div id="result-page">
