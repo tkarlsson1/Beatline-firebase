@@ -43,9 +43,9 @@
     button:hover {
       background: #555;
     }
-    /* Överstyr bredden på årtalsfälten så att bara 4 siffror ryms */
+    /* Justera bredden på årtalsfälten till 90px */
     #startYear, #endYear {
-      width: 60px;
+      width: 90px;
     }
     #song-display {
       text-align: center;
@@ -116,9 +116,9 @@
       padding: 0.5rem;
       margin-bottom: 0.5rem;
       background: #333; /* Grå bakgrund */
-      color: #fff; /* Vit text */
-      border: 1px solid #333; /* Gör bakgrund och kant lika */
-      border-radius: 4px; /* Rundar hörnen för en konsekvent design */
+      color: #fff;      /* Vit text */
+      border: 1px solid #333;
+      border-radius: 4px;
     }
     #spotify-import button {
       width: 40%;
@@ -358,7 +358,8 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med QR-kod och dolda detaljer, med artist på första raden och titeln på en ny rad
+    // Visa vald låt med QR-kod och dolda detaljer,
+    // med artist på första raden och titeln på en ny rad
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
