@@ -316,48 +316,37 @@
     };
 
     // Välj en slumpad låt som inte redan visats
-window.nextSong = function() {
-  const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
-  if (remainingSongs.length === 0) {
-    alert("Inga fler låtar, tryck på Startsida för att börja om.");
-    return;
-  }
-  const randomIndex = Math.floor(Math.random() * remainingSongs.length);
-  currentSong = remainingSongs[randomIndex];
-  shownSongs.push(currentSong);
-  displaySong(currentSong);
-};
+    window.nextSong = function() {
+      const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
+      if (remainingSongs.length === 0) {
+        alert("Inga fler låtar, tryck på Startsida för att börja om.");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * remainingSongs.length);
+      currentSong = remainingSongs[randomIndex];
+      shownSongs.push(currentSong);
+      displaySong(currentSong);
+    };
 
-window.restart = function() {
-  shownSongs = [];
-  currentSong = null;
-  document.getElementById("song-display").innerHTML = "";
-};
+    window.restart = function() {
+      shownSongs = [];
+      currentSong = null;
+      document.getElementById("song-display").innerHTML = "";
+    };
 
-// Visa vald låt med QR-kod och dolda detaljer
-function displaySong(song) {
-  const songDisplay = document.getElementById("song-display");
-  songDisplay.innerHTML = `
-    <div id="qrcode-${song.qr}" class="qrcode"></div>
-    <button onclick="revealDetails()" style="display: block; margin: 1rem auto;">Visa svar</button>
-    <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-      <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-      <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
-    </div>
-    <iframe src="https://open.spotify.com/embed/track/${song.qr}" 
-            style="display: none;" 
-            allow="autoplay; encrypted-media">
-    </iframe>
-  `;
-  generateQRCode(song.qr);
-}
-
-function revealDetails() {
-  document.getElementById("song-details").style.display = "block"; // Visa låtdetaljer
-};
-
-  generateQRCode(song.qr);
-};
+    // Visa vald låt med QR-kod och dolda detaljer
+    function displaySong(song) {
+      const songDisplay = document.getElementById("song-display");
+      songDisplay.innerHTML = `
+        <div id="qrcode-${song.qr}" class="qrcode"></div>
+        <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
+        <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+          <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
+          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
+        </div>
+      `;
+      generateQRCode(song.qr);
+    };
 
     // Generera QR-kod (160x160) som länkar till låtens Spotify-sida
     window.generateQRCode = function(qr) {
