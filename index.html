@@ -70,7 +70,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 0.6rem;
-      row-gap: 1.5rem; /* Ökar mellanrummet i höjdled */
+      row-gap: 1.5rem;
       margin-bottom: 2rem;
     }
     .checkbox-pill {
@@ -89,11 +89,11 @@
       font-size: 1rem;
       user-select: none;
     }
-    /* Här används hex-koden för turkos */
+    /* Markerad checkbox – turkos (hex: #40E0D0) */
     .checkbox-pill input[type="checkbox"]:checked + label {
-      background-color: #00B0B9;
+      background-color: #40E0D0;
       color: #fff;
-      border-color: #00B0B9;
+      border-color: #40E0D0;
     }
     #filter-page label {
       color: #fff;
@@ -105,16 +105,16 @@
       text-align: center;
       padding: 1rem;
       border-radius: 8px;
-      color: white; /* Ändrar färgen på texten */
+      color: white;
     }
     #spotify-import input {
-      width: 40%; /* Ändrar bredden till 40% */
+      width: 40%;
       padding: 0.5rem;
       margin-bottom: 0.5rem;
-      background: #333; /* Grå bakgrund */
-      color: #fff; /* Vit text */
-      border: 1px solid #333; /* Gör bakgrund och kant lika */
-      border-radius: 4px; /* Rundar hörnen för en konsekvent design */
+      background: #333;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
     }
     #spotify-import button {
       width: 40%;
@@ -156,10 +156,10 @@
     onValue(ref(db, 'songs'), (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        // Anta att standardlåtar redan har ett unikt "qr" och "source" kan vara en sträng
+        // Anta att standardlåtar redan har ett unikt "qr" och att "source" kan vara en sträng
         standardSongs = Object.entries(rawSongs).map(([qr, data]) => {
           if (!Array.isArray(data.source)) {
-            data.source = [data.source]; // Gör om till array om det inte redan är det
+            data.source = [data.source];
           }
           return { qr, ...data };
         });
@@ -180,7 +180,6 @@
           const playlistData = rawUserPlaylists[playlistName];
           if (playlistData.songs) {
             Object.entries(playlistData.songs).forEach(([songId, songData]) => {
-              // Sätt "source" som en array med spellistans namn
               const songEntry = { qr: songId, ...songData, source: [playlistName] };
               userPlaylistSongs.push(songEntry);
             });
@@ -190,28 +189,35 @@
       mergeSongs();
     });
 
-    // Slå ihop standardSongs och userPlaylistSongs så att varje låt (baserat på "qr") blir unikt.
-    // Om samma låt finns i flera listor, lägg ihop källorna (source arrays)
+    // Slå ihop standardSongs och userPlaylistSongs så att varje låt (baserat på "qr") är unikt
     function mergeSongs() {
       const merged = {};
-      // Gå igenom standardlåtar
       standardSongs.forEach(song => {
         merged[song.qr] = song;
       });
-
-      // Gå igenom importerade låtar
       userPlaylistSongs.forEach(song => {
         if (merged[song.qr]) {
-          // Om låten redan finns – slå ihop source-arrayerna (unika värden)
           merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
         } else {
           merged[song.qr] = song;
         }
       });
-
       songs = Object.values(merged);
       console.log("✅ Sammankopplad låtsamling (unika spår):", songs.length);
       populateSourceCheckboxes();
+    }
+
+    // Hjälpfunktion: Uppdatera "Alla låtar" checkbox utifrån de övriga checkboxarna
+    function updateAllaCheckbox() {
+      const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
+      const allaBox = document.querySelector('input[name="source"][value="alla"]');
+      let allChecked = true;
+      nonAlla.forEach(chk => {
+        if (!chk.checked) {
+          allChecked = false;
+        }
+      });
+      allaBox.checked = allChecked;
     }
 
     // Skapa checkboxar utifrån unika "source" från den sammanslagna listan
@@ -219,19 +225,18 @@
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla låtar"-alernativ (tidigare "Alla källor") på en egen rad, centrerat
+      // "Alla låtar" – ta upp hela raden och centrera innehållet
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
-      allDiv.style.flexBasis = "100%"; // Tar upp hela raden
+      allDiv.style.flexBasis = "100%";
       allDiv.style.display = "flex";
-      allDiv.style.justifyContent = "center"; // Centrerar innehållet horisontellt
+      allDiv.style.justifyContent = "center";
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
       checkboxAll.value = "alla";
       checkboxAll.id = "source-alla";
       checkboxAll.addEventListener("change", function() {
-        // Hämta alla checkboxes med name="source"
         const allSourceCheckboxes = document.querySelectorAll('input[name="source"]');
         allSourceCheckboxes.forEach(chk => {
           chk.checked = this.checked;
@@ -245,7 +250,7 @@
       allDiv.appendChild(labelAll);
       container.appendChild(allDiv);
       
-      // Hämta unika källor från varje låt
+      // Skapa checkboxar för varje unik spellista (källa)
       let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
@@ -256,9 +261,13 @@
         checkbox.type = "checkbox";
         checkbox.name = "source";
         checkbox.value = source;
-        let id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
+        const id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
         checkbox.id = id;
-        checkbox.addEventListener("change", updateYearSelection);
+        // När en enskild checkbox ändras, uppdatera "Alla låtar" utifrån
+        checkbox.addEventListener("change", function() {
+          updateAllaCheckbox();
+          updateYearSelection();
+        });
         const label = document.createElement("label");
         label.setAttribute("for", id);
         label.textContent = source;
@@ -276,10 +285,9 @@
         const allSources = songs.map(song => song.source).flat();
         selectedSources = [...new Set(allSources)];
       }
-      sourceFilteredSongs = songs.filter(song => {
-        // Eftersom song.source nu är en array, kolla om någon källa matchar
-        return song.source.some(src => selectedSources.includes(src));
-      });
+      sourceFilteredSongs = songs.filter(song =>
+        song.source.some(src => selectedSources.includes(src))
+      );
       
       const startYearDropdown = document.getElementById("startYear");
       const endYearDropdown = document.getElementById("endYear");
@@ -290,13 +298,13 @@
         const optionStart = document.createElement("option");
         optionStart.value = year;
         optionStart.textContent = year;
-        if (year === 1950) { optionStart.selected = true; }
+        if (year === 1950) optionStart.selected = true;
         startYearDropdown.appendChild(optionStart);
         
         const optionEnd = document.createElement("option");
         optionEnd.value = year;
         optionEnd.textContent = year;
-        if (year === 2025) { optionEnd.selected = true; }
+        if (year === 2025) optionEnd.selected = true;
         endYearDropdown.appendChild(optionEnd);
       }
     };
@@ -347,7 +355,8 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med QR-kod och dolda detaljer, med artist på första raden och titeln på en ny rad
+    // Visa vald låt med QR-kod och dolda detaljer,
+    // med artist på första raden och titeln på en ny rad
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -426,7 +435,7 @@
           };
         });
         
-        nextUrl = data.next; // Om det finns fler sidor, hämta nästa batch
+        nextUrl = data.next;
       }
       
       return tracks;

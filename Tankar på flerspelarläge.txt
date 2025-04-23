@@ -11,4 +11,5 @@ Byt språk till engelska
 
 Lägg till readme på förstasidan för betatest
 
+Om man tryckt alla låtar, och kryssar av några låtar så är fortfarande alla låtar markerad, blir det då alla låtar? den borde avmarkeras om man kryssar ur någon annan
 
