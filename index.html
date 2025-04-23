@@ -7,7 +7,6 @@
   <!-- Lägg till länken för Manrope från Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Grundläggande sidstil */
     body {
       font-family: 'Manrope', sans-serif;
       background: url('background.jpg') no-repeat center center fixed;
@@ -24,7 +23,6 @@
       max-width: 500px;
       width: 100%;
       margin: 2rem 1rem;
-      /* Gör att huvudinnehållet ligger under inloggningslagret */
       position: relative;
       z-index: 1;
     }
@@ -44,11 +42,22 @@
       border: 1px solid #333;
       border-radius: 4px;
     }
-    button:hover { background: #555; }
+    button:hover {
+      background: #555;
+    }
     /* Justera bredden på årtalsfälten till 90px */
-    #startYear, #endYear { width: 90px; }
-    #song-display { text-align: center; margin: 1.5rem 0; }
-    #song-display canvas, #song-display img { display: block; margin: 0 auto; }
+    #startYear, #endYear {
+      width: 90px;
+    }
+    #song-display {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    #song-display canvas,
+    #song-display img {
+      display: block;
+      margin: 0 auto;
+    }
     .qrcode {
       width: 160px;
       height: 160px;
@@ -57,7 +66,9 @@
       display: block;
       margin: 0 auto 1rem auto;
     }
-    #result-page { display: none; }
+    #result-page {
+      display: none;
+    }
     
     /* Styling för spellistsval (checkbox-pills) */
     #source-checkbox-container {
@@ -71,7 +82,9 @@
     .checkbox-pill {
       position: relative;
     }
-    .checkbox-pill input[type="checkbox"] { display: none; }
+    .checkbox-pill input[type="checkbox"] {
+      display: none;
+    }
     .checkbox-pill label {
       cursor: pointer;
       padding: 0.5rem 1rem;
@@ -88,7 +101,9 @@
       color: #fff;
       border-color: #0b939c;
     }
-    #filter-page label { color: #fff; }
+    #filter-page label {
+      color: #fff;
+    }
     
     /* Styling för Spotify-spellisteimport */
     #spotify-import {
@@ -107,11 +122,14 @@
       border: 1px solid #333;
       border-radius: 4px;
     }
-    #spotify-import button { width: 40%; padding: 0.5rem; }
+    #spotify-import button {
+      width: 40%;
+      padding: 0.5rem;
+    }
     
     /* Stil för Läs först!-knappen – alltid orange */
     #lasForstButton {
-      background-color: #ff9800;
+      background-color: #ff9800; /* Orange */
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -119,11 +137,50 @@
       padding: 0.4rem 0.8rem;
       font-size: 0.9rem;
     }
-    /* Vid hover ändras inte färgen */
-    #lasForstButton:hover { background-color: #ff9800; }
+    /* Vid hover ska färgen förbli orange */
+    #lasForstButton:hover {
+      background-color: #ff9800;
+    }
     
-    /* Modal-stilar för readme (inloggningsmodal och readme) */
-    /* Inloggningsmodal (hela sidan) */
+    /* Modal-stilar för readme */
+    #readmeModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    #readmeContent {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .closeBtn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      cursor: pointer;
+    }
+    .closeBtn:hover,
+    .closeBtn:focus {
+      color: black;
+      text-decoration: none;
+    }
+    
+    /* Inloggningsmodal */
     #loginModal {
       position: fixed;
       z-index: 2000;
@@ -165,44 +222,6 @@
       color: red;
       display: none;
     }
-    
-    /* Readme-modal (överlappande readme) */
-    #readmeModal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.7);
-    }
-    #readmeContent {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 600px;
-      border-radius: 8px;
-      position: relative;
-    }
-    .closeBtn {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      cursor: pointer;
-    }
-    .closeBtn:hover,
-    .closeBtn:focus {
-      color: black;
-      text-decoration: none;
-    }
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -242,7 +261,9 @@
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
         standardSongs = Object.entries(rawSongs).map(([qr, data]) => {
-          if (!Array.isArray(data.source)) { data.source = [data.source]; }
+          if (!Array.isArray(data.source)) {
+            data.source = [data.source];
+          }
           return { qr, ...data };
         });
         mergeSongs();
@@ -271,10 +292,12 @@
       mergeSongs();
     });
 
-    // Slå ihop låtarna så att varje låt är unik
+    // Slå ihop låtarna så att varje låt blir unikt
     function mergeSongs() {
       const merged = {};
-      standardSongs.forEach(song => { merged[song.qr] = song; });
+      standardSongs.forEach(song => {
+        merged[song.qr] = song;
+      });
       userPlaylistSongs.forEach(song => {
         if (merged[song.qr]) {
           merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
@@ -287,33 +310,43 @@
       populateSourceCheckboxes();
     }
 
-    // Hjälpfunktion: uppdatera "Alla låtar" checkboxen
+    // Uppdatera "Alla låtar" checkboxen
     function updateAllaCheckbox() {
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
       const allaBox = document.querySelector('input[name="source"][value="alla"]');
       let allChecked = true;
-      nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
+      nonAlla.forEach(chk => {
+        if (!chk.checked) { allChecked = false; }
+      });
       allaBox.checked = allChecked;
     }
 
-    // Skapa checkboxar för källor
+    // Skapa checkboxar för källor – här har vi lagt knappen Läs först! ovanför
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Skapa en behållare för "Alla låtar" och "Läs först!"-knappen
+      // Skapa en behållare (allHeader) med kolumn-layout
       const allHeader = document.createElement("div");
-      allHeader.style.position = "relative";
-      allHeader.style.width = "100%";
+      allHeader.style.display = "flex";
+      allHeader.style.flexDirection = "column";
+      allHeader.style.alignItems = "center";
       allHeader.style.marginBottom = "1rem";
       
-      // "Alla låtar" – centrerad
+      // Första raden: Läs först!-knappen
+      const lasForstButton = document.createElement("button");
+      lasForstButton.id = "lasForstButton";
+      lasForstButton.textContent = "Läs först!";
+      lasForstButton.addEventListener("click", function() {
+        document.getElementById("readmeModal").style.display = "block";
+      });
+      allHeader.appendChild(lasForstButton);
+      
+      // Andra raden: "Alla låtar" checkboxen centrerad
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
+      allDiv.style.marginTop = "1rem";
       allDiv.style.display = "inline-block";
-      allDiv.style.margin = "0 auto";
-      
-      // Checkbox och label för "Alla låtar"
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
@@ -327,29 +360,13 @@
       const labelAll = document.createElement("label");
       labelAll.setAttribute("for", "source-alla");
       labelAll.textContent = "Alla låtar";
-      
       allDiv.appendChild(checkboxAll);
       allDiv.appendChild(labelAll);
       
-      // Lägg in "Alla låtar" i headern
       allHeader.appendChild(allDiv);
-      
-      // Skapa "Läs först!"-knappen med sin egen stil, placeras till höger
-      const lasForstButton = document.createElement("button");
-      lasForstButton.id = "lasForstButton";
-      lasForstButton.textContent = "Läs först!";
-      lasForstButton.style.position = "absolute";
-      lasForstButton.style.right = "0";
-      lasForstButton.style.top = "50%";
-      lasForstButton.style.transform = "translateY(-50%)";
-      lasForstButton.addEventListener("click", function() {
-        document.getElementById("readmeModal").style.display = "block";
-      });
-      allHeader.appendChild(lasForstButton);
-      
       container.appendChild(allHeader);
       
-      // Skapa checkboxar för varje unik källa
+      // Skapa checkboxar för varje unik källa (spellista)
       let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
@@ -411,12 +428,10 @@
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
-      
       currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
       );
       shownSongs = [];
-      
       if (currentFilteredSongs.length > 0) {
         nextSong();
         return true;
@@ -510,16 +525,13 @@
     async function fetchSpotifyPlaylist(playlistUrl) {
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
       const token = await getSpotifyToken();
-      
       let tracks = {};
       let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-      
       while (nextUrl) {
         const response = await fetch(nextUrl, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await response.json();
-        
         data.items.forEach(item => {
           const trackId = item.track.id;
           tracks[trackId] = {
@@ -528,10 +540,8 @@
             year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
           };
         });
-        
         nextUrl = data.next;
       }
-      
       return tracks;
     }
 
@@ -582,7 +592,7 @@
         <select id="endYear"></select>
       </div>
       
-      <!-- Spotify-spellisteimportsektionen visas endast på filter-/startsidan -->
+      <!-- Spotify-spellisteimportsektionen -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
@@ -625,16 +635,13 @@
       }
     });
     
-    // Enkel inloggningsfunktion – Ändra lösenordet här efter behov
+    // Enkel inloggningsfunktion
     const passwordInput = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("loginError");
     const loginModal = document.getElementById("loginModal");
-    const mainContent = document.getElementById("mainContent");
     
-    // Exempel-lösenord
-    const pagePassword = "wutang";
-    
+    const pagePassword = "test123"; // Exempel-lösenord
     loginButton.addEventListener("click", function() {
       if (passwordInput.value === pagePassword) {
         loginModal.style.display = "none";
@@ -643,7 +650,6 @@
       }
     });
     
-    // Om användaren trycker på Enter i lösenordsfältet
     passwordInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         loginButton.click();
