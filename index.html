@@ -145,17 +145,17 @@
     // Globala variabler: standardbibliotek och importerade spellistor
     let standardSongs = [];    // Data från noden "songs"
     let userPlaylistSongs = []; // Data från noden "userPlaylists"
-    let songs = [];   // Sammankopplad lista (merged) med unika låtar
-    let sourceFilteredSongs = [];   // Låtar filtrerade på källor
-    let currentFilteredSongs = [];    // Låtar filtrerade på både källa & år
-    let shownSongs = [];              // Låtar som redan visats
+    let songs = [];            // Sammankopplad lista (merged) med unika låtar
+    let sourceFilteredSongs = []; // Låtar filtrerade på källor
+    let currentFilteredSongs = []; // Låtar filtrerade på både källa & år
+    let shownSongs = [];          // Låtar som redan visats
     let currentSong = null;
 
     // Hämta standardlåtar (från noden "songs")
     onValue(ref(db, 'songs'), (snapshot) => {
       if (snapshot.exists()) {
         const rawSongs = snapshot.val();
-        // Anta att standardlåtarna redan har ett unikt "qr" och "source" kan vara en sträng
+        // Anta att standardlåtar redan har ett unikt "qr" och "source" kan vara en sträng
         standardSongs = Object.entries(rawSongs).map(([qr, data]) => {
           if (!Array.isArray(data.source)) {
             data.source = [data.source]; // Gör om till array om det inte redan är det
@@ -218,7 +218,7 @@
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla källor"-alernativ
+      // "Alla källor"-alernativ med eventlistener som ändrar alla checkboxar
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       const checkboxAll = document.createElement("input");
@@ -226,7 +226,14 @@
       checkboxAll.name = "source";
       checkboxAll.value = "alla";
       checkboxAll.id = "source-alla";
-      checkboxAll.addEventListener("change", updateYearSelection);
+      checkboxAll.addEventListener("change", function() {
+        // Hämta alla checkboxes med name="source"
+        const allSourceCheckboxes = document.querySelectorAll('input[name="source"]');
+        allSourceCheckboxes.forEach(chk => {
+          chk.checked = this.checked;
+        });
+        updateYearSelection();
+      });
       const labelAll = document.createElement("label");
       labelAll.setAttribute("for", "source-alla");
       labelAll.textContent = "Alla källor";
@@ -336,7 +343,7 @@
       document.getElementById("song-display").innerHTML = "";
     };
 
-    // Visa vald låt med QR-kod och dolda detaljer
+    // Visa vald låt med QR-kod och dolda detaljer, med artist på första raden och titeln på en ny rad
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
@@ -399,13 +406,13 @@
       
       let tracks = {};
       let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-
+      
       while (nextUrl) {
         const response = await fetch(nextUrl, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await response.json();
-
+        
         data.items.forEach(item => {
           const trackId = item.track.id;
           tracks[trackId] = {
@@ -414,10 +421,10 @@
             year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
           };
         });
-
+        
         nextUrl = data.next; // Om det finns fler sidor, hämta nästa batch
       }
-
+      
       return tracks;
     }
 
