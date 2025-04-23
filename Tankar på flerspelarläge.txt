@@ -1,0 +1,8 @@
+Alternativ för flerspelarläge
+scanna QR-kod för att öppna ny sida där man registrerar sig som spelare. 
+alternativ 1 att man skriver in sina årtal själv. Optimalt rättas dom när man visa svar
+När rätt svar visas kan man utmana, med sitt årtal. Närmats vinner?
+
+bygg in timer!
+
+Testa ersätt QR-koder med länk som spelar upp låt, för att slippa scanna

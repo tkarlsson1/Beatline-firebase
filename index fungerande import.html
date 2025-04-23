@@ -335,21 +335,18 @@
     };
 
     // Visa vald låt med QR-kod och dolda detaljer
-function displaySong(song) {
-  const songDisplay = document.getElementById("song-display");
-  songDisplay.innerHTML = `
-    <div id="qrcode-${song.qr}" class="qrcode"></div>
-    <iframe src="https://open.spotify.com/embed/track/${song.qr}"
-            width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media" style="margin-top: 1rem;">
-    </iframe>
-    <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
-    <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-      <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-      <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
-    </div>
-  `;
-  generateQRCode(song.qr);
-};
+    function displaySong(song) {
+      const songDisplay = document.getElementById("song-display");
+      songDisplay.innerHTML = `
+        <div id="qrcode-${song.qr}" class="qrcode"></div>
+        <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
+        <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+          <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
+          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
+        </div>
+      `;
+      generateQRCode(song.qr);
+    };
 
     // Generera QR-kod (160x160) som länkar till låtens Spotify-sida
     window.generateQRCode = function(qr) {
