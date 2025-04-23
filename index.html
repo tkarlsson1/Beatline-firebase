@@ -317,7 +317,7 @@
       }
     };
 
-    // Välj en slumpad låt som inte redan visats
+   // Välj en slumpad låt som inte redan visats
 window.nextSong = function() {
   const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
   if (remainingSongs.length === 0) {
@@ -336,7 +336,7 @@ window.restart = function() {
   document.getElementById("song-display").innerHTML = "";
 };
 
-// Visa vald låt med QR-kod, dolda detaljer och uppspelning
+// Visa vald låt med QR-kod och dolda detaljer
 function displaySong(song) {
   const songDisplay = document.getElementById("song-display");
   songDisplay.innerHTML = `
@@ -346,13 +346,9 @@ function displaySong(song) {
       <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
       <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">${song.title} - ${song.artist}</div>
     </div>
-    <iframe src="https://open.spotify.com/embed/track/${song.qr}" 
-            style="display: none;" 
-            allow="autoplay; encrypted-media">
-    </iframe>
   `;
   generateQRCode(song.qr);
-};
+}
 
 // Generera QR-kod (160x160) som länkar till låtens Spotify-sida
 window.generateQRCode = function(qr) {
@@ -374,6 +370,7 @@ window.goToFilter = function() {
   document.getElementById("result-page").style.display = "none";
   document.getElementById("filter-page").style.display = "block";
 };
+
 
 
 // --- Spotify-spellisteimport --- 
