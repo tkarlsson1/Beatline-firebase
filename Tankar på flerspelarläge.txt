@@ -9,14 +9,6 @@ Testa ersätt QR-koder med länk som spelar upp låt, för att slippa scanna
 
 Byt språk till engelska
 
-Sätt bredd Visa svar knappen till fast, samma som Nästa låt
-
-Knapp lägg till spellista, räcker om den heter Lägg till
 
 Förtydliga var som är standardlistor och userlists
 
-Typsnitt manrope på knappar också
-
-Ta bort ljusare färg på knappen man tryckte sist
-
-Testa med vit ram runt knappar visa svar, byt låt och startsida. Kanske mörkare bakgrund också
