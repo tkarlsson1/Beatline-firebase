@@ -122,6 +122,16 @@
       border: 1px solid #333;
       border-radius: 4px;
     }
+    /* Nytt select-element för typ */
+    #playlistTypeInput {
+      width: 40%;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: #333;
+      color: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
+    }
     #spotify-import button {
       width: 40%;
       padding: 0.5rem;
@@ -679,12 +689,19 @@
       return tracks;
     }
 
-    async function addPlaylistToFirebase(playlistName, playlistUrl) {
+    // Modifierad addPlaylistToFirebase med ett extra parameter (playlistType)
+    async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
-        const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
-        await set(userPlaylistsRef, { songs: tracks });
-        alert(`Spellistan "${playlistName}" har lagts till!`);
+        if (playlistType === "standard") {
+          const standardListsRef = ref(db, `standardLists/${playlistName}`);
+          await set(standardListsRef, { songs: tracks });
+          alert(`Spellistan "${playlistName}" har lagts till i StandardLists!`);
+        } else {
+          const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
+          await set(userPlaylistsRef, { songs: tracks });
+          alert(`Spellistan "${playlistName}" har lagts till i UserPlaylists!`);
+        }
       } catch (error) {
         console.error("Fel vid hämtning av Spotify-spellista:", error);
         alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
@@ -694,8 +711,9 @@
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+      const playlistType = document.getElementById("playlistTypeInput").value;
       if (playlistName && playlistLink) {
-        addPlaylistToFirebase(playlistName, playlistLink);
+        addPlaylistToFirebase(playlistName, playlistLink, playlistType);
       } else {
         alert("Fyll i både spellistans namn och länk!");
       }
@@ -758,6 +776,11 @@
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+        <!-- Nytt val för typ -->
+        <select id="playlistTypeInput">
+          <option value="standard">StandardLists</option>
+          <option value="user">UserPlaylists</option>
+        </select>
         <button id="addPlaylistButton">Lägg till spellista</button>
       </div>
       
