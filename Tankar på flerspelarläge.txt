@@ -9,5 +9,4 @@ Testa ersätt QR-koder med länk som spelar upp låt, för att slippa scanna
 
 Byt språk till engelska
 
-Lägg till readme på förstasidan för betatest
 

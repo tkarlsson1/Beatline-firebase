@@ -155,14 +155,6 @@
       transform: translateY(-50%);
     }
     
-    /* Vita linjen (divider) – 2px tjock */
-    .divider {
-      height: 2px;
-      background-color: #fff;
-      width: 100%;
-      margin: 1rem 0;
-    }
-    
     /* Modal-stilar för readme */
     #readmeModal {
       display: none;
@@ -447,111 +439,38 @@
       
       container.appendChild(allHeader);
       
-      // Dela in källorna i två grupper: standard (songs) och userPlaylists.
-      let standardSourcesSet = new Set();
-      standardSongs.forEach(song => {
-          song.source.forEach(src => standardSourcesSet.add(src));
+      // Skapa checkboxar för varje unik källa (spellista)
+      let uniqueSources = songs.map(song => song.source).flat();
+      uniqueSources = [...new Set(uniqueSources)];
+      uniqueSources.sort();
+      uniqueSources.forEach(source => {
+        const div = document.createElement("div");
+        div.classList.add("checkbox-pill");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "source";
+        checkbox.value = source;
+        const id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
+        checkbox.id = id;
+        checkbox.addEventListener("change", function() {
+          updateAllaCheckbox();
+          updateYearSelection();
+        });
+        const label = document.createElement("label");
+        label.setAttribute("for", id);
+        label.textContent = source;
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        container.appendChild(div);
       });
-      let standardSources = Array.from(standardSourcesSet);
-      standardSources.sort();
-      
-      let userSourcesSet = new Set();
-      userPlaylistSongs.forEach(song => {
-          song.source.forEach(src => userSourcesSet.add(src));
-      });
-      // Ta bort källor som redan finns i standard
-      let userSources = Array.from(userSourcesSet).filter(src => !standardSourcesSet.has(src));
-      userSources.sort();
-      
-      // Om det finns standardspellistor, lägg in en header och checkboxar
-      if (standardSources.length > 0) {
-          let headerStandard = document.createElement("p");
-          headerStandard.style.margin = "0.5rem 0";
-          headerStandard.style.color = "#fff";
-          headerStandard.style.fontWeight = "bold";
-          headerStandard.textContent = "Standard spellistor:";
-          container.appendChild(headerStandard);
-          
-          standardSources.forEach(source => {
-              const div = document.createElement("div");
-              div.classList.add("checkbox-pill");
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.name = "source";
-              checkbox.value = source;
-              const id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
-              checkbox.id = id;
-              checkbox.addEventListener("change", function() {
-                  updateAllaCheckbox();
-                  updateYearSelection();
-              });
-              const label = document.createElement("label");
-              label.setAttribute("for", id);
-              label.textContent = source;
-              div.appendChild(checkbox);
-              div.appendChild(label);
-              container.appendChild(div);
-          });
-      }
-      
-      // Lägg in den vita linjen (divider)
-      let divider = document.createElement("div");
-      divider.className = "divider";
-      container.appendChild(divider);
-      
-      // Om det finns användarspellistor, lägg in en header och checkboxar
-      if (userSources.length > 0) {
-          let headerUser = document.createElement("p");
-          headerUser.style.margin = "0.5rem 0";
-          headerUser.style.color = "#fff";
-          headerUser.style.fontWeight = "bold";
-          headerUser.textContent = "Egna spellistor:";
-          container.appendChild(headerUser);
-          
-          userSources.forEach(source => {
-              const div = document.createElement("div");
-              div.classList.add("checkbox-pill");
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.name = "source";
-              checkbox.value = source;
-              const id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
-              checkbox.id = id;
-              checkbox.addEventListener("change", function() {
-                  updateAllaCheckbox();
-                  updateYearSelection();
-              });
-              const label = document.createElement("label");
-              label.setAttribute("for", id);
-              label.textContent = source;
-              div.appendChild(checkbox);
-              div.appendChild(label);
-              container.appendChild(div);
-          });
-      }
     }
 
     window.updateYearSelection = function() {
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
       if (selectedSources.includes("alla")) {
-        const allStandard = [];
-        standardSongs.forEach(song => {
-          song.source.forEach(src => {
-            if (!allStandard.includes(src)) {
-              allStandard.push(src);
-            }
-          });
-        });
-        const allUser = [];
-        userPlaylistSongs.forEach(song => {
-          song.source.forEach(src => {
-            if (!allUser.includes(src)) {
-              allUser.push(src);
-            }
-          });
-        });
-        selectedSources = [...new Set([...allStandard, ...allUser])];
+        const allSources = songs.map(song => song.source).flat();
+        selectedSources = [...new Set(allSources)];
       }
       sourceFilteredSongs = songs.filter(song =>
         song.source.some(src => selectedSources.includes(src))
@@ -845,9 +764,11 @@
     // Readme-modal
     const readmeModal = document.getElementById("readmeModal");
     const closeBtn = document.querySelector(".closeBtn");
+
     closeBtn.addEventListener("click", function() {
       readmeModal.style.display = "none";
     });
+    
     window.addEventListener("click", function(event) {
       if (event.target == readmeModal) {
         readmeModal.style.display = "none";
@@ -859,6 +780,7 @@
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("loginError");
     const loginModal = document.getElementById("loginModal");
+    
     const pagePassword = "wutang";
     loginButton.addEventListener("click", function() {
       if (passwordInput.value === pagePassword) {
@@ -867,6 +789,7 @@
         loginError.style.display = "block";
       }
     });
+    
     passwordInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         loginButton.click();
