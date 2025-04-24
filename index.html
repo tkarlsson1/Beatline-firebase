@@ -122,7 +122,7 @@
       border: 1px solid #333;
       border-radius: 4px;
     }
-    /* Nytt select-element för typ */
+    /* Nytt select-element för typ  */
     #playlistTypeInput {
       width: 40%;
       padding: 0.5rem;
@@ -367,7 +367,7 @@
               standardSongs.push({
                 qr: trackId,
                 ...tracks[trackId],
-                source: [playlistName]  // Här används endast nodens namn
+                source: [playlistName]  // Endast standardLists
               });
             }
           }
@@ -393,7 +393,7 @@
               userPlaylistSongs.push({
                 qr: trackId,
                 ...tracks[trackId],
-                source: [playlistName]  // Här används endast nodens namn
+                source: [playlistName]  // Endast userPlaylists
               });
             }
           }
@@ -406,7 +406,7 @@
       }
     });
 
-    // Kombinera spåren från båda grupperna (förening)
+    // Kombinera spåren från båda grupperna (förening, så att varje låt bara visas en gång)
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -414,6 +414,7 @@
       });
       userPlaylistSongs.forEach(song => {
         if (merged[song.qr]) {
+          // Kombinera origins om samma spår finns i båda noderna
           merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
         } else {
           merged[song.qr] = song;
@@ -432,14 +433,16 @@
       allaBox.checked = allChecked;
     }
 
-    // Skapa pills utifrån spellistorna – separata för standardLists och userPlaylists
+    // Funktion som skapar pills (UI) baserat på spellistorna, separerat i standard (ovanför) och user (under) 
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Globalt alternativ: Alla låtar
+      // Skapa headern med globalt alternativ "Alla låtar" och knappen "Läs först!"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
+      
+      // "Alla låtar" alternativet
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
@@ -459,9 +462,23 @@
       allDiv.appendChild(checkboxAll);
       allDiv.appendChild(labelAll);
       allHeader.appendChild(allDiv);
+
+      // Lägg in knappen "Läs först!"
+      const lasForstButton = document.createElement("button");
+      lasForstButton.id = "lasForstButton";
+      lasForstButton.textContent = "Läs först!";
+      lasForstButton.style.position = "absolute";
+      lasForstButton.style.right = "0";
+      lasForstButton.style.top = "50%";
+      lasForstButton.style.transform = "translateY(-50%)";
+      lasForstButton.addEventListener("click", function() {
+        document.getElementById("readmeModal").style.display = "block";
+      });
+      allHeader.appendChild(lasForstButton);
+      
       container.appendChild(allHeader);
       
-      // Skapa pillarna för standardLists (utifrån standardSongs)
+      // Skapa pills för standardLists – utifrån standardSongs
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -492,9 +509,8 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Skapa pillarna för userPlaylists (utifrån userPlaylistSongs)
+      // Skapa pills för userPlaylists – utifrån userPlaylistSongs och filtrera bort om samma namn finns i standard
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
-      // Filtrera bort de som redan finns i standard för att undvika dubbletter
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
       if (userSources.length > 0) {
@@ -816,7 +832,7 @@
     </div>
   </div>
   
-  <!-- Feedback Button (alltid längst ner på sidan) -->
+  <!-- Feedback Button (alltid längst ner) -->
   <button id="feedbackButton">💬</button>
   
   <!-- Feedback Modal -->
