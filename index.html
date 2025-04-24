@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NOTESTREAM</title>
-  <!-- Lägg till länken för Manrope från Google Fonts -->
+  <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Grundläggande sidstil */
@@ -33,21 +33,23 @@
       max-width: 80%;
       height: auto;
     }
+    /* Standardknappar (i filterformuläret) */
     select, button {
-      /* Dessa knappar är initialt satta till 25% men det gäller inte våra resultatknappar som vi stylar separat */
       width: 25%;
       padding: 0.5rem;
       font-size: 1rem;
       margin-bottom: 1rem;
       background: #333;
       color: #fff;
-      border: 1px solid #333;
+      border: 1px solid #fff;
       border-radius: 4px;
+      font-family: 'Manrope', sans-serif;
     }
-    button:hover {
-      background: #555;
+    /* Ta bort hover-effekt på dessa knappar (behåll samma färg) */
+    button:hover, button:active, button:focus {
+      background: #333;
     }
-    /* Årtalsfältens bredd ändrad till 80px */
+    /* Årtalsfältens bredd */
     #startYear, #endYear {
       width: 80px;
     }
@@ -68,14 +70,14 @@
       display: block;
       margin: 0 auto 1rem auto;
     }
-    /* Resultatsida – vi lägger extra padding nedtill för att ge plats åt den fasta knappen */
+    /* Resultatsida – extra padding på botten för den fasta knappen */
     #result-page {
       display: none;
       position: relative;
       padding-bottom: 80px;
     }
     
-    /* Styling för checkbox-pills */
+    /* Styling för checkbox-pills – oförändrad */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -99,6 +101,7 @@
       color: #fff;
       font-size: 1rem;
       user-select: none;
+      font-family: 'Manrope', sans-serif;
     }
     .checkbox-pill input[type="checkbox"]:checked + label {
       background-color: #0b939c;
@@ -109,7 +112,7 @@
       color: #fff;
     }
     
-    /* Styling för Spotify-spellisteimport */
+    /* Spotify-spellisteimport */
     #spotify-import {
       margin-bottom: 2rem;
       text-align: center;
@@ -117,45 +120,23 @@
       border-radius: 8px;
       color: white;
     }
-    #spotify-import input {
+    #spotify-import input, #playlistTypeInput {
       width: 40%;
       padding: 0.5rem;
       margin-bottom: 0.5rem;
       background: #333;
       color: #fff;
-      border: 1px solid #333;
+      border: 1px solid #fff;
       border-radius: 4px;
-    }
-    /* Nytt select-element för typ */
-    #playlistTypeInput {
-      width: 40%;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-      background: #333;
-      color: #fff;
-      border: 1px solid #333;
-      border-radius: 4px;
+      font-family: 'Manrope', sans-serif;
     }
     #spotify-import button {
       width: 40%;
       padding: 0.5rem;
+      font-family: 'Manrope', sans-serif;
     }
     
-    /* Stil för Läs först!-knappen – införd i headern */
-    #lasForstButton {
-      background-color: #ff9800;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.9rem;
-    }
-    #lasForstButton:hover {
-      background-color: #ff9800;
-    }
-    
-    /* Header för "Alla låtar" och "Läs först!" */
+    /* Header med globalt alternativ ("Alla låtar") och "Läs först!"-knappen */
     .allHeader {
       position: relative;
       width: 100%;
@@ -167,8 +148,8 @@
       right: 0;
       top: 50%;
       transform: translateY(-50%);
+      font-family: 'Manrope', sans-serif;
     }
-    
     /* Divider */
     .divider {
       height: 2px;
@@ -177,7 +158,7 @@
       margin: 0.5rem 0;
     }
     
-    /* Modal-stilar för readme */
+    /* Modal för Readme */
     #readmeModal {
       display: none;
       position: fixed;
@@ -198,6 +179,7 @@
       max-width: 600px;
       border-radius: 8px;
       position: relative;
+      font-family: 'Manrope', sans-serif;
     }
     .closeBtn {
       color: #aaa;
@@ -235,6 +217,7 @@
       text-align: center;
       width: 80%;
       max-width: 300px;
+      font-family: 'Manrope', sans-serif;
     }
     #loginBox input[type="password"] {
       width: 80%;
@@ -272,6 +255,7 @@
       font-size: 24px;
       cursor: pointer;
       z-index: 1100;
+      font-family: 'Manrope', sans-serif;
     }
     
     /* Feedback-modal */
@@ -295,6 +279,7 @@
       max-width: 400px;
       border-radius: 8px;
       position: relative;
+      font-family: 'Manrope', sans-serif;
     }
     #closeFeedback {
       position: absolute;
@@ -316,6 +301,7 @@
       padding: 10px;
       font-size: 1rem;
       box-sizing: border-box;
+      font-family: 'Manrope', sans-serif;
     }
     #submitFeedback {
       margin-top: 10px;
@@ -325,9 +311,10 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-family: 'Manrope', sans-serif;
     }
     
-    /* Fasta "Startsida"-knappen på resultatsidan */
+    /* Fasta knappar i resultatsidan */
     .startpage-button {
       position: fixed;
       bottom: 20px;
@@ -335,25 +322,55 @@
       transform: translateX(-50%);
       z-index: 1500;
       padding: 0.5rem 1rem;
-      width: 128px; /* 80% av QR-kodens 160px */
+      width: 128px; /* 80% av 160px QR-kod */
       background: #333;
       color: #fff;
-      border: 1px solid #333;
+      border: 1px solid #fff;
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
-      display: none; /* Visas endast på resultatsidan */
+      display: none;
+      font-family: 'Manrope', sans-serif;
     }
-    .startpage-button:hover {
-      background: #555;
+    .startpage-button:hover,
+    .startpage-button:active,
+    .startpage-button:focus {
+      background: #333;
     }
-    
-    /* Knapp för Nästa låt i resultatsidan */
     .next-song-button {
       display: block;
       margin: 0 auto;
       margin-bottom: 5rem;
-      width: 128px; /* 80% av 160px */
+      width: 128px; /* samma bredd */
+      background: #333;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+    }
+    .next-song-button:hover,
+    .next-song-button:active,
+    .next-song-button:focus {
+      background: #333;
+    }
+    .answer-button {
+      display: block;
+      margin: 0 auto;
+      width: 128px; /* samma bredd */
+      background: #333;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+    }
+    .answer-button:hover,
+    .answer-button:active,
+    .answer-button:focus {
+      background: #333;
     }
   </style>
   
@@ -378,7 +395,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Läs in spellistor från de två noderna: standardLists och userPlaylists
+    // Läs in spellistor från noderna standardLists och userPlaylists
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -387,7 +404,7 @@
     let shownSongs = [];
     let currentSong = null;
 
-    // Läs in standardspellistor från "standardLists"
+    // Läs in standardspellistor
     onValue(ref(db, 'standardLists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
@@ -413,7 +430,7 @@
       }
     });
 
-    // Läs in användarspellistor från "userPlaylists"
+    // Läs in användarspellistor
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
@@ -439,7 +456,7 @@
       }
     });
 
-    // Kombinera spår från båda noderna, så att varje låt visas en gång
+    // Kombinera spår (så att varje låt visas en gång)
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -465,12 +482,12 @@
       allaBox.checked = allChecked;
     }
 
-    // Skapa UI-pills utifrån spellistor – separata för standard (ovanför) och user (under)
+    // Skapa UI-pills utifrån spellistor – separata för standard och användare
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Header med globalt alternativ "Alla låtar" och knappen "Läs först!"
+      // Header med "Alla låtar" och "Läs först!"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
@@ -494,7 +511,7 @@
       allDiv.appendChild(labelAll);
       allHeader.appendChild(allDiv);
       
-      // Lägg in knappen "Läs först!"
+      // Lägg in "Läs först!"-knappen i headern
       const lasForstButton = document.createElement("button");
       lasForstButton.id = "lasForstButton";
       lasForstButton.textContent = "Läs först!";
@@ -509,7 +526,7 @@
       
       container.appendChild(allHeader);
       
-      // Pills för standardLists, baserade på standardSongs
+      // Pills för standardLists
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -540,7 +557,7 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Pills för userPlaylists, baserade på userPlaylistSongs, filtrera bort de som redan finns i standard
+      // Pills för userPlaylists – filtrera bort de som redan finns i standard
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -621,7 +638,7 @@
       if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
-        // Visa den fasta Startsida-knappen endast på resultsidan
+        // Visa den fasta Startsida-knappen endast på resultatsidan
         document.getElementById("startpageButton").style.display = "block";
       }
     };
@@ -648,7 +665,8 @@
       const songDisplay = document.getElementById("song-display");
       songDisplay.innerHTML = `
         <div id="qrcode-${song.qr}" class="qrcode"></div>
-        <button onclick="revealDetails()" style="display: block; margin: 0 auto;">Visa svar</button>
+        <!-- Visa svar-knappen med klassen answer-button -->
+        <button class="answer-button" onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
           <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
           <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
@@ -720,7 +738,7 @@
       return tracks;
     }
 
-    // Modifierad addPlaylistToFirebase med parameter: playlistType
+    // addPlaylistToFirebase med parameter playlistType
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
