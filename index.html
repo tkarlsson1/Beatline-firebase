@@ -33,6 +33,7 @@
       max-width: 80%;
       height: auto;
     }
+    
     /* Standardknappar (i filterformuläret) */
     select, button {
       width: 25%;
@@ -45,10 +46,11 @@
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
-    /* Ta bort hover-effekt på dessa knappar (behåll samma färg) */
+    /* Ta bort hover-/focus-effekter */
     button:hover, button:active, button:focus {
       background: #333;
     }
+    
     /* Årtalsfältens bredd */
     #startYear, #endYear {
       width: 80px;
@@ -235,6 +237,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      font-family: 'Manrope', sans-serif;
     }
     #loginBox p {
       color: red;
@@ -322,7 +325,7 @@
       transform: translateX(-50%);
       z-index: 1500;
       padding: 0.5rem 1rem;
-      width: 128px; /* 80% av 160px QR-kod */
+      width: 128px; /* 80% av 160px */
       background: #333;
       color: #fff;
       border: 1px solid #fff;
@@ -377,7 +380,7 @@
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <!-- Importera även push för att lägga till feedback -->
+  <!-- Importera push för feedback -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -404,7 +407,7 @@
     let shownSongs = [];
     let currentSong = null;
 
-    // Läs in standardspellistor
+    // Läs in standardspellistor från "standardLists"
     onValue(ref(db, 'standardLists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
@@ -430,7 +433,7 @@
       }
     });
 
-    // Läs in användarspellistor
+    // Läs in användarspellistor från "userPlaylists"
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
@@ -456,7 +459,7 @@
       }
     });
 
-    // Kombinera spår (så att varje låt visas en gång)
+    // Kombinera spåren (så att varje låt visas en gång)
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -482,12 +485,12 @@
       allaBox.checked = allChecked;
     }
 
-    // Skapa UI-pills utifrån spellistor – separata för standard och användare
+    // Skapa UI-pills utifrån spellistor – separata för standard (ovanför) och user (under)
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Header med "Alla låtar" och "Läs först!"
+      // Header med globalt alternativ "Alla låtar" och "Läs först!"-knappen
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
@@ -511,7 +514,7 @@
       allDiv.appendChild(labelAll);
       allHeader.appendChild(allDiv);
       
-      // Lägg in "Läs först!"-knappen i headern
+      // Lägg in "Läs först!"-knappen
       const lasForstButton = document.createElement("button");
       lasForstButton.id = "lasForstButton";
       lasForstButton.textContent = "Läs först!";
@@ -526,7 +529,7 @@
       
       container.appendChild(allHeader);
       
-      // Pills för standardLists
+      // Pills för standardLists – baserade på standardSongs
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -557,7 +560,7 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Pills för userPlaylists – filtrera bort de som redan finns i standard
+      // Pills för userPlaylists – baserade på userPlaylistSongs, filtrera bort de som redan finns i standardSources
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -738,7 +741,7 @@
       return tracks;
     }
 
-    // addPlaylistToFirebase med parameter playlistType
+    // addPlaylistToFirebase med parameter playlistType – ändrad knappptext nedan
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -757,6 +760,7 @@
       }
     }
 
+    // Ändrad knapptext: "Lägg till" istället för "Lägg till spellista"
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
@@ -766,33 +770,6 @@
       } else {
         alert("Fyll i både spellistans namn och länk!");
       }
-    });
-
-    // Feedback-hantering
-    document.getElementById("feedbackButton").addEventListener("click", function() {
-      document.getElementById("feedbackModal").style.display = "block";
-    });
-    document.getElementById("closeFeedback").addEventListener("click", function() {
-      document.getElementById("feedbackModal").style.display = "none";
-    });
-    window.addEventListener("click", function(event) {
-      if (event.target == document.getElementById("feedbackModal")) {
-        document.getElementById("feedbackModal").style.display = "none";
-      }
-    });
-    document.getElementById("submitFeedback").addEventListener("click", async function() {
-      const feedbackText = document.getElementById("feedbackText").value.trim();
-      if (feedbackText === "") {
-        alert("Feedbackfältet är tomt!");
-        return;
-      }
-      await set(push(ref(db, "feedback")), {
-        text: feedbackText,
-        timestamp: Date.now()
-      });
-      alert("Tack för din feedback!");
-      document.getElementById("feedbackText").value = "";
-      document.getElementById("feedbackModal").style.display = "none";
     });
   </script>
 </head>
@@ -830,7 +807,8 @@
           <option value="standard">StandardLists</option>
           <option value="user">UserPlaylists</option>
         </select>
-        <button id="addPlaylistButton">Lägg till spellista</button>
+        <!-- Ändrad knapptext från "Lägg till spellista" till "Lägg till" -->
+        <button id="addPlaylistButton">Lägg till</button>
       </div>
       
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
@@ -902,7 +880,7 @@
   
   <!-- Modal & inloggningshändelselyssnare -->
   <script>
-    // Readme-modal
+    // Readme Modal
     const readmeModal = document.getElementById("readmeModal");
     const closeBtn = document.querySelector(".closeBtn");
     closeBtn.addEventListener("click", function() {
