@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NOTESTREAM</title>
   <!-- Ladda Manrope -->
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     /* Grundläggande sidstil */
     body {
@@ -33,8 +33,7 @@
       max-width: 80%;
       height: auto;
     }
-    
-    /* Standardknappar (i filterformuläret) – knapparna här får bredd 25% och har vit border */
+    /* Standardknappar i filterformuläret (select & knappar) – vi tar bort border */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -42,9 +41,14 @@
       margin-bottom: 1rem;
       background: #333;
       color: #fff;
-      border: 1px solid #fff;
+      border: 1px solid #fff; /* Ursprunglig regel */
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
+    }
+    /* Överstyr genom att ta bort border på alla select- och button-element */
+    select,
+    button {
+      border: none !important;
     }
     button:hover,
     button:active,
@@ -52,7 +56,8 @@
       background: #333;
     }
     /* Årtalsfältens bredd */
-    #startYear, #endYear {
+    #startYear,
+    #endYear {
       width: 80px;
     }
     #song-display {
@@ -72,14 +77,13 @@
       display: block;
       margin: 0 auto 1rem auto;
     }
-    /* Resultatsida – extra padding på botten för den fasta knappen */
+    /* Resultatsida – med extra padding nedtill för den fasta knappen */
     #result-page {
       display: none;
       position: relative;
       padding-bottom: 80px;
     }
-    
-    /* Styling för checkbox-pills (filterxo) */
+    /* Styling för checkbox-pills (behåller sin vita border) */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -113,7 +117,6 @@
     #filter-page label {
       color: #fff;
     }
-    
     /* Spotify-spellisteimport */
     #spotify-import {
       margin-bottom: 2rem;
@@ -129,7 +132,7 @@
       margin-bottom: 0.5rem;
       background: #333;
       color: #fff;
-      border: 1px solid #fff;
+      border: none;
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
@@ -138,8 +141,7 @@
       padding: 0.5rem;
       font-family: 'Manrope', sans-serif;
     }
-    
-    /* Header med "Alla låtar" och knappen "Läs först!" */
+    /* Header med "Alla låtar" och "Läs först!"-knappen */
     .allHeader {
       position: relative;
       width: 100%;
@@ -160,7 +162,15 @@
       width: 100%;
       margin: 0.5rem 0;
     }
-    
+    /* Rubriker för listgrupper (subheadings) */
+    .subheading {
+      display: block;
+      width: 100%;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #fff;
+      margin: 0.5rem 0;
+    }
     /* Modal för Readme */
     #readmeModal {
       display: none;
@@ -199,7 +209,6 @@
       color: black;
       text-decoration: none;
     }
-    
     /* Inloggningsmodal */
     #loginModal {
       position: fixed;
@@ -208,7 +217,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.8);
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -244,7 +253,6 @@
       color: red;
       display: none;
     }
-    
     /* Feedback-knapp */
     #feedbackButton {
       position: fixed;
@@ -261,7 +269,6 @@
       z-index: 1100;
       font-family: 'Manrope', sans-serif;
     }
-    
     /* Feedback-modal */
     #feedbackModal {
       display: none;
@@ -317,8 +324,7 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    
-    /* Fasta knappar i resultatsidan – bredd 128px (80% av QR-kodens 160px), ingen border */
+    /* Fasta knappar i resultatsidan – bredd 128px (80% av 160px QR-kod), ingen border */
     .startpage-button {
       position: fixed;
       bottom: 20px;
@@ -333,7 +339,7 @@
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
-      display: none;
+      display: none; /* Visas endast på resultatsidan */
       font-family: 'Manrope', sans-serif;
     }
     .startpage-button:hover,
@@ -482,16 +488,11 @@
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
       const allaBox = document.querySelector('input[name="source"][value="alla"]');
       let allChecked = true;
-      nonAlla.forEach(chk => { 
-        if (!chk.checked) { 
-          allChecked = false; 
-        }
-      });
+      nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
       allaBox.checked = allChecked;
     }
     
-    // Skapa UI-pills utifrån spellistor – separata för standard (ovanför) och user (under)
-    // Med rubriker "Standardlistor" och "Egna spellistor" placerade ovanför respektive grupp
+    // Skapa UI-pills utifrån spellistor – separerade efter nod
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
@@ -537,10 +538,8 @@
       
       // Rubrik för Standardlistor
       const standardHeading = document.createElement("p");
+      standardHeading.className = "subheading";
       standardHeading.textContent = "Standardlistor";
-      standardHeading.style.fontSize = "0.8rem";
-      standardHeading.style.color = "#fff";
-      standardHeading.style.margin = "0.5rem 0";
       container.appendChild(standardHeading);
       
       // Pills för standardLists – baserade på standardSongs
@@ -576,13 +575,11 @@
       
       // Rubrik för Egna spellistor
       const userHeading = document.createElement("p");
+      userHeading.className = "subheading";
       userHeading.textContent = "Egna spellistor";
-      userHeading.style.fontSize = "0.8rem";
-      userHeading.style.color = "#fff";
-      userHeading.style.margin = "0.5rem 0";
       container.appendChild(userHeading);
       
-      // Pills för userPlaylists – baserade på userPlaylistSongs, filtrera bort om samma namn finns i standardSources
+      // Pills för userPlaylists – baserade på userPlaylistSongs; filtrera bort de som redan finns i standardSources
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -763,7 +760,7 @@
       return tracks;
     }
     
-    // addPlaylistToFirebase – knapptext döpt om till "Lägg till"
+    // addPlaylistToFirebase – knapptext ändrad till "Lägg till"
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -826,45 +823,43 @@
   <div id="loginModal">
     <div id="loginBox">
       <h2>Logga in</h2>
-      <input type="password" id="passwordInput" placeholder="Ange lösenord">
+      <input type="password" id="passwordInput" placeholder="Ange lösenord" />
       <button id="loginButton">Logga in</button>
       <p id="loginError">Fel lösenord!</p>
     </div>
   </div>
   
   <div class="container" id="mainContent">
-    <img src="logga.png" alt="Notestream-beta logo" class="logo">
-    
-    <!-- Filter-/Startsida -->
-    <div id="filter-page">
-      <div id="source-checkbox-container"></div>
-      <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="startYear">Från år:</label>
-        <select id="startYear"></select>
-        <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
-        <select id="endYear"></select>
-      </div>
-      <!-- Spotify-spellisteimportsektionen -->
-      <div id="spotify-import">
-        <h3>Lägg till Spotify-spellista</h3>
-        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <!-- Val för vilken nod spellistan ska sparas i -->
-        <select id="playlistTypeInput">
-          <option value="standard">StandardLists</option>
-          <option value="user">UserPlaylists</option>
-        </select>
-        <button id="addPlaylistButton">Lägg till</button>
-      </div>
-      
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
+    <img src="logga.png" alt="Notestream-beta logo" class="logo" />
+      <!-- Filter-/Startsida -->
+  <div id="filter-page">
+    <div id="source-checkbox-container"></div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <label for="startYear">Från år:</label>
+      <select id="startYear"></select>
+      <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
+      <select id="endYear"></select>
+    </div>
+    <!-- Spotify-spellisteimportsektionen -->
+    <div id="spotify-import">
+      <h3>Lägg till Spotify-spellista</h3>
+      <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
+      <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+      <!-- Val för vilken nod spellistan ska sparas i -->
+      <select id="playlistTypeInput">
+        <option value="standard">StandardLists</option>
+        <option value="user">UserPlaylists</option>
+      </select>
+      <button id="addPlaylistButton">Lägg till</button>
     </div>
     
-    <!-- Resultatsida -->
-    <div id="result-page">
-      <div id="song-display"></div>
-      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
-    </div>
+    <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
+  </div>
+  
+  <!-- Resultatsida -->
+  <div id="result-page">
+    <div id="song-display"></div>
+    <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
   </div>
   
   <!-- Fasta "Startsida"-knappen visas endast på resultatsidan -->
@@ -883,30 +878,30 @@
         Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
       </p>
       <p>
-        För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt men så det verkar inte vara möjligt, i alla fall inte i en webbversion.
+        För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
       </p>
       <p>
-        I webbversionen som du nu testar så bygger spelet på att du gör några val i början:<br>
+        I webbversionen bygger spelet på att du i början gör ett antal val:<br>
         • Vilka förinställda spellistor vill du inkludera?<br>
-        • Vilka årtal vill du inkludera låtar från baserat på de spellistor du valt?<br>
-        Utifrån de val du gjort på spellistor så plockas låtar inom de årtal du sen väljer.<br>
-        Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker Startsida eller laddar om sidan.
+        • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
+        Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
+        Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
       </p>
       <p>
-        Du kan också välja att lägga till egna spellistor och om du vill, kombinera dom med de förinställda.
+        Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda.
       </p>
       <p>
         Om du lägger till egna spellistor, tänk på följande:<br>
-        *All data per låt (artist, titel, årtal) baseras på det unika spotify‑id av låten som finns i spellistan du lägger till. Om du t. ex. lägger till en låt från "Best of.." som kom 20 år senare än originalet så kommer årtalet som visas bara baseras på vad som hämtas från spotify.<br>
-        *Spellistor genererade av spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
-        *Om du vill lägga till en av spotifygenererad spellista måste du först spara den som en av dina egna. Tre prickar längst upp → "Lägg till i annan spellista" → Ny spellista. Länkar till rena spotifygenererade‑spellistor "finns inte" mer än i din spotify.
+        * All data per låt (artist, titel, årtal) baseras på det unika spotify‑id som finns i spellistan du lägger till. Om du exempelvis lägger till en låt från "Best of…" som kom 20 år senare än originalet, kommer endast den version Facebook hämtar från Spotify att visas med angivet årtal.<br>
+        * Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
+        * Om du vill lägga till en spotifygenererad spellista, spara den först som din egen. (Exempelvis: Klicka på de tre prickarna → "Lägg till i annan spellista" → Ny spellista.)
       </p>
       <p>
-        När du ska lägga till en lista så namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka dela i spotify och sen kopiera länk.
+        När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
       </p>
       <p>
-        På sikt är tanken att det ska finnas ett standardbibliotek med några tusen låtar och sen användarlistor, som bara användaren ser.<br>
-        Listorna som finns nu är inlagda som exempel bara för att fylla upp databasen.
+        På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
+        De listor som nu visas är exempeldata för att fylla upp databasen.
       </p>
     </div>
   </div>
@@ -924,7 +919,7 @@
     </div>
   </div>
   
-  <!-- Modal & inloggningslyssnare -->
+  <!-- Modal & inloggning -->
   <script>
     // Readme Modal
     const readmeModal = document.getElementById("readmeModal");
@@ -933,8 +928,8 @@
       readmeModal.style.display = "none";
     });
     window.addEventListener("click", function(event) {
-      if (event.target == readmeModal) {
-        readmeModal.style.display = "none";
+      if (event.target == document.getElementById("readmeModal")) {
+        document.getElementById("readmeModal").style.display = "none";
       }
     });
     
@@ -984,5 +979,6 @@
       document.getElementById("feedbackModal").style.display = "none";
     });
   </script>
+
 </body>
 </html>
