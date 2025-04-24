@@ -7,6 +7,7 @@
   <!-- Lägg till länken för Manrope från Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* Grundläggande sidstil */
     body {
       font-family: 'Manrope', sans-serif;
       background: url('background.jpg') no-repeat center center fixed;
@@ -45,7 +46,7 @@
     button:hover {
       background: #555;
     }
-    /* Ändrad bredd på årtalsfälten: 80px */
+    /* Årtalsfältens bredd ändrad från 90px till 80px */
     #startYear, #endYear {
       width: 80px;
     }
@@ -95,7 +96,6 @@
       font-size: 1rem;
       user-select: none;
     }
-    /* Markerad checkbox – använder färgen #0b939c */
     .checkbox-pill input[type="checkbox"]:checked + label {
       background-color: #0b939c;
       color: #fff;
@@ -141,7 +141,7 @@
       background-color: #ff9800;
     }
     
-    /* Behållare för "Alla låtar" och läs först-knappen */
+    /* Behållare för "Alla låtar" och "Läs först!" */
     .allHeader {
       position: relative;
       width: 100%;
@@ -235,14 +235,84 @@
       color: red;
       display: none;
     }
+    
+    /* Feedback-knapp (alltid längst ner på sidan) */
+    #feedbackButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #0b939c;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1100;
+    }
+    
+    /* Feedback-modal */
+    #feedbackModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    #feedbackModal > div {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      position: relative;
+    }
+    #closeFeedback {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #aaa;
+    }
+    #closeFeedback:hover,
+    #closeFeedback:focus {
+      color: black;
+      text-decoration: none;
+    }
+    #feedbackText {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    #submitFeedback {
+      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      background-color: #ff9800;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
   
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
+  <!-- Importera även push för att lägga till feedback -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
@@ -330,7 +400,7 @@
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Skapa behållaren med klass "allHeader"
+      // Behållare med klass "allHeader" för "Alla låtar" och "Läs först!"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
@@ -356,7 +426,7 @@
       
       allHeader.appendChild(allDiv);
       
-      // Lägg till "Läs först!"-knappen absolut placerad inom allHeader
+      // Lägg till "Läs först!"-knappen absolut placerad
       const lasForstButton = document.createElement("button");
       lasForstButton.id = "lasForstButton";
       lasForstButton.textContent = "Läs först!";
@@ -371,7 +441,7 @@
       
       container.appendChild(allHeader);
       
-      // Skapa checkboxar för resterande unika källor (spellistor)
+      // Skapa checkboxar för varje unik källa (spellista)
       let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
@@ -565,6 +635,35 @@
         alert("Fyll i både spellistans namn och länk!");
       }
     });
+
+    // Feedback-hantering
+    document.getElementById("feedbackButton").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "block";
+    });
+    document.getElementById("closeFeedback").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == document.getElementById("feedbackModal")) {
+        document.getElementById("feedbackModal").style.display = "none";
+      }
+    });
+    document.getElementById("submitFeedback").addEventListener("click", async function() {
+      const feedbackText = document.getElementById("feedbackText").value.trim();
+      if (feedbackText === "") {
+        alert("Feedbackfältet är tomt!");
+        return;
+      }
+      // Skicka feedback till Firebase (under noden "feedback")
+      const feedbackRef = ref(db, "feedback");
+      await set(push(feedbackRef), {
+        text: feedbackText,
+        timestamp: Date.now()
+      });
+      alert("Tack för din feedback!");
+      document.getElementById("feedbackText").value = "";
+      document.getElementById("feedbackModal").style.display = "none";
+    });
   </script>
 </head>
 <body>
@@ -610,7 +709,7 @@
     </div>
   </div>
   
-  <!-- Readme Modal med uppdelad text -->
+  <!-- Readme Modal -->
   <div id="readmeModal">
     <div id="readmeContent">
       <span class="closeBtn">&times;</span>
@@ -630,6 +729,9 @@
         Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker Startsida eller laddar om sidan.
       </p>
       <p>
+        // Kan du lägga in radbrytningar enligt ovan?
+      </p>
+      <p>
         Du kan också välja att lägga till egna spellistor och, om du vill, kombinera dem med de förinställda.
       </p>
       <p>
@@ -647,8 +749,22 @@
     </div>
   </div>
   
-  <!-- Modal Event Listeners för readme -->
+  <!-- Feedback Button (alltid längst ner på sidan) -->
+  <button id="feedbackButton">💬</button>
+  
+  <!-- Feedback Modal -->
+  <div id="feedbackModal">
+    <div>
+      <span id="closeFeedback">&times;</span>
+      <h2>Lämna feedback</h2>
+      <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
+      <button id="submitFeedback">Skicka feedback</button>
+    </div>
+  </div>
+  
+  <!-- Modal & inloggningshändelselyssnare -->
   <script>
+    // Readme-modal
     const readmeModal = document.getElementById("readmeModal");
     const closeBtn = document.querySelector(".closeBtn");
 
@@ -662,7 +778,7 @@
       }
     });
     
-    // Enkel inloggningsfunktion med lösenord "wutang"
+    // Enkel inloggningsfunktion
     const passwordInput = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("loginError");
@@ -681,6 +797,38 @@
       if (e.key === "Enter") {
         loginButton.click();
       }
+    });
+    
+    // Feedback-knapp och modal
+    document.getElementById("feedbackButton").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "block";
+    });
+    document.getElementById("closeFeedback").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == document.getElementById("feedbackModal")) {
+        document.getElementById("feedbackModal").style.display = "none";
+      }
+    });
+    document.getElementById("submitFeedback").addEventListener("click", async function() {
+      const feedbackText = document.getElementById("feedbackText").value.trim();
+      if (feedbackText === "") {
+        alert("Feedbackfältet är tomt!");
+        return;
+      }
+      // Skicka feedback till Firebase under noden "feedback"
+      // Observera att vi använder "push" för att skapa en unik post
+      const feedbackRef = firebase.database().ref("feedback");
+      // Eftersom vi i vårt "module" använder Firebase-metoder direkt via import,
+      // använder vi istället: push(ref(db, "feedback"))
+      await set(push(ref(db, "feedback")), {
+        text: feedbackText,
+        timestamp: Date.now()
+      });
+      alert("Tack för din feedback!");
+      document.getElementById("feedbackText").value = "";
+      document.getElementById("feedbackModal").style.display = "none";
     });
   </script>
 </body>
