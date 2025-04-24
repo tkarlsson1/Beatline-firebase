@@ -151,7 +151,7 @@
       background-color: #ff9800;
     }
     
-    /* Behållare för "Alla låtar" och "Läs först!" */
+    /* Behållare för "Alla låtar" */
     .allHeader {
       position: relative;
       width: 100%;
@@ -345,7 +345,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Läs in spellistor från de nya noderna: standardLists och userPlaylists
+    // Läs in spellistor från de två noderna: standardLists och userPlaylists
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -367,7 +367,7 @@
               standardSongs.push({
                 qr: trackId,
                 ...tracks[trackId],
-                source: [playlistName]  // här lagras bara namnet från standardLists
+                source: [playlistName]  // Här används endast nodens namn
               });
             }
           }
@@ -393,7 +393,7 @@
               userPlaylistSongs.push({
                 qr: trackId,
                 ...tracks[trackId],
-                source: [playlistName]  // här lagras bara namnet från userPlaylists
+                source: [playlistName]  // Här används endast nodens namn
               });
             }
           }
@@ -406,7 +406,7 @@
       }
     });
 
-    // Mergar spår från båda grupperna till en samlad lista
+    // Kombinera spåren från båda grupperna (förening)
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -414,7 +414,6 @@
       });
       userPlaylistSongs.forEach(song => {
         if (merged[song.qr]) {
-          // Kombinera origin om samma spår finns i båda
           merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
         } else {
           merged[song.qr] = song;
@@ -433,15 +432,14 @@
       allaBox.checked = allChecked;
     }
 
-    // Uppdaterad populateSourceCheckboxes som separerar standard och user spellistor
+    // Skapa pills utifrån spellistorna – separata för standardLists och userPlaylists
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // "Alla låtar" header
+      // Globalt alternativ: Alla låtar
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
-      
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
@@ -460,18 +458,12 @@
       labelAll.textContent = "Alla låtar";
       allDiv.appendChild(checkboxAll);
       allDiv.appendChild(labelAll);
-      
       allHeader.appendChild(allDiv);
       container.appendChild(allHeader);
       
-      // Beräkna standardSources från standardSongs (endast från noden standardLists)
-      let standardSourcesSet = new Set();
-      standardSongs.forEach(song => {
-          song.source.forEach(src => standardSourcesSet.add(src));
-      });
-      let standardSources = Array.from(standardSourcesSet).sort();
-      
-      // Visa standardspellistor (checkboxar) ovanför dividern
+      // Skapa pillarna för standardLists (utifrån standardSongs)
+      let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
+      standardSources.sort();
       if (standardSources.length > 0) {
           standardSources.forEach(source => {
               const div = document.createElement("div");
@@ -480,7 +472,7 @@
               checkbox.type = "checkbox";
               checkbox.name = "source";
               checkbox.value = source;
-              const id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
+              const id = "standard-" + source.replace(/\s+/g, '-').toLowerCase();
               checkbox.id = id;
               checkbox.addEventListener("change", function() {
                   updateAllaCheckbox();
@@ -500,15 +492,11 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Beräkna userSources från userPlaylistSongs (endast från noden userPlaylists)
-      let userSourcesSet = new Set();
-      userPlaylistSongs.forEach(song => {
-          song.source.forEach(src => userSourcesSet.add(src));
-      });
-      // Filtrera bort de som redan finns i standard
-      let userSources = Array.from(userSourcesSet).filter(src => !standardSourcesSet.has(src)).sort();
-      
-      // Visa användarspellistor (checkboxar) under dividern
+      // Skapa pillarna för userPlaylists (utifrån userPlaylistSongs)
+      let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
+      // Filtrera bort de som redan finns i standard för att undvika dubbletter
+      userSources = userSources.filter(src => !standardSources.includes(src));
+      userSources.sort();
       if (userSources.length > 0) {
           userSources.forEach(source => {
               const div = document.createElement("div");
@@ -517,7 +505,7 @@
               checkbox.type = "checkbox";
               checkbox.name = "source";
               checkbox.value = source;
-              const id = "source-" + source.replace(/\s+/g, '-').toLowerCase();
+              const id = "user-" + source.replace(/\s+/g, '-').toLowerCase();
               checkbox.id = id;
               checkbox.addEventListener("change", function() {
                   updateAllaCheckbox();
@@ -537,23 +525,9 @@
       const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
       let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
       if (selectedSources.includes("alla")) {
-        const allStandard = [];
-        standardSongs.forEach(song => {
-          song.source.forEach(src => {
-            if (!allStandard.includes(src)) {
-              allStandard.push(src);
-            }
-          });
-        });
-        const allUser = [];
-        userPlaylistSongs.forEach(song => {
-          song.source.forEach(src => {
-            if (!allUser.includes(src)) {
-              allUser.push(src);
-            }
-          });
-        });
-        selectedSources = [...new Set([...allStandard, ...allUser])];
+        const allStandard = Array.from(new Set(standardSongs.map(song => song.source[0])));
+        const allUser = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
+        selectedSources = [...new Set([...allStandard, ...allUser, "alla"])];
       }
       sourceFilteredSongs = songs.filter(song =>
         song.source.some(src => selectedSources.includes(src))
@@ -782,7 +756,7 @@
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <!-- Val för vilken nod spellistan ska hamna i -->
+        <!-- Val för vilken nod spellistan ska sparas i -->
         <select id="playlistTypeInput">
           <option value="standard">StandardLists</option>
           <option value="user">UserPlaylists</option>
@@ -842,7 +816,7 @@
     </div>
   </div>
   
-  <!-- Feedback Button (alltid längst ner) -->
+  <!-- Feedback Button (alltid längst ner på sidan) -->
   <button id="feedbackButton">💬</button>
   
   <!-- Feedback Modal -->
