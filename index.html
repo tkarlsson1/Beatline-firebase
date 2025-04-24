@@ -345,7 +345,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Nu kommer vi att läsa in spellistor från två separata noder:
+    // Läs in spellistor från de nya noderna:
     // standardLists och userPlaylists
     let standardSongs = [];
     let userPlaylistSongs = [];
@@ -359,7 +359,7 @@
     onValue(ref(db, 'standardLists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
-        standardSongs = []; // kommer att innehålla spår från alla standardspellistor
+        standardSongs = [];
         for (const playlistName in rawPlaylists) {
           const playlistData = rawPlaylists[playlistName];
           if (playlistData.songs) {
@@ -385,7 +385,7 @@
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
-        userPlaylistSongs = []; // kommer att innehålla spår från alla användarspellistor
+        userPlaylistSongs = [];
         for (const playlistName in rawPlaylists) {
           const playlistData = rawPlaylists[playlistName];
           if (playlistData.songs) {
@@ -472,13 +472,12 @@
       let standardSources = Array.from(standardSourcesSet);
       standardSources.sort();
       
-      // Hämta användarkällor (spellistor) från userPlaylists
+      // Hämta användarkällor (spellistor) från userPlaylists – NU INTE filtrerat bort standard
       let userSourcesSet = new Set();
       userPlaylistSongs.forEach(song => {
           song.source.forEach(src => userSourcesSet.add(src));
       });
-      // Ta bort de som redan finns i standard
-      let userSources = Array.from(userSourcesSet).filter(src => !standardSourcesSet.has(src));
+      let userSources = Array.from(userSourcesSet);
       userSources.sort();
       
       // Visa standardspellistor (checkboxar) – inga rubriker
