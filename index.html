@@ -345,6 +345,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    // Nu kommer vi att läsa in spellistor från två separata noder:
+    // standardLists och userPlaylists
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -353,40 +355,59 @@
     let shownSongs = [];
     let currentSong = null;
 
-    onValue(ref(db, 'songs'), (snapshot) => {
+    // Läs in standardspellistor från "standardLists"
+    onValue(ref(db, 'standardLists'), (snapshot) => {
       if (snapshot.exists()) {
-        const rawSongs = snapshot.val();
-        standardSongs = Object.entries(rawSongs).map(([qr, data]) => {
-          if (!Array.isArray(data.source)) {
-            data.source = [data.source];
+        const rawPlaylists = snapshot.val();
+        standardSongs = []; // kommer att innehålla spår från alla standardspellistor
+        for (const playlistName in rawPlaylists) {
+          const playlistData = rawPlaylists[playlistName];
+          if (playlistData.songs) {
+            const tracks = playlistData.songs;
+            for (const trackId in tracks) {
+              standardSongs.push({
+                qr: trackId,
+                ...tracks[trackId],
+                source: [playlistName]
+              });
+            }
           }
-          return { qr, ...data };
-        });
+        }
         mergeSongs();
       } else {
-        console.error("❌ Inga låtar hittades i 'songs'.");
+        console.error("❌ Inga standardspellistor hittades i 'standardLists'.");
         standardSongs = [];
         mergeSongs();
       }
     });
 
+    // Läs in användarspellistor från "userPlaylists"
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
-      userPlaylistSongs = [];
       if (snapshot.exists()) {
-        const rawUserPlaylists = snapshot.val();
-        Object.keys(rawUserPlaylists).forEach(playlistName => {
-          const playlistData = rawUserPlaylists[playlistName];
+        const rawPlaylists = snapshot.val();
+        userPlaylistSongs = []; // kommer att innehålla spår från alla användarspellistor
+        for (const playlistName in rawPlaylists) {
+          const playlistData = rawPlaylists[playlistName];
           if (playlistData.songs) {
-            Object.entries(playlistData.songs).forEach(([songId, songData]) => {
-              const songEntry = { qr: songId, ...songData, source: [playlistName] };
-              userPlaylistSongs.push(songEntry);
-            });
+            const tracks = playlistData.songs;
+            for (const trackId in tracks) {
+              userPlaylistSongs.push({
+                qr: trackId,
+                ...tracks[trackId],
+                source: [playlistName]
+              });
+            }
           }
-        });
+        }
+        mergeSongs();
+      } else {
+        console.error("❌ Inga användarspellistor hittades i 'userPlaylists'.");
+        userPlaylistSongs = [];
+        mergeSongs();
       }
-      mergeSongs();
     });
 
+    // Mergar spår från båda grupperna till en samlad lista
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -441,23 +462,9 @@
       allDiv.appendChild(labelAll);
       
       allHeader.appendChild(allDiv);
-      
-      // Lägg till "Läs först!"-knappen absolut placerad inom allHeader
-      const lasForstButton = document.createElement("button");
-      lasForstButton.id = "lasForstButton";
-      lasForstButton.textContent = "Läs först!";
-      lasForstButton.style.position = "absolute";
-      lasForstButton.style.right = "0";
-      lasForstButton.style.top = "50%";
-      lasForstButton.style.transform = "translateY(-50%)";
-      lasForstButton.addEventListener("click", function() {
-        document.getElementById("readmeModal").style.display = "block";
-      });
-      allHeader.appendChild(lasForstButton);
-      
       container.appendChild(allHeader);
       
-      // Dela in källorna i två grupper: standard (songs) och userPlaylists.
+      // Hämta standardkällor (spellistor) från standardLists
       let standardSourcesSet = new Set();
       standardSongs.forEach(song => {
           song.source.forEach(src => standardSourcesSet.add(src));
@@ -465,15 +472,16 @@
       let standardSources = Array.from(standardSourcesSet);
       standardSources.sort();
       
+      // Hämta användarkällor (spellistor) från userPlaylists
       let userSourcesSet = new Set();
       userPlaylistSongs.forEach(song => {
           song.source.forEach(src => userSourcesSet.add(src));
       });
-      // Ta bort källor som redan finns i standard
+      // Ta bort de som redan finns i standard
       let userSources = Array.from(userSourcesSet).filter(src => !standardSourcesSet.has(src));
       userSources.sort();
       
-      // Om det finns standardspellistor, lägg in checkboxarna (utan headertext)
+      // Visa standardspellistor (checkboxar) – inga rubriker
       if (standardSources.length > 0) {
           standardSources.forEach(source => {
               const div = document.createElement("div");
@@ -497,12 +505,12 @@
           });
       }
       
-      // Lägg in den vita linjen (divider) med reducerad marginal
+      // Divider
       let divider = document.createElement("div");
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Om det finns användarspellistor, lägg in checkboxarna (utan headertext)
+      // Visa användarspellistor (checkboxar)
       if (userSources.length > 0) {
           userSources.forEach(source => {
               const div = document.createElement("div");
@@ -689,7 +697,7 @@
       return tracks;
     }
 
-    // Modifierad addPlaylistToFirebase med ett extra parameter (playlistType)
+    // Modifierad addPlaylistToFirebase med extra parameter: playlistType
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -776,7 +784,7 @@
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <!-- Nytt val för typ -->
+        <!-- Val för vilken nod spellistan ska hamna i -->
         <select id="playlistTypeInput">
           <option value="standard">StandardLists</option>
           <option value="user">UserPlaylists</option>
@@ -836,7 +844,7 @@
     </div>
   </div>
   
-  <!-- Feedback Button (alltid längst ner på sidan) -->
+  <!-- Feedback Button (alltid längst ner) -->
   <button id="feedbackButton">💬</button>
   
   <!-- Feedback Modal -->
