@@ -140,7 +140,7 @@
       padding: 0.5rem;
     }
     
-    /* Stil för Läs först!-knappen – återinförd i headern */
+    /* Stil för Läs först!-knappen – införd i headern */
     #lasForstButton {
       background-color: #ff9800;
       color: #fff;
@@ -334,12 +334,14 @@
       transform: translateX(-50%);
       z-index: 1500;
       padding: 0.5rem 1rem;
-      background: #333; /* Samma färg som Nästa låt-knappen */
+      width: 25%; /* Samma bredd som knappen "Starta spel" */
+      background: #333;
       color: #fff;
       border: 1px solid #333;
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
+      display: none; /* Skall bara synas på resultatsidan */
     }
     .startpage-button:hover {
       background: #555;
@@ -454,12 +456,12 @@
       allaBox.checked = allChecked;
     }
 
-    // Skapa UI-pills utifrån spellistor – separata för standard och user
+    // Skapa UI-pills utifrån spellistor – separata för standard (ovanför) och user (under)
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Header med globalt alternativ "Alla låtar" och "Läs först!"-knappen
+      // Header med globalt alternativ "Alla låtar" och knappen "Läs först!"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
@@ -498,7 +500,7 @@
       
       container.appendChild(allHeader);
       
-      // Pills för standardLists, baserade på standardSongs
+      // Pills för standardLists - baserat på standardSongs
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -529,7 +531,7 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Pills för userPlaylists, baserade på userPlaylistSongs, filtrera bort de som redan finns i standard
+      // Pills för userPlaylists - baserat på userPlaylistSongs, filtrera bort de som redan finns i standard
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -610,6 +612,8 @@
       if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
+        // Visa den fasta Startsida-knappen bara på resultatsidan
+        document.getElementById("startpageButton").style.display = "block";
       }
     };
 
@@ -664,6 +668,8 @@
       restart();
       document.getElementById("result-page").style.display = "none";
       document.getElementById("filter-page").style.display = "block";
+      // Dölj den fasta Startsida-knappen
+      document.getElementById("startpageButton").style.display = "none";
     };
 
     const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
@@ -810,8 +816,8 @@
     </div>
   </div>
   
-  <!-- Fasta "Startsida"-knappen visas endast när resultatsidan är aktiv -->
-  <button class="startpage-button" onclick="goToFilter()">Startsida</button>
+  <!-- Fasta "Startsida"-knappen som endast visas på resultatsidan -->
+  <button id="startpageButton" class="startpage-button" onclick="goToFilter()">Startsida</button>
   
   <!-- Readme Modal -->
   <div id="readmeModal">
@@ -819,7 +825,7 @@
       <span class="closeBtn">&times;</span>
       <h2>NOTESTREAM-BETA</h2>
       <p>
-        Testa och tyck till!<br>
+        Tack för att du testar! Var kritisk och kom med synpunkter, förbättringsförslag och idéer!<br>
         Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
       </p>
       <p>
