@@ -155,12 +155,12 @@
       transform: translateY(-50%);
     }
     
-    /* Vita linjen (divider) – 2px tjock */
+    /* Vita linjen (divider) – 2px tjock med halva marginaler */
     .divider {
       height: 2px;
       background-color: #fff;
       width: 100%;
-      margin: 1rem 0;
+      margin: 0.5rem 0;
     }
     
     /* Modal-stilar för readme */
@@ -463,15 +463,8 @@
       let userSources = Array.from(userSourcesSet).filter(src => !standardSourcesSet.has(src));
       userSources.sort();
       
-      // Om det finns standardspellistor, lägg in en header och checkboxar
+      // Om det finns standardspellistor, lägg in checkboxarna (utan headertext)
       if (standardSources.length > 0) {
-          let headerStandard = document.createElement("p");
-          headerStandard.style.margin = "0.5rem 0";
-          headerStandard.style.color = "#fff";
-          headerStandard.style.fontWeight = "bold";
-          headerStandard.textContent = "Standard spellistor:";
-          container.appendChild(headerStandard);
-          
           standardSources.forEach(source => {
               const div = document.createElement("div");
               div.classList.add("checkbox-pill");
@@ -494,20 +487,13 @@
           });
       }
       
-      // Lägg in den vita linjen (divider)
+      // Lägg in den vita linjen (divider) med reducerad marginal
       let divider = document.createElement("div");
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Om det finns användarspellistor, lägg in en header och checkboxar
+      // Om det finns användarspellistor, lägg in checkboxarna (utan headertext)
       if (userSources.length > 0) {
-          let headerUser = document.createElement("p");
-          headerUser.style.margin = "0.5rem 0";
-          headerUser.style.color = "#fff";
-          headerUser.style.fontWeight = "bold";
-          headerUser.textContent = "Egna spellistor:";
-          container.appendChild(headerUser);
-          
           userSources.forEach(source => {
               const div = document.createElement("div");
               div.classList.add("checkbox-pill");
