@@ -141,7 +141,7 @@
       background-color: #ff9800;
     }
     
-    /* Behållare för "Alla låtar" och "Läs först!" */
+    /* Behållare för "Alla låtar" och läs först-knappen */
     .allHeader {
       position: relative;
       width: 100%;
@@ -320,7 +320,9 @@
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
       const allaBox = document.querySelector('input[name="source"][value="alla"]');
       let allChecked = true;
-      nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
+      nonAlla.forEach(chk => {
+        if (!chk.checked) { allChecked = false; }
+      });
       allaBox.checked = allChecked;
     }
 
@@ -328,7 +330,7 @@
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Skapa behållare med klass "allHeader"
+      // Skapa behållaren med klass "allHeader"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
@@ -336,7 +338,6 @@
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
-      
       const checkboxAll = document.createElement("input");
       checkboxAll.type = "checkbox";
       checkboxAll.name = "source";
@@ -370,6 +371,7 @@
       
       container.appendChild(allHeader);
       
+      // Skapa checkboxar för resterande unika källor (spellistor)
       let uniqueSources = songs.map(song => song.source).flat();
       uniqueSources = [...new Set(uniqueSources)];
       uniqueSources.sort();
@@ -429,7 +431,6 @@
     window.filterSongs = function() {
       const startYear = parseInt(document.getElementById("startYear").value);
       const endYear = parseInt(document.getElementById("endYear").value);
-      
       currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
       );
@@ -609,32 +610,43 @@
     </div>
   </div>
   
-  <!-- Readme Modal -->
+  <!-- Readme Modal med uppdelad text -->
   <div id="readmeModal">
     <div id="readmeContent">
       <span class="closeBtn">&times;</span>
-      <h2>NOTESTREAM-BETA</h2>
-      <p>Tack för att du testar! Var kritisk och kom med synpunkter, förbättringsförslag och idéer! 
-Tankar kring allt från färg på text till funktioner uppskattas.
-
-För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt men så det verkar inte var möjligt, i alla fall inte i en webbversion. 
-
-I webbversionen som du nu testar så bygger spelet på att du gör några val i början:
-Vilka förinställda spellistor vill du inkludera?
-Vilka årtal vill du inkludera låtar från baserat på de spellistor du valt?
-Utifrån de val du gjort på spellistor så plockas låtar inom de årtal du sen väljer. 
-Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker Startsida eller laddar om sidan.
-
-Du kan också välja att lägga till egna spellistor och om du vill, kombinera dom med de förinställda.
-
-Om du lägger till egna spellistor, tänk på följande:
-*All data per låt (artist, titel, årtal) baseras på det unika spotify-id av låten som finns i spellistan du lägger till. Om du t. ex. lägger till en låt från "Best of.." som kom 20 år senare än originalet så kommer årtalet som visas bara baseras på vad som hämtas från spotify.
-*Spellistor genererade av spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välja gärna såna.
-
-När du ska lägga till en lista så namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka dela i spotify och sen kopiera länk.
-
-På sikt är tanken att det ska finnas ett standardbibliotek med några tusen låtar och sen användarlistor, som bara användaren ser. 
-Listorna som finns nu är inlagda som exempel bara för att fylla upp databasen. </p>
+      <h2>README</h2>
+      <p>
+        Tack för att du testar! Var kritisk och kom med synpunkter, förbättringsförslag och idéer!<br>
+        Tankar kring allt från färg på text till funktioner uppskattas.
+      </p>
+      <p>
+        För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt – men det verkar inte vara möjligt, i alla fall inte i en webbversion.
+      </p>
+      <p>
+        I webbversionen som du nu testar så bygger spelet på att du gör några val i början:<br>
+        • Vilka förinställda spellistor vill du inkludera?<br>
+        • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
+        Utifrån de val du gjort på spellistor så plockas låtar inom de årtal du därefter väljer.<br>
+        Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker Startsida eller laddar om sidan.
+      </p>
+      <p>
+        // Kan du lägga in radbrytningar enligt ovan?
+      </p>
+      <p>
+        Du kan också välja att lägga till egna spellistor och, om du vill, kombinera dem med de förinställda.
+      </p>
+      <p>
+        Om du lägger till egna spellistor, tänk på följande:<br>
+        • All data per låt (artist, titel, årtal) baseras på det unika Spotify-ID:t av låten som finns i spellistan du lägger till. Om du t.ex. lägger till en låt från "Best of…" som kom 20 år senare än originalet så kommer årtalet som visas bara baseras på vad som hämtas från Spotify.<br>
+        • Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna sådana.
+      </p>
+      <p>
+        När du ska lägga till en lista så namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka på "Dela" i Spotify och sen kopiera länken.
+      </p>
+      <p>
+        På sikt är tanken att det ska finnas ett standardbibliotek med några tusen låtar och sedan användarlistor, som bara användaren ser.<br>
+        Listorna som finns nu är inlagda som exempel, bara för att fylla upp databasen.
+      </p>
     </div>
   </div>
   
@@ -653,13 +665,13 @@ Listorna som finns nu är inlagda som exempel bara för att fylla upp databasen.
       }
     });
     
-    // Enkel inloggningsfunktion med nytt lösenord "wutang"
+    // Enkel inloggningsfunktion med lösenord "wutang"
     const passwordInput = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("loginError");
     const loginModal = document.getElementById("loginModal");
     
-    const pagePassword = "wutang";  // Nytt lösenord
+    const pagePassword = "wutang";
     loginButton.addEventListener("click", function() {
       if (passwordInput.value === pagePassword) {
         loginModal.style.display = "none";
