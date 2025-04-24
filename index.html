@@ -34,7 +34,7 @@
       height: auto;
     }
     
-    /* Standardknappar (i filterformuläret) */
+    /* Standardknappar (i filterformuläret) – övriga knappar använder Manrope och konstant utseende */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -138,7 +138,7 @@
       font-family: 'Manrope', sans-serif;
     }
     
-    /* Header med globalt alternativ ("Alla låtar") och "Läs först!"-knappen */
+    /* Header med globalt alternativ ("Alla låtar") & "Läs först!" */
     .allHeader {
       position: relative;
       width: 100%;
@@ -160,7 +160,7 @@
       margin: 0.5rem 0;
     }
     
-    /* Modal för Readme */
+    /* Modal för readme */
     #readmeModal {
       display: none;
       position: fixed;
@@ -317,7 +317,7 @@
       font-family: 'Manrope', sans-serif;
     }
     
-    /* Fasta knappar i resultatsidan */
+    /* Fasta knappar i resultatsidan – ändrad bredd och border borttagen */
     .startpage-button {
       position: fixed;
       bottom: 20px;
@@ -328,7 +328,7 @@
       width: 128px; /* 80% av 160px */
       background: #333;
       color: #fff;
-      border: 1px solid #fff;
+      border: none;
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
@@ -347,7 +347,7 @@
       width: 128px; /* samma bredd */
       background: #333;
       color: #fff;
-      border: 1px solid #fff;
+      border: none;
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
@@ -364,7 +364,7 @@
       width: 128px; /* samma bredd */
       background: #333;
       color: #fff;
-      border: 1px solid #fff;
+      border: none;
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
@@ -380,7 +380,7 @@
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <!-- Importera push för feedback -->
+  <!-- Importera även push för feedback -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -407,7 +407,7 @@
     let shownSongs = [];
     let currentSong = null;
 
-    // Läs in standardspellistor från "standardLists"
+    // Läs in standardspellistor
     onValue(ref(db, 'standardLists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
@@ -433,7 +433,7 @@
       }
     });
 
-    // Läs in användarspellistor från "userPlaylists"
+    // Läs in användarspellistor
     onValue(ref(db, 'userPlaylists'), (snapshot) => {
       if (snapshot.exists()) {
         const rawPlaylists = snapshot.val();
@@ -459,7 +459,7 @@
       }
     });
 
-    // Kombinera spåren (så att varje låt visas en gång)
+    // Kombinera spåren så att varje låt visas en gång
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -485,12 +485,12 @@
       allaBox.checked = allChecked;
     }
 
-    // Skapa UI-pills utifrån spellistor – separata för standard (ovanför) och user (under)
+    // Skapa UI-pills utifrån spellistor – separata för standard och user
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Header med globalt alternativ "Alla låtar" och "Läs först!"-knappen
+      // Header med "Alla låtar" och "Läs först!"-knappen
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
@@ -641,7 +641,7 @@
       if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
-        // Visa den fasta Startsida-knappen endast på resultatsidan
+        // Visa den fasta Startsida-knappen på resultatsidan
         document.getElementById("startpageButton").style.display = "block";
       }
     };
@@ -698,7 +698,7 @@
       restart();
       document.getElementById("result-page").style.display = "none";
       document.getElementById("filter-page").style.display = "block";
-      // Dölj den fasta Startsida-knappen när vi går tillbaka
+      // Dölj den fasta Startsida-knappen
       document.getElementById("startpageButton").style.display = "none";
     };
 
@@ -741,7 +741,7 @@
       return tracks;
     }
 
-    // addPlaylistToFirebase med parameter playlistType – ändrad knappptext nedan
+    // Modifierad addPlaylistToFirebase – knapptext ändrad till "Lägg till"
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -760,7 +760,6 @@
       }
     }
 
-    // Ändrad knapptext: "Lägg till" istället för "Lägg till spellista"
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
@@ -770,6 +769,33 @@
       } else {
         alert("Fyll i både spellistans namn och länk!");
       }
+    });
+
+    // Feedback-hantering
+    document.getElementById("feedbackButton").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "block";
+    });
+    document.getElementById("closeFeedback").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == document.getElementById("feedbackModal")) {
+        document.getElementById("feedbackModal").style.display = "none";
+      }
+    });
+    document.getElementById("submitFeedback").addEventListener("click", async function() {
+      const feedbackText = document.getElementById("feedbackText").value.trim();
+      if (feedbackText === "") {
+        alert("Feedbackfältet är tomt!");
+        return;
+      }
+      await set(push(ref(db, "feedback")), {
+        text: feedbackText,
+        timestamp: Date.now()
+      });
+      alert("Tack för din feedback!");
+      document.getElementById("feedbackText").value = "";
+      document.getElementById("feedbackModal").style.display = "none";
     });
   </script>
 </head>
@@ -807,7 +833,6 @@
           <option value="standard">StandardLists</option>
           <option value="user">UserPlaylists</option>
         </select>
-        <!-- Ändrad knapptext från "Lägg till spellista" till "Lägg till" -->
         <button id="addPlaylistButton">Lägg till</button>
       </div>
       
@@ -821,7 +846,7 @@
     </div>
   </div>
   
-  <!-- Fasta "Startsida"-knappen som endast visas på resultatsidan -->
+  <!-- Fasta "Startsida"-knappen visas endast på resultatsidan -->
   <button id="startpageButton" class="startpage-button" onclick="goToFilter()">Startsida</button>
   
   <!-- Readme Modal -->
@@ -853,7 +878,7 @@
         Om du lägger till egna spellistor, tänk på följande:<br>
         *All data per låt (artist, titel, årtal) baseras på det unika spotify‑id av låten som finns i spellistan du lägger till. Om du t. ex. lägger till en låt från "Best of.." som kom 20 år senare än originalet så kommer årtalet som visas bara baseras på vad som hämtas från spotify.<br>
         *Spellistor genererade av spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
-        *Om du vill lägga till en av spotifygenererad spellista måste du först spara den som en av dina egna. Tre prickar längst upp -> "Lägg till i annan spellista" -> Ny spellista. Länkar till rena spotifygenererade‑spellistor "finns inte" mer än i din spotify.
+        *Om du vill lägga till en av spotifygenererad spellista måste du först spara den som en av dina egna. Tre prickar längst upp → "Lägg till i annan spellista" → Ny spellista. Länkar till rena spotifygenererade‑spellistor "finns inte" mer än i din spotify.
       </p>
       <p>
         När du ska lägga till en lista så namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka dela i spotify och sen kopiera länk.
@@ -878,7 +903,7 @@
     </div>
   </div>
   
-  <!-- Modal & inloggningshändelselyssnare -->
+  <!-- Modal & inloggningslyssnare -->
   <script>
     // Readme Modal
     const readmeModal = document.getElementById("readmeModal");
