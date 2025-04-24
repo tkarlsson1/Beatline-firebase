@@ -46,7 +46,7 @@
     button:hover {
       background: #555;
     }
-    /* Årtalsfältens bredd ändrad från 90px till 80px */
+    /* Årtalsfältens bredd ändrad till 80px */
     #startYear, #endYear {
       width: 80px;
     }
@@ -390,9 +390,7 @@
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
       const allaBox = document.querySelector('input[name="source"][value="alla"]');
       let allChecked = true;
-      nonAlla.forEach(chk => {
-        if (!chk.checked) { allChecked = false; }
-      });
+      nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
       allaBox.checked = allChecked;
     }
 
@@ -426,7 +424,7 @@
       
       allHeader.appendChild(allDiv);
       
-      // Lägg till "Läs först!"-knappen absolut placerad
+      // Lägg till "Läs först!"-knappen absolut placerad inom allHeader
       const lasForstButton = document.createElement("button");
       lasForstButton.id = "lasForstButton";
       lasForstButton.textContent = "Läs först!";
@@ -654,9 +652,8 @@
         alert("Feedbackfältet är tomt!");
         return;
       }
-      // Skicka feedback till Firebase (under noden "feedback")
-      const feedbackRef = ref(db, "feedback");
-      await set(push(feedbackRef), {
+      // Skicka feedback till Firebase under noden "feedback"
+      await set(push(ref(db, "feedback")), {
         text: feedbackText,
         timestamp: Date.now()
       });
@@ -729,9 +726,6 @@
         Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker Startsida eller laddar om sidan.
       </p>
       <p>
-        // Kan du lägga in radbrytningar enligt ovan?
-      </p>
-      <p>
         Du kan också välja att lägga till egna spellistor och, om du vill, kombinera dem med de förinställda.
       </p>
       <p>
@@ -778,7 +772,7 @@
       }
     });
     
-    // Enkel inloggningsfunktion
+    // Inloggningsmodal
     const passwordInput = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("loginError");
@@ -799,7 +793,7 @@
       }
     });
     
-    // Feedback-knapp och modal
+    // Feedback-hantering
     document.getElementById("feedbackButton").addEventListener("click", function() {
       document.getElementById("feedbackModal").style.display = "block";
     });
@@ -818,10 +812,6 @@
         return;
       }
       // Skicka feedback till Firebase under noden "feedback"
-      // Observera att vi använder "push" för att skapa en unik post
-      const feedbackRef = firebase.database().ref("feedback");
-      // Eftersom vi i vårt "module" använder Firebase-metoder direkt via import,
-      // använder vi istället: push(ref(db, "feedback"))
       await set(push(ref(db, "feedback")), {
         text: feedbackText,
         timestamp: Date.now()
