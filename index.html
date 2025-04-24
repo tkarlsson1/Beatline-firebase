@@ -34,6 +34,7 @@
       height: auto;
     }
     select, button {
+      /* Dessa knappar är initialt satta till 25% men det gäller inte våra resultatknappar som vi stylar separat */
       width: 25%;
       padding: 0.5rem;
       font-size: 1rem;
@@ -67,7 +68,7 @@
       display: block;
       margin: 0 auto 1rem auto;
     }
-    /* Resultatsida – extra padding på botten för den fasta knappen */
+    /* Resultatsida – vi lägger extra padding nedtill för att ge plats åt den fasta knappen */
     #result-page {
       display: none;
       position: relative;
@@ -334,17 +335,25 @@
       transform: translateX(-50%);
       z-index: 1500;
       padding: 0.5rem 1rem;
-      width: 25%; /* Samma bredd som knappen "Starta spel" */
+      width: 128px; /* 80% av QR-kodens 160px */
       background: #333;
       color: #fff;
       border: 1px solid #333;
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
-      display: none; /* Skall bara synas på resultatsidan */
+      display: none; /* Visas endast på resultatsidan */
     }
     .startpage-button:hover {
       background: #555;
+    }
+    
+    /* Knapp för Nästa låt i resultatsidan */
+    .next-song-button {
+      display: block;
+      margin: 0 auto;
+      margin-bottom: 5rem;
+      width: 128px; /* 80% av 160px */
     }
   </style>
   
@@ -500,7 +509,7 @@
       
       container.appendChild(allHeader);
       
-      // Pills för standardLists - baserat på standardSongs
+      // Pills för standardLists, baserade på standardSongs
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -531,7 +540,7 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Pills för userPlaylists - baserat på userPlaylistSongs, filtrera bort de som redan finns i standard
+      // Pills för userPlaylists, baserade på userPlaylistSongs, filtrera bort de som redan finns i standard
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -612,7 +621,7 @@
       if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
-        // Visa den fasta Startsida-knappen bara på resultatsidan
+        // Visa den fasta Startsida-knappen endast på resultsidan
         document.getElementById("startpageButton").style.display = "block";
       }
     };
@@ -668,7 +677,7 @@
       restart();
       document.getElementById("result-page").style.display = "none";
       document.getElementById("filter-page").style.display = "block";
-      // Dölj den fasta Startsida-knappen
+      // Dölj den fasta Startsida-knappen när vi går tillbaka
       document.getElementById("startpageButton").style.display = "none";
     };
 
@@ -812,7 +821,7 @@
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
-      <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
+      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
     </div>
   </div>
   
