@@ -652,7 +652,6 @@
         alert("Feedbackfältet är tomt!");
         return;
       }
-      // Skicka feedback till Firebase under noden "feedback"
       await set(push(ref(db, "feedback")), {
         text: feedbackText,
         timestamp: Date.now()
@@ -706,7 +705,7 @@
     </div>
   </div>
   
-  <!-- Readme Modal med uppdaterad rubrik -->
+  <!-- Readme Modal med ändrad rubrik och nytt innehåll -->
   <div id="readmeModal">
     <div id="readmeContent">
       <span class="closeBtn">&times;</span>
@@ -716,34 +715,35 @@
         Tankar kring allt från färg på text till funktioner uppskattas.
       </p>
       <p>
-        För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt – men det verkar inte vara möjligt, i alla fall inte i en webbversion.
+        För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt men så det verkar inte vara möjligt, i alla fall inte i en webbversion.
       </p>
       <p>
         I webbversionen som du nu testar så bygger spelet på att du gör några val i början:<br>
         • Vilka förinställda spellistor vill du inkludera?<br>
-        • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
-        Utifrån de val du gjort på spellistor så plockas låtar inom de årtal du därefter väljer.<br>
+        • Vilka årtal vill du inkludera låtar från baserat på de spellistor du valt?<br>
+        Utifrån de val du gjort på spellistor så plockas låtar inom de årtal du sen väljer.<br>
         Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker Startsida eller laddar om sidan.
       </p>
       <p>
-        Du kan också välja att lägga till egna spellistor och, om du vill, kombinera dem med de förinställda.
+        Du kan också välja att lägga till egna spellistor och om du vill, kombinera dom med de förinställda.
       </p>
       <p>
         Om du lägger till egna spellistor, tänk på följande:<br>
-        • All data per låt (artist, titel, årtal) baseras på det unika Spotify-ID:t av låten som finns i spellistan du lägger till. Om du t.ex. lägger till en låt från "Best of…" som kom 20 år senare än originalet så kommer årtalet som visas bara baseras på vad som hämtas från Spotify.<br>
-        • Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna sådana.
+        *All data per låt (artist, titel, årtal) baseras på det unika spotify‑id av låten som finns i spellistan du lägger till. Om du t. ex. lägger till en låt från "Best of.." som kom 20 år senare än originalet så kommer årtalet som visas bara baseras på vad som hämtas från spotify.<br>
+        *Spellistor genererade av spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
+        *Om du vill lägga till en av spotifygenererad spellista måste du först spara den som en av dina egna. Tre prickar längst upp → "Lägg till i annan spellista" → Ny spellista. Länkar till rena spotifygenererade‑spellistor "finns inte" mer än i din spotify.
       </p>
       <p>
-        När du ska lägga till en lista så namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka på "Dela" i Spotify och sen kopiera länken.
+        När du ska lägga till en lista så namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka dela i spotify och sen kopiera länk.
       </p>
       <p>
-        På sikt är tanken att det ska finnas ett standardbibliotek med några tusen låtar och sedan användarlistor, som bara användaren ser.<br>
-        Listorna som finns nu är inlagda som exempel, bara för att fylla upp databasen.
+        På sikt är tanken att det ska finnas ett standardbibliotek med några tusen låtar och sen användarlistor, som bara användaren ser.<br>
+        Listorna som finns nu är inlagda som exempel bara för att fylla upp databasen.
       </p>
     </div>
   </div>
   
-  <!-- Feedback Button (alltid längst ner) -->
+  <!-- Feedback Button (alltid längst ner på sidan) -->
   <button id="feedbackButton">💬</button>
   
   <!-- Feedback Modal -->
