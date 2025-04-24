@@ -69,6 +69,8 @@
     }
     #result-page {
       display: none;
+      position: relative;
+      padding-bottom: 80px; /* extra luft för den fasta knappen */
     }
     
     /* Styling för checkbox-pills */
@@ -122,7 +124,7 @@
       border: 1px solid #333;
       border-radius: 4px;
     }
-    /* Nytt select-element för typ  */
+    /* Nytt select-element för typ */
     #playlistTypeInput {
       width: 40%;
       padding: 0.5rem;
@@ -137,7 +139,7 @@
       padding: 0.5rem;
     }
     
-    /* Stil för Läs först!-knappen – alltid orange */
+    /* Stil för Läs först!-knappen */
     #lasForstButton {
       background-color: #ff9800;
       color: #fff;
@@ -151,7 +153,7 @@
       background-color: #ff9800;
     }
     
-    /* Behållare för "Alla låtar" */
+    /* Header för "Alla låtar" och knappen "Läs först!" */
     .allHeader {
       position: relative;
       width: 100%;
@@ -165,7 +167,7 @@
       transform: translateY(-50%);
     }
     
-    /* Vita linjen (divider) – 2px tjock med halva marginaler */
+    /* Divider */
     .divider {
       height: 2px;
       background-color: #fff;
@@ -254,7 +256,7 @@
       display: none;
     }
     
-    /* Feedback-knapp (alltid längst ner på sidan) */
+    /* Feedback-knapp */
     #feedbackButton {
       position: fixed;
       bottom: 20px;
@@ -322,6 +324,25 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
+    /* Klass för den fasta "Startsida"-knappen på resultatsidan */
+    .startpage-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1500;
+      padding: 0.75rem 1.25rem;
+      background: #0b939c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .startpage-button:hover {
+      background: #00838f;
+    }
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -367,7 +388,7 @@
               standardSongs.push({
                 qr: trackId,
                 ...tracks[trackId],
-                source: [playlistName]  // Endast standardLists
+                source: [playlistName]
               });
             }
           }
@@ -393,7 +414,7 @@
               userPlaylistSongs.push({
                 qr: trackId,
                 ...tracks[trackId],
-                source: [playlistName]  // Endast userPlaylists
+                source: [playlistName]
               });
             }
           }
@@ -406,7 +427,7 @@
       }
     });
 
-    // Kombinera spåren från båda grupperna (förening, så att varje låt bara visas en gång)
+    // Kombinera spår från båda noderna, så att varje låt visas en gång
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -414,7 +435,6 @@
       });
       userPlaylistSongs.forEach(song => {
         if (merged[song.qr]) {
-          // Kombinera origins om samma spår finns i båda noderna
           merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
         } else {
           merged[song.qr] = song;
@@ -433,16 +453,15 @@
       allaBox.checked = allChecked;
     }
 
-    // Funktion som skapar pills (UI) baserat på spellistorna, separerat i standard (ovanför) och user (under) 
+    // Skapa UI-pills baserat på spellistor
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
       
-      // Skapa headern med globalt alternativ "Alla låtar" och knappen "Läs först!"
+      // Skapa header med globalt alternativ "Alla låtar" och knappen "Läs först!"
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
       
-      // "Alla låtar" alternativet
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
@@ -478,7 +497,7 @@
       
       container.appendChild(allHeader);
       
-      // Skapa pills för standardLists – utifrån standardSongs
+      // StandardList-pills: baserade på standardSongs
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -509,7 +528,7 @@
       divider.className = "divider";
       container.appendChild(divider);
       
-      // Skapa pills för userPlaylists – utifrån userPlaylistSongs och filtrera bort om samma namn finns i standard
+      // UserPlaylist-pills: baserade på userPlaylistSongs, filtrera bort de som redan finns i standardSources
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -685,7 +704,7 @@
       return tracks;
     }
 
-    // Modifierad addPlaylistToFirebase med extra parameter: playlistType
+    // Modifierad addPlaylistToFirebase med parameter: playlistType
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -787,11 +806,14 @@
     <div id="result-page">
       <div id="song-display"></div>
       <button onclick="nextSong()" style="display: block; margin: 0 auto; margin-bottom: 5rem;">Nästa låt</button>
-      <button onclick="goToFilter()" style="display: block; margin: 0 auto;">Startsida</button>
+      <!-- Knappen "Startsida" visas nu fast längst ned -->
     </div>
   </div>
   
-  <!-- Readme Modal med uppdaterad rubrik och innehåll -->
+  <!-- Fasta "Startsida"-knappen nedanför, alltid synlig -->
+  <button class="startpage-button" onclick="goToFilter()">Startsida</button>
+  
+  <!-- Readme Modal -->
   <div id="readmeModal">
     <div id="readmeContent">
       <span class="closeBtn">&times;</span>
@@ -832,7 +854,7 @@
     </div>
   </div>
   
-  <!-- Feedback Button (alltid längst ner) -->
+  <!-- Feedback Button -->
   <button id="feedbackButton">💬</button>
   
   <!-- Feedback Modal -->
