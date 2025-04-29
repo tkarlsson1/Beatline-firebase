@@ -9,6 +9,6 @@ Testa ersätt QR-koder med länk som spelar upp låt, för att slippa scanna
 
 Byt språk till engelska
 
+Ordna textstorlek och harmonisera begreppen List och Spellistor i text Standardlistor och Egna spellistor. Även mindre mellanrum ovanför
 
-Förtydliga var som är standardlistor och userlists
-
+Gör om hip-hop-listan
