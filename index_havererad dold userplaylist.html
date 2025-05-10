@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM</title>
+  <title>NOTESTREAM v0.356</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="favicon.png">
   <style>
     /* Grundläggande sidstil */
     body {
@@ -110,14 +111,14 @@
       color: #fff;
     }
     #spotify-import input, #playlistTypeInput {
-      width: 40%;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Manrope', sans-serif;
+      width: 40%; /* Matchar "Lägg till"-knappen */
+  padding: 0.5rem;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Manrope', sans-serif;
+  text-align: center; /* Säkerställer att texten är centrerad */
     }
     #spotify-import button {
       width: 40%;
@@ -282,7 +283,7 @@
     #submitFeedback {
       margin-top: 10px;
       padding: 0.5rem 1rem;
-      background-color: #ff9800;
+      background-color: #0b939c;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -302,6 +303,20 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
+    #addPlaylistButton {
+  width: 40%; /* Matchar spellistelistan och fälten */
+  padding: 0.5rem;
+  background: #333; /* Färgen kan justeras om du vill */
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Manrope', sans-serif;
+  margin-top: 2px; /* Säkerställer att knappen inte överlappar andra fält */
+  display: block;
+  text-align: center;
+}
+
     .next-song-button { margin-bottom: 5rem; }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #333; }
   </style>
@@ -404,18 +419,41 @@
     
     // Vänta tills DOM är laddad
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
-      onAuthStateChanged(auth, (user) => {
+    // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
+    onAuthStateChanged(auth, (user) => {
+      console.log("Auth State Changed Triggered - User:", user ? user.email : "Ingen inloggad");
         if (user) {
-          console.log("Inloggad användare:", user.email);
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("registerModal").style.display = "none";
-          initDataListeners();
+          if (user.email === "timmykarlsson@gmail.com") { 
+  console.log("Du är admin, spellistevalet visas.");
+  document.getElementById("adminPlaylistType").style.display = "block"; 
+} else {
+  console.log("Du är inte admin, spellistevalet tas bort.");
+  document.getElementById("adminPlaylistType").remove(); 
+}
+
+            console.log("Inloggad användare:", user.email);
+            document.getElementById("loginModal").style.display = "none";
+            document.getElementById("registerModal").style.display = "none";
+            initDataListeners();
+
+            // STYR VISNING AV SPELLISTEVALET
+            const adminPlaylistType = document.getElementById("adminPlaylistType");
+            if (adminPlaylistType) {
+                if (user.email === "timmykarlsson@gmail.com") { 
+                    console.log("Du är inloggad som admin, spellisteval visas!");
+                    adminPlaylistType.style.display = "block"; // Visa spellistevalet för admin
+                } else {
+                    console.log("Du är inte admin, spellisteval tas bort.");
+                    adminPlaylistType.remove(); // Ta bort spellistevalet för andra
+                }
+            } else {
+                console.error("adminPlaylistType saknas i DOM.");
+            }
         } else {
-          console.log("Ingen användare inloggad.");
-          document.getElementById("loginModal").style.display = "flex";
+            console.log("Ingen användare inloggad.");
+            document.getElementById("loginModal").style.display = "flex";
         }
-      });
+    });
       
       // Inloggningsfunktion
       const loginButton = document.getElementById("loginButton");
@@ -803,7 +841,10 @@
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
-      const playlistType = document.getElementById("playlistTypeInput").value;
+      const playlistType = document.getElementById("playlistTypeInput") 
+  ? document.getElementById("playlistTypeInput").value // Admin kan välja
+  : "user"; // Alla andra får "user" automatiskt
+
       if (playlistName && playlistLink) {
         addPlaylistToFirebase(playlistName, playlistLink, playlistType);
       } else {
@@ -937,31 +978,48 @@
     <div id="filter-page">
       <div id="source-checkbox-container"></div>
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="startYear">Från år:</label>
-        <select id="startYear"></select>
-        <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
-        <select id="endYear"></select>
-      </div>
-      <!-- Spotify-spellisteimport -->
-      <div id="spotify-import">
-        <h3>Lägg till Spotify-spellista</h3>
-        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <select id="playlistTypeInput">
-          <option value="standard">StandardLists</option>
-          <option value="user" selected>UserPlaylists</option>
-        </select>
-        <button id="addPlaylistButton">Lägg till</button>
+        <div style="display: flex; gap: 1rem;">
+          <div style="text-align: center;">
+            <label for="startYear">Från år</label><br>
+            <select id="startYear"></select>
+          </div>
+          <div style="text-align: center;">
+            <label for="endYear">Till år</label><br>
+            <select id="endYear"></select>
+          </div>
+        </div>
       </div>
       
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
-    </div>
-    
-    <!-- Resultatsida -->
-    <div id="result-page">
-      <div id="song-display"></div>
-      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
-    </div>
+      
+      <!-- Spotify-spellisteimport -->
+<div id="spotify-import">
+  <h3>Lägg till Spotify-spellista</h3>
+  <input type="text" id="playlistNameInput" placeholder="Spellistans namn" style="margin-bottom: 4px;">
+  <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+
+  <!-- Placera knappen direkt under fälten för namn och länk -->
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;">
+    <button id="addPlaylistButton">Lägg till</button>
+    <button onclick="applyFilter()">Starta spel</button>
+  </div>
+</div>
+
+<!-- Spellisteval visas endast för dig som admin -->
+<div id="adminPlaylistType" style="display: none; text-align: center; margin-top: 6px;">
+  <label for="playlistTypeInput">Lägg till i:</label><br>
+  <div style="display: flex; justify-content: center;">
+    <select id="playlistTypeInput">
+      <option value="standard">StandardLists</option>
+      <option value="user" selected>UserPlaylists</option>
+    </select>
+  </div>
+</div>
+
+<!-- Resultatsida -->
+<div id="result-page">
+  <div id="song-display"></div>
+  <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
+</div>
     
     <!-- Feedback Modal -->
     <div id="feedbackModal">
@@ -980,7 +1038,15 @@
         <h2>NOTESTREAM-BETA</h2>
         <p>
           Test och säg vad du tycker!<br>
-          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas via menyn.
+          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas via menyn uppe till höger.
+        </p>
+        <p>
+          Som det är nu får man scanna QR-koderna med kamera och sen vända ner telefonen direkt. Årtal får skötas på papper. Tanken är att få det helt digitalt på sikt.
+        </p>
+        <p>
+          Årtalen i standardlistorna stämmer i de allra flesta fall. I de listor du laddar in själv så kan det variera beroende på vad du laddar in. 
+          Spelet hämtar årtal direkt från det unika spotify-ID till den version av låtens som finns i spellistan.
+          Listor genererade för dig av Spotify stämmer oftast väldigt bra. För att kunna ladda in den behöver du i Spotify spara den som en egen spellista och sen kopiera den länken.
         </p>
         <p>
           Tidigare fanns en funktion för att ändra årtal på låtar, men den finns inte just nu – den kommer att introduceras senare när inloggning är implementerad fullt ut.
@@ -989,16 +1055,10 @@
           I webbversionen gör du ett antal val:<br>
           • Vilka förinställda spellistor vill du inkludera?<br>
           • Vilka årtal vill du inkludera låtar från?<br>
-          Utifrån dina val väljs sedan låtar ut, och ingen låt kommer att återkomma under samma session.
-        </p>
-        <p>
-          Du kan även lägga till egna spellistor och kombinera dem med de förinställda.
+          Utifrån dina val väljs sedan låtar ut, och även om en låt är med på flera listor kommer ingen låt kommer att återkomma under samma session.
         </p>
         <p>
           När du lägger till en lista, namnge den och klistra in länken som du kopierat från Spotify.
-        </p>
-        <p>
-          Målet är att ha ett bibliotek med tusentals låtar samt användarspellistor som är privata för varje användare.
         </p>
       </div>
     </div>
@@ -1022,7 +1082,7 @@
           document.getElementById("loginModal").style.display = "flex";
         });
       }
-      
+
       // Readme Modal
       const readmeModal = document.getElementById("readmeModal");
       const closeBtn = document.querySelector(".closeBtn");
@@ -1034,7 +1094,7 @@
           readmeModal.style.display = "none";
         }
       });
-      
+
       // Feedback-hantering
       document.getElementById("feedbackButton")?.addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "block";
@@ -1052,7 +1112,33 @@
         document.getElementById("feedbackText").value = "";
         document.getElementById("feedbackModal").style.display = "none";
       });
+
+      // Styr visningen av spellistevalet
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.email === "timmykarlsson@gmail.com") { 
+          document.getElementById("adminPlaylistType").style.display = "block"; // Visa spellistevalet för dig
+        } else {
+          document.getElementById("adminPlaylistType").remove(); // Tar bort elementet för alla andra
+        }
+      });
+
+      // Hantera spellistetyp automatiskt för användare
+      document.getElementById("addPlaylistButton").addEventListener("click", () => {
+        const playlistName = document.getElementById("playlistNameInput").value.trim();
+        const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+        const playlistType = document.getElementById("playlistTypeInput") 
+          ? document.getElementById("playlistTypeInput").value  // Admin kan välja
+          : "user"; // Alla andra får "user" automatiskt
+
+        if (playlistName && playlistLink) {
+          addPlaylistToFirebase(playlistName, playlistLink, playlistType);
+        } else {
+          alert("Fyll i både spellistans namn och länk!");
+        }
+      });
     });
-  </script>
+</script>
+
+
 </body>
 </html>
