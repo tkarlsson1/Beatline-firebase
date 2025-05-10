@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.347</title>
+  <title>NOTESTREAM v0.348</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -956,13 +956,16 @@
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+        
+        <button id="addPlaylistButton">Lägg till</button>
+      </div>
+      <div id="adminPlaylistType" style="display: none;">
+        <label for="playlistTypeInput">Lägg till i:</label>
         <select id="playlistTypeInput">
           <option value="standard">StandardLists</option>
           <option value="user" selected>UserPlaylists</option>
         </select>
-        <button id="addPlaylistButton">Lägg till</button>
       </div>
-      
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
     
@@ -1033,7 +1036,7 @@
           document.getElementById("loginModal").style.display = "flex";
         });
       }
-      
+
       // Readme Modal
       const readmeModal = document.getElementById("readmeModal");
       const closeBtn = document.querySelector(".closeBtn");
@@ -1045,7 +1048,7 @@
           readmeModal.style.display = "none";
         }
       });
-      
+
       // Feedback-hantering
       document.getElementById("feedbackButton")?.addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "block";
@@ -1063,7 +1066,33 @@
         document.getElementById("feedbackText").value = "";
         document.getElementById("feedbackModal").style.display = "none";
       });
+
+      // Styr visningen av spellistevalet
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.email === "timmykarlsson@gmail.com") { 
+          document.getElementById("adminPlaylistType").style.display = "block"; // Visa spellistevalet för dig
+        } else {
+          document.getElementById("adminPlaylistType").remove(); // Tar bort elementet för alla andra
+        }
+      });
+
+      // Hantera spellistetyp automatiskt för användare
+      document.getElementById("addPlaylistButton").addEventListener("click", () => {
+        const playlistName = document.getElementById("playlistNameInput").value.trim();
+        const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+        const playlistType = document.getElementById("playlistTypeInput") 
+          ? document.getElementById("playlistTypeInput").value  // Admin kan välja
+          : "user"; // Alla andra får "user" automatiskt
+
+        if (playlistName && playlistLink) {
+          addPlaylistToFirebase(playlistName, playlistLink, playlistType);
+        } else {
+          alert("Fyll i både spellistans namn och länk!");
+        }
+      });
     });
-  </script>
+</script>
+
+
 </body>
 </html>
