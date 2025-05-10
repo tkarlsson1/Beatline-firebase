@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.360</title>
+  <title>NOTESTREAM v0.361</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -616,7 +616,17 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       }
     }
     
-    window.updateYearSelection = function() {
+    function updateSongCount() {
+    const songCount = sourceFilteredSongs.length; // Räkna valda låtar
+    const songCountElement = document.getElementById("selectedSongCount");
+    if (songCountElement) {
+        songCountElement.textContent = `Valda låtar: ${songCount}`;
+    } else {
+        console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
+    }
+}
+
+window.updateYearSelection = function() {
     const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
     let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
     if (selectedSources.includes("alla")) {
@@ -692,42 +702,41 @@ window.restart = function() {
     document.getElementById("song-display").innerHTML = "";
 };
 
-    
-    function displaySong(song) {
-      const songDisplay = document.getElementById("song-display");
-      songDisplay.innerHTML = `
+function displaySong(song) {
+    const songDisplay = document.getElementById("song-display");
+    songDisplay.innerHTML = `
         <div id="qrcode-${song.qr}" class="qrcode"></div>
         <button class="answer-button" onclick="revealDetails()">Visa svar</button>
         <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-          <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
-            ${song.artist}<br>${song.title}
-          </div>
+            <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
+            <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
+                ${song.artist}<br>${song.title}
+            </div>
         </div>
-      `;
-      generateQRCode(song.qr);
-    }
-    
-    window.generateQRCode = function(qr) {
-      const spotifyUrl = `https://open.spotify.com/track/${qr}`;
-      const qrElement = document.getElementById(`qrcode-${qr}`);
-      qrElement.innerHTML = "";
-      new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
-    };
-    
-    window.revealDetails = function() {
-      document.getElementById("song-details").style.display = "block";
-    };
-    
-    window.goToFilter = function() {
-      const checkboxes = document.querySelectorAll('input[name="source"]');
-      checkboxes.forEach(checkbox => { checkbox.checked = false; });
-      updateYearSelection();
-      restart();
-      document.getElementById("result-page").style.display = "none";
-      document.getElementById("filter-page").style.display = "block";
-    };
-    
+    `;
+    generateQRCode(song.qr);
+}
+
+window.generateQRCode = function(qr) {
+    const spotifyUrl = `https://open.spotify.com/track/${qr}`;
+    const qrElement = document.getElementById(`qrcode-${qr}`);
+    qrElement.innerHTML = "";
+    new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
+};
+
+window.revealDetails = function() {
+    document.getElementById("song-details").style.display = "block";
+};
+
+window.goToFilter = function() {
+    const checkboxes = document.querySelectorAll('input[name="source"]');
+    checkboxes.forEach(checkbox => { checkbox.checked = false; });
+    updateYearSelection();
+    restart();
+    document.getElementById("result-page").style.display = "none";
+    document.getElementById("filter-page").style.display = "block";
+};
+
     /***** NY SPOTIFY TOKEN OCH CACHING DEL *****/
     async function getBackendSpotifyToken() {
       console.log("getBackendSpotifyToken: Kontrollerar om cachat token finns...");
@@ -1044,10 +1053,8 @@ window.restart = function() {
           readmeModal.style.display = "none";
         }
       });
-      function updateSongCount() {
-    const songCount = sourceFilteredSongs.length; // Räkna valda låtar
-    document.getElementById("selectedSongCount").textContent = `Valda låtar: ${songCount}`;
-}
+     
+
 
       // Feedback-hantering
       document.getElementById("feedbackButton")?.addEventListener("click", function() {
