@@ -305,6 +305,13 @@
     }
     .next-song-button { margin-bottom: 5rem; }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #333; }
+    @media (max-width: 768px) {
+  #filter-page div {
+    flex-direction: column; /* Staplar elementen på små skärmar */
+    gap: 0.5rem;
+  }
+}
+
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -937,12 +944,13 @@
     <!-- Filter-/Startsida -->
     <div id="filter-page">
       <div id="source-checkbox-container"></div>
-      <div style="display: flex; flex-direction: column; align-items: center;">
+      <div style="display: flex; justify-content: center; gap: 1rem; align-items: center;">
         <label for="startYear">Från år:</label>
         <select id="startYear"></select>
-        <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
+        <label for="endYear">Till år:</label>
         <select id="endYear"></select>
       </div>
+      
       <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
