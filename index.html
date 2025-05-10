@@ -44,18 +44,12 @@
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
-    select, button {
-      border: none !important;
-    }
+    select, button { border: none !important; }
     button:hover,
     button:active,
-    button:focus {
-      background: #333;
-    }
+    button:focus { background: #333; }
     /* Årtalsfältens bredd */
-    #startYear, #endYear {
-      width: 80px;
-    }
+    #startYear, #endYear { width: 80px; }
     #song-display {
       text-align: center;
       margin: 1.5rem 0;
@@ -88,12 +82,8 @@
       row-gap: 1.5rem;
       margin-bottom: 2rem;
     }
-    .checkbox-pill {
-      position: relative;
-    }
-    .checkbox-pill input[type="checkbox"] {
-      display: none;
-    }
+    .checkbox-pill { position: relative; }
+    .checkbox-pill input[type="checkbox"] { display: none; }
     .checkbox-pill label {
       cursor: pointer;
       padding: 0.5rem 1rem;
@@ -156,7 +146,6 @@
       background: #333;
       border: 1px solid #fff;
       border-radius: 4px;
-      overflow: hidden;
     }
     #dropdownMenu a {
       display: block;
@@ -165,10 +154,8 @@
       text-decoration: none;
       font-size: 1rem;
     }
-    #dropdownMenu a:hover {
-      background: #0b939c;
-    }
-    /* Divider, rubriker mm. */
+    #dropdownMenu a:hover { background: #0b939c; }
+    /* Divider och rubriker */
     .divider { height: 2px; background-color: #fff; width: 100%; margin: 0.5rem 0; }
     .subheading { display: block; width: 100%; text-align: center; font-size: 0.8rem; color: #fff; margin: 0.5rem 0; }
     /* Modal: Readme */
@@ -245,7 +232,7 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    /* Felmeddelanden med .error */
+    /* Felmeddelanden */
     .error {
       color: red;
       display: none;
@@ -302,7 +289,7 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    /* Övriga knappar */
+    /* Övriga knappar: Nästa låt och Visa svar */
     .next-song-button, .answer-button {
       display: block;
       margin: 0 auto;
@@ -326,12 +313,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      onAuthStateChanged, 
-      signOut 
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
     const firebaseConfig = {
@@ -359,8 +346,9 @@
     let shownSongs = [];
     let currentSong = null;
     
-    // Funktion för att sätta fast databashanteringslyssnare – kallas när användaren loggat in
+    // Funktion för att sätta fast databashanteringslyssnare – körs endast när en användare är inloggad.
     function initDataListeners() {
+      // Läs standardspellistor (offentliga)
       onValue(ref(db, 'standardLists'), (snapshot) => {
         if (snapshot.exists()) {
           const rawPlaylists = snapshot.val();
@@ -380,42 +368,42 @@
           }
           mergeSongs();
         } else {
-          console.error("? Inga standardspellistor hittades i 'standardLists'.");
+          console.error("Inga standardspellistor hittades i 'standardLists'.");
           standardSongs = [];
           mergeSongs();
         }
       });
       
-      onValue(ref(db, 'userPlaylists'), (snapshot) => {
+      // Läs användarspellistor endast för den inloggade användarens UID
+      const userId = auth.currentUser.uid;
+      onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
         if (snapshot.exists()) {
           const rawPlaylists = snapshot.val();
           userPlaylistSongs = [];
-          for (const userId in rawPlaylists) {
-            const userLists = rawPlaylists[userId];
-            for (const playlistName in userLists) {
-              const playlistData = userLists[playlistName];
-              if (playlistData.songs) {
-                const tracks = playlistData.songs;
-                userPlaylistSongs.push({
-                  qr: playlistName + "_dummy", // För att undvika dubbletter, justera om behövs.
-                  songs: tracks,
-                  source: [playlistName] // Alternativt kan du använda användarens ID om det passar bättre.
-                });
-              }
+          for (const playlistName in rawPlaylists) {
+            const playlistData = rawPlaylists[playlistName];
+            if (playlistData.songs) {
+              const tracks = playlistData.songs;
+              userPlaylistSongs.push({
+                qr: playlistName,
+                // Om du vill inkludera ytterligare data, gör det här
+                ...{ songs: tracks },
+                source: [playlistName]
+              });
             }
           }
           mergeSongs();
         } else {
-          console.error("? Inga användarspellistor hittades i 'userPlaylists'.");
+          console.error("Inga användarspellistor hittades för UID:", userId);
           userPlaylistSongs = [];
           mergeSongs();
         }
       });
     }
     
-    // Vänta tills DOM är laddat
+    // Vänta tills DOM är laddad
     document.addEventListener("DOMContentLoaded", () => {
-      // Autentisering: visa inloggningsmodal om ingen användare är inloggad; annars initiera dataläsning.
+      // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
       onAuthStateChanged(auth, (user) => {
         if (user) {
           console.log("Inloggad användare:", user.email);
@@ -483,12 +471,10 @@
       }
     });
     
-    // Funktionerna för att hantera spellistor
+    // Funktioner för att hantera spellistor
     function mergeSongs() {
       const merged = {};
-      standardSongs.forEach(song => {
-        merged[song.qr] = song;
-      });
+      standardSongs.forEach(song => { merged[song.qr] = song; });
       userPlaylistSongs.forEach(song => {
         if (merged[song.qr]) {
           merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
@@ -525,9 +511,9 @@
       checkboxAll.value = "alla";
       checkboxAll.id = "source-alla";
       checkboxAll.addEventListener("change", function() {
-          const allSourceCheckboxes = document.querySelectorAll('input[name="source"]');
-          allSourceCheckboxes.forEach(chk => { chk.checked = this.checked; });
-          updateYearSelection();
+        const allSourceCheckboxes = document.querySelectorAll('input[name="source"]');
+        allSourceCheckboxes.forEach(chk => { chk.checked = this.checked; });
+        updateYearSelection();
       });
       const labelAll = document.createElement("label");
       labelAll.setAttribute("for", "source-alla");
@@ -545,26 +531,26 @@
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
-          standardSources.forEach(source => {
-              const div = document.createElement("div");
-              div.classList.add("checkbox-pill");
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.name = "source";
-              checkbox.value = source;
-              const id = "standard-" + source.replace(/\s+/g, '-').toLowerCase();
-              checkbox.id = id;
-              checkbox.addEventListener("change", function() {
-                  updateAllaCheckbox();
-                  updateYearSelection();
-              });
-              const label = document.createElement("label");
-              label.setAttribute("for", id);
-              label.textContent = source;
-              div.appendChild(checkbox);
-              div.appendChild(label);
-              container.appendChild(div);
+        standardSources.forEach(source => {
+          const div = document.createElement("div");
+          div.classList.add("checkbox-pill");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "source";
+          checkbox.value = source;
+          const id = "standard-" + source.replace(/\s+/g, '-').toLowerCase();
+          checkbox.id = id;
+          checkbox.addEventListener("change", function() {
+            updateAllaCheckbox();
+            updateYearSelection();
           });
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.textContent = source;
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          container.appendChild(div);
+        });
       }
       
       let divider = document.createElement("div");
@@ -580,26 +566,26 @@
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
       if (userSources.length > 0) {
-          userSources.forEach(source => {
-              const div = document.createElement("div");
-              div.classList.add("checkbox-pill");
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.name = "source";
-              checkbox.value = source;
-              const id = "user-" + source.replace(/\s+/g, '-').toLowerCase();
-              checkbox.id = id;
-              checkbox.addEventListener("change", function() {
-                  updateAllaCheckbox();
-                  updateYearSelection();
-              });
-              const label = document.createElement("label");
-              label.setAttribute("for", id);
-              label.textContent = source;
-              div.appendChild(checkbox);
-              div.appendChild(label);
-              container.appendChild(div);
+        userSources.forEach(source => {
+          const div = document.createElement("div");
+          div.classList.add("checkbox-pill");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "source";
+          checkbox.value = source;
+          const id = "user-" + source.replace(/\s+/g, '-').toLowerCase();
+          checkbox.id = id;
+          checkbox.addEventListener("change", function() {
+            updateAllaCheckbox();
+            updateYearSelection();
           });
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.textContent = source;
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          container.appendChild(div);
+        });
       }
     }
     
@@ -619,7 +605,6 @@
       const endYearDropdown = document.getElementById("endYear");
       startYearDropdown.innerHTML = "";
       endYearDropdown.innerHTML = "";
-      
       for (let year = 1950; year <= 2025; year++) {
         const optionStart = document.createElement("option");
         optionStart.value = year;
@@ -747,7 +732,6 @@
       console.log("fetchSpotifyPlaylist: Playlist URL mottagen:", playlistUrl);
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
       console.log("fetchSpotifyPlaylist: Extraherat playlist-ID:", playlistId);
-      
       const token = await getBackendSpotifyToken();
       let tracks = {};
       let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
@@ -761,7 +745,7 @@
           tracks[trackId] = {
             title: item.track.name,
             artist: item.track.artists.map(artist => artist.name).join(", "),
-            year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null
+            year: item.track.album.release_date ? item.track.album.release_date.substring(0, 4) : null
           };
         });
         nextUrl = data.next;
@@ -769,7 +753,7 @@
       return tracks;
     }
     
-    // Ändrad funktion: ange att användarspellistor sparas under "userPlaylists/<uid>/<playlistName>".
+    // Skriv användarspellistor under userPlaylists/<uid>/<playlistName>
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         console.log("addPlaylistToFirebase: Försöker hämta spellista med namn:", playlistName);
@@ -782,11 +766,10 @@
           console.log("addPlaylistToFirebase: Spellista lagts till i StandardLists.");
           alert(`Spellistan "${playlistName}" har lagts till i StandardLists!`);
         } else {
-          // Hämta nuvarande användarens UID och skriv till "userPlaylists/<uid>/<playlistName>"
           const userId = auth.currentUser.uid;
           const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
           await set(userPlaylistsRef, { songs: tracks });
-          console.log("addPlaylistToFirebase: Spellista lagts till i UserPlaylists för UID:", userId);
+          console.log("addPlaylistToFirebase: Spellista lagts till för UID:", userId);
           alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
         }
       } catch (error) {
@@ -806,11 +789,10 @@
       }
     });
     
-    /***** MENY: Skapa en menyknapp i högra hörnet med alternativ *****/
+    /***** MENY: Skapa en hamburgermeny i högra hörnet *****/
     document.addEventListener("DOMContentLoaded", function() {
       const menuContainer = document.createElement("div");
       menuContainer.id = "menuContainer";
-      // Placera menyn i övre högra hörnet
       menuContainer.style.position = "fixed";
       menuContainer.style.top = "10px";
       menuContainer.style.right = "10px";
@@ -818,7 +800,7 @@
       
       const menuButton = document.createElement("button");
       menuButton.id = "menuButton";
-      menuButton.innerHTML = "&#9776;"; // Hamburger (tre streck)
+      menuButton.innerHTML = "&#9776;"; // Hamburger-ikon
       menuButton.style.background = "none";
       menuButton.style.border = "none";
       menuButton.style.color = "#fff";
@@ -898,7 +880,6 @@
       });
     });
   </script>
-  
 </head>
 <body>
   <!-- Inloggningsmodal -->
@@ -977,26 +958,25 @@
           Tankar kring allt från färg på text till funktioner uppskattas. Lämnas via menyn.
         </p>
         <p>
-          Tidigare har det funnits en funktion för att ändra årtal på låtar, men den finns inte just nu. Den kommer senare att finnas tillgänglig när man loggar in.
+          Tidigare fanns en funktion för att ändra årtal på låtar, men den finns inte just nu – den kommer att introduceras senare när inloggning är implementerad fullt ut.
         </p>
         <p>
           I webbversionen gör du ett antal val:<br>
           • Vilka förinställda spellistor vill du inkludera?<br>
           • Vilka årtal vill du inkludera låtar från?<br>
-          Utifrån dina val väljs sedan låtar ut. Ingen låt ska återkomma under samma session.
+          Utifrån dina val väljs sedan låtar ut, och ingen låt kommer att återkomma under samma session.
         </p>
         <p>
           Du kan även lägga till egna spellistor och kombinera dem med de förinställda.
         </p>
         <p>
-          När du lägger till en lista, namnge den och klistra in länken från Spotify.
+          När du lägger till en lista, namnge den och klistra in länken som du kopierat från Spotify.
         </p>
         <p>
-          Målet är att ha ett bibliotek med tusentals låtar samt användarspellistor som är privata per användare.
+          Målet är att ha ett bibliotek med tusentals låtar samt användarspellistor som är privata för varje användare.
         </p>
       </div>
     </div>
-    
   </div>
   
   <!-- Vanligt script för modal- och feedbackhantering -->
