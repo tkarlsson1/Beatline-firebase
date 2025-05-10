@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.357</title>
+  <title>NOTESTREAM v0.358</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -377,29 +377,34 @@
       
       // Läs användarspellistor endast för den inloggade användarens UID
       const userId = auth.currentUser.uid;
-      onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
-        if (snapshot.exists()) {
-          const rawPlaylists = snapshot.val();
-          userPlaylistSongs = [];
-          for (const playlistName in rawPlaylists) {
-            const playlistData = rawPlaylists[playlistName];
+onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
+    console.log("Hämtar spellistor för användare:", userId);
+    if (snapshot.exists()) {
+        const userPlaylistsData = snapshot.val();
+        userPlaylistSongs = [];
+
+        for (const playlistName in userPlaylistsData) { // Iterera genom varje spellista
+            const playlistData = userPlaylistsData[playlistName];
             if (playlistData.songs) {
-              const tracks = playlistData.songs;
-              userPlaylistSongs.push({
-                qr: playlistName,
-                // Om du vill inkludera ytterligare data, gör det här
-                ...{ songs: tracks },
-                source: [playlistName]
-              });
+                const tracks = playlistData.songs;
+                for (const trackId in tracks) {
+                    userPlaylistSongs.push({
+                        qr: trackId,
+                        ...tracks[trackId],
+                        source: [playlistName] // Spara spellistans namn för filtrering
+                    });
+                }
             }
-          }
-          mergeSongs();
-        } else {
-          console.error("Inga användarspellistor hittades för UID:", userId);
-          userPlaylistSongs = [];
-          mergeSongs();
         }
-      });
+        
+        console.log("Hämtade användarspellistor:", userPlaylistSongs);
+        mergeSongs(); // Uppdatera samtliga låtar
+    } else {
+        console.log("Inga användarspellistor hittades för UID:", userId);
+        userPlaylistSongs = [];
+        mergeSongs();
+    }
+});
     }
     
     // Vänta tills DOM är laddad
