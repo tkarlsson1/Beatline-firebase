@@ -33,7 +33,7 @@
       max-width: 80%;
       height: auto;
     }
-    /* Standardknappar i filterformuläret (select & knappar) */
+    /* Standardknappar i filterformuläret */
     select, button {
       width: 25%;
       padding: 0.5rem;
@@ -45,14 +45,26 @@
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
-    select, button { border: none !important; }
+    select, button {
+      border: none !important;
+    }
     button:hover,
     button:active,
-    button:focus { background: #333; }
+    button:focus {
+      background: #333;
+    }
     /* Årtalsfältens bredd */
-    #startYear, #endYear { width: 80px; }
-    #song-display { text-align: center; margin: 1.5rem 0; }
-    #song-display canvas, #song-display img { display: block; margin: 0 auto; }
+    #startYear, #endYear {
+      width: 80px;
+    }
+    #song-display {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    #song-display canvas, #song-display img {
+      display: block;
+      margin: 0 auto;
+    }
     .qrcode {
       width: 160px;
       height: 160px;
@@ -76,8 +88,12 @@
       row-gap: 1.5rem;
       margin-bottom: 2rem;
     }
-    .checkbox-pill { position: relative; }
-    .checkbox-pill input[type="checkbox"] { display: none; }
+    .checkbox-pill {
+      position: relative;
+    }
+    .checkbox-pill input[type="checkbox"] {
+      display: none;
+    }
     .checkbox-pill label {
       cursor: pointer;
       padding: 0.5rem 1rem;
@@ -94,7 +110,9 @@
       color: #fff;
       border-color: #0b939c;
     }
-    #filter-page label { color: #fff; }
+    #filter-page label {
+      color: #fff;
+    }
     /* Spotify-spellisteimport */
     #spotify-import {
       margin-bottom: 2rem;
@@ -221,7 +239,13 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    #loginBox p, #registerBox p { color: red; display: none; }
+    /* Felmeddelanden får klassen .error, istället för att dölja alla <p> i modaler */
+    .error {
+      color: red;
+      display: none;
+      font-size: 0.9rem;
+    }
+    /* Se till att övrig text (t.ex. "Inget konto? Registrera dig här") inte har klassen .error */
     /* Feedback-knapp */
     #feedbackButton {
       position: fixed;
@@ -333,9 +357,9 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    .answer-button:hover, .answer-button:active, .answer-button:focus {
-      background: #333;
-    }
+    .answer-button:hover,
+    .answer-button:active,
+    .answer-button:focus { background: #333; }
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -368,9 +392,9 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     
-    // Kör all DOM-relaterad kod när innehållet är laddat
+    // Kör DOM-relaterad kod när innehållet är laddat
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus – visa inloggnings-/registreringsmodal om ingen är inloggad
+      // Hantera autentiseringsstatus – visa login-/registreringsmodal om ingen är inloggad
       onAuthStateChanged(auth, (user) => {
         if (user) {
           console.log("Inloggad användare:", user.email);
@@ -827,7 +851,7 @@
       <input type="email" id="emailInput" placeholder="Ange e-post" />
       <input type="password" id="passwordInput" placeholder="Ange lösenord" />
       <button id="loginButton">Logga in</button>
-      <p id="loginError">Fel e-post eller lösenord!</p>
+      <p id="loginError" class="error">Fel e-post eller lösenord!</p>
       <p>Inget konto? <button id="showRegister">Registrera dig här</button></p>
     </div>
   </div>
@@ -839,7 +863,7 @@
       <input type="email" id="regEmail" placeholder="Ange din e-post" />
       <input type="password" id="regPassword" placeholder="Ange ditt lösenord" />
       <button id="registerButton">Registrera</button>
-      <p id="registerError">Registrering misslyckades!</p>
+      <p id="registerError" class="error">Registrering misslyckades!</p>
       <p>Redan har du ett konto? <button id="showLogin">Logga in</button></p>
     </div>
   </div>
@@ -860,7 +884,6 @@
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <!-- Val för vilken nod spellistan ska sparas i -->
         <select id="playlistTypeInput">
           <option value="standard">StandardLists</option>
           <option value="user" selected>UserPlaylists</option>
@@ -877,7 +900,7 @@
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
     </div>
     
-    <!-- Fasta "Startsida"-knappen visas endast på resultatsidan -->
+    <!-- Fasta "Startsida"-knappen -->
     <button id="startpageButton" class="startpage-button" onclick="goToFilter()">Startsida</button>
     
     <!-- Readme Modal -->
@@ -885,35 +908,22 @@
       <div id="readmeContent">
         <span class="closeBtn">&times;</span>
         <h2>NOTESTREAM-BETA</h2>
-        <p>
-          Test och säg vad du tycker!<br>
-          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
+        <p>Test och säg vad du tycker!<br>
+           Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
         </p>
-        <p>
-          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
+        <p>Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.</p>
+        <p>För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.</p>
+        <p>I webbversionen bygger spelet på att du i början gör ett antal val:<br>
+           • Vilka förinställda spellistor vill du inkludera?<br>
+           • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
+           Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
+           Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
         </p>
-        <p>
-          För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
-        </p>
-        <p>
-          I webbversionen bygger spelet på att du i början gör ett antal val:<br>
-          • Vilka förinställda spellistor vill du inkludera?<br>
-          • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
-          Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
-          Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
-        </p>
-        <p>
-          Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till.
-        </p>
-        <p>
-          Om du lägger till egna spellistor, tänk på att all data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till.
-        </p>
-        <p>
-          När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
-        </p>
-        <p>
-          På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
-          De listor som nu visas är exempeldata för att fylla upp databasen.
+        <p>Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till.</p>
+        <p>Om du lägger till egna spellistor, tänk på att all data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till.</p>
+        <p>När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.</p>
+        <p>På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
+           De listor som nu visas är exempeldata för att fylla upp databasen.
         </p>
       </div>
     </div>
@@ -940,13 +950,13 @@
       const showRegisterBtn = document.getElementById("showRegister");
       const showLoginBtn = document.getElementById("showLogin");
       
-      if(showRegisterBtn){
+      if (showRegisterBtn) {
         showRegisterBtn.addEventListener("click", () => {
           document.getElementById("loginModal").style.display = "none";
           document.getElementById("registerModal").style.display = "flex";
         });
       }
-      if(showLoginBtn){
+      if (showLoginBtn) {
         showLoginBtn.addEventListener("click", () => {
           document.getElementById("registerModal").style.display = "none";
           document.getElementById("loginModal").style.display = "flex";
@@ -984,5 +994,6 @@
       });
     });
   </script>
+  
 </body>
 </html>
