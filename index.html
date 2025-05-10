@@ -903,19 +903,20 @@
   </script>
 </head>
 <body>
-  <!-- Inloggningsmodal -->
-  <div id="loginModal">
-    <div id="loginBox">
-      <h2>Logga in</h2>
-      <input type="email" id="emailInput" placeholder="Ange e-post" />
-      <input type="password" id="passwordInput" placeholder="Ange lösenord" />
-      <!-- Länk för glömt lösenord -->
-      <a href="#" id="forgotPasswordLink">Glömt lösenord?</a>
-      <button id="loginButton">Logga in</button>
-      <p id="loginError" class="error">Fel e-post eller lösenord!</p>
-      <button id="showRegister">Skapa konto</button>
-    </div>
+<!-- Inloggningsmodal -->
+<div id="loginModal">
+  <div id="loginBox">
+    <h2>Logga in</h2>
+    <input type="email" id="emailInput" placeholder="Ange e-post" />
+    <input type="password" id="passwordInput" placeholder="Ange lösenord" />
+    <!-- Länk för glömt lösenord -->
+    <a href="#" id="forgotPasswordLink" style="font-size: 0.85rem; text-decoration: underline; color: #0b939c; display: block; margin-bottom: 1rem;">Glömt lösenord?</a>
+    <button id="loginButton">Logga in</button>
+    <p id="loginError" class="error">Fel e-post eller lösenord!</p>
+    <button id="showRegister" style="margin-top: 1rem;">Skapa konto</button>
   </div>
+</div>
+
   
   <!-- Registreringsmodal -->
   <div id="registerModal" style="display:none;">
@@ -925,7 +926,7 @@
       <input type="password" id="regPassword" placeholder="Ange ditt lösenord" />
       <button id="registerButton">Registrera</button>
       <p id="registerError" class="error">Registrering misslyckades!</p>
-      <p>Redan har du ett konto? <button id="showLogin">Logga in</button></p>
+      <p>Har du redan ett konto? <button id="showLogin">Logga in</button></p>
     </div>
   </div>
   
