@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.360</title>
+  <title>NOTESTREAM v0.359</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -617,22 +617,22 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     }
     
     window.updateYearSelection = function() {
-    const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
-    let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
-    if (selectedSources.includes("alla")) {
+      const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
+      let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
+      if (selectedSources.includes("alla")) {
         const allStandard = Array.from(new Set(standardSongs.map(song => song.source[0])));
         const allUser = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
         selectedSources = [...new Set([...allStandard, ...allUser, "alla"])];
-    }
-    sourceFilteredSongs = songs.filter(song =>
+      }
+      sourceFilteredSongs = songs.filter(song =>
         song.source.some(src => selectedSources.includes(src))
-    );
-
-    const startYearDropdown = document.getElementById("startYear");
-    const endYearDropdown = document.getElementById("endYear");
-    startYearDropdown.innerHTML = "";
-    endYearDropdown.innerHTML = "";
-    for (let year = 1950; year <= 2025; year++) {
+      );
+      
+      const startYearDropdown = document.getElementById("startYear");
+      const endYearDropdown = document.getElementById("endYear");
+      startYearDropdown.innerHTML = "";
+      endYearDropdown.innerHTML = "";
+      for (let year = 1950; year <= 2025; year++) {
         const optionStart = document.createElement("option");
         optionStart.value = year;
         optionStart.textContent = year;
@@ -644,54 +644,50 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
         optionEnd.textContent = year;
         if (year === 2025) optionEnd.selected = true;
         endYearDropdown.appendChild(optionEnd);
-    }
-
-    updateSongCount(); // Uppdatera antalet valda låtar!
-};
-
-window.filterSongs = function() {
-    const startYear = parseInt(document.getElementById("startYear").value);
-    const endYear = parseInt(document.getElementById("endYear").value);
-    currentFilteredSongs = sourceFilteredSongs.filter(song =>
+      }
+    };
+    
+    window.filterSongs = function() {
+      const startYear = parseInt(document.getElementById("startYear").value);
+      const endYear = parseInt(document.getElementById("endYear").value);
+      currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
-    );
-    shownSongs = [];
-    if (currentFilteredSongs.length > 0) {
+      );
+      shownSongs = [];
+      if (currentFilteredSongs.length > 0) {
         nextSong();
         return true;
-    } else {
+      } else {
         alert("Inga låtar hittades i den valda perioden.");
         document.getElementById("song-display").innerHTML = "";
         return false;
-    }
-};
-
-window.applyFilter = function() {
-    if (filterSongs()) {
+      }
+    };
+    
+    window.applyFilter = function() {
+      if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
-        updateSongCount(); // Uppdatera antalet valda låtar!
-    }
-};
-
-window.nextSong = function() {
-    const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
-    if (remainingSongs.length === 0) {
+      }
+    };
+    
+    window.nextSong = function() {
+      const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
+      if (remainingSongs.length === 0) {
         alert("Inga fler låtar, tryck på menyvalet 'Startsida' för att börja om.");
         return;
-    }
-    const randomIndex = Math.floor(Math.random() * remainingSongs.length);
-    currentSong = remainingSongs[randomIndex];
-    shownSongs.push(currentSong);
-    displaySong(currentSong);
-};
-
-window.restart = function() {
-    shownSongs = [];
-    currentSong = null;
-    document.getElementById("song-display").innerHTML = "";
-};
-
+      }
+      const randomIndex = Math.floor(Math.random() * remainingSongs.length);
+      currentSong = remainingSongs[randomIndex];
+      shownSongs.push(currentSong);
+      displaySong(currentSong);
+    };
+    
+    window.restart = function() {
+      shownSongs = [];
+      currentSong = null;
+      document.getElementById("song-display").innerHTML = "";
+    };
     
     function displaySong(song) {
       const songDisplay = document.getElementById("song-display");
@@ -964,7 +960,6 @@ window.restart = function() {
       </div>
       
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
-      <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
     </div>
     
     <!-- Resultatsida -->
@@ -1044,11 +1039,7 @@ window.restart = function() {
           readmeModal.style.display = "none";
         }
       });
-      function updateSongCount() {
-    const songCount = sourceFilteredSongs.length; // Räkna valda låtar
-    document.getElementById("selectedSongCount").textContent = `Valda låtar: ${songCount}`;
-}
-
+      
       // Feedback-hantering
       document.getElementById("feedbackButton")?.addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "block";
