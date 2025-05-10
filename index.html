@@ -52,8 +52,7 @@
     /* Årtalsfältens bredd */
     #startYear, #endYear { width: 80px; }
     #song-display { text-align: center; margin: 1.5rem 0; }
-    #song-display canvas,
-    #song-display img { display: block; margin: 0 auto; }
+    #song-display canvas, #song-display img { display: block; margin: 0 auto; }
     .qrcode {
       width: 160px;
       height: 160px;
@@ -222,10 +221,7 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    #loginBox p, #registerBox p {
-      color: red;
-      display: none;
-    }
+    #loginBox p, #registerBox p { color: red; display: none; }
     /* Feedback-knapp */
     #feedbackButton {
       position: fixed;
@@ -337,9 +333,9 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    .answer-button:hover,
-    .answer-button:active,
-    .answer-button:focus { background: #333; }
+    .answer-button:hover, .answer-button:active, .answer-button:focus {
+      background: #333;
+    }
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -372,55 +368,76 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     
-    // Hantera autentiseringsstatus – visa logga in eller registreringsmodal om ingen är inloggad
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("Inloggad användare:", user.email);
-        document.getElementById("loginModal").style.display = "none";
-        document.getElementById("registerModal").style.display = "none";
-      } else {
-        console.log("Ingen användare inloggad.");
-        document.getElementById("loginModal").style.display = "flex";
+    // Kör all DOM-relaterad kod när innehållet är laddat
+    document.addEventListener("DOMContentLoaded", () => {
+      // Hantera autentiseringsstatus – visa inloggnings-/registreringsmodal om ingen är inloggad
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("Inloggad användare:", user.email);
+          document.getElementById("loginModal").style.display = "none";
+          document.getElementById("registerModal").style.display = "none";
+        } else {
+          console.log("Ingen användare inloggad.");
+          document.getElementById("loginModal").style.display = "flex";
+        }
+      });
+      
+      // Inloggningsfunktion
+      const loginButton = document.getElementById("loginButton");
+      if (loginButton) {
+        loginButton.addEventListener("click", () => {
+          const email = document.getElementById("emailInput").value.trim();
+          const password = document.getElementById("passwordInput").value;
+          signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log("Inloggning lyckades:", userCredential.user.email);
+              document.getElementById("loginError").style.display = "none";
+            })
+            .catch((error) => {
+              console.error("Inloggningsfel:", error);
+              document.getElementById("loginError").style.display = "block";
+            });
+        });
+      }
+      
+      // Registreringsfunktion
+      const registerButton = document.getElementById("registerButton");
+      if (registerButton) {
+        registerButton.addEventListener("click", () => {
+          const email = document.getElementById("regEmail").value.trim();
+          const password = document.getElementById("regPassword").value;
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log("Registrering lyckades:", userCredential.user.email);
+              document.getElementById("registerError").style.display = "none";
+              document.getElementById("registerModal").style.display = "none";
+            })
+            .catch((error) => {
+              console.error("Registreringsfel:", error);
+              document.getElementById("registerError").style.display = "block";
+              document.getElementById("registerError").textContent = error.message;
+            });
+        });
+      }
+      
+      // Växla mellan modaler
+      const showRegisterBtn = document.getElementById("showRegister");
+      if (showRegisterBtn) {
+        showRegisterBtn.addEventListener("click", () => {
+          document.getElementById("loginModal").style.display = "none";
+          document.getElementById("registerModal").style.display = "flex";
+        });
+      }
+      const showLoginBtn = document.getElementById("showLogin");
+      if (showLoginBtn) {
+        showLoginBtn.addEventListener("click", () => {
+          document.getElementById("registerModal").style.display = "none";
+          document.getElementById("loginModal").style.display = "flex";
+        });
       }
     });
     
-    // Inloggningsfunktion
-    document.getElementById("loginButton").addEventListener("click", () => {
-      const email = document.getElementById("emailInput").value.trim();
-      const password = document.getElementById("passwordInput").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log("Inloggning lyckades:", userCredential.user.email);
-          document.getElementById("loginError").style.display = "none";
-        })
-        .catch((error) => {
-          console.error("Inloggningsfel:", error);
-          document.getElementById("loginError").style.display = "block";
-        });
-    });
-    
-    // Registreringsfunktion
-    document.getElementById("registerButton").addEventListener("click", () => {
-      const email = document.getElementById("regEmail").value.trim();
-      const password = document.getElementById("regPassword").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log("Registrering lyckades:", userCredential.user.email);
-          document.getElementById("registerError").style.display = "none";
-          document.getElementById("registerModal").style.display = "none";
-        })
-        .catch((error) => {
-          console.error("Registreringsfel:", error);
-          document.getElementById("registerError").style.display = "block";
-          document.getElementById("registerError").textContent = error.message;
-        });
-    });
-    
-    // Observera att vi sätter inte event listener för "showRegister"/"showLogin" här
-    // Dessa sätts upp i DOMContentLoaded (se nedan i icke-modul script)
-    
     /* ----- Övrig kod för databashantering, spellistor osv. (oförändrad) ----- */
-    
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -799,7 +816,6 @@
         alert("Fyll i både spellistans namn och länk!");
       }
     });
-    
   </script>
   
 </head>
@@ -919,8 +935,8 @@
   
   <!-- Vanligt script för modal- och feedbackhantering -->
   <script>
-    // Eventlisteners för att växla mellan logga in och registrera
     document.addEventListener("DOMContentLoaded", function() {
+      // Växla mellan logga in och registrera
       const showRegisterBtn = document.getElementById("showRegister");
       const showLoginBtn = document.getElementById("showLogin");
       
@@ -930,45 +946,43 @@
           document.getElementById("registerModal").style.display = "flex";
         });
       }
-      
       if(showLoginBtn){
         showLoginBtn.addEventListener("click", () => {
           document.getElementById("registerModal").style.display = "none";
           document.getElementById("loginModal").style.display = "flex";
         });
       }
-    });
-    
-    // Readme Modal
-    const readmeModal = document.getElementById("readmeModal");
-    const closeBtn = document.querySelector(".closeBtn");
-    closeBtn.addEventListener("click", function() {
-      readmeModal.style.display = "none";
-    });
-    window.addEventListener("click", function(event) {
-      if (event.target == document.getElementById("readmeModal")) {
-        document.getElementById("readmeModal").style.display = "none";
-      }
-    });
-    
-    // Feedback-hantering
-    document.getElementById("feedbackButton").addEventListener("click", function() {
-      document.getElementById("feedbackModal").style.display = "block";
-    });
-    document.getElementById("closeFeedback").addEventListener("click", function() {
-      document.getElementById("feedbackModal").style.display = "none";
-    });
-    window.addEventListener("click", function(event) {
-      if (event.target == document.getElementById("feedbackModal")) {
+      
+      // Readme Modal
+      const readmeModal = document.getElementById("readmeModal");
+      const closeBtn = document.querySelector(".closeBtn");
+      closeBtn.addEventListener("click", function() {
+        readmeModal.style.display = "none";
+      });
+      window.addEventListener("click", function(event) {
+        if (event.target == readmeModal) {
+          readmeModal.style.display = "none";
+        }
+      });
+      
+      // Feedback-hantering
+      document.getElementById("feedbackButton").addEventListener("click", function() {
+        document.getElementById("feedbackModal").style.display = "block";
+      });
+      document.getElementById("closeFeedback").addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "none";
-      }
-    });
-    document.getElementById("submitFeedback").addEventListener("click", function() {
-      alert("Tack för din feedback!");
-      document.getElementById("feedbackText").value = "";
-      document.getElementById("feedbackModal").style.display = "none";
+      });
+      window.addEventListener("click", function(event) {
+        if (event.target == document.getElementById("feedbackModal")) {
+          document.getElementById("feedbackModal").style.display = "none";
+        }
+      });
+      document.getElementById("submitFeedback").addEventListener("click", function() {
+        alert("Tack för din feedback!");
+        document.getElementById("feedbackText").value = "";
+        document.getElementById("feedbackModal").style.display = "none";
+      });
     });
   </script>
-  
 </body>
 </html>
