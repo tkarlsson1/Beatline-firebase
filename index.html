@@ -45,18 +45,12 @@
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
-    select, button {
-      border: none !important;
-    }
+    select, button { border: none !important; }
     button:hover,
     button:active,
-    button:focus {
-      background: #333;
-    }
+    button:focus { background: #333; }
     /* Årtalsfältens bredd */
-    #startYear, #endYear {
-      width: 80px;
-    }
+    #startYear, #endYear { width: 80px; }
     #song-display {
       text-align: center;
       margin: 1.5rem 0;
@@ -110,9 +104,7 @@
       color: #fff;
       border-color: #0b939c;
     }
-    #filter-page label {
-      color: #fff;
-    }
+    #filter-page label { color: #fff; }
     /* Spotify-spellisteimport */
     #spotify-import {
       margin-bottom: 2rem;
@@ -197,8 +189,10 @@
       right: 20px;
       cursor: pointer;
     }
-    .closeBtn:hover,
-    .closeBtn:focus { color: black; text-decoration: none; }
+    .closeBtn:hover, .closeBtn:focus {
+      color: black;
+      text-decoration: none;
+    }
     /* Inloggningsmodal och registreringsmodal */
     #loginModal, #registerModal {
       position: fixed;
@@ -239,13 +233,13 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    /* Felmeddelanden får klassen .error, istället för att dölja alla <p> i modaler */
+    /* Felmeddelanden med .error - dessa är dolda från början */
     .error {
       color: red;
       display: none;
       font-size: 0.9rem;
     }
-    /* Se till att övrig text (t.ex. "Inget konto? Registrera dig här") inte har klassen .error */
+    /* Se till att vanlig text (t.ex. knappar för att byta modal) inte får klassen .error */
     /* Feedback-knapp */
     #feedbackButton {
       position: fixed;
@@ -294,8 +288,10 @@
       cursor: pointer;
       color: #aaa;
     }
-    #closeFeedback:hover,
-    #closeFeedback:focus { color: black; text-decoration: none; }
+    #closeFeedback:hover, #closeFeedback:focus {
+      color: black;
+      text-decoration: none;
+    }
     #feedbackText {
       width: 100%;
       height: 150px;
@@ -357,24 +353,19 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    .answer-button:hover,
-    .answer-button:active,
-    .answer-button:focus { background: #333; }
+    .answer-button:hover, .answer-button:active, .answer-button:focus {
+      background: #333;
+    }
   </style>
   
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <!-- Importera Firebase SDK:er (app, database, auth) i modulformat -->
+  <!-- Importera Firebase SDK:er (app, database, auth) via moduler -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword,
-      onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
@@ -392,14 +383,71 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     
-    // Kör DOM-relaterad kod när innehållet är laddat
+    // Definiera en funktion som sätter fast onValue-lyssnare när användaren är autentiserad.
+    function initDataListeners() {
+      // StandardLists
+      onValue(ref(db, 'standardLists'), (snapshot) => {
+        if (snapshot.exists()) {
+          const rawPlaylists = snapshot.val();
+          standardSongs = [];
+          for (const playlistName in rawPlaylists) {
+            const playlistData = rawPlaylists[playlistName];
+            if (playlistData.songs) {
+              const tracks = playlistData.songs;
+              for (const trackId in tracks) {
+                standardSongs.push({
+                  qr: trackId,
+                  ...tracks[trackId],
+                  source: [playlistName]
+                });
+              }
+            }
+          }
+          mergeSongs();
+        } else {
+          console.error("? Inga standardspellistor hittades i 'standardLists'.");
+          standardSongs = [];
+          mergeSongs();
+        }
+      });
+      
+      // UserPlaylists
+      onValue(ref(db, 'userPlaylists'), (snapshot) => {
+        if (snapshot.exists()) {
+          const rawPlaylists = snapshot.val();
+          userPlaylistSongs = [];
+          for (const playlistName in rawPlaylists) {
+            const playlistData = rawPlaylists[playlistName];
+            if (playlistData.songs) {
+              const tracks = playlistData.songs;
+              for (const trackId in tracks) {
+                userPlaylistSongs.push({
+                  qr: trackId,
+                  ...tracks[trackId],
+                  source: [playlistName]
+                });
+              }
+            }
+          }
+          mergeSongs();
+        } else {
+          console.error("? Inga användarspellistor hittades i 'userPlaylists'.");
+          userPlaylistSongs = [];
+          mergeSongs();
+        }
+      });
+    }
+    
+    // Vänta tills DOM är laddad innan vi sätter eventlyssnare på DOM-element för autentisering
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus – visa login-/registreringsmodal om ingen är inloggad
+      // Hantera autentiseringsstatus – när en användare loggar in, anropa initDataListeners
       onAuthStateChanged(auth, (user) => {
         if (user) {
           console.log("Inloggad användare:", user.email);
           document.getElementById("loginModal").style.display = "none";
           document.getElementById("registerModal").style.display = "none";
+          // Nu kan vi sätta fast våra databashanteringslyssnare
+          initDataListeners();
         } else {
           console.log("Ingen användare inloggad.");
           document.getElementById("loginModal").style.display = "flex";
@@ -444,7 +492,7 @@
         });
       }
       
-      // Växla mellan modaler
+      // Växla mellan modaler för inloggning och registrering
       const showRegisterBtn = document.getElementById("showRegister");
       if (showRegisterBtn) {
         showRegisterBtn.addEventListener("click", () => {
@@ -461,7 +509,7 @@
       }
     });
     
-    /* ----- Övrig kod för databashantering, spellistor osv. (oförändrad) ----- */
+    /* ----- Övrig kod för databashantering, spellistor osv. ----- */
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -469,56 +517,6 @@
     let currentFilteredSongs = [];
     let shownSongs = [];
     let currentSong = null;
-    
-    onValue(ref(db, 'standardLists'), (snapshot) => {
-      if (snapshot.exists()) {
-        const rawPlaylists = snapshot.val();
-        standardSongs = [];
-        for (const playlistName in rawPlaylists) {
-          const playlistData = rawPlaylists[playlistName];
-          if (playlistData.songs) {
-            const tracks = playlistData.songs;
-            for (const trackId in tracks) {
-              standardSongs.push({
-                qr: trackId,
-                ...tracks[trackId],
-                source: [playlistName]
-              });
-            }
-          }
-        }
-        mergeSongs();
-      } else {
-        console.error("? Inga standardspellistor hittades i 'standardLists'.");
-        standardSongs = [];
-        mergeSongs();
-      }
-    });
-    
-    onValue(ref(db, 'userPlaylists'), (snapshot) => {
-      if (snapshot.exists()) {
-        const rawPlaylists = snapshot.val();
-        userPlaylistSongs = [];
-        for (const playlistName in rawPlaylists) {
-          const playlistData = rawPlaylists[playlistName];
-          if (playlistData.songs) {
-            const tracks = playlistData.songs;
-            for (const trackId in tracks) {
-              userPlaylistSongs.push({
-                qr: trackId,
-                ...tracks[trackId],
-                source: [playlistName]
-              });
-            }
-          }
-        }
-        mergeSongs();
-      } else {
-        console.error("? Inga användarspellistor hittades i 'userPlaylists'.");
-        userPlaylistSongs = [];
-        mergeSongs();
-      }
-    });
     
     function mergeSongs() {
       const merged = {};
@@ -908,22 +906,35 @@
       <div id="readmeContent">
         <span class="closeBtn">&times;</span>
         <h2>NOTESTREAM-BETA</h2>
-        <p>Test och säg vad du tycker!<br>
-           Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
+        <p>
+          Test och säg vad du tycker!<br>
+          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
         </p>
-        <p>Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.</p>
-        <p>För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.</p>
-        <p>I webbversionen bygger spelet på att du i början gör ett antal val:<br>
-           • Vilka förinställda spellistor vill du inkludera?<br>
-           • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
-           Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
-           Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
+        <p>
+          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
         </p>
-        <p>Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till.</p>
-        <p>Om du lägger till egna spellistor, tänk på att all data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till.</p>
-        <p>När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.</p>
-        <p>På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
-           De listor som nu visas är exempeldata för att fylla upp databasen.
+        <p>
+          För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
+        </p>
+        <p>
+          I webbversionen bygger spelet på att du i början gör ett antal val:<br>
+          • Vilka förinställda spellistor vill du inkludera?<br>
+          • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
+          Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
+          Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
+        </p>
+        <p>
+          Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till.
+        </p>
+        <p>
+          Om du lägger till egna spellistor, tänk på att all data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till.
+        </p>
+        <p>
+          När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
+        </p>
+        <p>
+          På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
+          De listor som nu visas är exempeldata för att fylla upp databasen.
         </p>
       </div>
     </div>
