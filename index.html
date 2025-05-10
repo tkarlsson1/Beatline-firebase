@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.348</title>
+  <title>NOTESTREAM v0.349</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -405,18 +405,32 @@
     
     // Vänta tills DOM är laddad
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
-      onAuthStateChanged(auth, (user) => {
+    // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
+    onAuthStateChanged(auth, (user) => {
         if (user) {
-          console.log("Inloggad användare:", user.email);
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("registerModal").style.display = "none";
-          initDataListeners();
+            console.log("Inloggad användare:", user.email);
+            document.getElementById("loginModal").style.display = "none";
+            document.getElementById("registerModal").style.display = "none";
+            initDataListeners();
+
+            // STYR VISNING AV SPELLISTEVALET
+            const adminPlaylistType = document.getElementById("adminPlaylistType");
+            if (adminPlaylistType) {
+                if (user.email === "timmykarlsson@gmail.com") { 
+                    console.log("Du är inloggad som admin, spellisteval visas!");
+                    adminPlaylistType.style.display = "block"; // Visa spellistevalet för admin
+                } else {
+                    console.log("Du är inte admin, spellisteval tas bort.");
+                    adminPlaylistType.remove(); // Ta bort spellistevalet för andra
+                }
+            } else {
+                console.error("adminPlaylistType saknas i DOM.");
+            }
         } else {
-          console.log("Ingen användare inloggad.");
-          document.getElementById("loginModal").style.display = "flex";
+            console.log("Ingen användare inloggad.");
+            document.getElementById("loginModal").style.display = "flex";
         }
-      });
+    });
       
       // Inloggningsfunktion
       const loginButton = document.getElementById("loginButton");
