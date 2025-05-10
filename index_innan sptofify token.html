@@ -434,7 +434,7 @@
         }
         mergeSongs();
       } else {
-        console.error("? Inga standardspellistor hittades i 'standardLists'.");
+        console.error("❌ Inga standardspellistor hittades i 'standardLists'.");
         standardSongs = [];
         mergeSongs();
       }
@@ -460,7 +460,7 @@
         }
         mergeSongs();
       } else {
-        console.error("? Inga användarspellistor hittades i 'userPlaylists'.");
+        console.error("❌ Inga användarspellistor hittades i 'userPlaylists'.");
         userPlaylistSongs = [];
         mergeSongs();
       }
@@ -480,7 +480,7 @@
         }
       });
       songs = Object.values(merged);
-      console.log("? Sammankopplad låtsamling (unika spår):", songs.length);
+      console.log("✅ Sammankopplad låtsamling (unika spår):", songs.length);
       populateSourceCheckboxes();
     }
     
@@ -721,44 +721,25 @@
       document.getElementById("startpageButton").style.display = "none";
     };
     
-    /***** NY SPOTIFY TOKEN OCH CACHING DEL *****/
-    // Ersätt den tidigare direkta anropet med backend-anrop samt caching
-    async function getBackendSpotifyToken() {
-      // Försök att hämta token från localStorage om det finns och inte har gått ut
-      const cachedToken = localStorage.getItem('spotifyToken');
-      const tokenExpiry = localStorage.getItem('spotifyTokenExpiry');
-      if (cachedToken && tokenExpiry && Date.now() < Number(tokenExpiry)) {
-        console.log("Använder cachad token från backend.");
-        return cachedToken;
-      }
+    const spotifyClientId = "3033344ef55647b8b70ef1dccfa7e65f";
+    const spotifyClientSecret = "a12ea29b5d7a47fa8a62b39d8e0dc6e1";
     
-      try {
-        const response = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', {
-          method: 'POST'
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP-fel: ${response.status}`);
-        }
-        const data = await response.json();
-        const token = data.access_token;
-        const expiresIn = data.expires_in;  // giltighetstid i sekunder
-        
-        // Beräkna utgångstid med en buffert på 1 minut
-        const expiryTime = Date.now() + (expiresIn * 1000) - (60 * 1000);
-        localStorage.setItem('spotifyToken', token);
-        localStorage.setItem('spotifyTokenExpiry', expiryTime.toString());
-        
-        return token;
-      } catch (error) {
-        console.error("Fel vid hämtning av token via backend:", error);
-        return null;
-      }
+    async function getSpotifyToken() {
+      const response = await fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": "Basic " + btoa(spotifyClientId + ":" + spotifyClientSecret)
+        },
+        body: "grant_type=client_credentials"
+      });
+      const data = await response.json();
+      return data.access_token;
     }
     
-    // Uppdatera fetchSpotifyPlaylist-funktionen att använda den nya backend-funktionen
     async function fetchSpotifyPlaylist(playlistUrl) {
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
-      const token = await getBackendSpotifyToken();
+      const token = await getSpotifyToken();
       let tracks = {};
       let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
       while (nextUrl) {
@@ -779,8 +760,62 @@
       return tracks;
     }
     
-    // Övrig spelkod och Spotify-import fungerar som tidigare ...
+    // addPlaylistToFirebase – knapptext ändrad till "Lägg till"
+    async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
+      try {
+        const tracks = await fetchSpotifyPlaylist(playlistUrl);
+        if (playlistType === "standard") {
+          const standardListsRef = ref(db, `standardLists/${playlistName}`);
+          await set(standardListsRef, { songs: tracks });
+          alert(`Spellistan "${playlistName}" har lagts till i StandardLists!`);
+        } else {
+          const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
+          await set(userPlaylistsRef, { songs: tracks });
+          alert(`Spellistan "${playlistName}" har lagts till i UserPlaylists!`);
+        }
+      } catch (error) {
+        console.error("Fel vid hämtning av Spotify-spellista:", error);
+        alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
+      }
+    }
     
+    document.getElementById("addPlaylistButton").addEventListener("click", () => {
+      const playlistName = document.getElementById("playlistNameInput").value.trim();
+      const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+      const playlistType = document.getElementById("playlistTypeInput").value;
+      if (playlistName && playlistLink) {
+        addPlaylistToFirebase(playlistName, playlistLink, playlistType);
+      } else {
+        alert("Fyll i både spellistans namn och länk!");
+      }
+    });
+    
+    // Feedback-hantering
+    document.getElementById("feedbackButton").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "block";
+    });
+    document.getElementById("closeFeedback").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == document.getElementById("feedbackModal")) {
+        document.getElementById("feedbackModal").style.display = "none";
+      }
+    });
+    document.getElementById("submitFeedback").addEventListener("click", async function() {
+      const feedbackText = document.getElementById("feedbackText").value.trim();
+      if (feedbackText === "") {
+        alert("Feedbackfältet är tomt!");
+        return;
+      }
+      await set(push(ref(db, "feedback")), {
+        text: feedbackText,
+        timestamp: Date.now()
+      });
+      alert("Tack för din feedback!");
+      document.getElementById("feedbackText").value = "";
+      document.getElementById("feedbackModal").style.display = "none";
+    });
   </script>
 </head>
 <body>
@@ -857,9 +892,9 @@
       </p>
       <p>
         Om du lägger till egna spellistor, tänk på följande:<br>
-        * All data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till. Om du exempelvis lägger till en låt från "Best of…" som kom 20 år senare än originalet, kommer endast den version Facebook hämtar från Spotify att visas med angivet årtal.<br>
+        * All data per låt (artist, titel, årtal) baseras på det unika spotify‑id som finns i spellistan du lägger till. Om du exempelvis lägger till en låt från "Best of…" som kom 20 år senare än originalet, kommer endast den version Facebook hämtar från Spotify att visas med angivet årtal.<br>
         * Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
-        * Om du vill lägga till en spotifygenererad spellista, spara den först som din egen. (Exempelvis: Klicka på de tre prickarna ? "Lägg till i annan spellista" ? Ny spellista.)
+        * Om du vill lägga till en spotifygenererad spellista, spara den först som din egen. (Exempelvis: Klicka på de tre prickarna → "Lägg till i annan spellista" → Ny spellista.)
       </p>
       <p>
         När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
@@ -872,7 +907,7 @@
   </div>
   
   <!-- Feedback Button -->
-  <button id="feedbackButton">??</button>
+  <button id="feedbackButton">💬</button>
   
   <!-- Feedback Modal -->
   <div id="feedbackModal">
@@ -944,6 +979,6 @@
       document.getElementById("feedbackModal").style.display = "none";
     });
   </script>
-  
+
 </body>
 </html>
