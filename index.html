@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.351</title>
+  <title>NOTESTREAM v0.352</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -827,7 +827,10 @@
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
-      const playlistType = document.getElementById("playlistTypeInput").value;
+      const playlistType = document.getElementById("playlistTypeInput") 
+  ? document.getElementById("playlistTypeInput").value // Admin kan välja
+  : "user"; // Alla andra får "user" automatiskt
+
       if (playlistName && playlistLink) {
         addPlaylistToFirebase(playlistName, playlistLink, playlistType);
       } else {
