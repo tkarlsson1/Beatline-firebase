@@ -722,17 +722,18 @@
     };
     
     /***** NY SPOTIFY TOKEN OCH CACHING DEL *****/
-    // Ersätt den tidigare direkta anropet med backend-anrop samt caching
     async function getBackendSpotifyToken() {
-      // Försök att hämta token från localStorage om det finns och inte har gått ut
+      // Steg 3: Logga innan vi kontrollerar localStorage
+      console.log("getBackendSpotifyToken: Kontrollerar om cachat token finns...");
       const cachedToken = localStorage.getItem('spotifyToken');
       const tokenExpiry = localStorage.getItem('spotifyTokenExpiry');
       if (cachedToken && tokenExpiry && Date.now() < Number(tokenExpiry)) {
-        console.log("Använder cachad token från backend.");
+        console.log("Använder cachad token från backend:", cachedToken);
         return cachedToken;
       }
     
       try {
+        console.log("Begär nytt token via backend...");
         const response = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', {
           method: 'POST'
         });
@@ -742,12 +743,11 @@
         const data = await response.json();
         const token = data.access_token;
         const expiresIn = data.expires_in;  // giltighetstid i sekunder
-        
-        // Beräkna utgångstid med en buffert på 1 minut
         const expiryTime = Date.now() + (expiresIn * 1000) - (60 * 1000);
         localStorage.setItem('spotifyToken', token);
         localStorage.setItem('spotifyTokenExpiry', expiryTime.toString());
-        
+    
+        console.log("Hämtat nytt token via backend:", token);
         return token;
       } catch (error) {
         console.error("Fel vid hämtning av token via backend:", error);
@@ -755,9 +755,12 @@
       }
     }
     
-    // Uppdatera fetchSpotifyPlaylist-funktionen att använda den nya backend-funktionen
+    // Steg 2: Logga URL och extrahera playlist-ID
     async function fetchSpotifyPlaylist(playlistUrl) {
+      console.log("fetchSpotifyPlaylist: Playlist URL mottagen:", playlistUrl);
       const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
+      console.log("fetchSpotifyPlaylist: Extraherat playlist-ID:", playlistId);
+      
       const token = await getBackendSpotifyToken();
       let tracks = {};
       let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
@@ -779,8 +782,67 @@
       return tracks;
     }
     
-    // Övrig spelkod och Spotify-import fungerar som tidigare ...
+    // Steg 5: Utökad loggning i addPlaylistToFirebase()
+    async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
+      try {
+        console.log("addPlaylistToFirebase: Försöker hämta spellista med namn:", playlistName);
+        console.log("addPlaylistToFirebase: Använder URL:", playlistUrl);
+        const tracks = await fetchSpotifyPlaylist(playlistUrl);
+        console.log("addPlaylistToFirebase: Hämtade spår:", tracks);
+        if (playlistType === "standard") {
+          const standardListsRef = ref(db, `standardLists/${playlistName}`);
+          await set(standardListsRef, { songs: tracks });
+          console.log("addPlaylistToFirebase: Spellista lagts till i StandardLists.");
+          alert(`Spellistan "${playlistName}" har lagts till i StandardLists!`);
+        } else {
+          const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
+          await set(userPlaylistsRef, { songs: tracks });
+          console.log("addPlaylistToFirebase: Spellista lagts till i UserPlaylists.");
+          alert(`Spellistan "${playlistName}" har lagts till i UserPlaylists!`);
+        }
+      } catch (error) {
+        console.error("Fel vid hämtning av Spotify-spellista i addPlaylistToFirebase:", error);
+        alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
+      }
+    }
     
+    document.getElementById("addPlaylistButton").addEventListener("click", () => {
+      const playlistName = document.getElementById("playlistNameInput").value.trim();
+      const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+      const playlistType = document.getElementById("playlistTypeInput").value;
+      if (playlistName && playlistLink) {
+        addPlaylistToFirebase(playlistName, playlistLink, playlistType);
+      } else {
+        alert("Fyll i både spellistans namn och länk!");
+      }
+    });
+    
+    // Feedback-hantering
+    document.getElementById("feedbackButton").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "block";
+    });
+    document.getElementById("closeFeedback").addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == document.getElementById("feedbackModal")) {
+        document.getElementById("feedbackModal").style.display = "none";
+      }
+    });
+    document.getElementById("submitFeedback").addEventListener("click", async function() {
+      const feedbackText = document.getElementById("feedbackText").value.trim();
+      if (feedbackText === "") {
+        alert("Feedbackfältet är tomt!");
+        return;
+      }
+      await set(push(ref(db, "feedback")), {
+        text: feedbackText,
+        timestamp: Date.now()
+      });
+      alert("Tack för din feedback!");
+      document.getElementById("feedbackText").value = "";
+      document.getElementById("feedbackModal").style.display = "none";
+    });
   </script>
 </head>
 <body>
@@ -797,91 +859,93 @@
   <div class="container" id="mainContent">
     <img src="logga.png" alt="Notestream-beta logo" class="logo" />
       <!-- Filter-/Startsida -->
-  <div id="filter-page">
-    <div id="source-checkbox-container"></div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <label for="startYear">Från år:</label>
-      <select id="startYear"></select>
-      <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
-      <select id="endYear"></select>
-    </div>
-    <!-- Spotify-spellisteimportsektionen -->
-    <div id="spotify-import">
-      <h3>Lägg till Spotify-spellista</h3>
-      <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-      <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-      <!-- Val för vilken nod spellistan ska sparas i -->
-      <select id="playlistTypeInput">
-        <option value="standard">StandardLists</option>
-        <option value="user" selected>UserPlaylists</option>
-      </select>
-      <button id="addPlaylistButton">Lägg till</button>
+    <div id="filter-page">
+      <div id="source-checkbox-container"></div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <label for="startYear">Från år:</label>
+        <select id="startYear"></select>
+        <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
+        <select id="endYear"></select>
+      </div>
+      <!-- Spotify-spellisteimportsektionen -->
+      <div id="spotify-import">
+        <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+        <!-- Val för vilken nod spellistan ska sparas i -->
+        <select id="playlistTypeInput">
+          <option value="standard">StandardLists</option>
+          <option value="user" selected>UserPlaylists</option>
+        </select>
+        <button id="addPlaylistButton">Lägg till</button>
+      </div>
+      
+      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
     </div>
     
-    <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
-  </div>
-  
-  <!-- Resultatsida -->
-  <div id="result-page">
-    <div id="song-display"></div>
-    <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
-  </div>
-  
-  <!-- Fasta "Startsida"-knappen visas endast på resultatsidan -->
-  <button id="startpageButton" class="startpage-button" onclick="goToFilter()">Startsida</button>
-  
-  <!-- Readme Modal -->
-  <div id="readmeModal">
-    <div id="readmeContent">
-      <span class="closeBtn">&times;</span>
-      <h2>NOTESTREAM-BETA</h2>
-      <p>
-        Test och säg vad du tycker!<br>
-        Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
-      </p>
-      <p>
-        Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
-      </p>
-      <p>
-        För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
-      </p>
-      <p>
-        I webbversionen bygger spelet på att du i början gör ett antal val:<br>
-        • Vilka förinställda spellistor vill du inkludera?<br>
-        • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
-        Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
-        Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
-      </p>
-      <p>
-        Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till
-      </p>
-      <p>
-        Om du lägger till egna spellistor, tänk på följande:<br>
-        * All data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till. Om du exempelvis lägger till en låt från "Best of…" som kom 20 år senare än originalet, kommer endast den version Facebook hämtar från Spotify att visas med angivet årtal.<br>
-        * Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
-        * Om du vill lägga till en spotifygenererad spellista, spara den först som din egen. (Exempelvis: Klicka på de tre prickarna ? "Lägg till i annan spellista" ? Ny spellista.)
-      </p>
-      <p>
-        När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
-      </p>
-      <p>
-        På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
-        De listor som nu visas är exempeldata för att fylla upp databasen.
-      </p>
+    <!-- Resultatsida -->
+    <div id="result-page">
+      <div id="song-display"></div>
+      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
     </div>
-  </div>
-  
-  <!-- Feedback Button -->
-  <button id="feedbackButton">??</button>
-  
-  <!-- Feedback Modal -->
-  <div id="feedbackModal">
-    <div>
-      <span id="closeFeedback">&times;</span>
-      <h2>Lämna feedback</h2>
-      <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
-      <button id="submitFeedback">Skicka feedback</button>
+    
+    <!-- Fasta "Startsida"-knappen visas endast på resultatsidan -->
+    <button id="startpageButton" class="startpage-button" onclick="goToFilter()">Startsida</button>
+    
+    <!-- Readme Modal -->
+    <div id="readmeModal">
+      <div id="readmeContent">
+        <span class="closeBtn">&times;</span>
+        <h2>NOTESTREAM-BETA</h2>
+        <p>
+          Test och säg vad du tycker!<br>
+          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
+        </p>
+        <p>
+          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
+        </p>
+        <p>
+          För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
+        </p>
+        <p>
+          I webbversionen bygger spelet på att du i början gör ett antal val:<br>
+          • Vilka förinställda spellistor vill du inkludera?<br>
+          • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
+          Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
+          Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
+        </p>
+        <p>
+          Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till
+        </p>
+        <p>
+          Om du lägger till egna spellistor, tänk på följande:<br>
+          * All data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till. Om du exempelvis lägger till en låt från "Best of…" som kom 20 år senare än originalet, kommer endast den version Facebook hämtar från Spotify att visas med angivet årtal.<br>
+          * Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
+          * Om du vill lägga till en spotifygenererad spellista, spara den först som din egen. (Exempelvis: Klicka på de tre prickarna ? "Lägg till i annan spellista" ? Ny spellista.)
+        </p>
+        <p>
+          När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
+        </p>
+        <p>
+          På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
+          De listor som nu visas är exempeldata för att fylla upp databasen.
+        </p>
+      </div>
     </div>
+    
+    <!-- Feedback Button -->
+    <button id="feedbackButton">??</button>
+    
+    <!-- Feedback Modal -->
+    <div id="feedbackModal">
+      <div>
+        <span id="closeFeedback">&times;</span>
+        <h2>Lämna feedback</h2>
+        <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
+        <button id="submitFeedback">Skicka feedback</button>
+      </div>
+    </div>
+  
   </div>
   
   <!-- Modal & inloggning -->
