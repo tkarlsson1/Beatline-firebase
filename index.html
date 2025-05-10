@@ -44,17 +44,24 @@
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
-    select, button { border: none !important; }
+    select, button {
+      border: none !important;
+    }
     button:hover,
     button:active,
-    button:focus { background: #333; }
+    button:focus {
+      background: #333;
+    }
     /* Årtalsfältens bredd */
-    #startYear, #endYear { width: 80px; }
+    #startYear, #endYear {
+      width: 80px;
+    }
     #song-display {
       text-align: center;
       margin: 1.5rem 0;
     }
-    #song-display canvas, #song-display img {
+    #song-display canvas,
+    #song-display img {
       display: block;
       margin: 0 auto;
     }
@@ -72,7 +79,7 @@
       position: relative;
       padding-bottom: 80px;
     }
-    /* Styling för checkbox-pills */
+    /* Checkbox-pills */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -127,7 +134,7 @@
       padding: 0.5rem;
       font-family: 'Manrope', sans-serif;
     }
-    /* Header – menyknappen */
+    /* Menyheader och menyknapp */
     #menuContainer {
       position: fixed;
       top: 10px;
@@ -161,11 +168,10 @@
     #dropdownMenu a:hover {
       background: #0b939c;
     }
-    /* Divider, rubriker, mm. (samma som tidigare) */
+    /* Divider, rubriker mm. */
     .divider { height: 2px; background-color: #fff; width: 100%; margin: 0.5rem 0; }
     .subheading { display: block; width: 100%; text-align: center; font-size: 0.8rem; color: #fff; margin: 0.5rem 0; }
-    
-    /* Modal för Readme */
+    /* Modal: Readme */
     #readmeModal {
       display: none;
       position: fixed;
@@ -199,8 +205,7 @@
       cursor: pointer;
     }
     .closeBtn:hover, .closeBtn:focus { color: black; text-decoration: none; }
-    
-    /* Inloggningsmodal och registreringsmodal */
+    /* Inloggnings- och registreringsmodaler */
     #loginModal, #registerModal {
       position: fixed;
       z-index: 2000;
@@ -240,17 +245,13 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
+    /* Felmeddelanden med .error */
     .error {
       color: red;
       display: none;
       font-size: 0.9rem;
     }
-    
-    /* Feedback-knapp */
-    /* Eftersom vi lägger Feedback i menyn, tar vi bort den fasta knappen.
-       Om du vill ha en separat ikon, kan den läggas in här med lämplig CSS. */
-    
-    /* Övriga modaler (Feedback, etc.) behålls */
+    /* Feedback-modal */
     #feedbackModal {
       display: none;
       position: fixed;
@@ -301,22 +302,8 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    
-    /* Fasta knappar i resultatsidan, t.ex. "Nästa låt" */
-    .next-song-button {
-      display: block;
-      margin: 0 auto;
-      margin-bottom: 5rem;
-      width: 128px;
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      font-family: 'Manrope', sans-serif;
-    }
-    .answer-button {
+    /* Övriga knappar */
+    .next-song-button, .answer-button {
       display: block;
       margin: 0 auto;
       width: 128px;
@@ -328,19 +315,24 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    .answer-button:hover, .answer-button:active, .answer-button:focus {
-      background: #333;
-    }
+    .next-song-button { margin-bottom: 5rem; }
+    .answer-button:hover, .answer-button:active, .answer-button:focus { background: #333; }
   </style>
   
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <!-- Importera Firebase SDK:er i modulformat -->
+  <!-- Importera Firebase SDK:er via moduler -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
@@ -352,13 +344,13 @@
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
     
-    // Initiera app, database och auth
+    // Initiera Firebase
     const app = initializeApp(firebaseConfig);
     window.app = app;
     const db = getDatabase(app);
     const auth = getAuth(app);
     
-    // Variabler för dataläsning (komplett från tidigare)
+    // Variabler för dataläsning
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -367,7 +359,7 @@
     let shownSongs = [];
     let currentSong = null;
     
-    // Funktion för att sätta fast dataläsnings-lyssnare (bara när en användare loggat in)
+    // Funktion för att sätta fast databashanteringslyssnare – kallas när användaren loggat in
     function initDataListeners() {
       onValue(ref(db, 'standardLists'), (snapshot) => {
         if (snapshot.exists()) {
@@ -398,15 +390,16 @@
         if (snapshot.exists()) {
           const rawPlaylists = snapshot.val();
           userPlaylistSongs = [];
-          for (const playlistName in rawPlaylists) {
-            const playlistData = rawPlaylists[playlistName];
-            if (playlistData.songs) {
-              const tracks = playlistData.songs;
-              for (const trackId in tracks) {
+          for (const userId in rawPlaylists) {
+            const userLists = rawPlaylists[userId];
+            for (const playlistName in userLists) {
+              const playlistData = userLists[playlistName];
+              if (playlistData.songs) {
+                const tracks = playlistData.songs;
                 userPlaylistSongs.push({
-                  qr: trackId,
-                  ...tracks[trackId],
-                  source: [playlistName]
+                  qr: playlistName + "_dummy", // För att undvika dubbletter, justera om behövs.
+                  songs: tracks,
+                  source: [playlistName] // Alternativt kan du använda användarens ID om det passar bättre.
                 });
               }
             }
@@ -420,9 +413,9 @@
       });
     }
     
-    // Vänta tills DOM är laddad
+    // Vänta tills DOM är laddat
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus – när inloggad, initiera dataläsning
+      // Autentisering: visa inloggningsmodal om ingen användare är inloggad; annars initiera dataläsning.
       onAuthStateChanged(auth, (user) => {
         if (user) {
           console.log("Inloggad användare:", user.email);
@@ -490,7 +483,7 @@
       }
     });
     
-    // Funktioner för övrig databehandling (mergeSongs, updateAllaCheckbox, populateSourceCheckboxes, filter, nextSong etc.)
+    // Funktionerna för att hantera spellistor
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -776,6 +769,7 @@
       return tracks;
     }
     
+    // Ändrad funktion: ange att användarspellistor sparas under "userPlaylists/<uid>/<playlistName>".
     async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
       try {
         console.log("addPlaylistToFirebase: Försöker hämta spellista med namn:", playlistName);
@@ -788,10 +782,12 @@
           console.log("addPlaylistToFirebase: Spellista lagts till i StandardLists.");
           alert(`Spellistan "${playlistName}" har lagts till i StandardLists!`);
         } else {
-          const userPlaylistsRef = ref(db, `userPlaylists/${playlistName}`);
+          // Hämta nuvarande användarens UID och skriv till "userPlaylists/<uid>/<playlistName>"
+          const userId = auth.currentUser.uid;
+          const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
           await set(userPlaylistsRef, { songs: tracks });
-          console.log("addPlaylistToFirebase: Spellista lagts till i UserPlaylists.");
-          alert(`Spellistan "${playlistName}" har lagts till i UserPlaylists!`);
+          console.log("addPlaylistToFirebase: Spellista lagts till i UserPlaylists för UID:", userId);
+          alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
         }
       } catch (error) {
         console.error("Fel vid hämtning av Spotify-spellista i addPlaylistToFirebase:", error);
@@ -810,33 +806,47 @@
       }
     });
     
-    /* ----- Meny för logga ut, Läs först, Startsida, Feedback ----- */
-    // Vi skapar en menyknapp (hamburger) i det övre högra hörnet
+    /***** MENY: Skapa en menyknapp i högra hörnet med alternativ *****/
     document.addEventListener("DOMContentLoaded", function() {
       const menuContainer = document.createElement("div");
       menuContainer.id = "menuContainer";
+      // Placera menyn i övre högra hörnet
+      menuContainer.style.position = "fixed";
+      menuContainer.style.top = "10px";
+      menuContainer.style.right = "10px";
+      menuContainer.style.zIndex = "3000";
+      
       const menuButton = document.createElement("button");
       menuButton.id = "menuButton";
-      menuButton.innerHTML = "&#9776;"; // Hamburger-ikon (tre streck)
+      menuButton.innerHTML = "&#9776;"; // Hamburger (tre streck)
+      menuButton.style.background = "none";
+      menuButton.style.border = "none";
+      menuButton.style.color = "#fff";
+      menuButton.style.fontSize = "2rem";
+      menuButton.style.cursor = "pointer";
       menuContainer.appendChild(menuButton);
       
       const dropdownMenu = document.createElement("div");
       dropdownMenu.id = "dropdownMenu";
+      dropdownMenu.style.display = "none";
+      dropdownMenu.style.position = "absolute";
+      dropdownMenu.style.right = "0";
+      dropdownMenu.style.top = "2.5rem";
+      dropdownMenu.style.background = "#333";
+      dropdownMenu.style.border = "1px solid #fff";
+      dropdownMenu.style.borderRadius = "4px";
       
-      // Skapa menyalternativ
-      // "Läs först" – om du har logik att öppna en readme/modal, kan du koppla den här
+      // Menyalternativ
       const lasForstLink = document.createElement("a");
       lasForstLink.href = "#";
       lasForstLink.textContent = "Läs först";
       lasForstLink.addEventListener("click", (e) => {
         e.preventDefault();
-        // Exempel: Visa readmeModal
         document.getElementById("readmeModal").style.display = "block";
         dropdownMenu.style.display = "none";
       });
       dropdownMenu.appendChild(lasForstLink);
       
-      // "Startsida" – återställ spelet / visa filter
       const startpageLink = document.createElement("a");
       startpageLink.href = "#";
       startpageLink.textContent = "Startsida";
@@ -847,7 +857,6 @@
       });
       dropdownMenu.appendChild(startpageLink);
       
-      // "Feedback" – öppna feedbackmodal
       const feedbackLink = document.createElement("a");
       feedbackLink.href = "#";
       feedbackLink.textContent = "Feedback";
@@ -858,36 +867,30 @@
       });
       dropdownMenu.appendChild(feedbackLink);
       
-      // "Logga ut" – anropa Firebase signOut
       const logoutLink = document.createElement("a");
       logoutLink.href = "#";
       logoutLink.textContent = "Logga ut";
       logoutLink.addEventListener("click", (e) => {
         e.preventDefault();
-        signOut(auth).then(() => {
-          console.log("Utloggad!");
-          // Visa inloggningsmodalen igen
-          document.getElementById("loginModal").style.display = "flex";
-          dropdownMenu.style.display = "none";
-        }).catch((error) => {
-          console.error("Fel vid utloggning:", error);
-        });
+        signOut(auth)
+          .then(() => {
+            console.log("Utloggad!");
+            document.getElementById("loginModal").style.display = "flex";
+            dropdownMenu.style.display = "none";
+          })
+          .catch((error) => {
+            console.error("Fel vid utloggning:", error);
+          });
       });
       dropdownMenu.appendChild(logoutLink);
       
       menuContainer.appendChild(dropdownMenu);
       document.body.appendChild(menuContainer);
       
-      // Toggle dropdown-menyn vid klick på hamburgerknappen
       menuButton.addEventListener("click", () => {
-        if (dropdownMenu.style.display === "block") {
-          dropdownMenu.style.display = "none";
-        } else {
-          dropdownMenu.style.display = "block";
-        }
+        dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
       });
       
-      // Dölj dropdown-menyn om man klickar utanför
       document.addEventListener("click", (event) => {
         if (!menuContainer.contains(event.target)) {
           dropdownMenu.style.display = "none";
@@ -953,7 +956,7 @@
       <div id="song-display"></div>
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
     </div>
-  
+    
     <!-- Feedback Modal -->
     <div id="feedbackModal">
       <div>
@@ -963,7 +966,7 @@
         <button id="submitFeedback">Skicka feedback</button>
       </div>
     </div>
-  
+    
     <!-- Readme Modal -->
     <div id="readmeModal">
       <div id="readmeContent">
@@ -971,20 +974,19 @@
         <h2>NOTESTREAM-BETA</h2>
         <p>
           Test och säg vad du tycker!<br>
-          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via menyn.
+          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas via menyn.
         </p>
         <p>
-          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
+          Tidigare har det funnits en funktion för att ändra årtal på låtar, men den finns inte just nu. Den kommer senare att finnas tillgänglig när man loggar in.
         </p>
         <p>
           I webbversionen gör du ett antal val:<br>
           • Vilka förinställda spellistor vill du inkludera?<br>
           • Vilka årtal vill du inkludera låtar från?<br>
-          Utifrån dina val väljs sedan låtar ut.<br>
-          Ingen låt ska återkomma under samma session.
+          Utifrån dina val väljs sedan låtar ut. Ingen låt ska återkomma under samma session.
         </p>
         <p>
-          Du kan även välja att lägga till egna spellistor och kombinera dem med de förinställda.
+          Du kan även lägga till egna spellistor och kombinera dem med de förinställda.
         </p>
         <p>
           När du lägger till en lista, namnge den och klistra in länken från Spotify.
@@ -994,13 +996,13 @@
         </p>
       </div>
     </div>
-  
+    
   </div>
   
   <!-- Vanligt script för modal- och feedbackhantering -->
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // Växla mellan logga in och registrera
+      // Växla mellan inloggnings- och registreringsmodaler
       const showRegisterBtn = document.getElementById("showRegister");
       const showLoginBtn = document.getElementById("showLogin");
       if (showRegisterBtn) {
