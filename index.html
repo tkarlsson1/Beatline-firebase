@@ -407,7 +407,16 @@
     document.addEventListener("DOMContentLoaded", () => {
     // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
     onAuthStateChanged(auth, (user) => {
+      console.log("Auth State Changed Triggered - User:", user ? user.email : "Ingen inloggad");
         if (user) {
+          if (user.email === "timmykarlsson@gmail.com") { 
+  console.log("Du är admin, spellistevalet visas.");
+  document.getElementById("adminPlaylistType").style.display = "block"; 
+} else {
+  console.log("Du är inte admin, spellistevalet tas bort.");
+  document.getElementById("adminPlaylistType").remove(); 
+}
+
             console.log("Inloggad användare:", user.email);
             document.getElementById("loginModal").style.display = "none";
             document.getElementById("registerModal").style.display = "none";
