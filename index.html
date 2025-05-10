@@ -15,8 +15,8 @@
       margin: 0;
       padding: 0;
       display: flex;
-      justify-content: center;
-      align-items: start;
+      flex-direction: column;
+      align-items: center;
       min-height: 100vh;
     }
     .container {
@@ -35,7 +35,6 @@
     }
     /* Standardknappar i filterformuläret */
     select, button {
-      width: 25%;
       padding: 0.5rem;
       font-size: 1rem;
       margin-bottom: 1rem;
@@ -128,34 +127,44 @@
       padding: 0.5rem;
       font-family: 'Manrope', sans-serif;
     }
-    /* Header för spellistor */
-    .allHeader {
-      position: relative;
-      width: 100%;
-      text-align: center;
-      margin-bottom: 1rem;
+    /* Header – menyknappen */
+    #menuContainer {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 3000;
     }
-    .allHeader button#lasForstButton {
+    #menuButton {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    #dropdownMenu {
+      display: none;
       position: absolute;
       right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      font-family: 'Manrope', sans-serif;
+      top: 2.5rem;
+      background: #333;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      overflow: hidden;
     }
-    .divider {
-      height: 2px;
-      background-color: #fff;
-      width: 100%;
-      margin: 0.5rem 0;
-    }
-    .subheading {
+    #dropdownMenu a {
       display: block;
-      width: 100%;
-      text-align: center;
-      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
       color: #fff;
-      margin: 0.5rem 0;
+      text-decoration: none;
+      font-size: 1rem;
     }
+    #dropdownMenu a:hover {
+      background: #0b939c;
+    }
+    /* Divider, rubriker, mm. (samma som tidigare) */
+    .divider { height: 2px; background-color: #fff; width: 100%; margin: 0.5rem 0; }
+    .subheading { display: block; width: 100%; text-align: center; font-size: 0.8rem; color: #fff; margin: 0.5rem 0; }
+    
     /* Modal för Readme */
     #readmeModal {
       display: none;
@@ -189,10 +198,8 @@
       right: 20px;
       cursor: pointer;
     }
-    .closeBtn:hover, .closeBtn:focus {
-      color: black;
-      text-decoration: none;
-    }
+    .closeBtn:hover, .closeBtn:focus { color: black; text-decoration: none; }
+    
     /* Inloggningsmodal och registreringsmodal */
     #loginModal, #registerModal {
       position: fixed;
@@ -233,30 +240,17 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    /* Felmeddelanden med .error - dessa är dolda från början */
     .error {
       color: red;
       display: none;
       font-size: 0.9rem;
     }
-    /* Se till att vanlig text (t.ex. knappar för att byta modal) inte får klassen .error */
+    
     /* Feedback-knapp */
-    #feedbackButton {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #0b939c;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 1100;
-      font-family: 'Manrope', sans-serif;
-    }
-    /* Feedback-modal */
+    /* Eftersom vi lägger Feedback i menyn, tar vi bort den fasta knappen.
+       Om du vill ha en separat ikon, kan den läggas in här med lämplig CSS. */
+    
+    /* Övriga modaler (Feedback, etc.) behålls */
     #feedbackModal {
       display: none;
       position: fixed;
@@ -288,10 +282,7 @@
       cursor: pointer;
       color: #aaa;
     }
-    #closeFeedback:hover, #closeFeedback:focus {
-      color: black;
-      text-decoration: none;
-    }
+    #closeFeedback:hover, #closeFeedback:focus { color: black; text-decoration: none; }
     #feedbackText {
       width: 100%;
       height: 150px;
@@ -310,24 +301,8 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    /* Fasta knappar i resultatsidan */
-    .startpage-button {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1500;
-      padding: 0.5rem 1rem;
-      width: 128px;
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-      display: none;
-      font-family: 'Manrope', sans-serif;
-    }
+    
+    /* Fasta knappar i resultatsidan, t.ex. "Nästa låt" */
     .next-song-button {
       display: block;
       margin: 0 auto;
@@ -361,14 +336,14 @@
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <!-- Importera Firebase SDK:er (app, database, auth) via moduler -->
+  <!-- Importera Firebase SDK:er i modulformat -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
     const firebaseConfig = {
-      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      apiKey: "DIN_API_KEY",
       authDomain: "beatlinefirebase.firebaseapp.com",
       databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "beatlinefirebase",
@@ -383,9 +358,17 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     
-    // Definiera en funktion som sätter fast onValue-lyssnare när användaren är autentiserad.
+    // Variabler för dataläsning (komplett från tidigare)
+    let standardSongs = [];
+    let userPlaylistSongs = [];
+    let songs = [];
+    let sourceFilteredSongs = [];
+    let currentFilteredSongs = [];
+    let shownSongs = [];
+    let currentSong = null;
+    
+    // Funktion för att sätta fast dataläsnings-lyssnare (bara när en användare loggat in)
     function initDataListeners() {
-      // StandardLists
       onValue(ref(db, 'standardLists'), (snapshot) => {
         if (snapshot.exists()) {
           const rawPlaylists = snapshot.val();
@@ -411,7 +394,6 @@
         }
       });
       
-      // UserPlaylists
       onValue(ref(db, 'userPlaylists'), (snapshot) => {
         if (snapshot.exists()) {
           const rawPlaylists = snapshot.val();
@@ -438,15 +420,14 @@
       });
     }
     
-    // Vänta tills DOM är laddad innan vi sätter eventlyssnare på DOM-element för autentisering
+    // Vänta tills DOM är laddad
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus – när en användare loggar in, anropa initDataListeners
+      // Hantera autentiseringsstatus – när inloggad, initiera dataläsning
       onAuthStateChanged(auth, (user) => {
         if (user) {
           console.log("Inloggad användare:", user.email);
           document.getElementById("loginModal").style.display = "none";
           document.getElementById("registerModal").style.display = "none";
-          // Nu kan vi sätta fast våra databashanteringslyssnare
           initDataListeners();
         } else {
           console.log("Ingen användare inloggad.");
@@ -492,7 +473,7 @@
         });
       }
       
-      // Växla mellan modaler för inloggning och registrering
+      // Växla mellan modaler
       const showRegisterBtn = document.getElementById("showRegister");
       if (showRegisterBtn) {
         showRegisterBtn.addEventListener("click", () => {
@@ -509,15 +490,7 @@
       }
     });
     
-    /* ----- Övrig kod för databashantering, spellistor osv. ----- */
-    let standardSongs = [];
-    let userPlaylistSongs = [];
-    let songs = [];
-    let sourceFilteredSongs = [];
-    let currentFilteredSongs = [];
-    let shownSongs = [];
-    let currentSong = null;
-    
+    // Funktioner för övrig databehandling (mergeSongs, updateAllaCheckbox, populateSourceCheckboxes, filter, nextSong etc.)
     function mergeSongs() {
       const merged = {};
       standardSongs.forEach(song => {
@@ -690,14 +663,13 @@
       if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
-        document.getElementById("startpageButton").style.display = "block";
       }
     };
     
     window.nextSong = function() {
       const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
       if (remainingSongs.length === 0) {
-        alert("Inga fler låtar, tryck på Startsida för att börja om.");
+        alert("Inga fler låtar, tryck på menyvalet 'Startsida' för att börja om.");
         return;
       }
       const randomIndex = Math.floor(Math.random() * remainingSongs.length);
@@ -745,7 +717,6 @@
       restart();
       document.getElementById("result-page").style.display = "none";
       document.getElementById("filter-page").style.display = "block";
-      document.getElementById("startpageButton").style.display = "none";
     };
     
     /***** NY SPOTIFY TOKEN OCH CACHING DEL *****/
@@ -838,6 +809,91 @@
         alert("Fyll i både spellistans namn och länk!");
       }
     });
+    
+    /* ----- Meny för logga ut, Läs först, Startsida, Feedback ----- */
+    // Vi skapar en menyknapp (hamburger) i det övre högra hörnet
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuContainer = document.createElement("div");
+      menuContainer.id = "menuContainer";
+      const menuButton = document.createElement("button");
+      menuButton.id = "menuButton";
+      menuButton.innerHTML = "&#9776;"; // Hamburger-ikon (tre streck)
+      menuContainer.appendChild(menuButton);
+      
+      const dropdownMenu = document.createElement("div");
+      dropdownMenu.id = "dropdownMenu";
+      
+      // Skapa menyalternativ
+      // "Läs först" – om du har logik att öppna en readme/modal, kan du koppla den här
+      const lasForstLink = document.createElement("a");
+      lasForstLink.href = "#";
+      lasForstLink.textContent = "Läs först";
+      lasForstLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Exempel: Visa readmeModal
+        document.getElementById("readmeModal").style.display = "block";
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(lasForstLink);
+      
+      // "Startsida" – återställ spelet / visa filter
+      const startpageLink = document.createElement("a");
+      startpageLink.href = "#";
+      startpageLink.textContent = "Startsida";
+      startpageLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        goToFilter();
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(startpageLink);
+      
+      // "Feedback" – öppna feedbackmodal
+      const feedbackLink = document.createElement("a");
+      feedbackLink.href = "#";
+      feedbackLink.textContent = "Feedback";
+      feedbackLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("feedbackModal").style.display = "block";
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(feedbackLink);
+      
+      // "Logga ut" – anropa Firebase signOut
+      const logoutLink = document.createElement("a");
+      logoutLink.href = "#";
+      logoutLink.textContent = "Logga ut";
+      logoutLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => {
+          console.log("Utloggad!");
+          // Visa inloggningsmodalen igen
+          document.getElementById("loginModal").style.display = "flex";
+          dropdownMenu.style.display = "none";
+        }).catch((error) => {
+          console.error("Fel vid utloggning:", error);
+        });
+      });
+      dropdownMenu.appendChild(logoutLink);
+      
+      menuContainer.appendChild(dropdownMenu);
+      document.body.appendChild(menuContainer);
+      
+      // Toggle dropdown-menyn vid klick på hamburgerknappen
+      menuButton.addEventListener("click", () => {
+        if (dropdownMenu.style.display === "block") {
+          dropdownMenu.style.display = "none";
+        } else {
+          dropdownMenu.style.display = "block";
+        }
+      });
+      
+      // Dölj dropdown-menyn om man klickar utanför
+      document.addEventListener("click", (event) => {
+        if (!menuContainer.contains(event.target)) {
+          dropdownMenu.style.display = "none";
+        }
+      });
+    });
   </script>
   
 </head>
@@ -877,7 +933,7 @@
         <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
         <select id="endYear"></select>
       </div>
-      <!-- Spotify-spellisteimportsektionen -->
+      <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
@@ -897,51 +953,7 @@
       <div id="song-display"></div>
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
     </div>
-    
-    <!-- Fasta "Startsida"-knappen -->
-    <button id="startpageButton" class="startpage-button" onclick="goToFilter()">Startsida</button>
-    
-    <!-- Readme Modal -->
-    <div id="readmeModal">
-      <div id="readmeContent">
-        <span class="closeBtn">&times;</span>
-        <h2>NOTESTREAM-BETA</h2>
-        <p>
-          Test och säg vad du tycker!<br>
-          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
-        </p>
-        <p>
-          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
-        </p>
-        <p>
-          För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
-        </p>
-        <p>
-          I webbversionen bygger spelet på att du i början gör ett antal val:<br>
-          • Vilka förinställda spellistor vill du inkludera?<br>
-          • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
-          Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
-          Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
-        </p>
-        <p>
-          Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till.
-        </p>
-        <p>
-          Om du lägger till egna spellistor, tänk på att all data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till.
-        </p>
-        <p>
-          När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
-        </p>
-        <p>
-          På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
-          De listor som nu visas är exempeldata för att fylla upp databasen.
-        </p>
-      </div>
-    </div>
-    
-    <!-- Feedback Button -->
-    <button id="feedbackButton">??</button>
-    
+  
     <!-- Feedback Modal -->
     <div id="feedbackModal">
       <div>
@@ -949,6 +961,37 @@
         <h2>Lämna feedback</h2>
         <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
         <button id="submitFeedback">Skicka feedback</button>
+      </div>
+    </div>
+  
+    <!-- Readme Modal -->
+    <div id="readmeModal">
+      <div id="readmeContent">
+        <span class="closeBtn">&times;</span>
+        <h2>NOTESTREAM-BETA</h2>
+        <p>
+          Test och säg vad du tycker!<br>
+          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via menyn.
+        </p>
+        <p>
+          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
+        </p>
+        <p>
+          I webbversionen gör du ett antal val:<br>
+          • Vilka förinställda spellistor vill du inkludera?<br>
+          • Vilka årtal vill du inkludera låtar från?<br>
+          Utifrån dina val väljs sedan låtar ut.<br>
+          Ingen låt ska återkomma under samma session.
+        </p>
+        <p>
+          Du kan även välja att lägga till egna spellistor och kombinera dem med de förinställda.
+        </p>
+        <p>
+          När du lägger till en lista, namnge den och klistra in länken från Spotify.
+        </p>
+        <p>
+          Målet är att ha ett bibliotek med tusentals låtar samt användarspellistor som är privata per användare.
+        </p>
       </div>
     </div>
   
@@ -960,7 +1003,6 @@
       // Växla mellan logga in och registrera
       const showRegisterBtn = document.getElementById("showRegister");
       const showLoginBtn = document.getElementById("showLogin");
-      
       if (showRegisterBtn) {
         showRegisterBtn.addEventListener("click", () => {
           document.getElementById("loginModal").style.display = "none";
@@ -987,10 +1029,10 @@
       });
       
       // Feedback-hantering
-      document.getElementById("feedbackButton").addEventListener("click", function() {
+      document.getElementById("feedbackButton")?.addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "block";
       });
-      document.getElementById("closeFeedback").addEventListener("click", function() {
+      document.getElementById("closeFeedback")?.addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "none";
       });
       window.addEventListener("click", function(event) {
@@ -998,13 +1040,12 @@
           document.getElementById("feedbackModal").style.display = "none";
         }
       });
-      document.getElementById("submitFeedback").addEventListener("click", function() {
+      document.getElementById("submitFeedback")?.addEventListener("click", function() {
         alert("Tack för din feedback!");
         document.getElementById("feedbackText").value = "";
         document.getElementById("feedbackModal").style.display = "none";
       });
     });
   </script>
-  
 </body>
 </html>
