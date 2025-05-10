@@ -41,11 +41,10 @@
       margin-bottom: 1rem;
       background: #333;
       color: #fff;
-      border: 1px solid #fff; /* Ursprunglig regel */
+      border: 1px solid #fff;
       border-radius: 4px;
       font-family: 'Manrope', sans-serif;
     }
-    /* Överstyr genom att ta bort border på alla select- och button-element */
     select, button {
       border: none !important;
     }
@@ -76,13 +75,13 @@
       display: block;
       margin: 0 auto 1rem auto;
     }
-    /* Resultatsida – med extra padding nedtill för den fasta knappen */
+    /* Resultatsida – med extra padding nedtill */
     #result-page {
       display: none;
       position: relative;
       padding-bottom: 80px;
     }
-    /* Styling för checkbox-pills (behåller sin vita border) */
+    /* Styling för checkbox-pills */
     #source-checkbox-container {
       display: flex;
       flex-wrap: wrap;
@@ -140,7 +139,7 @@
       padding: 0.5rem;
       font-family: 'Manrope', sans-serif;
     }
-    /* Header med "Alla låtar" och "Läs först!"-knappen */
+    /* Header för spellistor */
     .allHeader {
       position: relative;
       width: 100%;
@@ -154,14 +153,12 @@
       transform: translateY(-50%);
       font-family: 'Manrope', sans-serif;
     }
-    /* Divider */
     .divider {
       height: 2px;
       background-color: #fff;
       width: 100%;
       margin: 0.5rem 0;
     }
-    /* Rubriker för listgrupper (subheadings) */
     .subheading {
       display: block;
       width: 100%;
@@ -208,8 +205,8 @@
       color: black;
       text-decoration: none;
     }
-    /* Inloggningsmodal – Ändrad för Firebase Authentication */
-    #loginModal {
+    /* Inloggningsmodal – nu med registrering */
+    #loginModal, #registerModal {
       position: fixed;
       z-index: 2000;
       top: 0;
@@ -221,7 +218,7 @@
       justify-content: center;
       align-items: center;
     }
-    #loginBox {
+    #loginBox, #registerBox {
       background: #fff;
       padding: 20px;
       border-radius: 8px;
@@ -230,7 +227,7 @@
       max-width: 300px;
       font-family: 'Manrope', sans-serif;
     }
-    #loginBox input {
+    #loginBox input, #registerBox input {
       width: 80%;
       padding: 0.5rem;
       margin: 1rem 0;
@@ -238,7 +235,7 @@
       border-radius: 4px;
       font-size: 1rem;
     }
-    #loginBox button {
+    #loginBox button, #registerBox button {
       padding: 0.4rem 0.8rem;
       font-size: 1rem;
       background-color: #0b939c;
@@ -248,7 +245,7 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    #loginBox p {
+    #loginBox p, #registerBox p {
       color: red;
       display: none;
     }
@@ -323,7 +320,7 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    /* Fasta knappar i resultatsidan – bredd 128px (80% av 160px QR-kod), ingen border */
+    /* Fasta knappar i resultatsidan */
     .startpage-button {
       position: fixed;
       bottom: 20px;
@@ -338,13 +335,8 @@
       border-radius: 4px;
       font-size: 1rem;
       cursor: pointer;
-      display: none; /* Visas endast på resultatsidan */
+      display: none;
       font-family: 'Manrope', sans-serif;
-    }
-    .startpage-button:hover,
-    .startpage-button:active,
-    .startpage-button:focus {
-      background: #333;
     }
     .next-song-button {
       display: block;
@@ -358,11 +350,6 @@
       font-size: 1rem;
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
-    }
-    .next-song-button:hover,
-    .next-song-button:active,
-    .next-song-button:focus {
-      background: #333;
     }
     .answer-button {
       display: block;
@@ -386,11 +373,16 @@
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <!-- Importera Firebase SDK:er: app, database och auth via moduler -->
+  <!-- Importera Firebase SDK:er (app, database och auth) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword,
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
     const firebaseConfig = {
       apiKey: "DIN_API_KEY",
@@ -404,22 +396,23 @@
     
     // Initiera app, database och auth
     const app = initializeApp(firebaseConfig);
-    window.app = app; // gör app globalt tillgänglig om behövs
+    window.app = app;
     const db = getDatabase(app);
     const auth = getAuth(app);
     
-    // Lyssna på autentiseringsstatusen
+    // Hantera autentiseringsstatus – visa inloggnings- eller registreringsmodal om ingen är inloggad
     onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log("Inloggad användare:", user.email);
         document.getElementById("loginModal").style.display = "none";
+        document.getElementById("registerModal").style.display = "none";
       } else {
         console.log("Ingen användare inloggad.");
         document.getElementById("loginModal").style.display = "flex";
       }
     });
     
-    // Hantera inloggning (email & lösenord)
+    // Inloggningsfunktion
     document.getElementById("loginButton").addEventListener("click", () => {
       const email = document.getElementById("emailInput").value.trim();
       const password = document.getElementById("passwordInput").value;
@@ -434,7 +427,30 @@
         });
     });
     
-    // ----- Övrig kod för databashantering, spellistor osv. (exakt som tidigare) -----
+    // Registreringsfunktion
+    document.getElementById("registerButton").addEventListener("click", () => {
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log("Registrering lyckades:", userCredential.user.email);
+          document.getElementById("registerError").style.display = "none";
+          document.getElementById("registerModal").style.display = "none";
+        })
+        .catch((error) => {
+          console.error("Registreringsfel:", error);
+          document.getElementById("registerError").style.display = "block";
+          document.getElementById("registerError").textContent = error.message;
+        });
+    });
+    
+    // Knapp för att visa registreringsformuläret
+    document.getElementById("showRegister").addEventListener("click", () => {
+      document.getElementById("loginModal").style.display = "none";
+      document.getElementById("registerModal").style.display = "flex";
+    });
+    
+    // ----- Övrig kod för databashantering, spellistor, mm. (exakt som tidigare) -----
     let standardSongs = [];
     let userPlaylistSongs = [];
     let songs = [];
@@ -815,7 +831,7 @@
       }
     });
     
-    // Feedback-hantering
+    // Feedback-hantering (kan utökas som tidigare)
     document.getElementById("feedbackButton").addEventListener("click", function() {
       document.getElementById("feedbackModal").style.display = "block";
     });
@@ -833,25 +849,35 @@
         alert("Feedbackfältet är tomt!");
         return;
       }
-      await set(push(ref(db, "feedback")), {
-        text: feedbackText,
-        timestamp: Date.now()
-      });
       alert("Tack för din feedback!");
       document.getElementById("feedbackText").value = "";
       document.getElementById("feedbackModal").style.display = "none";
     });
+    
   </script>
 </head>
 <body>
-  <!-- Inloggningsmodal (Firebase Auth-based) -->
+  <!-- Inloggningsmodal -->
   <div id="loginModal">
     <div id="loginBox">
       <h2>Logga in</h2>
       <input type="email" id="emailInput" placeholder="Ange e-post" />
       <input type="password" id="passwordInput" placeholder="Ange lösenord" />
       <button id="loginButton">Logga in</button>
-      <p id="loginError" style="color:red; display:none;">Fel e-post eller lösenord!</p>
+      <p id="loginError">Fel e-post eller lösenord!</p>
+      <p>Inget konto? <button id="showRegister">Registrera dig här</button></p>
+    </div>
+  </div>
+  
+  <!-- Registreringsmodal -->
+  <div id="registerModal" style="display:none;">
+    <div id="registerBox">
+      <h2>Registrera dig</h2>
+      <input type="email" id="regEmail" placeholder="Ange din e-post" />
+      <input type="password" id="regPassword" placeholder="Ange ditt lösenord" />
+      <button id="registerButton">Registrera</button>
+      <p id="registerError">Registrering misslyckades!</p>
+      <p>Redan har du ett konto? <button id="showLogin">Logga in</button></p>
     </div>
   </div>
   
@@ -896,38 +922,22 @@
       <div id="readmeContent">
         <span class="closeBtn">&times;</span>
         <h2>NOTESTREAM-BETA</h2>
-        <p>
-          Test och säg vad du tycker!<br>
-          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
+        <p>Test och säg vad du tycker!<br>
+           Tankar kring allt från färg på text till funktioner uppskattas. Lämnas förslagsvis via knappen nere i högra hörnet.
         </p>
-        <p>
-          Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen senare när man kan logga in som användare och då bara för dina egna uppladdade spellistor.
+        <p>Tidigare har det funnits en funktion för att ändra årtal på låtar, den finns inte just nu men kommer att komma igen när man kan logga in som användare och då bara för dina egna uppladdade spellistor.</p>
+        <p>För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.</p>
+        <p>I webbversionen bygger spelet på att du i början gör ett antal val:<br>
+           • Vilka förinställda spellistor vill du inkludera?<br>
+           • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
+           Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
+           Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
         </p>
-        <p>
-          För att förekomma det uppenbara, istället för att scanna QR-koder så borde knappen "Nästa låt" starta uppspelningen av låten direkt, men så verkar det inte vara möjligt i en webbversion.
-        </p>
-        <p>
-          I webbversionen bygger spelet på att du i början gör ett antal val:<br>
-          • Vilka förinställda spellistor vill du inkludera?<br>
-          • Vilka årtal vill du inkludera låtar från, baserat på de spellistor du valt?<br>
-          Utifrån dina val plockas sedan låtar inom de årtal du angivit.<br>
-          Ingen låt ska kunna komma två gånger i samma spel, så länge du inte trycker på "Startsida" eller laddar om sidan.
-        </p>
-        <p>
-          Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till
-        </p>
-        <p>
-          Om du lägger till egna spellistor, tänk på följande:<br>
-          * All data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till. Om du exempelvis lägger till en låt från "Best of…" som kom 20 år senare än originalet, kommer endast den version Facebook hämtar från Spotify att visas med angivet årtal.<br>
-          * Spellistor genererade av Spotify tenderar att välja ursprungsversionen av låten över senare släpp. Välj gärna såna.<br>
-          * Om du vill lägga till en spotifygenererad spellista, spara den först som din egen. (Exempelvis: Klicka på de tre prickarna ? "Lägg till i annan spellista" ? Ny spellista.)
-        </p>
-        <p>
-          När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.
-        </p>
-        <p>
-          På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
-          De listor som nu visas är exempeldata för att fylla upp databasen.
+        <p>Du kan även välja att lägga till egna spellistor och kombinera dessa med de förinställda. Välj UserPlaylists innan du trycker Lägg till.</p>
+        <p>Om du lägger till egna spellistor, tänk på att all data per låt (artist, titel, årtal) baseras på det unika spotify-id som finns i spellistan du lägger till.</p>
+        <p>När du ska lägga till en lista, namnge den och klistra in länken i rätt fält. Länken hämtas genom att klicka "Dela" i Spotify och sedan kopiera länken.</p>
+        <p>På sikt är målet att ha ett standardbibliotek med tusentals låtar samt användarspellistor som endast är synliga för respektive användare.<br>
+           De listor som nu visas är exempeldata för att fylla upp databasen.
         </p>
       </div>
     </div>
@@ -947,7 +957,7 @@
   
   </div>
   
-  <!-- Spara inloggning och feedbackhantering (vanlig script-block, ej modul) -->
+  <!-- Vanligt script för modalhantering (ej modul) -->
   <script>
     // Readme Modal
     const readmeModal = document.getElementById("readmeModal");
@@ -973,13 +983,7 @@
         document.getElementById("feedbackModal").style.display = "none";
       }
     });
-    document.getElementById("submitFeedback").addEventListener("click", async function() {
-      const feedbackText = document.getElementById("feedbackText").value.trim();
-      if (feedbackText === "") {
-        alert("Feedbackfältet är tomt!");
-        return;
-      }
-      // Förutsatt att funktionen push och ref är exponerade från tidigare via firebase-database; annars bör du hantera detta i modulen.
+    document.getElementById("submitFeedback").addEventListener("click", function() {
       alert("Tack för din feedback!");
       document.getElementById("feedbackText").value = "";
       document.getElementById("feedbackModal").style.display = "none";
