@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.003</title>
+    <title>Adminpanel 0.004</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -35,8 +35,22 @@
         }
 
         onAuthStateChanged(auth, (user) => {
-            checkAdminAccess(user);
-        });
+    if (user) {
+        // Om användaren är inloggad, kontrollera adminbehörighet
+        if (user.email === ADMIN_EMAIL) {
+            document.getElementById("adminLoginForm").style.display = "none";
+            document.getElementById("adminContent").style.display = "block";
+        } else {
+            alert("Du har inte behörighet att använda denna sida.");
+            window.location.href = "index.html"; // Skickas tillbaka till startsidan
+        }
+    } else {
+        // Visa inloggningsformuläret om ingen är inloggad
+        document.getElementById("adminLoginForm").style.display = "block";
+        document.getElementById("adminContent").style.display = "none";
+    }
+});
+
 
         document.getElementById("adminLoginBtn").addEventListener("click", () => {
             const email = document.getElementById("adminEmail").value;
