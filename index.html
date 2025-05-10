@@ -469,6 +469,27 @@
           document.getElementById("loginModal").style.display = "flex";
         });
       }
+      
+      // Glömt lösenord-funktion
+      const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+      if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const email = document.getElementById("emailInput").value.trim();
+          if (!email) {
+            alert("Ange din e-postadress för att återställa lösenordet.");
+            return;
+          }
+          sendPasswordResetEmail(auth, email)
+            .then(() => {
+              alert("En återställningslänk har skickats till din e-post.");
+            })
+            .catch((error) => {
+              console.error("Fel vid återställning av lösenord:", error);
+              alert("Fel: " + error.message);
+            });
+        });
+      }
     });
     
     // Funktioner för att hantera spellistor
