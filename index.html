@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.355</title>
+  <title>NOTESTREAM v0.356</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -992,34 +992,34 @@
       
       
       <!-- Spotify-spellisteimport -->
-      <div id="spotify-import">
-        <h3>Lägg till Spotify-spellista</h3>
-        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        
-        
-      </div>
-      <div id="adminPlaylistType" style="display: none; text-align: center;">
-        <label for="playlistTypeInput">Lägg till i:</label><br>
-        <div style="display: flex; justify-content: center;">
-          <select id="playlistTypeInput">
-            <option value="standard">StandardLists</option>
-            <option value="user" selected>UserPlaylists</option>
-          </select>
-        </div>
-      </div>
-      <!-- Placera knappen efter spellistevalet -->
-<div style="display: flex; justify-content: center; margin-top: 10px;">
-  <button id="addPlaylistButton">Lägg till</button>
+<div id="spotify-import">
+  <h3>Lägg till Spotify-spellista</h3>
+  <input type="text" id="playlistNameInput" placeholder="Spellistans namn" style="margin-bottom: 4px;">
+  <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+
+  <!-- Placera knappen direkt under fälten för namn och länk -->
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;">
+    <button id="addPlaylistButton">Lägg till</button>
+    <button onclick="applyFilter()">Starta spel</button>
+  </div>
 </div>
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto; margin-top: 8px;">Starta spel</button>
-    </div>
-    
-    <!-- Resultatsida -->
-    <div id="result-page">
-      <div id="song-display"></div>
-      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
-    </div>
+
+<!-- Spellisteval visas endast för dig som admin -->
+<div id="adminPlaylistType" style="display: none; text-align: center; margin-top: 6px;">
+  <label for="playlistTypeInput">Lägg till i:</label><br>
+  <div style="display: flex; justify-content: center;">
+    <select id="playlistTypeInput">
+      <option value="standard">StandardLists</option>
+      <option value="user" selected>UserPlaylists</option>
+    </select>
+  </div>
+</div>
+
+<!-- Resultatsida -->
+<div id="result-page">
+  <div id="song-display"></div>
+  <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
+</div>
     
     <!-- Feedback Modal -->
     <div id="feedbackModal">

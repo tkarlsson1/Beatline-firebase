@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.347</title>
+  <title>NOTESTREAM v0.355</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -111,14 +111,14 @@
       color: #fff;
     }
     #spotify-import input, #playlistTypeInput {
-      width: 40%;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-      background: #333;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Manrope', sans-serif;
+      width: 40%; /* Matchar "Lägg till"-knappen */
+  padding: 0.5rem;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Manrope', sans-serif;
+  text-align: center; /* Säkerställer att texten är centrerad */
     }
     #spotify-import button {
       width: 40%;
@@ -303,6 +303,20 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
+    #addPlaylistButton {
+  width: 40%; /* Matchar spellistelistan och fälten */
+  padding: 0.5rem;
+  background: #333; /* Färgen kan justeras om du vill */
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Manrope', sans-serif;
+  margin-top: 2px; /* Säkerställer att knappen inte överlappar andra fält */
+  display: block;
+  text-align: center;
+}
+
     .next-song-button { margin-bottom: 5rem; }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #333; }
   </style>
@@ -405,18 +419,41 @@
     
     // Vänta tills DOM är laddad
     document.addEventListener("DOMContentLoaded", () => {
-      // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
-      onAuthStateChanged(auth, (user) => {
+    // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
+    onAuthStateChanged(auth, (user) => {
+      console.log("Auth State Changed Triggered - User:", user ? user.email : "Ingen inloggad");
         if (user) {
-          console.log("Inloggad användare:", user.email);
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("registerModal").style.display = "none";
-          initDataListeners();
+          if (user.email === "timmykarlsson@gmail.com") { 
+  console.log("Du är admin, spellistevalet visas.");
+  document.getElementById("adminPlaylistType").style.display = "block"; 
+} else {
+  console.log("Du är inte admin, spellistevalet tas bort.");
+  document.getElementById("adminPlaylistType").remove(); 
+}
+
+            console.log("Inloggad användare:", user.email);
+            document.getElementById("loginModal").style.display = "none";
+            document.getElementById("registerModal").style.display = "none";
+            initDataListeners();
+
+            // STYR VISNING AV SPELLISTEVALET
+            const adminPlaylistType = document.getElementById("adminPlaylistType");
+            if (adminPlaylistType) {
+                if (user.email === "timmykarlsson@gmail.com") { 
+                    console.log("Du är inloggad som admin, spellisteval visas!");
+                    adminPlaylistType.style.display = "block"; // Visa spellistevalet för admin
+                } else {
+                    console.log("Du är inte admin, spellisteval tas bort.");
+                    adminPlaylistType.remove(); // Ta bort spellistevalet för andra
+                }
+            } else {
+                console.error("adminPlaylistType saknas i DOM.");
+            }
         } else {
-          console.log("Ingen användare inloggad.");
-          document.getElementById("loginModal").style.display = "flex";
+            console.log("Ingen användare inloggad.");
+            document.getElementById("loginModal").style.display = "flex";
         }
-      });
+    });
       
       // Inloggningsfunktion
       const loginButton = document.getElementById("loginButton");
@@ -804,7 +841,10 @@
     document.getElementById("addPlaylistButton").addEventListener("click", () => {
       const playlistName = document.getElementById("playlistNameInput").value.trim();
       const playlistLink = document.getElementById("playlistLinkInput").value.trim();
-      const playlistType = document.getElementById("playlistTypeInput").value;
+      const playlistType = document.getElementById("playlistTypeInput") 
+  ? document.getElementById("playlistTypeInput").value // Admin kan välja
+  : "user"; // Alla andra får "user" automatiskt
+
       if (playlistName && playlistLink) {
         addPlaylistToFirebase(playlistName, playlistLink, playlistType);
       } else {
@@ -956,14 +996,23 @@
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <select id="playlistTypeInput">
-          <option value="standard">StandardLists</option>
-          <option value="user" selected>UserPlaylists</option>
-        </select>
-        <button id="addPlaylistButton">Lägg till</button>
+        
+        
       </div>
-      
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
+      <div id="adminPlaylistType" style="display: none; text-align: center;">
+        <label for="playlistTypeInput">Lägg till i:</label><br>
+        <div style="display: flex; justify-content: center;">
+          <select id="playlistTypeInput">
+            <option value="standard">StandardLists</option>
+            <option value="user" selected>UserPlaylists</option>
+          </select>
+        </div>
+      </div>
+      <!-- Placera knappen efter spellistevalet -->
+<div style="display: flex; justify-content: center; margin-top: 10px;">
+  <button id="addPlaylistButton">Lägg till</button>
+</div>
+      <button onclick="applyFilter()" style="display: block; margin: 0 auto; margin-top: 8px;">Starta spel</button>
     </div>
     
     <!-- Resultatsida -->
@@ -1033,7 +1082,7 @@
           document.getElementById("loginModal").style.display = "flex";
         });
       }
-      
+
       // Readme Modal
       const readmeModal = document.getElementById("readmeModal");
       const closeBtn = document.querySelector(".closeBtn");
@@ -1045,7 +1094,7 @@
           readmeModal.style.display = "none";
         }
       });
-      
+
       // Feedback-hantering
       document.getElementById("feedbackButton")?.addEventListener("click", function() {
         document.getElementById("feedbackModal").style.display = "block";
@@ -1063,7 +1112,33 @@
         document.getElementById("feedbackText").value = "";
         document.getElementById("feedbackModal").style.display = "none";
       });
+
+      // Styr visningen av spellistevalet
+      onAuthStateChanged(auth, (user) => {
+        if (user && user.email === "timmykarlsson@gmail.com") { 
+          document.getElementById("adminPlaylistType").style.display = "block"; // Visa spellistevalet för dig
+        } else {
+          document.getElementById("adminPlaylistType").remove(); // Tar bort elementet för alla andra
+        }
+      });
+
+      // Hantera spellistetyp automatiskt för användare
+      document.getElementById("addPlaylistButton").addEventListener("click", () => {
+        const playlistName = document.getElementById("playlistNameInput").value.trim();
+        const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+        const playlistType = document.getElementById("playlistTypeInput") 
+          ? document.getElementById("playlistTypeInput").value  // Admin kan välja
+          : "user"; // Alla andra får "user" automatiskt
+
+        if (playlistName && playlistLink) {
+          addPlaylistToFirebase(playlistName, playlistLink, playlistType);
+        } else {
+          alert("Fyll i både spellistans namn och länk!");
+        }
+      });
     });
-  </script>
+</script>
+
+
 </body>
 </html>
