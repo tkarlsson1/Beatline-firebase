@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.358</title>
+  <title>NOTESTREAM v0.359</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -586,7 +586,7 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       
       const userHeading = document.createElement("p");
       userHeading.className = "subheading";
-      userHeading.textContent = "Egna spellistor (trasig sen lördag eftermiddag..)";
+      userHeading.textContent = "Egna spellistor";
       container.appendChild(userHeading);
       
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
