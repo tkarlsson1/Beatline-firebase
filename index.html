@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.344</title>
+  <title>NOTESTREAM v0.345</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -944,12 +944,19 @@
     <!-- Filter-/Startsida -->
     <div id="filter-page">
       <div id="source-checkbox-container"></div>
-      <div style="display: flex; justify-content: center; gap: 1rem; align-items: center;">
-        <label for="startYear">Från år:</label>
-        <select id="startYear"></select>
-        <label for="endYear">Till år:</label>
-        <select id="endYear"></select>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="display: flex; gap: 1rem;">
+          <div style="text-align: center;">
+            <label for="startYear">Från år</label><br>
+            <select id="startYear"></select>
+          </div>
+          <div style="text-align: center;">
+            <label for="endYear">Till år</label><br>
+            <select id="endYear"></select>
+          </div>
+        </div>
       </div>
+      
       
       <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
