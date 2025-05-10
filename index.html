@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.361</title>
+  <title>NOTESTREAM v0.362</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -1069,10 +1069,24 @@ window.goToFilter = function() {
         }
       });
       document.getElementById("submitFeedback")?.addEventListener("click", function() {
-        alert("Tack för din feedback!");
-        document.getElementById("feedbackText").value = "";
-        document.getElementById("feedbackModal").style.display = "none";
-      });
+    const feedbackText = document.getElementById("feedbackText").value.trim();
+    if (feedbackText.length === 0) {
+        alert("Feedback kan inte vara tom!");
+        return;
+    }
+
+    const feedbackRef = ref(db, 'feedback');
+    push(feedbackRef, { text: feedbackText, timestamp: Date.now() })
+        .then(() => {
+            alert("Tack för din feedback!");
+            document.getElementById("feedbackText").value = "";
+            document.getElementById("feedbackModal").style.display = "none";
+        })
+        .catch((error) => {
+            console.error("Fel vid lagring av feedback:", error);
+            alert("Något gick fel. Försök igen senare.");
+        });
+});
     });
   </script>
 </body>
