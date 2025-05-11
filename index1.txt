@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.361</title>
+  <title>NOTESTREAM v0.366</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="favicon.png">
   <style>
     /* Grundläggande sidstil */
     body {
@@ -794,40 +795,41 @@ window.goToFilter = function() {
     }
     
     // Skriv användarspellistor under userPlaylists/<uid>/<playlistName>
-    async function addPlaylistToFirebase(playlistName, playlistUrl, playlistType) {
-      try {
-        console.log("addPlaylistToFirebase: Försöker hämta spellista med namn:", playlistName);
-        console.log("addPlaylistToFirebase: Använder URL:", playlistUrl);
-        const tracks = await fetchSpotifyPlaylist(playlistUrl);
-        console.log("addPlaylistToFirebase: Hämtade spår:", tracks);
-        if (playlistType === "standard") {
-          const standardListsRef = ref(db, `standardLists/${playlistName}`);
-          await set(standardListsRef, { songs: tracks });
-          console.log("addPlaylistToFirebase: Spellista lagts till i StandardLists.");
-          alert(`Spellistan "${playlistName}" har lagts till i StandardLists!`);
-        } else {
-          const userId = auth.currentUser.uid;
-          const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
-          await set(userPlaylistsRef, { songs: tracks });
-          console.log("addPlaylistToFirebase: Spellista lagts till för UID:", userId);
-          alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
+      async function addPlaylistToFirebase(playlistName, playlistUrl) {
+    try {
+        console.log("Försöker hämta spellista:", playlistName);
+        const tracks = await fetchSpotifyPlaylist(playlistUrl); // Hämta låtarna
+
+        if (!tracks || Object.keys(tracks).length === 0) {
+            alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
+            return;
         }
-      } catch (error) {
-        console.error("Fel vid hämtning av Spotify-spellista i addPlaylistToFirebase:", error);
-        alert("Något gick fel vid hämtning av spellistan. Kontrollera att länken är korrekt.");
-      }
+
+        const userId = auth.currentUser.uid; // Endast lägga till i userPlaylists
+        const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
+        await set(userPlaylistsRef, { songs: tracks });
+
+        alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
+    } catch (error) {
+        console.error("Fel vid lagring av spellista:", error);
+        alert("Något gick fel vid lagring av spellistan.");
+    }
+}
+
+    
+document.getElementById("addPlaylistButton").addEventListener("click", async () => {
+    const playlistName = document.getElementById("playlistNameInput").value.trim();
+    const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+    
+    if (!playlistName || !playlistLink) {
+        alert("Fyll i både spellistans namn och länk!");
+        return;
     }
     
-    document.getElementById("addPlaylistButton").addEventListener("click", () => {
-      const playlistName = document.getElementById("playlistNameInput").value.trim();
-      const playlistLink = document.getElementById("playlistLinkInput").value.trim();
-      const playlistType = document.getElementById("playlistTypeInput").value;
-      if (playlistName && playlistLink) {
-        addPlaylistToFirebase(playlistName, playlistLink, playlistType);
-      } else {
-        alert("Fyll i både spellistans namn och länk!");
-      }
-    });
+    await addPlaylistToFirebase(playlistName, playlistLink);
+});
+
+
     
     /***** MENY: Skapa en hamburgermeny i högra hörnet *****/
     document.addEventListener("DOMContentLoaded", function() {
@@ -881,7 +883,7 @@ window.goToFilter = function() {
       
       const feedbackLink = document.createElement("a");
       feedbackLink.href = "#";
-      feedbackLink.textContent = "Feedback";
+      feedbackLink.textContent = "Feedback (trasig)";
       feedbackLink.addEventListener("click", (e) => {
         e.preventDefault();
         document.getElementById("feedbackModal").style.display = "block";
@@ -964,12 +966,8 @@ window.goToFilter = function() {
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-        <select id="playlistTypeInput">
-          <option value="standard">StandardLists</option>
-          <option value="user" selected>UserPlaylists</option>
-        </select>
-        <button id="addPlaylistButton">Lägg till</button>
+<input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
+<button id="addPlaylistButton">Lägg till</button>
       </div>
       
       <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
@@ -1069,10 +1067,24 @@ window.goToFilter = function() {
         }
       });
       document.getElementById("submitFeedback")?.addEventListener("click", function() {
-        alert("Tack för din feedback!");
-        document.getElementById("feedbackText").value = "";
-        document.getElementById("feedbackModal").style.display = "none";
-      });
+    const feedbackText = document.getElementById("feedbackText").value.trim();
+    if (feedbackText.length === 0) {
+        alert("Feedback kan inte vara tom!");
+        return;
+    }
+
+    const feedbackRef = ref(db, 'feedback');
+    push(feedbackRef, { text: feedbackText, timestamp: Date.now() })
+        .then(() => {
+            alert("Tack för din feedback!");
+            document.getElementById("feedbackText").value = "";
+            document.getElementById("feedbackModal").style.display = "none";
+        })
+        .catch((error) => {
+            console.error("Fel vid lagring av feedback:", error);
+            alert("Något gick fel. Försök igen senare.");
+        });
+});
     });
   </script>
 </body>
