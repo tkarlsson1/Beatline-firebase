@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.408</title>
+  <title>NOTESTREAM v0.409</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -778,7 +778,9 @@ window.generateQRCode = function(qr) {
     qrElement.style.width = "160px"
     qrElement.style.width = "160px"
     new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
-};
+    console.log("QR-kodens position efter generering:", qrElement.getBoundingClientRect());
+  };
+
 
 window.revealDetails = function() {
     document.getElementById("song-details").style.display = "block";
