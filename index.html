@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.388</title>
+  <title>NOTESTREAM v0.389</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -957,15 +957,20 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
   
   <div class="container" id="mainContent">
     <img src="logga.png" alt="Notestream-beta logo" class="logo" />
-    <!-- Filter-/Startsida -->
-    <div id="filter-page">
-      <div id="source-checkbox-container"></div>
+<!-- Filter-/Startsida -->
+<div id="filter-page">
+  <div id="source-checkbox-container"></div>
+  <div style="display: flex; justify-content: center; gap: 1rem;">
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="startYear">Från år:</label>
-        <select id="startYear"></select>
-        <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
-        <select id="endYear"></select>
+          <label for="startYear">Från år:</label>
+          <select id="startYear"></select>
       </div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+          <label for="endYear">Till år:</label>
+          <select id="endYear"></select>
+      </div>
+  </div>
+</div>
       <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
