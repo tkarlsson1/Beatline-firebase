@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.419</title>
+  <title>NOTESTREAM v0.420</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -325,13 +325,30 @@
     transform: scale(1.05);
 }
 select {
-    background-color: #032934;
+    background-color: #032934; /* Bakgrundsfärg för hela dropdownen */
     color: #fff;
     border: none;
 }
 
+/* Förhindra att hela listan ändras när den är öppen */
 select:focus, select:hover {
-    background-color: #0b939c; /* Samma färg som markerade pills */
+    background-color: #032934 !important;
+    color: #fff;
+}
+
+/* Gör så att markerade alternativ har rätt färg */
+select option {
+    background-color: #032934;
+    color: #fff;
+}
+
+select option:hover {
+    background-color: #0b939c !important; /* Markerad hover */
+    color: #fff;
+}
+
+select option:checked {
+    background-color: #0b939c !important; /* Färgen på det valda alternativet */
     color: #fff;
 }
 
