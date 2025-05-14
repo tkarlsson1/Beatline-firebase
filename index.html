@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.382</title>
+  <title>NOTESTREAM v0.383</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -838,7 +838,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       menuContainer.style.position = "fixed";
       menuContainer.style.top = "10px";
       menuContainer.style.right = "10px";
-      menuContainer.style.zIndex = "3000";
+      menuContainer.style.zIndex = "9999";
       
       const menuButton = document.createElement("button");
       menuButton.id = "menuButton";
@@ -848,6 +848,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       menuButton.style.color = "#fff";
       menuButton.style.fontSize = "2rem";
       menuButton.style.cursor = "pointer";
+      menuButton.style.zIndex = "9999";
       menuContainer.appendChild(menuButton);
       
       const dropdownMenu = document.createElement("div");
@@ -859,6 +860,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       dropdownMenu.style.background = "#333";
       dropdownMenu.style.border = "1px solid #fff";
       dropdownMenu.style.borderRadius = "4px";
+      dropdownMenu.style.zIndex = "9999";
       
       // Menyalternativ
       const lasForstLink = document.createElement("a");
