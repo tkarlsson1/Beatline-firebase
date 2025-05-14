@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.383</title>
+  <title>NOTESTREAM v0.384</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -839,7 +839,8 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       menuContainer.style.top = "10px";
       menuContainer.style.right = "10px";
       menuContainer.style.zIndex = "9999";
-      
+      menuContainer.style.width = "60px";
+
       const menuButton = document.createElement("button");
       menuButton.id = "menuButton";
       menuButton.innerHTML = "&#9776;"; // Hamburger-ikon
@@ -861,6 +862,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       dropdownMenu.style.border = "1px solid #fff";
       dropdownMenu.style.borderRadius = "4px";
       dropdownMenu.style.zIndex = "9999";
+      dropdownMenu.style.width = "max-content";
       
       // Menyalternativ
       const lasForstLink = document.createElement("a");
