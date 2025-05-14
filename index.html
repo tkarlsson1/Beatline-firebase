@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.420</title>
+  <title>NOTESTREAM v0.421</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -339,11 +339,6 @@ select:focus, select:hover {
 /* Gör så att markerade alternativ har rätt färg */
 select option {
     background-color: #032934;
-    color: #fff;
-}
-
-select option:hover {
-    background-color: #0b939c !important; /* Markerad hover */
     color: #fff;
 }
 
@@ -687,22 +682,55 @@ window.updateYearSelection = function() {
     );
 
     const startYearDropdown = document.getElementById("startYear");
-    const endYearDropdown = document.getElementById("endYear");
-    startYearDropdown.innerHTML = "";
-    endYearDropdown.innerHTML = "";
-    for (let year = 1950; year <= 2025; year++) {
-        const optionStart = document.createElement("option");
-        optionStart.value = year;
-        optionStart.textContent = year;
-        if (year === 1950) optionStart.selected = true;
-        startYearDropdown.appendChild(optionStart);
-        
-        const optionEnd = document.createElement("option");
-        optionEnd.value = year;
-        optionEnd.textContent = year;
-        if (year === 2025) optionEnd.selected = true;
-        endYearDropdown.appendChild(optionEnd);
-    }
+const endYearDropdown = document.getElementById("endYear");
+
+startYearDropdown.innerHTML = "";
+endYearDropdown.innerHTML = "";
+
+for (let year = 1950; year <= 2025; year++) {
+    const optionStart = document.createElement("option");
+    optionStart.value = year;
+    optionStart.textContent = year;
+    if (year === 1950) optionStart.selected = true;
+    startYearDropdown.appendChild(optionStart);
+
+    const optionEnd = document.createElement("option");
+    optionEnd.value = year;
+    optionEnd.textContent = year;
+    if (year === 2025) optionEnd.selected = true;
+    endYearDropdown.appendChild(optionEnd);
+
+    // Lägger till hover-effekt på årtal
+    optionStart.addEventListener("mouseover", function() {
+        optionStart.style.backgroundColor = "#0b939c"; // Hover-färg
+        optionStart.style.color = "#fff";
+    });
+
+    optionStart.addEventListener("mouseout", function() {
+        optionStart.style.backgroundColor = "#032934"; // Återställ färgen
+    });
+
+    optionEnd.addEventListener("mouseover", function() {
+        optionEnd.style.backgroundColor = "#0b939c"; // Hover-färg
+        optionEnd.style.color = "#fff";
+    });
+
+    optionEnd.addEventListener("mouseout", function() {
+        optionEnd.style.backgroundColor = "#032934"; // Återställ färgen
+    });
+
+    // Lägger till markerad färg på valt alternativ
+    optionStart.addEventListener("click", function() {
+        startYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
+        startYearDropdown.style.color = "#fff";
+    });
+
+    optionEnd.addEventListener("click", function() {
+        endYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
+        endYearDropdown.style.color = "#fff";
+    });
+}
+
 
     updateSongCount(); // Uppdatera antalet valda låtar!
 };
