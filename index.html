@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.386</title>
+  <title>NOTESTREAM v0.387</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -19,6 +19,8 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      position: fixed;
+      width: max-content;
     }
     .container {
       padding: 2rem;
@@ -129,8 +131,8 @@
     #menuContainer {
       position: fixed;
       top: 10px;
-      right: 10px;
-      z-index: 3000;
+      right: 2vw;
+      z-index: 9999;
     }
     #menuButton {
       background: none;
@@ -147,6 +149,7 @@
       background: #333;
       border: 1px solid #fff;
       border-radius: 4px;
+      width: auto;
     }
     #dropdownMenu a {
       display: block;
@@ -960,7 +963,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
     <!-- Filter-/Startsida -->
     <div id="filter-page">
       <div id="source-checkbox-container"></div>
-      <div style="display: flex; flex-direction: row; align-items: center;">
+      <div style="display: flex; flex-direction: column; align-items: center;">
         <label for="startYear">Från år:</label>
         <select id="startYear"></select>
         <label for="endYear" style="margin-top: 0.1rem;">Till år:</label>
