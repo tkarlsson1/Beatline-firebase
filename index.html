@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.405</title>
+  <title>NOTESTREAM v0.406</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -50,7 +50,10 @@
     button:active,
     button:focus { background: #333; }
     /* Årtalsfältens bredd */
-    #startYear, #endYear { width: 80px; }
+    #startYear, #endYear { 
+      width: 80px; 
+      
+    }
     #song-display {
       text-align: center;
       margin: 1.5rem 0;
@@ -65,8 +68,10 @@
       height: 160px;
       border: 5px solid black;
       border-radius: 10px;
-      display: block;
-      margin-top: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: auto;
       padding-top: 0;
     }
     /* Resultatsida – med extra padding nedtill */
@@ -74,7 +79,7 @@
       display: none;
       position: relative;
       padding: 0;
-      margin: 0;
+      margin-bottom: 80px;
     }
     /* Checkbox-pills */
     #source-checkbox-container {
@@ -759,6 +764,8 @@ window.generateQRCode = function(qr) {
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
     const qrElement = document.getElementById(`qrcode-${qr}`);
     qrElement.innerHTML = "";
+    qrElement.style.width = "160px"
+    qrElement.style.width = "160px"
     new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
 };
 
