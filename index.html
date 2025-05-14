@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.418</title>
+  <title>NOTESTREAM v0.419</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -325,7 +325,7 @@
     transform: scale(1.05);
 }
 select {
-    background-color: #032934; /* Matchar markerade pills */
+    background-color: #032934;
     color: #fff;
     border: none;
 }
@@ -1003,9 +1003,9 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="margin-right: 1px" style="margin-left: 1px">
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-<input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-<button id="addPlaylistButton">Lägg till</button>
+      <button id="addPlaylistButton">Lägg till</button>
       </div>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
       <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
