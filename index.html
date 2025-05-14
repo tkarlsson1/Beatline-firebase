@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.407</title>
+  <title>NOTESTREAM v0.408</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -80,6 +80,10 @@
     display: flex;
     flex-direction: column; /* Se till att info placeras vertikalt */
     align-items: center; /* Håller allt snyggt centrerat */
+}
+.info {
+    max-width: 300px; /* Begränsar textbredden så den inte skiftar layouten */
+    word-wrap: break-word; /* Se till att långa ord inte påverkar layouten */
 }
     /* Resultatsida – med extra padding nedtill */
     #result-page {
