@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.413</title>
+  <title>NOTESTREAM v0.414</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -306,20 +306,25 @@
     .next-song-button { margin-bottom: 5rem; }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #333; 
     }
-    #startGameButton {
-    background: linear-gradient(80deg, #f91423, #ff6310); /* Snygg färgövergång */
-    color: #fff;
-    font-size: 1.4rem;
-    font-weight: bold;
-    padding: 12px 24px;
+    .start-button {
+    background: linear-gradient(to right, #fb1820, #ff6310); /* Anpassa färgerna */
     border: none;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease-in-out;
     display: block;
-    margin: 1rem auto; /* Centrerad knapp */
+    margin: 0 auto;
 }
+
+.start-button:hover {
+    background: linear-gradient(to right, #e52e71, #ff8a00);
+    transform: scale(1.05);
+}
+
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -989,7 +994,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
 <button id="addPlaylistButton">Lägg till</button>
       </div>
       
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
+      <button id="startButton" onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
     </div>
     
