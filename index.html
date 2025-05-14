@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.421</title>
+  <title>NOTESTREAM v0.422</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -672,68 +672,70 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
 window.updateYearSelection = function() {
     const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
     let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
+    
     if (selectedSources.includes("alla")) {
         const allStandard = Array.from(new Set(standardSongs.map(song => song.source[0])));
         const allUser = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
         selectedSources = [...new Set([...allStandard, ...allUser, "alla"])];
     }
+
     sourceFilteredSongs = songs.filter(song =>
         song.source.some(src => selectedSources.includes(src))
     );
 
     const startYearDropdown = document.getElementById("startYear");
-const endYearDropdown = document.getElementById("endYear");
+    const endYearDropdown = document.getElementById("endYear");
 
-startYearDropdown.innerHTML = "";
-endYearDropdown.innerHTML = "";
+    startYearDropdown.innerHTML = "";
+    endYearDropdown.innerHTML = "";
 
-for (let year = 1950; year <= 2025; year++) {
-    const optionStart = document.createElement("option");
-    optionStart.value = year;
-    optionStart.textContent = year;
-    if (year === 1950) optionStart.selected = true;
-    startYearDropdown.appendChild(optionStart);
+    for (let year = 1950; year <= 2025; year++) {
+        const optionStart = document.createElement("option");
+        optionStart.value = year;
+        optionStart.textContent = year;
+        if (year === 1950) optionStart.selected = true;
+        startYearDropdown.appendChild(optionStart);
 
-    const optionEnd = document.createElement("option");
-    optionEnd.value = year;
-    optionEnd.textContent = year;
-    if (year === 2025) optionEnd.selected = true;
-    endYearDropdown.appendChild(optionEnd);
+        const optionEnd = document.createElement("option");
+        optionEnd.value = year;
+        optionEnd.textContent = year;
+        if (year === 2025) optionEnd.selected = true;
+        endYearDropdown.appendChild(optionEnd);
 
-    // Lägger till hover-effekt på årtal
-    optionStart.addEventListener("mouseover", function() {
-        optionStart.style.backgroundColor = "#0b939c"; // Hover-färg
-        optionStart.style.color = "#fff";
-    });
+        // Hover-effekt för individuella alternativ
+        optionStart.addEventListener("mouseenter", function() {
+            optionStart.style.backgroundColor = "#0b939c"; // Hover-färg
+            optionStart.style.color = "#fff";
+        });
 
-    optionStart.addEventListener("mouseout", function() {
-        optionStart.style.backgroundColor = "#032934"; // Återställ färgen
-    });
+        optionStart.addEventListener("mouseleave", function() {
+            optionStart.style.backgroundColor = "#032934"; // Återställ färg
+        });
 
-    optionEnd.addEventListener("mouseover", function() {
-        optionEnd.style.backgroundColor = "#0b939c"; // Hover-färg
-        optionEnd.style.color = "#fff";
-    });
+        optionEnd.addEventListener("mouseenter", function() {
+            optionEnd.style.backgroundColor = "#0b939c"; // Hover-färg
+            optionEnd.style.color = "#fff";
+        });
 
-    optionEnd.addEventListener("mouseout", function() {
-        optionEnd.style.backgroundColor = "#032934"; // Återställ färgen
-    });
+        optionEnd.addEventListener("mouseleave", function() {
+            optionEnd.style.backgroundColor = "#032934"; // Återställ färg
+        });
+    }
 
-    // Lägger till markerad färg på valt alternativ
-    optionStart.addEventListener("click", function() {
+    // Ändrar bakgrundsfärg på dropdown vid val
+    startYearDropdown.addEventListener("change", function() {
         startYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
         startYearDropdown.style.color = "#fff";
     });
 
-    optionEnd.addEventListener("click", function() {
+    endYearDropdown.addEventListener("change", function() {
         endYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
         endYearDropdown.style.color = "#fff";
     });
-}
-
 
     updateSongCount(); // Uppdatera antalet valda låtar!
 };
+
 
 window.filterSongs = function() {
     const startYear = parseInt(document.getElementById("startYear").value);
