@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.391</title>
+  <title>NOTESTREAM v0.392</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -305,6 +305,25 @@
     }
     .next-song-button { margin-bottom: 5rem; }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #333; }
+    #startGameButton {
+    background: linear-gradient(45deg, #ff9800, #ff5722); /* Snygg färgövergång */
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 1rem auto; /* Centrerad knapp */
+}
+
+#startGameButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -974,14 +993,13 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-<input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken">
-<button id="addPlaylistButton">Lägg till</button>
+        <button id="addPlaylistButton">Lägg till</button>
       </div>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
-      <button onclick="applyFilter()" style="display: block; margin: 0 auto;">Starta spel</button>
-      
-    </div>
+      <button id="startGameButton" onclick="applyFilter()">Starta spel</button>
+      </div>
     
     <!-- Resultatsida -->
     <div id="result-page">
