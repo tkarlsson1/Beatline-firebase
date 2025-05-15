@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.423</title>
+  <title>NOTESTREAM v0.422</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -324,43 +324,27 @@
     background: linear-gradient(to right, #e52e71, #ff8a00);
     transform: scale(1.05);
 }
-.custom-dropdown {
-    position: relative;
-    display: inline-block;
-    width: 120px;
-}
-
-.custom-dropdown button {
-    background: #032934;
-    color: white;
-    padding: 10px;
+select {
+    background-color: #032934; /* Bakgrundsfärg för hela dropdownen */
+    color: #fff;
     border: none;
-    cursor: pointer;
 }
 
-.custom-dropdown .dropdown-options {
-    display: none;
-    position: absolute;
-    background: #032934;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
+/* Förhindra att hela listan ändras när den är öppen */
+select:focus, select:hover {
+    background-color: #032934 !important;
+    color: #fff;
 }
 
-.custom-dropdown .dropdown-options div {
-    padding: 10px;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
+/* Gör så att markerade alternativ har rätt färg */
+select option {
+    background-color: #032934;
+    color: #fff;
 }
 
-.custom-dropdown .dropdown-options div:hover {
-    background: #0b939c; /* Mouse-over styling */
-}
-
-/* Ensure selected year stays highlighted */
-.selected-year {
-    background: #0b939c !important;
+select option:checked {
+    background-color: #0b939c !important; /* Färgen på det valda alternativet */
+    color: #fff;
 }
 
   </style>
@@ -700,45 +684,43 @@ window.updateYearSelection = function() {
     );
 
     const startYearDropdown = document.getElementById("startYear");
-const endYearDropdown = document.getElementById("endYear");
+    const endYearDropdown = document.getElementById("endYear");
 
-startYearDropdown.innerHTML = "";
-endYearDropdown.innerHTML = "";
+    startYearDropdown.innerHTML = "";
+    endYearDropdown.innerHTML = "";
 
-for (let year = 1950; year <= 2025; year++) {
-    const optionStart = document.createElement("option");
-    optionStart.value = year;
-    optionStart.textContent = year;
-    if (year === 1950) optionStart.selected = true;
-    startYearDropdown.appendChild(optionStart);
+    for (let year = 1950; year <= 2025; year++) {
+        const optionStart = document.createElement("option");
+        optionStart.value = year;
+        optionStart.textContent = year;
+        if (year === 1950) optionStart.selected = true;
+        startYearDropdown.appendChild(optionStart);
 
-    const optionEnd = document.createElement("option");
-    optionEnd.value = year;
-    optionEnd.textContent = year;
-    if (year === 2025) optionEnd.selected = true;
-    endYearDropdown.appendChild(optionEnd);
-}
+        const optionEnd = document.createElement("option");
+        optionEnd.value = year;
+        optionEnd.textContent = year;
+        if (year === 2025) optionEnd.selected = true;
+        endYearDropdown.appendChild(optionEnd);
 
-// Förhindrar blå standard-hover i vissa webbläsare
-startYearDropdown.addEventListener("mouseover", function() {
-    startYearDropdown.style.backgroundColor = "#032934"; // Behåll bakgrundsfärg
-});
+        // Hover-effekt för individuella alternativ
+        optionStart.addEventListener("mouseenter", function() {
+            optionStart.style.backgroundColor = "#0b939c"; // Hover-färg
+            optionStart.style.color = "#fff";
+        });
 
-endYearDropdown.addEventListener("mouseover", function() {
-    endYearDropdown.style.backgroundColor = "#032934"; // Behåll bakgrundsfärg
-});
+        optionStart.addEventListener("mouseleave", function() {
+            optionStart.style.backgroundColor = "#032934"; // Återställ färg
+        });
 
-// Ändra färg på vald årtal korrekt
-startYearDropdown.addEventListener("change", function() {
-    startYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
-    startYearDropdown.style.color = "#fff";
-});
+        optionEnd.addEventListener("mouseenter", function() {
+            optionEnd.style.backgroundColor = "#0b939c"; // Hover-färg
+            optionEnd.style.color = "#fff";
+        });
 
-endYearDropdown.addEventListener("change", function() {
-    endYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
-    endYearDropdown.style.color = "#fff";
-});
-
+        optionEnd.addEventListener("mouseleave", function() {
+            optionEnd.style.backgroundColor = "#032934"; // Återställ färg
+        });
+    }
 
     // Ändrar bakgrundsfärg på dropdown vid val
     startYearDropdown.addEventListener("change", function() {
@@ -1052,18 +1034,17 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
   
   <div class="container" id="mainContent">
     <img src="logga.png" alt="Notestream-beta logo" class="logo" />
-  <!-- Filter-/Startsida -->
-<div id="filter-page">
-    <div id="source-checkbox-container"></div>
-    <div class="year-selection-container">
-        <div class="year-selection">
-            <label for="startYear">Från år:</label>
-            <select id="startYear"></select>
-        </div>
-        <div class="year-selection">
-            <label for="endYear">Till år:</label>
-            <select id="endYear"></select>
-        </div>
+    <!-- Filter-/Startsida -->
+    <div id="filter-page">
+      <div id="source-checkbox-container"></div>
+      <div style="display: flex; justify-content: center; gap: 1rem;">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <label for="startYear">Från år:</label>
+        <select id="startYear"></select>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <label for="endYear">Till år:</label>
+        <select id="endYear"></select>
     </div>
 </div>
       <!-- Spotify-spellisteimport -->
