@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.424</title>
+  <title>NOTESTREAM v0.425</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -729,19 +729,22 @@ window.updateYearSelection = function() {
         });
     }
 
-    // Ändrar bakgrundsfärg på dropdown vid val
+    // Ändrar bakgrundsfärg på dropdown vid val och uppdaterar låträknaren direkt
     startYearDropdown.addEventListener("change", function() {
         startYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
         startYearDropdown.style.color = "#fff";
+        updateSongCount(); // 🔥 Uppdatera låträknaren direkt vid ändring av årtal!
     });
 
     endYearDropdown.addEventListener("change", function() {
         endYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
         endYearDropdown.style.color = "#fff";
+        updateSongCount(); // 🔥 Uppdatera låträknaren direkt vid ändring av årtal!
     });
 
-    updateSongCount(); // Uppdatera antalet valda låtar!
+    updateSongCount(); // ✅ Behåll detta här – säkerställer att låträknaren uppdateras vid spellisteval!
 };
+
 
 
 window.filterSongs = function() {
