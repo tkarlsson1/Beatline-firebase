@@ -2,8 +2,9 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.434</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>NOTESTREAM v0.435</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -132,13 +133,14 @@
 #menuContainer {
     position: fixed;
     top: 5px;
-    right: 5px;
+    right: max(5px, 2vw); /* 🔥 Dynamisk justering för olika skärmstorlekar */
     width: auto;
     max-width: 60px;
     height: auto;
     z-index: 99999;
-    pointer-events: auto; /* 🔥 Säkerställer att menyn alltid är klickbar */
+    pointer-events: auto;
 }
+
 
 /* 🔥 Mobilfix för att hamburgermenyn alltid ska vara synlig och inte påverkas av zoom */
 @media (max-width: 768px) {
