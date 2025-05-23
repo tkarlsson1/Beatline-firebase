@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.430</title>
+  <title>NOTESTREAM v0.431</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -239,34 +239,6 @@
       display: none;
       font-size: 0.9rem;
     }
-    #errorModal div {
-    background: linear-gradient(to right, #fb1820, #ff6310); /* 🔥 Snygg färggradient */
-    color: white;
-    font-size: 1.2rem;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-    padding: 1.5rem;
-}
-
-#errorModal h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-#errorModal button {
-    background: #032934;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 1rem;
-}
-
-#errorModal button:hover {
-    background: #0b939c;
-}
-
     /* Feedback-modal */
     #feedbackModal {
       display: none;
@@ -538,23 +510,22 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       // Glömt lösenord-funktion
       const forgotPasswordLink = document.getElementById("forgotPasswordLink");
       if (forgotPasswordLink) {
-       forgotPasswordLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("emailInput").value.trim();
-    if (!email) {
-        showError("Ange din e-postadress för att återställa lösenordet.", "Lösenordsåterställning");
-        return;
-    }
-    sendPasswordResetEmail(auth, email)
-        .then(() => {
-            showError("En återställningslänk har skickats till din e-post.", "Återställningslänk skickad!");
-        })
-        .catch((error) => {
-            console.error("Fel vid återställning av lösenord:", error);
-            showError("Fel: " + error.message, "Lösenordsåterställning misslyckades");
+        forgotPasswordLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const email = document.getElementById("emailInput").value.trim();
+          if (!email) {
+            alert("Ange din e-postadress för att återställa lösenordet.");
+            return;
+          }
+          sendPasswordResetEmail(auth, email)
+            .then(() => {
+              alert("En återställningslänk har skickats till din e-post.");
+            })
+            .catch((error) => {
+              console.error("Fel vid återställning av lösenord:", error);
+              alert("Fel: " + error.message);
+            });
         });
-});
-
       }
     });
     
@@ -775,28 +746,24 @@ window.filterSongs = function() {
         nextSong();
         return true;
     } else {
-        showError("Inga låtar hittades i den valda perioden. Prova att välja ett bredare årsspann.", "Ingen träff!");
+        alert("Inga låtar hittades i den valda perioden.");
         document.getElementById("song-display").innerHTML = "";
         return false;
     }
 };
-
 
 window.applyFilter = function() {
     if (filterSongs()) {
         document.getElementById("filter-page").style.display = "none";
         document.getElementById("result-page").style.display = "block";
         updateSongCount(); // Uppdatera antalet valda låtar!
-    } else {
-        showError("Ingen låt matchar ditt filter! Prova att välja bredare årsspann eller fler spellistor.", "Filter gav ingen träff");
     }
 };
-
 
 window.nextSong = function() {
     const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
     if (remainingSongs.length === 0) {
-        showError("Tryck på menyvalet 'Startsida' för att börja om.", "Inga fler låtar!");
+        alert("Inga fler låtar, tryck på menyvalet 'Startsida' för att börja om.");
         return;
     }
     const randomIndex = Math.floor(Math.random() * remainingSongs.length);
@@ -805,12 +772,11 @@ window.nextSong = function() {
     displaySong(currentSong);
 };
 
-function showError(message, title = "Fel!") {
-    document.getElementById("errorTitle").textContent = title; // 🔥 Sätt rubrik
-    document.getElementById("errorMessageText").textContent = message; // 🔥 Sätt felmeddelandet
-    document.getElementById("errorModal").style.display = "flex"; // 🔥 Visa modalen
-}
-
+window.restart = function() {
+    shownSongs = [];
+    currentSong = null;
+    document.getElementById("song-display").innerHTML = "";
+};
 
 function displaySong(song) {
     const songDisplay = document.getElementById("song-display");
@@ -828,17 +794,11 @@ function displaySong(song) {
 }
 
 window.generateQRCode = function(qr) {
-    if (!qr) {
-        showError("QR-koden kunde inte genereras. Kontrollera att låtens ID är korrekt.", "QR-kodfel");
-        return;
-    }
-
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
     const qrElement = document.getElementById(`qrcode-${qr}`);
     qrElement.innerHTML = "";
     new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
 };
-
 
 window.revealDetails = function() {
     document.getElementById("song-details").style.display = "block";
@@ -851,10 +811,7 @@ window.goToFilter = function() {
     restart();
     document.getElementById("result-page").style.display = "none";
     document.getElementById("filter-page").style.display = "block";
-    
-    showError("Spelet har startats om! Du är nu tillbaka till filter-sidan.", "Starta om");
 };
-
 
     /***** NY SPOTIFY TOKEN OCH CACHING DEL *****/
     async function getBackendSpotifyToken() {
@@ -913,13 +870,13 @@ window.goToFilter = function() {
     }
     
     // Skriv användarspellistor under userPlaylists/<uid>/<playlistName>
-async function addPlaylistToFirebase(playlistName, playlistUrl) {
+      async function addPlaylistToFirebase(playlistName, playlistUrl) {
     try {
         console.log("Försöker hämta spellista:", playlistName);
         const tracks = await fetchSpotifyPlaylist(playlistUrl); // Hämta låtarna
 
         if (!tracks || Object.keys(tracks).length === 0) {
-            showError("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!", "Fel vid spellisteimport");
+            alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
             return;
         }
 
@@ -927,14 +884,12 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
         const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
         await set(userPlaylistsRef, { songs: tracks });
 
-        showError(`Spellistan "${playlistName}" har lagts till i dina spellistor!`, "Spellista tillagd");
+        alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
     } catch (error) {
         console.error("Fel vid lagring av spellista:", error);
-        showError("Något gick fel vid lagring av spellistan.", "Fel vid lagring");
+        alert("Något gick fel vid lagring av spellistan.");
     }
 }
-
-
 
     
 document.getElementById("addPlaylistButton").addEventListener("click", async () => {
@@ -1091,15 +1046,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
       
     </div>
-
-    <div id="errorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center;">
-    <div style="background: #fff; padding: 1rem; border-radius: 8px; text-align: center; max-width: 300px;">
-        <h2 id="errorTitle">Fel!</h2>
-        <p id="errorMessageText">Något gick fel.</p>
-        <button onclick="document.getElementById('errorModal').style.display='none'">Stäng</button>
-    </div>
-</div>
-
+    
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
@@ -1196,26 +1143,25 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
           document.getElementById("feedbackModal").style.display = "none";
         }
       });
-   document.getElementById("submitFeedback")?.addEventListener("click", function() {
+      document.getElementById("submitFeedback")?.addEventListener("click", function() {
     const feedbackText = document.getElementById("feedbackText").value.trim();
     if (feedbackText.length === 0) {
-        showError("Feedback kan inte vara tom!", "Fel vid feedback");
+        alert("Feedback kan inte vara tom!");
         return;
     }
 
     const feedbackRef = ref(db, 'feedback');
     push(feedbackRef, { text: feedbackText, timestamp: Date.now() })
         .then(() => {
-            showError("Tack för din feedback!", "Feedback skickad!");
+            alert("Tack för din feedback!");
             document.getElementById("feedbackText").value = "";
             document.getElementById("feedbackModal").style.display = "none";
         })
         .catch((error) => {
             console.error("Fel vid lagring av feedback:", error);
-            showError("Något gick fel. Försök igen senare.", "Fel vid lagring av feedback");
+            alert("Något gick fel. Försök igen senare.");
         });
 });
-
     });
   </script>
 </body>
