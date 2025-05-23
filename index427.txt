@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.428</title>
+  <title>NOTESTREAM v0.427</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -335,6 +335,18 @@ select:focus, select:hover {
     background-color: #032934 !important;
     color: #fff;
 }
+
+/* Gör så att markerade alternativ har rätt färg */
+select option {
+    background-color: #032934;
+    color: #fff;
+}
+
+select option:checked {
+    background-color: #0b939c !important; /* Färgen på det valda alternativet */
+    color: #fff;
+}
+
   </style>
   
   <!-- Inkludera QRCodeJS -->
@@ -719,10 +731,14 @@ window.updateYearSelection = function() {
 
     // Ändrar bakgrundsfärg på dropdown vid val och uppdaterar låträknaren direkt
     startYearDropdown.addEventListener("change", function() {
+        startYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
+        startYearDropdown.style.color = "#fff";
         updateSongCount(); // 🔥 Uppdatera låträknaren direkt vid ändring av årtal!
     });
 
     endYearDropdown.addEventListener("change", function() {
+        endYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
+        endYearDropdown.style.color = "#fff";
         updateSongCount(); // 🔥 Uppdatera låträknaren direkt vid ändring av årtal!
     });
 
