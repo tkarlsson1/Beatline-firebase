@@ -3,15 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-  <title>NOTESTREAM v0.429</title>
-=======
   <title>NOTESTREAM v0.427</title>
->>>>>>> parent of 9a578d0 (428)
-=======
-  <title>NOTESTREAM v0.429</title>
->>>>>>> a8f23ff30de2dc1b3398f5ad3f79ba9cb5f0d78f
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -332,7 +324,28 @@
     background: linear-gradient(to right, #e52e71, #ff8a00);
     transform: scale(1.05);
 }
+select {
+    background-color: #032934; /* Bakgrundsfärg för hela dropdownen */
+    color: #fff;
+    border: none;
+}
 
+/* Förhindra att hela listan ändras när den är öppen */
+select:focus, select:hover {
+    background-color: #032934 !important;
+    color: #fff;
+}
+
+/* Gör så att markerade alternativ har rätt färg */
+select option {
+    background-color: #032934;
+    color: #fff;
+}
+
+select option:checked {
+    background-color: #0b939c !important; /* Färgen på det valda alternativet */
+    color: #fff;
+}
 
   </style>
   
@@ -696,8 +709,38 @@ window.updateYearSelection = function() {
         if (year === 2025) optionEnd.selected = true;
         endYearDropdown.appendChild(optionEnd);
 
+        // Hover-effekt för individuella alternativ
+        optionStart.addEventListener("mouseenter", function() {
+            optionStart.style.backgroundColor = "#0b939c"; // Hover-färg
+            optionStart.style.color = "#fff";
+        });
+
+        optionStart.addEventListener("mouseleave", function() {
+            optionStart.style.backgroundColor = "#032934"; // Återställ färg
+        });
+
+        optionEnd.addEventListener("mouseenter", function() {
+            optionEnd.style.backgroundColor = "#0b939c"; // Hover-färg
+            optionEnd.style.color = "#fff";
+        });
+
+        optionEnd.addEventListener("mouseleave", function() {
+            optionEnd.style.backgroundColor = "#032934"; // Återställ färg
+        });
     }
 
+    // Ändrar bakgrundsfärg på dropdown vid val och uppdaterar låträknaren direkt
+    startYearDropdown.addEventListener("change", function() {
+        startYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
+        startYearDropdown.style.color = "#fff";
+        updateSongCount(); // 🔥 Uppdatera låträknaren direkt vid ändring av årtal!
+    });
+
+    endYearDropdown.addEventListener("change", function() {
+        endYearDropdown.style.backgroundColor = "#0b939c"; // Markerad färg
+        endYearDropdown.style.color = "#fff";
+        updateSongCount(); // 🔥 Uppdatera låträknaren direkt vid ändring av årtal!
+    });
 
     updateSongCount(); // ✅ Behåll detta här – säkerställer att låträknaren uppdateras vid spellisteval!
 };
