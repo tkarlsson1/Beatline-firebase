@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.423</title>
+  <title>NOTESTREAM v0.422</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -659,8 +659,8 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       }
     }
     
-   function updateSongCount() {
-    const songCount = currentFilteredSongs.length; // Räkna endast filtrerade låtar
+    function updateSongCount() {
+    const songCount = sourceFilteredSongs.length; // Räkna valda låtar
     const songCountElement = document.getElementById("selectedSongCount");
     if (songCountElement) {
         songCountElement.textContent = `Valda låtar: ${songCount}`;
@@ -668,7 +668,6 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
         console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
     }
 }
-
 
 window.updateYearSelection = function() {
     const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
@@ -741,14 +740,9 @@ window.updateYearSelection = function() {
 window.filterSongs = function() {
     const startYear = parseInt(document.getElementById("startYear").value);
     const endYear = parseInt(document.getElementById("endYear").value);
-    
     currentFilteredSongs = sourceFilteredSongs.filter(song =>
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
     );
-
-    // Uppdatera låträknaren efter filtrering
-    updateSongCount();
-
     shownSongs = [];
     if (currentFilteredSongs.length > 0) {
         nextSong();
@@ -759,7 +753,6 @@ window.filterSongs = function() {
         return false;
     }
 };
-
 
 window.applyFilter = function() {
     if (filterSongs()) {
