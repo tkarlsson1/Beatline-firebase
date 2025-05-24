@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <title>NOTESTREAM v0.438</title>
+  <title>NOTESTREAM v0.439</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -137,18 +137,14 @@
 /* Menyheader och menyknapp */
 #menuContainer {
     position: fixed;
-    top: 0; /* 🔥 Fäster den exakt vid skärmens övre kant */
-    right: 5px;
+    top: 5px;
+    right: max(5px, 2vw);
     width: auto;
     max-width: 60px;
     height: auto;
     z-index: 99999;
     pointer-events: auto;
-    background-color: rgba(3, 41, 52, 0.95); /* 🔥 Gör den lätt synlig vid scroll */
-    padding: 5px;
-    border-bottom-left-radius: 8px; /* 🔥 Rundar hörnet mot innehållet */
 }
-
 
 
 /* 🔥 Mobilfix för att hamburgermenyn alltid ska vara synlig och inte påverkas av zoom */
