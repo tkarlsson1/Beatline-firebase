@@ -9,9 +9,6 @@
   "description": "En progressiv webbapp för hantering av innehåll.",
   "orientation": "portrait-primary",
   "scope": "/",
-  "launch_handler": {
-    "client_mode": "navigate"
-  },
   "icons": [
     {
       "src": "/icon.png",
@@ -34,7 +31,7 @@
       "form_factor": "wide"
     },
     {
-      "src": "/mobile.png",
+      "src": "/mobile-png",
       "sizes": "750x1334",
       "type": "image/png"
     }
