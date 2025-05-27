@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.449</title>
+  <title>NOTESTREAM v0.450</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -800,6 +800,16 @@ window.generateQRCode = function(qr) {
     qrElement.innerHTML = "";
     new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
 };
+// Ny funktion som spelar upp den aktuella låten
+window.playCurrentSong = function() {
+  // Säkerställ att currentSong är definierad och innehåller ett spår-ID
+  if (window.currentSong && window.currentSong.qr) {
+    const spotifyUrl = `https://open.spotify.com/track/${window.currentSong.qr}`;
+    window.location.href = spotifyUrl;
+  } else {
+    alert("Ingen aktuell låt att spela upp!");
+  }
+};
 
 window.revealDetails = function() {
     document.getElementById("song-details").style.display = "block";
@@ -1052,6 +1062,9 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
     <div id="result-page">
       <div id="song-display"></div>
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
+      <!-- Temporär knapp för att testa uppspelning av aktuell låt -->
+<button id="tempPlayButton" onclick="playCurrentSong()">Testa Uppspelning</button>
+
     </div>
     
     <!-- Feedback Modal -->
