@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.450</title>
+  <title>NOTESTREAM v0.451</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -802,14 +802,14 @@ window.generateQRCode = function(qr) {
 };
 // Ny funktion som spelar upp den aktuella låten
 window.playCurrentSong = function() {
-  // Säkerställ att currentSong är definierad och innehåller ett spår-ID
-  if (window.currentSong && window.currentSong.qr) {
-    const spotifyUrl = `https://open.spotify.com/track/${window.currentSong.qr}`;
+  if (currentSong && currentSong.qr) {
+    const spotifyUrl = `https://open.spotify.com/track/${currentSong.qr}`;
     window.location.href = spotifyUrl;
   } else {
     alert("Ingen aktuell låt att spela upp!");
   }
 };
+
 
 window.revealDetails = function() {
     document.getElementById("song-details").style.display = "block";
