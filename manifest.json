@@ -31,7 +31,7 @@
       "form_factor": "wide"
     },
     {
-      "src": "/mobile-png",
+      "src": "/mobile.png",
       "sizes": "750x1334",
       "type": "image/png"
     }
