@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.457</title>
+  <title>NOTESTREAM v0.458</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -801,6 +801,11 @@ function displaySong(song) {
         </div>
     `;
     generateQRCode(song.qr);
+      let playlistInfoElement = document.getElementById("playlist-info");
+  if (playlistInfoElement) {
+    // Om song.source är en array med en eller flera spellistor
+    playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
+  }
 }
 
 window.generateQRCode = function(qr) {
@@ -1061,6 +1066,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
     <div id="result-page">
       <div id="song-display"></div>
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
+       <p id="playlist-info" style="text-align: center; font-size: 0.85rem; color: #fff; margin-top: 0.5rem;"></p>
     </div>
     
     <!-- Feedback Modal -->
