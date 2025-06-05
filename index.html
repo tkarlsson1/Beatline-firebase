@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.463</title>
+  <title>NOTESTREAM v0.464</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -540,20 +540,33 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     });
     
     // Funktioner för att hantera spellistor
-    function mergeSongs() {
-      const merged = {};
-      standardSongs.forEach(song => { merged[song.qr] = song; });
-      userPlaylistSongs.forEach(song => {
-        if (merged[song.qr]) {
-          merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
-        } else {
-          merged[song.qr] = song;
-        }
-      });
-      songs = Object.values(merged);
-      console.log("? Sammankopplad låtsamling (unika spår):", songs.length);
-      populateSourceCheckboxes();
+   function mergeSongs() {
+  const merged = {};
+  
+  // Först, bearbeta standardlistorna.
+  standardSongs.forEach(song => {
+    // Lägg in hela låtobjektet från standardlistor.
+    // Här litar vi på att year-värdet är 100% korrekt.
+    merged[song.qr] = { ...song, source: [...song.source] };
+  });
+  
+  // Sedan, bearbeta användarspellistor.
+  userPlaylistSongs.forEach(song => {
+    if (merged[song.qr]) {
+      // Låtens från standardlistor är betrodd – lägg till källan.
+      merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
+    } else {
+      // Låten finns endast i användarspellistor.
+      // Om användaren angett ett customYear, använd det; annars behåll inläst year.
+      const yearToUse = song.customYear ? song.customYear : song.year;
+      merged[song.qr] = { ...song, year: yearToUse, source: [...song.source] };
     }
+  });
+  
+  songs = Object.values(merged);
+  console.log("Sammankopplade låtar (unika spår):", songs.length);
+  populateSourceCheckboxes();
+}
     
     function updateAllaCheckbox() {
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
