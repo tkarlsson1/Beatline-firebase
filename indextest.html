@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM v0.454 - Split</title>
+  
+  <!-- Ladda Manrope -->
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Extern CSS -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Inkludera QRCodeJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
+  <!-- Import och initiering av Firebase och övriga skript sker nu i script.js -->
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+  <!-- Inloggningsmodal -->
+  <div id="loginModal">
+    <div id="loginBox">
+      <h2>Logga in</h2>
+      <input type="email" id="emailInput" placeholder="Ange e-post" />
+      <input type="password" id="passwordInput" placeholder="Ange lösenord" />
+      <!-- Länk för glömt lösenord -->
+      <a href="#" id="forgotPasswordLink" style="font-size: 0.85rem; text-decoration: underline; color: #0b939c; display: block; margin-bottom: 1rem;">
+        Glömt lösenord?
+      </a>
+      <button id="loginButton">Logga in</button>
+      <p id="loginError" class="error">Fel e-post eller lösenord!</p>
+      <button id="showRegister" style="margin-top: 1rem;">Skapa konto</button>
+    </div>
+  </div>
+  
+  <!-- Registreringsmodal -->
+  <div id="registerModal" style="display:none;">
+    <div id="registerBox">
+      <h2>Registrera dig</h2>
+      <input type="email" id="regEmail" placeholder="Ange din e-post" />
+      <input type="password" id="regPassword" placeholder="Ange ditt lösenord" />
+      <button id="registerButton">Registrera</button>
+      <p id="registerError" class="error">Registrering misslyckades!</p>
+      <p>Har du redan ett konto? <button id="showLogin">Logga in</button></p>
+    </div>
+  </div>
+  
+  <div class="container" id="mainContent">
+    <img src="logga.png" alt="Notestream-beta logo" class="logo" />
+    
+    <!-- Filter-/Startsida -->
+    <div id="filter-page">
+      <div id="source-checkbox-container"></div>
+      <div style="display: flex; justify-content: center; gap: 1rem;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <label for="startYear">Från år:</label>
+          <select id="startYear"></select>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <label for="endYear">Till år:</label>
+          <select id="endYear"></select>
+        </div>
+      </div>
+      
+      <!-- Spotify-spellisteimport -->
+      <div id="spotify-import">
+        <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="margin: 0 2px;">
+        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
+        <button id="addPlaylistButton">Lägg till</button>
+      </div>
+      <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
+      <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
+    </div>
+    
+    <!-- Resultatsida -->
+    <div id="result-page">
+      <div id="song-display"></div>
+      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
+    </div>
+    
+    <!-- Feedback Modal -->
+    <div id="feedbackModal">
+      <div>
+        <span id="closeFeedback">&times;</span>
+        <h2>Lämna feedback</h2>
+        <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
+        <button id="submitFeedback">Skicka feedback</button>
+      </div>
+    </div>
+    
+    <!-- Readme Modal -->
+    <div id="readmeModal">
+      <div id="readmeContent">
+        <span class="closeBtn">&times;</span>
+        <h2>NOTESTREAM-BETA</h2>
+        <p>
+          Test och säg vad du tycker!<br>
+          Tankar kring allt från färg på text till funktioner uppskattas. Lämnas via menyn.
+        </p>
+        <p>
+          Tidigare fanns en funktion för att ändra årtal på låtar, men den finns inte just nu – den kommer att introduceras senare när inloggning är implementerad fullt ut.
+        </p>
+        <p>
+          I webbversionen gör du ett antal val:<br>
+          • Vilka förinställda spellistor vill du inkludera?<br>
+          • Vilka årtal vill du inkludera låtar från?<br>
+          Utifrån dina val väljs sedan låtar ut, och ingen låt kommer att återkomma under samma session.
+        </p>
+        <p>
+          Du kan även lägga till egna spellistor och kombinera dem med de förinställda.
+        </p>
+        <p>
+          När du lägger till en lista, namnge den och klistra in länken som du kopierat från Spotify.
+          Tänk på:<br>
+          • Spelet hämtar årtal direkt från det unika Spotify-ID låten har som du har i listan. Låtar från samlingsalbum kommer alltså ha årtal därefter<br>
+          • Spotify-genererade listor för dig stämmer oftast bra i årtal<br>
+          • Spotify-genererade listor behöver först sparas som en av dina listor för att kunna laddas in. Lägg till i annan lista -> skapa ny<br>
+        </p>
+        <p>
+          Målet är att ha ett bibliotek med tusentals låtar samt användarspellistor som är privata för varje användare.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Script för service worker-registrering -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js")
+        .then(registration => {
+          console.log("Service Worker registrerad med scope:", registration.scope);
+        })
+        .catch(error => {
+          console.error("Service Worker misslyckades:", error);
+        });
+    }
+  </script>
+</body>
+</html>

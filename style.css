@@ -1,0 +1,381 @@
+/* Grundläggande sidstil */
+body {
+  font-family: 'Manrope', sans-serif;
+  background: url('background.jpg') no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+.container {
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  margin: 2rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+.logo {
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  max-width: 80%;
+  height: auto;
+}
+
+/* Standardknappar i filterformuläret */
+select, button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  background: #032934;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  font-family: 'Manrope', sans-serif;
+}
+select, button { 
+  border: none !important; 
+}
+button:hover,
+button:active,
+button:focus {
+  background: #032934;
+}
+
+/* Årtalsfältens bredd */
+#startYear, #endYear {
+  width: 80px;
+}
+#song-display {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+#song-display canvas,
+#song-display img {
+  display: block;
+  margin: 0 auto;
+}
+.qrcode {
+  width: 160px;
+  height: 160px;
+  border: 5px solid black;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto 1rem auto;
+}
+
+/* Resultatsida – med extra padding nedtill */
+#result-page {
+  display: none;
+  position: relative;
+  padding-bottom: 80px;
+}
+
+/* Checkbox-pills */
+#source-checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.7rem 0.5rem;
+  margin-bottom: 2rem;
+}
+.checkbox-pill {
+  position: relative;
+}
+.checkbox-pill input[type="checkbox"] {
+  display: none;
+}
+.checkbox-pill label {
+  cursor: pointer;
+  padding: 0.5rem 0.5rem;
+  border: 3px solid #032934;
+  border-radius: 8px;
+  background-color: #032934;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+  color: #fff;
+  font-size: 1rem;
+  user-select: none;
+  font-family: 'Manrope', sans-serif;
+}
+.checkbox-pill input[type="checkbox"]:checked + label {
+  background-color: #0b939c;
+  color: #fff;
+  border-color: #0b939c;
+}
+#filter-page label {
+  color: #fff;
+}
+
+/* Spotify-spellisteimport */
+#spotify-import {
+  margin-bottom: 2rem;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #fff;
+}
+#spotify-import input, #playlistTypeInput {
+  width: 40%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: #032934;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Manrope', sans-serif;
+}
+#spotify-import button {
+  width: 40%;
+  padding: 0.5rem;
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Menyheader och menyknapp */
+#menuContainer {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 3000;
+}
+#menuButton {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+}
+#dropdownMenu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 2.5rem;
+  background: #032934;
+  border: 1px solid #fff;
+  border-radius: 4px;
+}
+#dropdownMenu a {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+}
+#dropdownMenu a:hover {
+  background: #0b939c;
+}
+
+/* Divider och rubriker */
+.divider {
+  height: 2px;
+  background-color: #fff;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+.subheading {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #fff;
+  margin: 0.5rem 0;
+}
+
+/* Modal: Readme */
+#readmeModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+#readmeContent {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  position: relative;
+  font-family: 'Manrope', sans-serif;
+}
+.closeBtn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  cursor: pointer;
+}
+.closeBtn:hover,
+.closeBtn:focus {
+  color: black;
+  text-decoration: none;
+}
+
+/* Inloggnings- och registreringsmodaler */
+#loginModal,
+#registerModal {
+  position: fixed;
+  z-index: 2000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#loginBox,
+#registerBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 80%;
+  max-width: 300px;
+  font-family: 'Manrope', sans-serif;
+}
+#loginBox input,
+#registerBox input {
+  width: 80%;
+  padding: 0.5rem;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+#loginBox button,
+#registerBox button {
+  padding: 0.4rem 0.8rem;
+  font-size: 1rem;
+  background-color: #0b939c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Felmeddelanden */
+.error {
+  color: red;
+  display: none;
+  font-size: 0.9rem;
+}
+
+/* Feedback-modal */
+#feedbackModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+#feedbackModal > div {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  position: relative;
+  font-family: 'Manrope', sans-serif;
+}
+#closeFeedback {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+}
+#closeFeedback:hover,
+#closeFeedback:focus {
+  color: black;
+  text-decoration: none;
+}
+#feedbackText {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  font-family: 'Manrope', sans-serif;
+}
+#submitFeedback {
+  margin-top: 10px;
+  padding: 0.5rem 1rem;
+  background-color: #ff9800;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Övriga knappar: Nästa låt och Visa svar */
+.next-song-button,
+.answer-button {
+  display: block;
+  margin: 0 auto;
+  width: 128px;
+  background: #032934;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+}
+.next-song-button {
+  margin-bottom: 5rem;
+}
+.answer-button:hover,
+.answer-button:active,
+.answer-button:focus {
+  background: #032934;
+}
+.start-button {
+  background: linear-gradient(to right, #fb1820, #ff6310);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: block;
+  margin: 0 auto;
+}
+.start-button:hover {
+  background: linear-gradient(to right, #e52e71, #ff8a00);
+  transform: scale(1.05);
+}
+select {
+  background-color: #032934;
+  color: #fff;
+  border: none;
+}
+select:focus,
+select:hover {
+  background-color: #032934 !important;
+  color: #fff;
+}
