@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.468</title>
+  <title>NOTESTREAM v0.469</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -886,10 +886,8 @@ window.restart = function() {
 };
 
 function displaySong(song) {
-  // Välj att visa customYear om det finns, annars song.year
   const displayYear = song.customYear ? song.customYear : song.year;
-  // Vi antar att standardlistor identifieras med "standard" (i gemener) i song.source.
-  // Penn-ikonen visas bara om ingen av källorna innehåller "standard".
+  // Visa pennikonen endast om ingen av källorna innehåller "standard" (gemener)
   const isUserSong = !song.source.some(src => src.toLowerCase().includes("standard"));
   
   const songDisplay = document.getElementById("song-display");
@@ -897,15 +895,14 @@ function displaySong(song) {
     <div id="qrcode-${song.qr}" class="qrcode"></div>
     <button class="answer-button" onclick="revealDetails()">Visa svar</button>
     <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-      <!-- Årtalsbehållare med centrerad text -->
-      <div class="year-container" style="position: relative; text-align: center;">
-        <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000; display: inline-block;">
+      <!-- Använder en inline-flex-container för att centrera årtalet och ikonen -->
+      <div class="year-container" style="display: inline-flex; align-items: center; justify-content: center; width: 100%;">
+        <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
           ${displayYear}
         </span>
         ${ 
           isUserSong 
-            ? `<i class="edit-icon" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 0.8em; color: #0b939c;" 
-                        onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>` 
+            ? `<i class="edit-icon" style="margin-left: 10px; cursor: pointer; font-size: 1.2em; color: #0b939c;" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>` 
             : ``
         }
       </div>
