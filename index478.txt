@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.479</title>
+  <title>NOTESTREAM v0.478</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -903,17 +903,18 @@ function displaySong(song) {
     <button class="answer-button" onclick="revealDetails()">Visa svar</button>
     <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
       <!-- Inline-flex-container för att centrera årtalet -->
-    <div class="year-container" style="position: relative; width: 100%; text-align: center;">
-  <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
-    ${displayYear}
-  </span>
-  ${
-    isUserSong
-      ? `<i class="edit-icon" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
-      : ``
-  }
-</div>
-
+      <div class="year-container" style="display: inline-flex; align-items: center; justify-content: center; width: 100%;">
+        <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+          ${displayYear}
+        </span>
+        ${
+          isUserSong 
+            ? `<i class="edit-icon" 
+                  style="margin-left: 10px; cursor: pointer; font-size: 1.8em; color: #0a6e73; transform: scaleX(-1);" 
+                  onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
+            : ``
+        }
+      </div>
       <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
         ${song.artist}<br>${song.title}
       </div>
