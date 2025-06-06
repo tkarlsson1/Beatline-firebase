@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.466</title>
+  <title>NOTESTREAM v0.467</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -39,7 +39,17 @@
       height: auto;
     }
     /* --- NY CSS för redigeringsmodalen --- */
-  
+  .edit-icon {
+  cursor: pointer;
+  margin-left: 0.5rem;
+  font-size: 0.8em;
+  color: #0b939c;
+}
+
+.edit-icon:hover {
+  color: #0a7c85;
+}
+
   /* Grundläggande modal-stil */
   .modal {
     position: fixed;
@@ -374,6 +384,16 @@
       font-family: 'Manrope', sans-serif;
     }
     .next-song-button { margin-bottom: 1rem; }
+      .edit-icon {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 0.8em;
+    color: #0b939c;
+  }
+  
+  .edit-icon:hover {
+    color: #0a7c85;
+  }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #032934; 
     }
     .start-button {
