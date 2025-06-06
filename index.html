@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.482</title>
+  <title>NOTESTREAM v0.483</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -902,7 +902,7 @@ songDisplay.innerHTML = `
   <div id="qrcode-${song.qr}" class="qrcode"></div>
   <button class="answer-button" onclick="revealDetails()">Visa svar</button>
   <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-    <!-- Inline-container för att centrera årtalet -->
+    <!-- Inline-container för att centrera årtalet -->1
     <div class="year-container" style="text-align: center; width: 100%;">
       <span style="display: inline-block; position: relative;">
         <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
@@ -910,7 +910,7 @@ songDisplay.innerHTML = `
         </span>
         ${
           isUserSong 
-            ? `<i class="edit-icon" style="position: absolute; right: +1em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
+            ? `<i class="edit-icon" style="position: absolute; right: +2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
             : ``
         }
       </span>
