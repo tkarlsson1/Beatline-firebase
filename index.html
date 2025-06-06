@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.465</title>
+  <title>NOTESTREAM v0.466</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -866,21 +866,24 @@ window.restart = function() {
 };
 
 function displaySong(song) {
-    const songDisplay = document.getElementById("song-display");
-    songDisplay.innerHTML = `
-        <div id="qrcode-${song.qr}" class="qrcode"></div>
-        <button class="answer-button" onclick="revealDetails()">Visa svar</button>
-        <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-            <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-            <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
-                ${song.artist}<br>${song.title}
-            </div>
-        </div>
-    `;
-    generateQRCode(song.qr);
-      let playlistInfoElement = document.getElementById("playlist-info");
+  // Om en customYear finns, visa denna; annars använd song.year
+  const displayYear = song.customYear ? song.customYear : song.year;
+  const songDisplay = document.getElementById("song-display");
+  songDisplay.innerHTML = `
+    <div id="qrcode-${song.qr}" class="qrcode"></div>
+    <button class="answer-button" onclick="revealDetails()">Visa svar</button>
+    <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+      <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+        ${displayYear} <i class="edit-icon" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>
+      </div>
+      <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
+        ${song.artist}<br>${song.title}
+      </div>
+    </div>
+  `;
+  generateQRCode(song.qr);
+  let playlistInfoElement = document.getElementById("playlist-info");
   if (playlistInfoElement) {
-    // Om song.source är en array med en eller flera spellistor
     playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
   }
 }
