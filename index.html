@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.467</title>
+  <title>NOTESTREAM v0.468</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -886,15 +886,28 @@ window.restart = function() {
 };
 
 function displaySong(song) {
-  // Om en customYear finns, visa denna; annars använd song.year
+  // Välj att visa customYear om det finns, annars song.year
   const displayYear = song.customYear ? song.customYear : song.year;
+  // Vi antar att standardlistor identifieras med "standard" (i gemener) i song.source.
+  // Penn-ikonen visas bara om ingen av källorna innehåller "standard".
+  const isUserSong = !song.source.some(src => src.toLowerCase().includes("standard"));
+  
   const songDisplay = document.getElementById("song-display");
   songDisplay.innerHTML = `
     <div id="qrcode-${song.qr}" class="qrcode"></div>
     <button class="answer-button" onclick="revealDetails()">Visa svar</button>
     <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-      <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
-        ${displayYear} <i class="edit-icon" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>
+      <!-- Årtalsbehållare med centrerad text -->
+      <div class="year-container" style="position: relative; text-align: center;">
+        <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000; display: inline-block;">
+          ${displayYear}
+        </span>
+        ${ 
+          isUserSong 
+            ? `<i class="edit-icon" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 0.8em; color: #0b939c;" 
+                        onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>` 
+            : ``
+        }
       </div>
       <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
         ${song.artist}<br>${song.title}
@@ -907,6 +920,7 @@ function displaySong(song) {
     playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
   }
 }
+
 
 window.generateQRCode = function(qr) {
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
