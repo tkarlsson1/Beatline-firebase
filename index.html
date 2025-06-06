@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.484</title>
+  <title>NOTESTREAM v0.485</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -902,19 +902,21 @@ songDisplay.innerHTML = `
   <div id="qrcode-${song.qr}" class="qrcode"></div>
   <button class="answer-button" onclick="revealDetails()">Visa svar</button>
   <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-    <!-- Inline-container för att centrera årtalet -->1
-    <div class="year-container" style="text-align: center; width: 100%;">
-      <span style="display: inline-block; position: relative;">
-        <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
-          ${displayYear}
+          <!-- Inline-container för att centrera årtalet -->
+      <div class="year-container" style="text-align: center; width: 100%;">
+        <span style="display: inline-block; position: relative;">
+          <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+            ${displayYear}
+          </span>
+          ${
+            isUserSong 
+              ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
+                   onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
+              : ``
+          }
         </span>
-        ${
-          isUserSong 
-            ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;" onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
-            : ``
-        }
-      </span>
-    </div>
+      </div>
+
     <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
       ${song.artist}<br>${song.title}
     </div>
@@ -1312,6 +1314,18 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
             alert("Något gick fel. Försök igen senare.");
         });
 });
+    document.getElementById("saveYearButton").addEventListener("click", function() {
+        const newYear = document.getElementById("newYearInput").value.trim();
+        if (!/^\d{4}$/.test(newYear)) {
+          alert("Ange ett giltigt årtal med 4 siffror.");
+          return;
+        }
+        updateCustomYear(currentPlaylistName, currentSpotifyID, newYear);
+        closeEditYearModal();
+      });
+      document.getElementById("closeModal").addEventListener("click", function() {
+        closeEditYearModal();
+      });
     });
   </script>
   <script>
