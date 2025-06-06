@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.489</title>
+  <title>NOTESTREAM v0.490</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -458,38 +458,40 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
     window.app = app;
     const db = getDatabase(app);
     const auth = getAuth(app);
-     // ===== NYA RADER FÖR REDIGERING AV ÅRTAL (ligger här, ca 10 rader nedan) =====
+  // ===== NYA RADER FÖR REDIGERING AV ÅRTAL (lägger in här) =====
+    // Globala variabler som används för redigeringsmodalen
     let currentPlaylistName = null;
     let currentSpotifyID = null;
     
-    // Funktion för att öppna modalen med redigeringsläge för customYear
+    // Funktion för att öppna modal med redigeringsläge för customYear
     function openEditYearModal(playlistName, spotifyID, currentYear) {
       currentPlaylistName = playlistName;
       currentSpotifyID = spotifyID;
       document.getElementById("newYearInput").value = currentYear;
       document.getElementById("editYearModal").style.display = "flex";
     }
-    // Gör funktionen global så att inline-attributet i HTML hittar den
+    // Gör funktionen global så att HTML inline-attributet hittar den
     window.openEditYearModal = openEditYearModal;
     
+    // Funktion för att stänga redigeringsmodalen
     function closeEditYearModal() {
       document.getElementById("editYearModal").style.display = "none";
     }
     
-  // Funktion för att uppdatera customYear – JUSTERAD version
-function updateCustomYear(playlistName, spotifyID, newYear) {
-  const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
-  return update(songRef, { customYear: newYear })
-    .then(() => {
-        console.log("customYear uppdaterades till", newYear);
-        mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
-    })
-    .catch((error) => {
-        console.error("Fel vid uppdatering av customYear:", error);
-        alert("Något gick fel vid uppdatering: " + error.message);
-        throw error;
-    });
-}
+    // Funktion för att uppdatera customYear i databasen
+    function updateCustomYear(playlistName, spotifyID, newYear) {
+      const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
+      return update(songRef, { customYear: newYear })
+        .then(() => {
+          console.log("customYear uppdaterades till", newYear);
+          mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
+        })
+        .catch((error) => {
+          console.error("Fel vid uppdatering av customYear:", error);
+          alert("Något gick fel vid uppdatering: " + error.message);
+          throw error;
+        });
+    }
 
     // Variabler för dataläsning
     let standardSongs = [];
