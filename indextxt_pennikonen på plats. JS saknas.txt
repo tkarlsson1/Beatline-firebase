@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.461</title>
+  <title>NOTESTREAM v0.471</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -38,6 +38,76 @@
       max-width: 80%;
       height: auto;
     }
+    /* --- NY CSS för redigeringsmodalen --- */
+  .edit-icon {
+  cursor: pointer;
+  margin-left: 0.5rem;
+  font-size: 0.8em;
+  color: #0b939c;
+}
+
+.edit-icon:hover {
+  color: #0a7c85;
+}
+
+  /* Grundläggande modal-stil */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);  /* Dämpad bakgrund */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+  }
+  
+  /* Modalinnehållet */
+  .modal-content {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 300px;
+    width: 90%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  /* Stängningsikonen */
+  .close {
+    float: right;
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-top: -0.5rem;
+    margin-right: -0.5rem;
+    color: #333;
+  }
+  
+  /* Inputfältet för årtalet */
+  #newYearInput {
+    width: 80%;
+    padding: 0.5rem;
+    margin: 1rem 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Spara-knappen */
+  #saveYearButton {
+    padding: 0.5rem 1rem;
+    background-color: #0b939c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+  }
+  #saveYearButton:hover {
+    background-color: #0a7c85;
+  }
+  /* --- Slut på modal CSS --- */
     /* Standardknappar i filterformuläret */
     select, button {
       padding: 0.5rem;
@@ -313,7 +383,17 @@
       cursor: pointer;
       font-family: 'Manrope', sans-serif;
     }
-    .next-song-button { margin-bottom: 5rem; }
+    .next-song-button { margin-bottom: 1rem; }
+      .edit-icon {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 0.8em;
+    color: #0b939c;
+  }
+  
+  .edit-icon:hover {
+    color: #0a7c85;
+  }
     .answer-button:hover, .answer-button:active, .answer-button:focus { background: #032934; 
     }
     .start-button {
@@ -540,20 +620,33 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     });
     
     // Funktioner för att hantera spellistor
-    function mergeSongs() {
-      const merged = {};
-      standardSongs.forEach(song => { merged[song.qr] = song; });
-      userPlaylistSongs.forEach(song => {
-        if (merged[song.qr]) {
-          merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
-        } else {
-          merged[song.qr] = song;
-        }
-      });
-      songs = Object.values(merged);
-      console.log("? Sammankopplad låtsamling (unika spår):", songs.length);
-      populateSourceCheckboxes();
+   function mergeSongs() {
+  const merged = {};
+  
+  // Först, bearbeta standardlistorna.
+  standardSongs.forEach(song => {
+    // Lägg in hela låtobjektet från standardlistor.
+    // Här litar vi på att year-värdet är 100% korrekt.
+    merged[song.qr] = { ...song, source: [...song.source] };
+  });
+  
+  // Sedan, bearbeta användarspellistor.
+  userPlaylistSongs.forEach(song => {
+    if (merged[song.qr]) {
+      // Låtens från standardlistor är betrodd – lägg till källan.
+      merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
+    } else {
+      // Låten finns endast i användarspellistor.
+      // Om användaren angett ett customYear, använd det; annars behåll inläst year.
+      const yearToUse = song.customYear ? song.customYear : song.year;
+      merged[song.qr] = { ...song, year: yearToUse, source: [...song.source] };
     }
+  });
+  
+  songs = Object.values(merged);
+  console.log("Sammankopplade låtar (unika spår):", songs.length);
+  populateSourceCheckboxes();
+}
     
     function updateAllaCheckbox() {
       const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
@@ -779,6 +872,10 @@ window.nextSong = function() {
     const randomIndex = Math.floor(Math.random() * remainingSongs.length);
     currentSong = remainingSongs[randomIndex];
     shownSongs.push(currentSong);
+       let playlistInfo = document.getElementById("playlist-info");
+    if (playlistInfo) {
+      playlistInfo.style.display = "none";
+    }
     displaySong(currentSong);
 };
 
@@ -789,24 +886,50 @@ window.restart = function() {
 };
 
 function displaySong(song) {
-    const songDisplay = document.getElementById("song-display");
-    songDisplay.innerHTML = `
-        <div id="qrcode-${song.qr}" class="qrcode"></div>
-        <button class="answer-button" onclick="revealDetails()">Visa svar</button>
-        <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-            <div class="year" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">${song.year}</div>
-            <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
-                ${song.artist}<br>${song.title}
-            </div>
-        </div>
-    `;
-    generateQRCode(song.qr);
-      let playlistInfoElement = document.getElementById("playlist-info");
+  // Bestäm vilket årtal som ska visas: customYear om det finns, annars song.year
+  const displayYear = song.customYear ? song.customYear : song.year;
+  
+  // Hämta unika standardlistnamn från den globala variabeln standardSongs
+  const standardListNames = (typeof standardSongs !== "undefined" && standardSongs.length)
+    ? Array.from(new Set(standardSongs.map(s => s.source[0])))
+    : [];
+  
+  // Pennikonen ska bara visas om ingen av låtens källor finns i standardlistorna
+  const isUserSong = !song.source.some(src => standardListNames.includes(src));
+
+  const songDisplay = document.getElementById("song-display");
+  songDisplay.innerHTML = `
+    <div id="qrcode-${song.qr}" class="qrcode"></div>
+    <button class="answer-button" onclick="revealDetails()">Visa svar</button>
+    <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+      <!-- Inline-flex-container för att centrera årtalet -->
+      <div class="year-container" style="display: inline-flex; align-items: center; justify-content: center; width: 100%;">
+        <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+          ${displayYear}
+        </span>
+        ${
+          isUserSong 
+            ? `<i class="edit-icon" 
+                  style="margin-left: 10px; cursor: pointer; font-size: 1.8em; color: #0a6e73; transform: scaleX(-1);" 
+                  onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
+            : ``
+        }
+      </div>
+      <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
+        ${song.artist}<br>${song.title}
+      </div>
+    </div>
+  `;
+  generateQRCode(song.qr);
+  
+  let playlistInfoElement = document.getElementById("playlist-info");
   if (playlistInfoElement) {
-    // Om song.source är en array med en eller flera spellistor
     playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
   }
 }
+
+
+
 
 window.generateQRCode = function(qr) {
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
@@ -817,6 +940,10 @@ window.generateQRCode = function(qr) {
 
 window.revealDetails = function() {
     document.getElementById("song-details").style.display = "block";
+      let playlistInfo = document.getElementById("playlist-info");
+    if (playlistInfo) {
+      playlistInfo.style.display = "block";
+    }
 };
 
 window.goToFilter = function() {
@@ -1113,7 +1240,14 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       </div>
     </div>
   </div>
-  
+  <div id="editYearModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h3>Redigera årtal</h3>
+    <input id="newYearInput" type="text" placeholder="Ange nytt årtal">
+    <button id="saveYearButton">Spara</button>
+  </div>
+</div>
   <!-- Vanligt script för modal- och feedbackhantering -->
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -1191,6 +1325,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
         });
     }
 </script>
+
 
 </body>
 </html>
