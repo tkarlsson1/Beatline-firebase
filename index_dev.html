@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.488</title>
+  <title>NOTESTREAM v0.489</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -476,18 +476,21 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       document.getElementById("editYearModal").style.display = "none";
     }
     
-    function updateCustomYear(playlistName, spotifyID, newYear) {
-      const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
-      update(songRef, { customYear: newYear })
-        .then(() => {
-          console.log("customYear uppdaterades till " + newYear);
-          mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
-        })
-        .catch((error) => {
-          console.error("Fel vid uppdatering av customYear:", error);
-          alert("Något gick fel vid uppdatering: " + error.message);
-        });
-    }
+  // Funktion för att uppdatera customYear – JUSTERAD version
+function updateCustomYear(playlistName, spotifyID, newYear) {
+  const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
+  return update(songRef, { customYear: newYear })
+    .then(() => {
+        console.log("customYear uppdaterades till", newYear);
+        mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
+    })
+    .catch((error) => {
+        console.error("Fel vid uppdatering av customYear:", error);
+        alert("Något gick fel vid uppdatering: " + error.message);
+        throw error;
+    });
+}
+
     // Variabler för dataläsning
     let standardSongs = [];
     let userPlaylistSongs = [];
@@ -1343,16 +1346,25 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
             alert("Något gick fel. Försök igen senare.");
         });
 });
-    document.getElementById("saveYearButton").addEventListener("click", function() {
+      document.getElementById("saveYearButton").addEventListener("click", function() {
           const newYear = document.getElementById("newYearInput").value.trim();
+          console.log("Save-knappen klickad, nytt år:", newYear);
           if (!/^\d{4}$/.test(newYear)) {
               alert("Ange ett giltigt årtal med 4 siffror.");
               return;
           }
-          updateCustomYear(currentPlaylistName, currentSpotifyID, newYear);
-          closeEditYearModal();
+          console.log("Uppdaterar customYear för playlist:", currentPlaylistName, "spotifyID:", currentSpotifyID);
+          updateCustomYear(currentPlaylistName, currentSpotifyID, newYear)
+              .then(() => {
+                  console.log("Uppdatering lyckades, stänger modal.");
+                  closeEditYearModal();
+              })
+              .catch((error) => {
+                  console.error("Fel vid uppdatering av customYear:", error);
+              });
       });
       document.getElementById("closeModal").addEventListener("click", function() {
+          console.log("Stänger modal via stäng-knappen.");
           closeEditYearModal();
       });
     });
