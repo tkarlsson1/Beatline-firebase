@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.486</title>
+  <title>NOTESTREAM v0.493</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -433,7 +433,7 @@ select:focus, select:hover {
   <!-- Importera Firebase SDK:er via moduler -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
@@ -458,36 +458,41 @@ select:focus, select:hover {
     window.app = app;
     const db = getDatabase(app);
     const auth = getAuth(app);
-     // ===== NYA RADER FÖR REDIGERING AV ÅRTAL (ligger här, ca 10 rader nedan) =====
-    let currentPlaylistName = null;
-    let currentSpotifyID = null;
-    
-    // Funktion för att öppna modalen med redigeringsläge för customYear
+      // Gör de globala variablerna tillgängliga
+    window.currentPlaylistName = null;
+    window.currentSpotifyID = null;
+
+    // Funktion för att öppna modal med redigeringsläge för customYear
     function openEditYearModal(playlistName, spotifyID, currentYear) {
-      currentPlaylistName = playlistName;
-      currentSpotifyID = spotifyID;
+      window.currentPlaylistName = playlistName;
+      window.currentSpotifyID = spotifyID;
       document.getElementById("newYearInput").value = currentYear;
       document.getElementById("editYearModal").style.display = "flex";
     }
-    // Gör funktionen global så att inline-attributet i HTML hittar den
+    // Exponera funktionen globalt
     window.openEditYearModal = openEditYearModal;
     
+    // Funktion för att stänga redigeringsmodalen
     function closeEditYearModal() {
       document.getElementById("editYearModal").style.display = "none";
     }
-    
+    window.closeEditYearModal = closeEditYearModal;
+
+    // Funktion för att uppdatera customYear i databasen
     function updateCustomYear(playlistName, spotifyID, newYear) {
       const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
-      update(songRef, { customYear: newYear })
+      return update(songRef, { customYear: newYear })
         .then(() => {
-          console.log("customYear uppdaterades till " + newYear);
+          console.log("customYear uppdaterades till", newYear);
           mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
         })
         .catch((error) => {
           console.error("Fel vid uppdatering av customYear:", error);
           alert("Något gick fel vid uppdatering: " + error.message);
+          throw error;
         });
     }
+    window.updateCustomYear = updateCustomYear;
     // Variabler för dataläsning
     let standardSongs = [];
     let userPlaylistSongs = [];
@@ -1343,17 +1348,26 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
             alert("Något gick fel. Försök igen senare.");
         });
 });
-    document.getElementById("saveYearButton").addEventListener("click", function() {
-        const newYear = document.getElementById("newYearInput").value.trim();
-        if (!/^\d{4}$/.test(newYear)) {
-          alert("Ange ett giltigt årtal med 4 siffror.");
-          return;
-        }
-        updateCustomYear(currentPlaylistName, currentSpotifyID, newYear);
-        closeEditYearModal();
+      document.getElementById("saveYearButton").addEventListener("click", function() {
+          const newYear = document.getElementById("newYearInput").value.trim();
+          console.log("Save-knappen klickad, nytt år:", newYear);
+          if (!/^\d{4}$/.test(newYear)) {
+              alert("Ange ett giltigt årtal med 4 siffror.");
+              return;
+          }
+          console.log("Uppdaterar customYear för playlist:", currentPlaylistName, "spotifyID:", currentSpotifyID);
+          updateCustomYear(currentPlaylistName, currentSpotifyID, newYear)
+              .then(() => {
+                  console.log("Uppdatering lyckades, stänger modal.");
+                  closeEditYearModal();
+              })
+              .catch((error) => {
+                  console.error("Fel vid uppdatering av customYear:", error);
+              });
       });
       document.getElementById("closeModal").addEventListener("click", function() {
-        closeEditYearModal();
+          console.log("Stänger modal via stäng-knappen.");
+          closeEditYearModal();
       });
     });
   </script>
