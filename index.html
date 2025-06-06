@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.470</title>
+  <title>NOTESTREAM v0.471</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -886,17 +886,15 @@ window.restart = function() {
 };
 
 function displaySong(song) {
-  // Välj displayYear: customYear om det finns, annars song.year
+  // Bestäm vilket årtal som ska visas: customYear om det finns, annars song.year
   const displayYear = song.customYear ? song.customYear : song.year;
   
-  // Hämta en lista över unika standardlistor från global variabel standardSongs
-  // Om standardSongs inte finns eller är tom, blir standardListNames en tom array.
+  // Hämta unika standardlistnamn från den globala variabeln standardSongs
   const standardListNames = (typeof standardSongs !== "undefined" && standardSongs.length)
     ? Array.from(new Set(standardSongs.map(s => s.source[0])))
     : [];
-    
-  // Bestäm om låten kommer endast från användarspellistor:
-  // Om ingen av låtens källor matchar något av standardlistnamnen, är det en användarlåt.
+  
+  // Pennikonen ska bara visas om ingen av låtens källor finns i standardlistorna
   const isUserSong = !song.source.some(src => standardListNames.includes(src));
 
   const songDisplay = document.getElementById("song-display");
@@ -904,14 +902,15 @@ function displaySong(song) {
     <div id="qrcode-${song.qr}" class="qrcode"></div>
     <button class="answer-button" onclick="revealDetails()">Visa svar</button>
     <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-      <!-- Använder en inline-flex-container för årtal och eventuell ikon -->
+      <!-- Inline-flex-container för att centrera årtalet -->
       <div class="year-container" style="display: inline-flex; align-items: center; justify-content: center; width: 100%;">
         <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
           ${displayYear}
         </span>
         ${
           isUserSong 
-            ? `<i class="edit-icon" style="margin-left: 10px; cursor: pointer; font-size: 1.2em; color: #0b939c;"
+            ? `<i class="edit-icon" 
+                  style="margin-left: 10px; cursor: pointer; font-size: 1.8em; color: #0a6e73; transform: scaleX(-1);" 
                   onclick="openEditYearModal('spellista', '${song.qr}', '${displayYear}')">✎</i>`
             : ``
         }
@@ -928,6 +927,7 @@ function displaySong(song) {
     playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
   }
 }
+
 
 
 
