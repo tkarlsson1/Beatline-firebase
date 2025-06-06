@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.472</title>
+  <title>NOTESTREAM v0.473</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -527,47 +527,7 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     }
 });
     }
-      // NYA funktioner för redigering av årtal (pennan)
-    let currentPlaylistName = null;
-    let currentSpotifyID = null;
     
-    function openEditYearModal(playlistName, spotifyID, currentYear) {
-      currentPlaylistName = playlistName;
-      currentSpotifyID = spotifyID;
-      document.getElementById("newYearInput").value = currentYear;
-      document.getElementById("editYearModal").style.display = "flex";
-    }
-    
-    function closeEditYearModal() {
-      document.getElementById("editYearModal").style.display = "none";
-    }
-    
-    function updateCustomYear(playlistName, spotifyID, newYear) {
-      const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
-      update(songRef, { customYear: newYear })
-        .then(() => {
-          console.log("Årtalet uppdaterades till " + newYear);
-          mergeSongs();
-        })
-        .catch((error) => {
-          console.error("Fel vid uppdatering av årtal:", error);
-          alert("Något gick fel vid uppdatering av årtalet.");
-        });
-    }
-    
-    document.getElementById("saveYearButton").addEventListener("click", function() {
-      const newYear = document.getElementById("newYearInput").value.trim();
-      if (!/^\d{4}$/.test(newYear)) {
-        alert("Ange ett giltigt årtal med 4 siffror.");
-        return;
-      }
-      updateCustomYear(currentPlaylistName, currentSpotifyID, newYear);
-      closeEditYearModal();
-    });
-    
-    document.getElementById("closeModal").addEventListener("click", function() {
-      closeEditYearModal();
-    });
     // Vänta tills DOM är laddad
     document.addEventListener("DOMContentLoaded", () => {
       // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
