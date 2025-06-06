@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.490</title>
+  <title>NOTESTREAM v0.491</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -458,15 +458,15 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
     window.app = app;
     const db = getDatabase(app);
     const auth = getAuth(app);
-  // ===== NYA RADER FÖR REDIGERING AV ÅRTAL (lägger in här) =====
-    // Globala variabler som används för redigeringsmodalen
-    let currentPlaylistName = null;
-    let currentSpotifyID = null;
+   // ===== NYA RADER FÖR REDIGERING AV ÅRTAL (lägg in här) =====
+    // Gör de globala variablerna tillgängliga globalt
+    window.currentPlaylistName = null;
+    window.currentSpotifyID = null;
     
     // Funktion för att öppna modal med redigeringsläge för customYear
     function openEditYearModal(playlistName, spotifyID, currentYear) {
-      currentPlaylistName = playlistName;
-      currentSpotifyID = spotifyID;
+      window.currentPlaylistName = playlistName;
+      window.currentSpotifyID = spotifyID;
       document.getElementById("newYearInput").value = currentYear;
       document.getElementById("editYearModal").style.display = "flex";
     }
@@ -477,6 +477,8 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
     function closeEditYearModal() {
       document.getElementById("editYearModal").style.display = "none";
     }
+    // Gör funktionen global
+    window.closeEditYearModal = closeEditYearModal;
     
     // Funktion för att uppdatera customYear i databasen
     function updateCustomYear(playlistName, spotifyID, newYear) {
