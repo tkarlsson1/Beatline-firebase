@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM DEV 0.495 - 0.493 live</title>
+  <title>NOTESTREAM DEV 0.496 - 0.493 live</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -75,17 +75,22 @@
   border: 1px solid #0b939c; /* Ljus blå kant */
   width: 80%;
   max-width: 400px;
+  text-align: center;
 }
   
   /* Stängningsikonen */
   .close {
+    color: #fff;
     float: right;
+    font-size: 28px;
+    font-weight: bold;
     cursor: pointer;
-    font-size: 1.5rem;
-    margin-top: -0.5rem;
-    margin-right: -0.5rem;
-    color: #333;
   }
+  
+  .close:hover {
+    color: #ff9800;
+  }
+
   /* Stil för inmatningsfält */
 .modal-content input {
   background-color: #0b939c; /* Blå bakgrund */
@@ -110,41 +115,73 @@
 .modal-content button:hover {
   background-color: #e68900; /* Lite mörkare vid hover */
 }
-/* Stängningsikon */
-.close {
-  color: #fff;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
+
+/* Inputfältet för årtalet */
+#newYearInput {
+  width: 80%;
+  padding: 0.5rem;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.close:hover {
-  color: #ff9800;
+/* Spara-knappen */
+#saveYearButton {
+  padding: 0.5rem 1rem;
+  background-color: #0b939c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
 }
-  /* Inputfältet för årtalet */
-  #newYearInput {
-    width: 80%;
-    padding: 0.5rem;
-    margin: 1rem 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  /* Spara-knappen */
-  #saveYearButton {
-    padding: 0.5rem 1rem;
-    background-color: #0b939c;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Manrope', sans-serif;
-  }
-  #saveYearButton:hover {
-    background-color: #0a7c85;
-  }
-  /* --- Slut på modal CSS --- */
+
+#saveYearButton:hover {
+  background-color: #0a7c85;
+}
+
+/* --- Anpassningar för inloggnings- och registreringsmodalerna --- */
+#loginModal, #registerModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#loginBox, #registerBox {
+  background-color: #032934; /* Samma mörka stil */
+  color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #0b939c;
+  text-align: center;
+  width: 80%;
+  max-width: 400px;
+}
+
+#loginBox input, #registerBox input {
+  background-color: #0b939c;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 0.5rem;
+  width: 100%;
+  border-radius: 5px;
+}
+
+#loginBox button, #registerBox button {
+  background-color: #ff9800;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#loginBox button:hover, #registerBox button:hover {
+  background-color: #e68900;
+}
+
+/* --- Slut på modal CSS --- */
     /* Standardknappar i filterformuläret */
     select, button {
       padding: 0.5rem;
@@ -1210,12 +1247,12 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
 </head>
 <body>
 <!-- Inloggningsmodal -->
-<div id="loginModal" style="display: none;">
-  <div id="loginBox">
+<div id="loginModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" id="closeLoginModal">&times;</span>
     <h2>Logga in</h2>
     <input type="email" id="emailInput" placeholder="Ange e-post" />
     <input type="password" id="passwordInput" placeholder="Ange lösenord" />
-    <!-- Länk för glömt lösenord -->
     <a href="#" id="forgotPasswordLink" style="font-size: 0.85rem; text-decoration: underline; color: #0b939c; display: block; margin-bottom: 1rem;">Glömt lösenord?</a>
     <button id="loginButton">Logga in</button>
     <p id="loginError" class="error">Fel e-post eller lösenord!</p>
@@ -1223,18 +1260,18 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
   </div>
 </div>
 
-  
-  <!-- Registreringsmodal -->
-  <div id="registerModal" style="display:none;">
-    <div id="registerBox">
-      <h2>Registrera dig</h2>
-      <input type="email" id="regEmail" placeholder="Ange din e-post" />
-      <input type="password" id="regPassword" placeholder="Ange ditt lösenord" />
-      <button id="registerButton">Registrera</button>
-      <p id="registerError" class="error">Registrering misslyckades!</p>
-      <p>Har du redan ett konto? <button id="showLogin">Logga in</button></p>
-    </div>
+<!-- Registreringsmodal -->
+<div id="registerModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" id="closeRegisterModal">&times;</span>
+    <h2>Registrera dig</h2>
+    <input type="email" id="regEmail" placeholder="Ange din e-post" />
+    <input type="password" id="regPassword" placeholder="Ange ditt lösenord" />
+    <button id="registerButton">Registrera</button>
+    <p id="registerError" class="error">Registrering misslyckades!</p>
+    <p>Har du redan ett konto? <button id="showLogin">Logga in</button></p>
   </div>
+</div>
   
   <div class="container" id="mainContent">
     <img src="logga.png" alt="Notestream-beta logo" class="logo" />
