@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM DEV 0.494 - 0.493 live</title>
+  <title>NOTESTREAM v0.493</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -51,31 +51,29 @@
 }
 
   /* Grundläggande modal-stil */
- .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.7); /* Halvtransparent mörk bakgrund */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);  /* Dämpad bakgrund */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+  }
   
   /* Modalinnehållet */
- .modal-content {
-  background-color: #032934; /* Mörk bakgrund */
-  color: #fff; /* Vit text */
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid #0b939c; /* Ljus blå kant */
-  width: 80%;
-  max-width: 400px;
-}
+  .modal-content {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 300px;
+    width: 90%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
   
   /* Stängningsikonen */
   .close {
@@ -86,42 +84,7 @@
     margin-right: -0.5rem;
     color: #333;
   }
-  /* Stil för inmatningsfält */
-.modal-content input {
-  background-color: #0b939c; /* Blå bakgrund */
-  color: #fff; /* Vit text */
-  border: 1px solid #fff;
-  padding: 0.5rem;
-  width: 100%;
-  border-radius: 5px;
-}
-
-/* Stil för knappar */
-.modal-content button {
-  background-color: #ff9800; /* Varmt orange */
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.modal-content button:hover {
-  background-color: #e68900; /* Lite mörkare vid hover */
-}
-/* Stängningsikon */
-.close {
-  color: #fff;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover {
-  color: #ff9800;
-}
+  
   /* Inputfältet för årtalet */
   #newYearInput {
     width: 80%;

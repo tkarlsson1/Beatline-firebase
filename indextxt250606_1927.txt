@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.485</title>
+  <title>NOTESTREAM v0.495</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -433,7 +433,7 @@ select:focus, select:hover {
   <!-- Importera Firebase SDK:er via moduler -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
@@ -458,7 +458,41 @@ select:focus, select:hover {
     window.app = app;
     const db = getDatabase(app);
     const auth = getAuth(app);
+      // Gör de globala variablerna tillgängliga
+    window.currentPlaylistName = null;
+    window.currentSpotifyID = null;
+
+    // Funktion för att öppna modal med redigeringsläge för customYear
+    function openEditYearModal(playlistName, spotifyID, currentYear) {
+      window.currentPlaylistName = playlistName;
+      window.currentSpotifyID = spotifyID;
+      document.getElementById("newYearInput").value = currentYear;
+      document.getElementById("editYearModal").style.display = "flex";
+    }
+    // Exponera funktionen globalt
+    window.openEditYearModal = openEditYearModal;
     
+    // Funktion för att stänga redigeringsmodalen
+    function closeEditYearModal() {
+      document.getElementById("editYearModal").style.display = "none";
+    }
+    window.closeEditYearModal = closeEditYearModal;
+
+    // Funktion för att uppdatera customYear i databasen
+    function updateCustomYear(playlistName, spotifyID, newYear) {
+      const songRef = ref(db, `userPlaylists/${auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
+      return update(songRef, { customYear: newYear })
+        .then(() => {
+          console.log("customYear uppdaterades till", newYear);
+          mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
+        })
+        .catch((error) => {
+          console.error("Fel vid uppdatering av customYear:", error);
+          alert("Något gick fel vid uppdatering: " + error.message);
+          throw error;
+        });
+    }
+    window.updateCustomYear = updateCustomYear;
     // Variabler för dataläsning
     let standardSongs = [];
     let userPlaylistSongs = [];
@@ -1167,29 +1201,26 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
   <div class="container" id="mainContent">
     <img src="logga.png" alt="Notestream-beta logo" class="logo" />
     <!-- Filter-/Startsida -->
-    <div id="filter-page">
-      <div id="source-checkbox-container"></div>
-      <div style="display: flex; justify-content: center; gap: 1rem;">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="startYear">Från år:</label>
-        <select id="startYear"></select>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="endYear">Till år:</label>
-        <select id="endYear"></select>
-    </div>
-</div>
-      <!-- Spotify-spellisteimport -->
-      <div id="spotify-import">
-        <h3>Lägg till Spotify-spellista</h3>
-        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="margin-right: 2px" style="margin-left: 2px">
-        <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-      <button id="addPlaylistButton">Lägg till</button>
+      <div id="filter-page">
+    <div id="source-checkbox-container"></div>
+    <div style="display: flex; justify-content: center; gap: 1rem;">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+          <label for="startYear">Från år:</label>
+          <select id="startYear"></select>
       </div>
-      <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
-      <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
-      
+      <div style="display: flex; flex-direction: column; align-items: center;">
+          <label for="endYear">Till år:</label>
+          <select id="endYear"></select>
+      </div>
     </div>
+    <!-- Ersätt den fasta Spotify-spellisteimporten med en knapp -->
+    <button id="openAddPlaylistModal" class="start-button" style="background: #0b939c; margin-top: 1rem;">
+      Lägg till lista
+    </button>
+    <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
+    <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
+  </div>
+
     
     <!-- Resultatsida -->
     <div id="result-page">
@@ -1250,96 +1281,138 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
     <button id="saveYearButton">Spara</button>
   </div>
 </div>
+   <!-- Modal för att lägga till Spotify-spellista -->
+    <div id="addPlaylistModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span id="closeAddPlaylist" class="close">&times;</span>
+        <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="margin-bottom: 0.5rem; width: 80%;" />
+        <input type="text" id="playlistNameInput" placeholder="Spellistans namn" style="margin-bottom: 0.5rem; width: 80%;" />
+        <button id="addPlaylistButton">Lägg till</button>
+      </div>
+    </div>
   <!-- Vanligt script för modal- och feedbackhantering -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // Växla mellan inloggnings- och registreringsmodaler
-      const showRegisterBtn = document.getElementById("showRegister");
-      const showLoginBtn = document.getElementById("showLogin");
-      if (showRegisterBtn) {
-        showRegisterBtn.addEventListener("click", () => {
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("registerModal").style.display = "flex";
-        });
-      }
-      if (showLoginBtn) {
-        showLoginBtn.addEventListener("click", () => {
-          document.getElementById("registerModal").style.display = "none";
-          document.getElementById("loginModal").style.display = "flex";
-        });
-      }
-      
-      // Readme Modal
-      const readmeModal = document.getElementById("readmeModal");
-      const closeBtn = document.querySelector(".closeBtn");
-      closeBtn.addEventListener("click", function() {
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Växla mellan inloggnings- och registreringsmodaler
+    const showRegisterBtn = document.getElementById("showRegister");
+    const showLoginBtn = document.getElementById("showLogin");
+    if (showRegisterBtn) {
+      showRegisterBtn.addEventListener("click", () => {
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("registerModal").style.display = "flex";
+      });
+    }
+    if (showLoginBtn) {
+      showLoginBtn.addEventListener("click", () => {
+        document.getElementById("registerModal").style.display = "none";
+        document.getElementById("loginModal").style.display = "flex";
+      });
+    }
+    
+    // Readme Modal
+    const readmeModal = document.getElementById("readmeModal");
+    const closeBtn = document.querySelector(".closeBtn");
+    closeBtn.addEventListener("click", function() {
+      readmeModal.style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == readmeModal) {
         readmeModal.style.display = "none";
-      });
-      window.addEventListener("click", function(event) {
-        if (event.target == readmeModal) {
-          readmeModal.style.display = "none";
-        }
-      });
-     
-
-
-      // Feedback-hantering
-      document.getElementById("feedbackButton")?.addEventListener("click", function() {
-        document.getElementById("feedbackModal").style.display = "block";
-      });
-      document.getElementById("closeFeedback")?.addEventListener("click", function() {
+      }
+    });
+    
+    // Eventhanterare för att öppna modal för att lägga till Spotify-spellista
+    const openAddPlaylistBtn = document.getElementById("openAddPlaylistModal");
+    openAddPlaylistBtn.addEventListener("click", () => {
+      document.getElementById("addPlaylistModal").style.display = "flex";
+    });
+    
+    // Eventhanterare för att stänga modalen med stäng-ikonen
+    document.getElementById("closeAddPlaylist").addEventListener("click", () => {
+      document.getElementById("addPlaylistModal").style.display = "none";
+    });
+    
+    // Feedback-hantering
+    document.getElementById("feedbackButton")?.addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "block";
+    });
+    document.getElementById("closeFeedback")?.addEventListener("click", function() {
+      document.getElementById("feedbackModal").style.display = "none";
+    });
+    window.addEventListener("click", function(event) {
+      if (event.target == document.getElementById("feedbackModal")) {
         document.getElementById("feedbackModal").style.display = "none";
-      });
-      window.addEventListener("click", function(event) {
-        if (event.target == document.getElementById("feedbackModal")) {
-          document.getElementById("feedbackModal").style.display = "none";
-        }
-      });
-      document.getElementById("submitFeedback")?.addEventListener("click", function() {
-    const feedbackText = document.getElementById("feedbackText").value.trim();
-    if (feedbackText.length === 0) {
+      }
+    });
+    document.getElementById("submitFeedback")?.addEventListener("click", function() {
+      const feedbackText = document.getElementById("feedbackText").value.trim();
+      if (feedbackText.length === 0) {
         alert("Feedback kan inte vara tom!");
         return;
-    }
-
-    const feedbackRef = ref(db, 'feedback');
-    push(feedbackRef, { text: feedbackText, timestamp: Date.now() })
+      }
+      const feedbackRef = ref(db, 'feedback');
+      push(feedbackRef, { text: feedbackText, timestamp: Date.now() })
         .then(() => {
-            alert("Tack för din feedback!");
-            document.getElementById("feedbackText").value = "";
-            document.getElementById("feedbackModal").style.display = "none";
+          alert("Tack för din feedback!");
+          document.getElementById("feedbackText").value = "";
+          document.getElementById("feedbackModal").style.display = "none";
         })
         .catch((error) => {
-            console.error("Fel vid lagring av feedback:", error);
-            alert("Något gick fel. Försök igen senare.");
+          console.error("Fel vid lagring av feedback:", error);
+          alert("Något gick fel. Försök igen senare.");
         });
-});
-    document.getElementById("saveYearButton").addEventListener("click", function() {
-        const newYear = document.getElementById("newYearInput").value.trim();
-        if (!/^\d{4}$/.test(newYear)) {
-          alert("Ange ett giltigt årtal med 4 siffror.");
-          return;
-        }
-        updateCustomYear(currentPlaylistName, currentSpotifyID, newYear);
-        closeEditYearModal();
-      });
-      document.getElementById("closeModal").addEventListener("click", function() {
-        closeEditYearModal();
-      });
     });
-  </script>
-  <script>
- if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js")
-        .then(registration => {
-          console.log("Service Worker registrerad med scope:", registration.scope);
+    
+    document.getElementById("saveYearButton").addEventListener("click", function() {
+      const newYear = document.getElementById("newYearInput").value.trim();
+      console.log("Save-knappen klickad, nytt år:", newYear);
+      if (!/^\d{4}$/.test(newYear)) {
+        alert("Ange ett giltigt årtal med 4 siffror.");
+        return;
+      }
+      console.log("Uppdaterar customYear för playlist:", currentPlaylistName, "spotifyID:", currentSpotifyID);
+      updateCustomYear(currentPlaylistName, currentSpotifyID, newYear)
+        .then(() => {
+          console.log("Uppdatering lyckades, stänger modal.");
+          closeEditYearModal();
         })
-        .catch(error => {
-          console.error("Service Worker misslyckades:", error);
+        .catch((error) => {
+          console.error("Fel vid uppdatering av customYear:", error);
         });
-    }
+    });
+    
+    document.getElementById("closeModal").addEventListener("click", function() {
+      console.log("Stänger modal via stäng-knappen.");
+      closeEditYearModal();
+    });
+    
+    // Hantera "Lägg till"-knappen i modal för att lägga till Spotify-spellista
+    document.getElementById("addPlaylistButton").addEventListener("click", async () => {
+      const playlistName = document.getElementById("playlistNameInput").value.trim();
+      const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+      if (!playlistName || !playlistLink) {
+        alert("Fyll i både spellistans namn och länk!");
+        return;
+      }
+      await addPlaylistToFirebase(playlistName, playlistLink);
+      document.getElementById("addPlaylistModal").style.display = "none";
+      document.getElementById("playlistNameInput").value = "";
+      document.getElementById("playlistLinkInput").value = "";
+    });
+  });
 </script>
-
-
+<!-- Slut ändring -->
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(registration => {
+        console.log("Service Worker registrerad med scope:", registration.scope);
+      })
+      .catch(error => {
+        console.error("Service Worker misslyckades:", error);
+      });
+  }
+</script>
 </body>
 </html>
