@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.499_fixed_listor</title>
+  <title>NOTESTREAM v0.500_fixed_listor</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1150,7 +1150,17 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
       });
       dropdownMenu.appendChild(startpageLink);
       
-      const logoutLink = document.createElement("a");
+      
+      const managePlaylistsLink = document.createElement("a");
+      managePlaylistsLink.href = "#";
+      managePlaylistsLink.textContent = "Hantera spellistor";
+      managePlaylistsLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.openManagePlaylists && window.openManagePlaylists();
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(managePlaylistsLink);
+const logoutLink = document.createElement("a");
       logoutLink.href = "#";
       logoutLink.textContent = "Logga ut";
       logoutLink.addEventListener("click", (e) => {
