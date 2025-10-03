@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.501_fixed</title>
+  <title>NOTESTREAM v0.502_fixed</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -468,7 +468,10 @@ window.firebaseDb = db;
 window.firebaseRef = ref;
 window.firebasePush = push;
 
-    const auth = getAuth(app);
+    window.firebaseOnValue = onValue;
+window.firebaseSet = set;
+window.firebaseUpdate = update;
+const auth = getAuth(app);
       window.auth = auth;
 // Gör de globala variablerna tillgängliga
     window.currentPlaylistName = null;
@@ -1484,7 +1487,7 @@ function setSafeHTML(el, html){
     return new Promise((resolve, reject) => {
       const userId = window.window.auth.currentUser.uid;
       const userRef = window.firebaseRef(window.firebaseDb, 'userPlaylists/' + userId);
-      onValue(userRef, (snap) => {
+      window.firebaseOnValue(userRef, (snap) => {
         const val = snap.val() || {};
         resolve(val);
       }, (err) => reject(err), { onlyOnce: true });
@@ -1537,7 +1540,7 @@ function setSafeHTML(el, html){
         try {
           const userId = window.window.auth.currentUser.uid;
           const refToList = window.firebaseRef(window.firebaseDb, 'userPlaylists/' + userId + '/' + name);
-          await set(refToList, null); // delete node
+          await window.firebaseSet(refToList, null); // delete node
           // Optimistisk uppdatering
           item.remove();
           if (!qs('managePlaylistsList').children.length){
