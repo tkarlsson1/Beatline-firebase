@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.502_fixed</title>
+  <title>NOTESTREAM v0.503_fixed</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1463,7 +1463,7 @@ function setSafeHTML(el, html){
 </script>
 
     <!-- Manage Playlists Modal -->
-    <div id="managePlaylistsModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
+    <div id="managePlaylistsModal" class="modal" role="dialog" aria-modal="true" style="display:none; text-align:left;">
       <div class="modal-content" style="max-width: 600px; margin: 10% auto; background:#111; color:#fff; padding:20px; border-radius:12px;">
         <span id="closeManagePlaylists" class="closeBtn" aria-label="Stäng">&times;</span>
         <h2>Hantera spellistor</h2>
@@ -1497,6 +1497,8 @@ function setSafeHTML(el, html){
   function renderPlaylists(listMap){
     const container = qs('managePlaylistsList');
     container.innerHTML = '';
+    container.style.textAlign = "left";
+
     const keys = Object.keys(listMap || {});
     if (!keys.length){
       container.innerHTML = '<p>Du har inga egna spellistor ännu.</p>';
@@ -1506,6 +1508,7 @@ function setSafeHTML(el, html){
       const item = document.createElement('div');
       item.className = 'playlist-row';
       item.style.display = 'flex';
+      item.style.width = '100%';
       item.style.alignItems = 'center';
       item.style.justifyContent = 'space-between';
       item.style.gap = '1rem';
@@ -1514,11 +1517,17 @@ function setSafeHTML(el, html){
       // Left: name + count (if songs exist)
       const left = document.createElement('div');
       left.style.display = 'flex';
+      left.style.alignItems = 'flex-start';
+      left.style.textAlign = 'left';
       left.style.flexDirection = 'column';
       const title = document.createElement('strong');
+      title.style.display = 'block';
+      title.style.textAlign = 'left';
       title.textContent = name;
       left.appendChild(title);
       const meta = document.createElement('span');
+      meta.style.display = 'block';
+      meta.style.textAlign = 'left';
       const songCount = listMap[name] && listMap[name].songs ? Object.keys(listMap[name].songs).length : 0;
       meta.textContent = songCount + ' låtar';
       meta.style.opacity = '.8';
