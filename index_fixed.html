@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.503_fixed</title>
+  <title>NOTESTREAM v0.504_fixed</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1215,6 +1215,19 @@ function setSafeHTML(el, html){
 }
 </script>
 
+
+<style>
+/* Responsive tweaks for Manage Playlists modal */
+#managePlaylistsModal .modal-content { width: min(92vw, 600px); max-width: 600px; box-sizing: border-box; }
+#managePlaylistsList .playlist-row { overflow: hidden; }
+#managePlaylistsList .playlist-row strong,
+#managePlaylistsList .playlist-row span { overflow-wrap: anywhere; word-break: break-word; }
+@media (max-width: 480px) {
+  #managePlaylistsModal .modal-content { width: 92vw !important; margin: 8vh auto !important; padding: 16px !important; }
+  #managePlaylistsList .playlist-row { gap: .6rem !important; }
+}
+</style>
+
 </head>
 <body>
 <!-- Inloggningsmodal -->
@@ -1463,8 +1476,8 @@ function setSafeHTML(el, html){
 </script>
 
     <!-- Manage Playlists Modal -->
-    <div id="managePlaylistsModal" class="modal" role="dialog" aria-modal="true" style="display:none; text-align:left;">
-      <div class="modal-content" style="max-width: 600px; margin: 10% auto; background:#111; color:#fff; padding:20px; border-radius:12px;">
+    <div id="managePlaylistsModal" class="modal" role="dialog" aria-modal="true" style="display:none; text-align:left; padding:8px;">
+      <div class="modal-content" style="width:min(92vw, 600px); max-width:600px; margin:6vh auto; background:#111; color:#fff; padding:20px; border-radius:12px; box-sizing:border-box; max-height:80vh; overflow:auto;">
         <span id="closeManagePlaylists" class="closeBtn" aria-label="Stäng">&times;</span>
         <h2>Hantera spellistor</h2>
         <p id="managePlaylistsInfo" style="opacity:.9; margin-top:.5rem;"></p>
