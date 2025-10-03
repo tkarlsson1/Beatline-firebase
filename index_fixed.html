@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.494_fixed</title>
+  <title>NOTESTREAM v0.495_fixed</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -460,7 +460,9 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
     // Initiera Firebase
     const app = initializeApp(firebaseConfig);
     window.app = app;
-    \1
+
+
+const db = getDatabase(app);
 // Expose Firebase APIs for non-module scripts
 window.firebaseDb = db;
 window.firebaseRef = ref;
@@ -701,7 +703,7 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
-      container.innerHTML =  setSafeHTML(this, "");
+      container.innerHTML = "");
       
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
@@ -827,8 +829,8 @@ window.updateYearSelection = function() {
     const startYearDropdown = document.getElementById("startYear");
     const endYearDropdown = document.getElementById("endYear");
 
-    startYearDropdown.innerHTML =  setSafeHTML(this, "");
-    endYearDropdown.innerHTML =  setSafeHTML(this, "");
+    startYearDropdown.innerHTML = "");
+    endYearDropdown.innerHTML = "");
 
     const thisYear = new Date().getFullYear();
 for (let year = 1950; year <= thisYear; year++) {
@@ -894,7 +896,7 @@ window.filterSongs = function() {
         return true;
     } else {
         alert("Inga låtar hittades i den valda perioden.");
-        document.getElementById("song-display").innerHTML =  setSafeHTML(this, "");
+        document.getElementById("song-display").innerHTML = "");
         return false;
     }
 };
@@ -926,7 +928,7 @@ window.nextSong = function() {
 window.restart = function() {
     shownSongs = [];
     currentSong = null;
-    document.getElementById("song-display").innerHTML =  setSafeHTML(this, "");
+    document.getElementById("song-display").innerHTML = "");
 };
 
 function displaySong(song) {
@@ -942,7 +944,7 @@ function displaySong(song) {
 const isUserSong = !song.source.some(src => standardListNames.includes(src));
 
 const songDisplay = document.getElementById("song-display");
-songDisplay.innerHTML =  setSafeHTML(this, `
+songDisplay.innerHTML = `
   <div id="qrcode-${song.qr}" class="qrcode"></div>
   <button class="answer-button" onclick="revealDetails()">Visa svar</button>
   <div id="song-details" style="display: none); margin-top: 1rem; font-weight: bold;">
@@ -980,7 +982,7 @@ songDisplay.innerHTML =  setSafeHTML(this, `
 window.generateQRCode = function(qr) {
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
     const qrElement = document.getElementById(`qrcode-${qr}`);
-    qrElement.innerHTML =  setSafeHTML(this, "");
+    qrElement.innerHTML = "");
     new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
 };
 
@@ -1106,7 +1108,7 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
 
       const menuButton = document.createElement("button");
       menuButton.id = "menuButton";
-      menuButton.innerHTML =  setSafeHTML(this, "&#9776);"; // Hamburger-ikon
+      menuButton.innerHTML = "&#9776);"; // Hamburger-ikon
       menuButton.style.background = "none";
       menuButton.style.border = "none";
       menuButton.style.color = "#fff";
@@ -1195,7 +1197,7 @@ function escapeHTML(str){
     .replace(/'/g,'&#39;');
 }
 function setSafeHTML(el, html){
-  el.innerHTML =  setSafeHTML(this, String(html).replace(/<script/gi,'&lt);script');
+  el.innerHTML = String(html).replace(/<script/gi,'&lt);script');
 }
 </script>
 
