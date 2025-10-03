@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.495_fixed</title>
+  <title>NOTESTREAM v0.496_fixed</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -703,7 +703,7 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
-      container.innerHTML = "");
+      container.innerHTML = "";
       
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
@@ -829,8 +829,8 @@ window.updateYearSelection = function() {
     const startYearDropdown = document.getElementById("startYear");
     const endYearDropdown = document.getElementById("endYear");
 
-    startYearDropdown.innerHTML = "");
-    endYearDropdown.innerHTML = "");
+    startYearDropdown.innerHTML = "";
+    endYearDropdown.innerHTML = "";
 
     const thisYear = new Date().getFullYear();
 for (let year = 1950; year <= thisYear; year++) {
@@ -896,7 +896,7 @@ window.filterSongs = function() {
         return true;
     } else {
         alert("Inga låtar hittades i den valda perioden.");
-        document.getElementById("song-display").innerHTML = "");
+        document.getElementById("song-display").innerHTML = "";
         return false;
     }
 };
@@ -928,7 +928,7 @@ window.nextSong = function() {
 window.restart = function() {
     shownSongs = [];
     currentSong = null;
-    document.getElementById("song-display").innerHTML = "");
+    document.getElementById("song-display").innerHTML = "";
 };
 
 function displaySong(song) {
@@ -982,7 +982,7 @@ songDisplay.innerHTML = `
 window.generateQRCode = function(qr) {
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
     const qrElement = document.getElementById(`qrcode-${qr}`);
-    qrElement.innerHTML = "");
+    qrElement.innerHTML = "";
     new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
 };
 
