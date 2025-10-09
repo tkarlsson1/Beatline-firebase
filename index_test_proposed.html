@@ -3,86 +3,73 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.604_test</title>
+<title>NOTESTREAM v0.605_test</title>
 <style>
   :root {
     --bg: #0b0f12;
     --txt: #fff;
-    --accent: #ffcc00;
-    --blue: #00a0ff;
     --card-w: 96px;
     --gap: 12px;
+    /* lagfärger */
+    --team1: #ffcc00; /* gul */
+    --team2: #00a0ff; /* blå */
+    --team3: #ff4d5a; /* röd */
   }
   html,body { margin:0; height:100%; background: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
   #app { padding: 14px; display:flex; flex-direction:column; gap:14px; }
   .topbar { display:flex; justify-content:space-between; gap:10px; align-items:center; }
   .badge { background: rgba(0,0,0,.5); padding:.45rem .7rem; border:1px solid rgba(255,255,255,.2); border-radius:999px; }
-  .legend { display:flex; gap:10px; align-items:center; opacity:.9; }
+  .legend { display:flex; gap:12px; align-items:center; opacity:.9; }
+  .legend .chip { display:flex; align-items:center; gap:6px; padding:.2rem .5rem; border:1px solid rgba(255,255,255,.2); border-radius:999px; background:rgba(255,255,255,.05); }
   .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
-  .dot.active { background: var(--accent); }
-  .dot.oppo { background: var(--blue); }
-  .dot.placed { background: #ccc; }
+  .dot.t1 { background: var(--team1); }
+  .dot.t2 { background: var(--team2); }
+  .dot.t3 { background: var(--team3); }
 
-  .token-panel { display:flex; gap:8px; align-items:center; }
-  .pill { padding:.3rem .6rem; border-radius:999px; border:1px solid rgba(255,255,255,.25); }
-
-  .controls { display:flex; gap:10px; flex-wrap:wrap; }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
   .controls button { padding:.55rem .9rem; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff; cursor:pointer; }
   .controls button:hover { background: rgba(255,255,255,.12); }
 
   .stage { display:flex; flex-direction:column; gap:12px; }
   .panel { background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px; }
 
-  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  .prompt { display:none; gap:8px; align-items:center; }
+  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px; }
+  .prompt { display:none; gap:8px; align-items:center; flex-wrap:wrap; }
   .prompt.active { display:flex; }
   .timer { font-variant-numeric: tabular-nums; }
 
   .timeline-wrap { overflow:auto; }
   .timeline { display:flex; align-items:center; gap: var(--gap); padding: 8px; }
   .card { width: var(--card-w); height: calc(var(--card-w)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
-  .card.start { background: #032934; border-color:#0b939c; font-weight:700; }
   .card .year-vert { 
     transform: rotate(90deg);
     transform-origin:center; 
     font-weight:600; 
     letter-spacing:.4px; 
     font-size: calc(var(--card-w) * 0.58);
-    line-height: 1;
-    white-space: nowrap;
+    line-height: 1; white-space: nowrap;
   }
-  .tentative-active { background: #2d2200; border-color: var(--accent); }
-  .tentative-oppo   { background: #001f33; border-color: var(--blue); }
+  /* Tentative-kort i gapen (per lagfärg) */
+  .tentative.t1 { background: #2d2200; border-color: var(--team1); }
+  .tentative.t2 { background: #001f33; border-color: var(--team2); }
+  .tentative.t3 { background: #2a0a0e; border-color: var(--team3); }
 
-  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); display:flex; align-items:center; justify-content:center; }
+  /* Gap container: vi visar bara bredd när hover/markerad */
+  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); display:flex; align-items:center; justify-content:center; position:relative; }
   .ghost-gap.active { width: var(--card-w); }
-
-  .dnd-card { width:140px; height:84px; background:#222; border:2px solid #666; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; box-shadow: 0 10px 22px rgba(0,0,0,.35); }
-  .dnd-card.dragging { opacity:.85; cursor:grabbing; transform: scale(1.02); }
-  .dnd-palette { display:flex; gap:12px; align-items:center; }
 
   .mini .timeline { transform: scale(.3); transform-origin: left top; }
   .mini { height: calc((var(--card-w)*1.5) * .3 + 24px); overflow:hidden; }
-
-  @media (orientation: portrait) {
-    .hint { text-align:center; opacity:.8; }
-  }
 </style>
 </head>
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.604</strong></div>
+    <div class="badge">Testläge – <strong>PROTOTYP v0.605</strong></div>
     <div class="legend">
-      <span class="dot active"></span> Aktivas val
-      <span class="dot oppo"></span> Opponentens val
-      <span class="dot placed"></span> Placerade
-    </div>
-    <div class="token-panel">
-      <span>Tokens A: <span id="tokA" class="pill">4</span></span>
-      <button id="tokAplus">+1</button>
-      <span style="margin-left:8px;">Tokens B: <span id="tokB" class="pill">4</span></span>
-      <button id="tokBplus">+1</button>
+      <span class="chip"><span class="dot t1"></span>Lag 1</span>
+      <span class="chip"><span class="dot t2"></span>Lag 2</span>
+      <span class="chip"><span class="dot t3"></span>Lag 3</span>
     </div>
   </div>
 
@@ -94,16 +81,16 @@
       <button id="btnReveal" disabled>Reveal</button>
       <button id="btnNextTurn" disabled>Nästa tur</button>
       <span id="phaseLabel" class="badge"></span>
-      <span class="badge" id="startBadge"></span>
+      <span id="startBadge" class="badge"></span>
     </div>
 
     <div class="panel">
       <div class="row">
-        <strong>Aktivt lag: <span id="activeTeamName">Team A</span></strong>
+        <strong>Aktivt lag: <span id="activeTeamName">Lag 1</span></strong>
         <div class="prompt" id="oppPrompt">
           <span>Opponera?</span>
-          <button id="btnOppYes">Ja (−1)</button>
-          <button id="btnOppNo">Nej</button>
+          <div id="oppButtons" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+          <button id="btnOppNo">Ingen</button>
           <span class="timer" id="promptTimer"></span>
         </div>
         <div class="prompt" id="oppDnD">
@@ -124,7 +111,7 @@
     </div>
 
     <div class="panel mini">
-      <strong>Min tidslinje (Team B – mini)</strong>
+      <strong>Min tidslinje (Nästa lag – mini)</strong>
       <div class="timeline-wrap">
         <div class="timeline" id="miniTimeline"></div>
       </div>
@@ -135,31 +122,38 @@
 <script>
 (function(){
   const $ = (id) => document.getElementById(id);
-  // MOCK: tills vi kopplar Spotify/Firebase — sätt årspann manuellt eller från en mockad pool
+
+  // === Mock konfig för startår (ersätts senare av poolens min/max) ===
   const MOCK_MIN_YEAR = 1955;
   const MOCK_MAX_YEAR = 2023;
+  const randInt = (a,b)=> a + Math.floor(Math.random()*(b-a+1));
 
-  // Teams
-  let teamA = { name:'Team A', tokens:4, years:[] };
-  let teamB = { name:'Team B', tokens:4, years:[] };
-  let activeTeam = 'A';
-
-  // State
+  // === Tre lag med färger ===
+  const teams = [
+    { id:1, name:'Lag 1', color:'var(--team1)', tokens:4, years:[] },
+    { id:2, name:'Lag 2', color:'var(--team2)', tokens:4, years:[] },
+    { id:3, name:'Lag 3', color:'var(--team3)', tokens:4, years:[] },
+  ];
+  let activeIdx = 0; // roterar 0->1->2->0...
   let startYear = null;
-  let phase = 'idle'; // listening|locked|prompt|opposition|reveal|resolve
-  let placedSlotIndex = null;     // active team's tentative slot
-  let opponentWants   = false;
-  let opponentSlotIndex = null;
+  let gameOver = false;
+
+  // === State ===
+  let phase = 'idle'; // listening|locked|prompt|opposition|reveal|resolve|gameover
+  let placedSlotIndex = null;        // aktivas tentativ
+  let opponentTeamIdx = null;        // vilket lag (index) opponerar
+  let opponentSlotIndex = null;      // opponen­tens tentativ
   let dragging = false;
   let currentHoverIndex = null;
   let currentTrackYear = null;
 
-  // DOM
+  // === DOM ===
   const activeTimeline = $('activeTimeline');
   const miniTimeline   = $('miniTimeline');
   const songCard       = $('songCard');
   const phaseLabel     = $('phaseLabel');
   const oppPrompt      = $('oppPrompt');
+  const oppButtons     = $('oppButtons');
   const oppDnD         = $('oppDnD');
   const promptTimerEl  = $('promptTimer');
   const oppTimerEl     = $('oppTimer');
@@ -167,25 +161,32 @@
   const hintText       = $('hintText');
   const startBadge     = $('startBadge');
 
-  // Controls
-  $('btnNext').addEventListener('click', startRound);
-  $('btnReroll').addEventListener('click', doReroll);
-  $('btnLock').addEventListener('click', lockPlacement);
-  $('btnReveal').addEventListener('click', doReveal);
-  $('btnNextTurn').addEventListener('click', nextTurn);
-  $('btnOppYes').addEventListener('click', () => beginOpposition(true));
-  $('btnOppNo').addEventListener('click', () => beginOpposition(false));
-  $('btnOppLock').addEventListener('click', () => { if (phase==='opposition' && opponentWants && opponentSlotIndex!==null) doReveal(); });
-  $('tokAplus').addEventListener('click', ()=> { teamA.tokens++; updateTokens(); });
-  $('tokBplus').addEventListener('click', ()=> { teamB.tokens++; updateTokens(); });
+  const btnNext        = $('btnNext');
+  const btnReroll      = $('btnReroll');
+  const btnLock        = $('btnLock');
+  const btnReveal      = $('btnReveal');
+  const btnNextTurn    = $('btnNextTurn');
+  const btnOppNo       = $('btnOppNo');
+  const btnOppLock     = $('btnOppLock');
+
+  // === Events ===
+  btnNext.addEventListener('click', startRound);
+  btnReroll.addEventListener('click', doReroll);
+  btnLock.addEventListener('click', lockPlacement);
+  btnReveal.addEventListener('click', doReveal);
+  btnNextTurn.addEventListener('click', nextTurn);
+  btnOppNo.addEventListener('click', () => beginOpposition(null));
+  btnOppLock.addEventListener('click', () => { if (phase==='opposition' && opponentTeamIdx!==null && opponentSlotIndex!==null) doReveal(); });
   window.addEventListener('resize', computeCardLayout);
   window.addEventListener('orientationchange', computeCardLayout);
 
-  // Helpers
-  const yearsFor = (team)=> (team==='A'?teamA.years:teamB.years).slice().sort((a,b)=>a-b);
-  const other    = (team)=> team==='A' ? 'B' : 'A';
-  const teamObj  = (team)=> team==='A' ? teamA : teamB;
-  const randInt  = (a,b)=> a + Math.floor(Math.random()*(b-a+1));
+  // === Helpers ===
+  const otherIdxs = ()=> teams.map((_,i)=>i).filter(i => i!==activeIdx);
+  const yearsFor  = (idx)=> teams[idx].years.slice().sort((a,b)=>a-b);
+  const nextIdx   = (i)=> (i+1) % teams.length;
+
+  function teamColorClass(idx){ return idx===0?'t1': idx===1?'t2':'t3'; }
+  function teamColorValue(idx){ return getComputedStyle(document.documentElement).getPropertyValue(idx===0?'--team1':idx===1?'--team2':'--team3'); }
 
   function makeCard(val, classes=''){
     const d = document.createElement('div');
@@ -197,71 +198,82 @@
     return d;
   }
 
-  // Render timeline with startYear as anchor in the sequence
-  function renderTimeline(container, years, inOpposition){
-    container.innerHTML = '';
-
-    const ys = years.slice().sort((a,b)=>a-b);
-    // Logical sequence: [ ... left side (< start), START, ... right side (> start) ]
-    const left = ys.filter(y => y < startYear);
-    const right= ys.filter(y => y >= startYear);
-
-    // Build order: left..., START, right...
-    const ordered = left.concat([startYear], right);
-
-    // Gaps are between all elements in ordered, plus before first and after last
-    // We want a visible Start card in the middle of the flow (not always left)
-    // So we paint cards in 'ordered', but label startYear specially.
-    for (let i=0;i<=ordered.length;i++){
-      // gap
-      const gapIdx = i; // 0..N
-      const g = makeGap(gapIdx, placedSlotIndex, opponentSlotIndex, dragging ? currentHoverIndex : null, inOpposition);
-      container.appendChild(g);
-      // card after the gap (if any)
-      if (i < ordered.length){
-        const y = ordered[i];
-        const isStart = (y === startYear);
-        container.appendChild(makeCard(isStart ? ('Startår ' + y) : String(y), isStart ? 'start' : ''));
-      }
-    }
-  }
-
-  function makeGap(i, activeTentativeIdx, oppTentativeIdx, hoverIdx, inOpposition){
+  function makeGap(i, showActive, showOpp, hoverIdx){
     const g = document.createElement('div');
     g.className = 'ghost-gap';
     g.dataset.slotIndex = i;
-    if (i === hoverIdx || i === activeTentativeIdx || (inOpposition && i === oppTentativeIdx)) {
-      g.classList.add('active');
+    if (i === hoverIdx || i === showActive || i === showOpp) g.classList.add('active');
+
+    if (showActive !== null && i === showActive){
+      g.appendChild(makeCard('?', 'tentative ' + teamColorClass(activeIdx)));
     }
-    if (activeTentativeIdx !== null && i === activeTentativeIdx) {
-      g.appendChild(makeCard('?', 'tentative-active'));
-    }
-    if (inOpposition && oppTentativeIdx !== null && i === oppTentativeIdx) {
-      const c = makeCard('?', 'tentative-oppo');
-      c.style.position = (activeTentativeIdx === i) ? 'absolute' : 'static';
-      if (activeTentativeIdx === i) { c.style.transform = 'translateY(8px)'; }
-      g.style.position = 'relative';
+    if (showOpp !== null && i === showOpp){
+      const c = makeCard('?', 'tentative ' + teamColorClass(opponentTeamIdx));
+      if (showActive === showOpp){ // enkel stack vid samma gap
+        c.style.position = 'absolute'; c.style.transform = 'translateY(8px)'; g.style.position = 'relative';
+      }
       g.appendChild(c);
     }
     return g;
   }
 
-  function renderAll(){
-    computeCardLayout();
-    renderTimeline(activeTimeline, yearsFor(activeTeam), phase==='opposition');
-    renderTimeline(miniTimeline, yearsFor(other(activeTeam)), false);
-    activeTeamName.textContent = teamObj(activeTeam).name;
-    startBadge.textContent = startYear ? ('Startår: ' + startYear) : '';
-    updateTokens(); updateControls();
+  function renderTimeline(container, years, inOpposition){
+    container.innerHTML = '';
+
+    // Bygg ordning: sorterat inkl. startYear i korrekt position (som ett vanligt kort)
+    const ys = years.slice().sort((a,b)=>a-b);
+    const ordered = insertSorted(ys, startYear);
+
+    for (let i=0;i<=ordered.length;i++){
+      const g = makeGap(i, placedSlotIndex, inOpposition ? opponentSlotIndex : null, dragging ? currentHoverIndex : null);
+      container.appendChild(g);
+      if (i < ordered.length){
+        const y = ordered[i];
+        container.appendChild(makeCard(String(y)));
+      }
+    }
   }
 
-  function updateTokens(){ $('tokA').textContent = teamA.tokens; $('tokB').textContent = teamB.tokens; }
-  function updateControls(){
-    $('btnLock').disabled    = (placedSlotIndex===null || phase!=='listening');
-    $('btnReveal').disabled  = !(['prompt','opposition','locked'].includes(phase));
-    $('btnNextTurn').disabled= (phase!=='resolve');
-    $('btnReroll').disabled  = (phase!=='listening' || teamObj(activeTeam).tokens<=0);
-    phaseLabel.textContent   = 'Fas: ' + phase;
+  function insertSorted(arr, x){
+    const out = arr.slice();
+    let pos = out.findIndex(v => x <= v);
+    if (pos === -1) out.push(x);
+    else out.splice(pos, 0, x);
+    return out;
+  }
+
+  function renderAll(){
+    computeCardLayout();
+    renderTimeline(activeTimeline, yearsFor(activeIdx), phase==='opposition');
+    // mini visar nästa lags tidslinje
+    renderTimeline(miniTimeline, yearsFor(nextIdx(activeIdx)), false);
+    activeTeamName.textContent = teams[activeIdx].name;
+    startBadge.textContent = startYear ? ('Startår: ' + startYear) : '';
+
+    // Opponera-knappar
+    oppButtons.innerHTML = '';
+    otherIdxs().forEach(i => {
+      const b = document.createElement('button');
+      b.textContent = `${teams[i].name} (−1)`;
+      b.style.borderColor = 'rgba(255,255,255,.2)';
+      b.style.background = 'rgba(255,255,255,.06)';
+      b.style.color = '#fff';
+      b.onclick = ()=> beginOpposition(i);
+      // disable if no tokens
+      if (teams[i].tokens <= 0) { b.disabled = true; b.style.opacity = .5; }
+      oppButtons.appendChild(b);
+    });
+
+    updateTokensAndControls();
+  }
+
+  function updateTokensAndControls(){
+    phaseLabel.textContent = 'Fas: ' + phase + (gameOver ? ' (slut)' : '');
+    btnLock.disabled    = (placedSlotIndex===null || phase!=='listening' || gameOver);
+    btnReveal.disabled  = !(['prompt','opposition','locked'].includes(phase)) || gameOver;
+    btnNextTurn.disabled= (phase!=='resolve') || gameOver;
+    btnReroll.disabled  = (phase!=='listening' || teams[activeIdx].tokens<=0 || gameOver);
+    btnNext.disabled    = gameOver;
   }
 
   function computeCardLayout(){
@@ -280,13 +292,11 @@
     document.documentElement.style.setProperty('--gap', bestGap + 'px');
   }
 
-  // Flow
+  // === Flöde ===
   function startRound(){
-    if (startYear === null){
-      // Randomize once per game (first round)
-      startYear = randInt(MOCK_MIN_YEAR, MOCK_MAX_YEAR);
-    }
-    phase='listening'; placedSlotIndex=null; opponentWants=false; opponentSlotIndex=null;
+    if (gameOver) return;
+    if (startYear === null){ startYear = randInt(MOCK_MIN_YEAR, MOCK_MAX_YEAR); }
+    phase='listening'; placedSlotIndex=null; opponentTeamIdx=null; opponentSlotIndex=null;
     currentHoverIndex=null; currentTrackYear = mockRandomYear();
     hintText.textContent='Dra kortet till rätt mellanrum';
     showCard(true);
@@ -295,47 +305,54 @@
   }
 
   function doReroll(){
-    const t = teamObj(activeTeam); if (t.tokens<=0) return;
+    const t = teams[activeIdx]; if (t.tokens<=0 || gameOver) return;
     t.tokens--; currentTrackYear = mockRandomYear();
-    hintText.textContent='Ny låt dragen (−1 token). Dra igen.'; updateTokens();
+    hintText.textContent='Ny låt dragen (−1 token). Dra igen.'; updateTokensAndControls();
   }
 
   function lockPlacement(){
-    if (placedSlotIndex===null) return;
+    if (placedSlotIndex===null || gameOver) return;
     phase='locked'; renderAll(); startPromptCountdown();
   }
 
-  // 5s prompt (auto reveal på No/all)
+  // 5s prompt (auto reveal om ingen opponerar)
   let promptTimer=null, promptRemaining=0;
   function startPromptCountdown(){
     promptRemaining=5; oppPrompt.classList.add('active'); promptTimerEl.textContent=` ${promptRemaining}s`;
-    if (promptTimer) clearInterval(promptTimer);
+    clearInterval(promptTimer);
     promptTimer = setInterval(()=>{
       promptRemaining--; promptTimerEl.textContent=` ${promptRemaining}s`;
-      if (promptRemaining<=0){ clearInterval(promptTimer); beginOpposition(false); }
+      if (promptRemaining<=0){ clearInterval(promptTimer); beginOpposition(null); }
     },1000);
   }
 
-  function beginOpposition(yes){
-    oppPrompt.classList.remove('active');
-    if (promptTimer) clearInterval(promptTimer);
-    if (yes){
-      const oppTeam = other(activeTeam);
-      if (teamObj(oppTeam).tokens<=0){ opponentWants=false; phase='prompt'; doReveal(); return; }
-      teamObj(oppTeam).tokens--; opponentWants=true; phase='opposition';
-      startOppCountdown(); oppDnD.classList.add('active');
-      hintText.textContent='Motståndare: dra din markör (blå) till vald slot och Lås opponering';
-    } else {
-      opponentWants=false; phase='prompt'; doReveal(); return;
+  // yesTeamIdx: index för laget som opponerar, eller null om ingen
+  function beginOpposition(yesTeamIdx){
+    oppPrompt.classList.remove('active'); clearInterval(promptTimer);
+    if (yesTeamIdx===null){
+      // Ingen opponerar -> direkt reveal
+      phase='prompt'; doReveal(); return;
     }
-    updateTokens(); updateControls();
+    // Kolla tokens
+    if (teams[yesTeamIdx].tokens <= 0){
+      // om saknar tokens: behandla som ingen opponerar
+      phase='prompt'; doReveal(); return;
+    }
+    teams[yesTeamIdx].tokens--;
+    opponentTeamIdx = yesTeamIdx;
+    opponentSlotIndex = null;
+    phase='opposition';
+    startOppCountdown();
+    oppDnD.classList.add('active');
+    hintText.textContent = `${teams[yesTeamIdx].name}: dra din markör till vald slot och Lås opponering`;
+    updateTokensAndControls(); renderAll();
   }
 
-  // 30s opposition
+  // 30s för oppositionsdrag
   let oppTimer=null, oppRemaining=0;
   function startOppCountdown(){
     oppRemaining=30; oppTimerEl.textContent=` ${oppRemaining}s`;
-    if (oppTimer) clearInterval(oppTimer);
+    clearInterval(oppTimer);
     oppTimer = setInterval(()=>{
       oppRemaining--; oppTimerEl.textContent=` ${oppRemaining}s`;
       if (oppRemaining<=0){ clearInterval(oppTimer); doReveal(); }
@@ -343,41 +360,62 @@
   }
 
   function doReveal(){
+    if (gameOver) return;
     phase='reveal'; oppDnD.classList.remove('active');
-    const actOK = isCorrectSlotWithStart(yearsFor(activeTeam), placedSlotIndex, currentTrackYear, startYear);
-    const oppOK = opponentWants ? isCorrectSlotWithStart(yearsFor(activeTeam), opponentSlotIndex, currentTrackYear, startYear) : false;
 
+    const ordered = insertSorted(yearsFor(activeIdx), startYear);
+    const actOK = isCorrectSlotAgainstOrdered(ordered, placedSlotIndex, currentTrackYear);
+    const oppOK = (opponentTeamIdx!==null) ? isCorrectSlotAgainstOrdered(ordered, opponentSlotIndex, currentTrackYear) : false;
+
+    // Ny logik:
+    // - Aktiva rätt => aktiva får kortet (alltid)
+    // - Aktiva fel  => aktiva får ALDRIG kortet; om opponent är rätt => opponent får kortet; annars discard
     if (actOK){
-      commitToTimeline(activeTeam, currentTrackYear);
-      hintText.textContent = `Facit: ${currentTrackYear}. Aktiva korrekt (eller lika) – låten stannar.`;
-    } else if (opponentWants && oppOK){
-      commitToTimeline(other(activeTeam), currentTrackYear);
-      hintText.textContent = `Facit: ${currentTrackYear}. Opponent korrekt – tar låten.`;
+      commitToTimeline(activeIdx, currentTrackYear);
+      hintText.textContent = `Facit: ${currentTrackYear}. ${teams[activeIdx].name} korrekt – behåller.`;
+    } else if (opponentTeamIdx!==null && oppOK){
+      commitToTimeline(opponentTeamIdx, currentTrackYear);
+      hintText.textContent = `Facit: ${currentTrackYear}. ${teams[opponentTeamIdx].name} korrekt – tar kortet.`;
     } else {
-      commitToTimeline(activeTeam, currentTrackYear);
-      hintText.textContent = `Facit: ${currentTrackYear}. Ingen rätt – aktiva vinner tvisten.`;
+      hintText.textContent = `Facit: ${currentTrackYear}. Inget lag får kortet.`;
     }
 
-    // Rensa markörer efter reveal
+    // Rensa markörer
     placedSlotIndex = null;
     opponentSlotIndex = null;
+    opponentTeamIdx = null;
 
-    phase='resolve'; updateControls(); renderAll();
+    // Vinstkontroll
+    if (teams[activeIdx].years.length >= 11){
+      phase='gameover'; gameOver=true;
+      alert(`${teams[activeIdx].name} når 11! Spelet är slut.`);
+    } else if (teams.some(t => t.years.length >= 11)){
+      const winner = teams.find(t => t.years.length >= 11);
+      phase='gameover'; gameOver=true;
+      alert(`${winner.name} når 11! Spelet är slut.`);
+    } else {
+      phase='resolve';
+    }
+
+    updateTokensAndControls(); renderAll();
   }
 
   function nextTurn(){
-    if (teamA.years.length>=11){ alert('Team A når 11!'); return; }
-    if (teamB.years.length>=11){ alert('Team B når 11!'); return; }
-    activeTeam = other(activeTeam); startRound();
+    if (gameOver) return;
+    if (teams.some(t => t.years.length >= 11)){ phase='gameover'; gameOver=true; updateTokensAndControls(); return; }
+    activeIdx = (activeIdx + 1) % teams.length;
+    startRound();
   }
 
-  function commitToTimeline(team, year){
-    const t = teamObj(team); t.years.push(year); t.years.sort((a,b)=>a-b);
+  function commitToTimeline(teamIdx, year){
+    const t = teams[teamIdx];
+    if (t.years.length >= 11) return; // säkerhetsnät
+    t.years.push(year); t.years.sort((a,b)=>a-b);
   }
 
-  // DnD (mouse + touch)
+  // DnD
   songCard.addEventListener('dragstart', (e)=>{
-    if (!(phase==='listening' || phase==='opposition')) { e.preventDefault(); return; }
+    if (!(phase==='listening' || phase==='opposition') || gameOver) { e.preventDefault(); return; }
     dragging=true; songCard.classList.add('dragging');
     if (e.dataTransfer && e.dataTransfer.setDragImage){
       const img = new Image(); img.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GQAJFQMc6zL2sQAAAABJRU5ErkJggg==';
@@ -388,37 +426,15 @@
     dragging=false; songCard.classList.remove('dragging');
     if (phase==='listening') placedSlotIndex = currentHoverIndex;
     else if (phase==='opposition') opponentSlotIndex = currentHoverIndex;
-    updateControls(); renderAll();
+    updateTokensAndControls(); renderAll();
   });
   activeTimeline.addEventListener('dragover', (e)=>{
-    if (!dragging) return;
+    if (!dragging || gameOver) return;
     e.preventDefault();
     const x = e.clientX;
     const idx = nearestIndexByMidpoint(x);
     if (idx!==null){ currentHoverIndex = idx; renderAll(); }
   });
-
-  function attachTouchDrag(el){
-    let down=false;
-    el.addEventListener('touchstart',(e)=>{
-      if (!(phase==='listening' || phase==='opposition')) return;
-      down=true; dragging=true; el.classList.add('dragging');
-    },{passive:true});
-    el.addEventListener('touchmove',(e)=>{
-      if (!down) return;
-      const t = e.touches[0];
-      const idx = nearestIndexByMidpoint(t.clientX);
-      if (idx!==null){ currentHoverIndex = idx; renderAll(); }
-    },{passive:true});
-    el.addEventListener('touchend',()=>{
-      if (!down) return;
-      down=false; dragging=false; el.classList.remove('dragging');
-      if (phase==='listening') placedSlotIndex = currentHoverIndex;
-      else if (phase==='opposition') opponentSlotIndex = currentHoverIndex;
-      updateControls(); renderAll();
-    },{passive:true});
-  }
-  attachTouchDrag(songCard);
 
   function nearestIndexByMidpoint(x){
     const gaps = activeTimeline.querySelectorAll('.ghost-gap');
@@ -432,22 +448,11 @@
     return bestIdx;
   }
 
-  // Correctness using Startår as anchor inside sequence
-  function isCorrectSlotWithStart(teamYears, slotIndex, Y, S){
+  function isCorrectSlotAgainstOrdered(ordered, slotIndex, Y){
     if (slotIndex===null || slotIndex===undefined) return false;
-    const ys = teamYears.slice().sort((a,b)=>a-b);
-    const left = ys.filter(y => y < S);
-    const right= ys.filter(y => y >= S);
-    const ordered = left.concat([S], right); // cards rendered in this order
-    // Slots: 0 before ordered[0], 1 between 0-1, ..., N after ordered[N-1]
-    if (ordered.length === 1){ // only Startår present
-      if (slotIndex === 0) return Y <= S;
-      if (slotIndex === 1) return Y >= S;
-      return false;
-    }
-    // General case
-    if (slotIndex === 0) return Y <= ordered[0];
-    if (slotIndex === ordered.length) return Y >= ordered[ordered.length-1];
+    if (ordered.length===0) return true;
+    if (slotIndex===0) return Y <= ordered[0];
+    if (slotIndex===ordered.length) return Y >= ordered[ordered.length-1];
     const L = ordered[slotIndex-1];
     const R = ordered[slotIndex];
     return (L <= Y && Y <= R);
@@ -455,7 +460,7 @@
 
   function mockRandomYear(){ return randInt(1955, 2023); }
 
-  // Init a first round for convenience
+  // Init
   computeCardLayout();
   startRound();
 })();
