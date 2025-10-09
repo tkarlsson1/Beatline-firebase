@@ -3,12 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.601_test</title>
+<title>NOTESTREAM v0.602_test</title>
 <style>
   :root {
     --bg: #0b0f12;
-    --panel: rgba(255,255,255,.06);
-    --panel2: rgba(255,255,255,.12);
     --txt: #fff;
     --accent: #ffcc00;
     --blue: #00a0ff;
@@ -45,20 +43,23 @@
   .card { width: var(--card-w); height: calc(var(--card-w)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
   .card.start { background: #032934; border-color:#0b939c; font-weight:700; }
   .card .year-vert { 
-    transform: rotate(-90deg); transform-origin:center; font-weight:800; letter-spacing:.5px; 
-    font-size: calc(var(--card-w) * 0.7);  /* Årtalet täcker nästan hela kortet */
+    transform: rotate(90deg);  /* 180° från tidigare -90° => +90°, första siffra högst upp */
+    transform-origin:center; 
+    font-weight:600; 
+    letter-spacing:.5px; 
+    font-size: calc(var(--card-w) * 0.6);  /* något mindre och mindre bold */
     line-height: 1;
     white-space: nowrap;
   }
-  .card.tentative { background: #2d2200; border-color: #ffcc00; } /* visuell "lagt här" innan lock */
-  .card.tentative::after { content: '⋯'; position:absolute; top:6px; right:8px; opacity:.6; }
+  /* Tentative kort — visar var man har släppt (aktivt lag) */
+  .card.tentative { background: #2d2200; border-color: #ffcc00; }
+  /* Tentative kort — opponentens val */
+  .card.tentative.oppo { background: #002233; border-color: #00a0ff; }
 
-  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); transition: width .12s ease; display:flex; align-items:center; justify-content:center; }
-  .ghost-gap.active { width: calc(var(--card-w) + var(--gap)); }
-  .ghost { width: var(--card-w); height: calc(var(--card-w)*1.5); border:2px dashed rgba(255,255,255,.6); border-radius:12px; opacity:.35; }
-
-  .marker-active { outline: 3px solid var(--accent); outline-offset: -3px; }
-  .marker-oppo { outline: 3px solid var(--blue); outline-offset: -3px; }
+  /* Vi tar bort “streck”-känslan: ghost-gap expanderar inte och visar inget dashed-innehåll */
+  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); }
+  .ghost-gap.active { width: 0; } /* ingen visuell expansion */
+  .ghost { display:none; }        /* inget dashed-ghost */
 
   .dnd-card { width:140px; height:84px; background:#222; border:2px solid #666; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; box-shadow: 0 10px 22px rgba(0,0,0,.35); }
   .dnd-card.dragging { opacity:.85; cursor:grabbing; transform: scale(1.02); }
@@ -76,10 +77,10 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.601</strong></div>
+    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.602</strong></div>
     <div class="legend">
-      <span class="dot active"></span> Aktivas låsta
-      <span class="dot oppo"></span> Opponents förslag
+      <span class="dot active"></span> Aktivas val
+      <span class="dot oppo"></span> Opponentens val
       <span class="dot placed"></span> Placerade
     </div>
     <div class="token-panel">
@@ -183,25 +184,31 @@
   const other    = (team)=> team==='A' ? 'B' : 'A';
   const teamObj  = (team)=> team==='A' ? teamA : teamB;
 
-  function renderTimeline(container, years, highlightIndex=null, marks={}, tentativeIndex=null){
+  function renderTimeline(container, years, highlightIndex=null, isOppPhase=false){
     container.innerHTML = '';
     // Startår-kort
     container.appendChild(makeCard('Startår', true));
     const ys = years.slice().sort((a,b)=>a-b);
     for (let i=0;i<=ys.length;i++){
-      // Ghost gap
-      container.appendChild(makeGap(i, highlightIndex, marks));
-      // Tentative preview card (visar "lagt här" innan lock)
-      if (tentativeIndex !== null && tentativeIndex === i && (phase==='listening' || phase==='locked' || phase==='prompt' || phase==='opposition')) {
-        container.appendChild(makeCard('?', false, true));
+      container.appendChild(makeGap(i));
+      // Tentative preview card (visar "lagt här" där man släppte ELLER där man håller)
+      const tentativeIdx = (isOppPhase ? opponentSlotIndex : placedSlotIndex);
+      const hoverIdx     = currentHoverIndex;
+      // Visa persistent marker om användaren redan släppt någonstans
+      if (tentativeIdx !== null && tentativeIdx === i) {
+        container.appendChild(makeCard('?', false, true, isOppPhase));
+      }
+      // Annars visa temporär “flyttmarkör” medan man drar
+      else if (dragging && hoverIdx !== null && hoverIdx === i){
+        container.appendChild(makeCard('?', false, true, isOppPhase));
       }
       if (i<ys.length) container.appendChild(makeCard(String(ys[i])));
     }
   }
 
-  function makeCard(val, isStart=false, isTentative=false){
+  function makeCard(val, isStart=false, isTentative=false, isOpp=false){
     const d = document.createElement('div');
-    d.className = 'card' + (isStart ? ' start' : '') + (isTentative ? ' tentative' : '');
+    d.className = 'card' + (isStart ? ' start' : '') + (isTentative ? (' tentative' + (isOpp ? ' oppo' : '')) : '');
     const lab = document.createElement('div');
     lab.className = 'year-vert';
     lab.textContent = val;
@@ -209,28 +216,17 @@
     return d;
   }
 
-  function makeGap(i, highlightIndex, marks){
+  function makeGap(i){
     const g = document.createElement('div');
-    g.className = 'ghost-gap' + (i===highlightIndex ? ' active' : '');
-    if (marks.active === i) g.classList.add('marker-active');
-    if (marks.oppo   === i) g.classList.add('marker-oppo');
-    const ghost = document.createElement('div');
-    ghost.className = 'ghost';
-    g.appendChild(ghost);
+    g.className = 'ghost-gap';
     g.dataset.slotIndex = i;
     return g;
   }
 
   function renderAll(){
     computeCardLayout(); // ensure sizes fit 10 kort + 1 gap
-    const actYears = yearsFor(activeTeam);
-    const marks = {
-      active: (['locked','prompt','opposition','reveal','resolve'].includes(phase) ? placedSlotIndex : null),
-      oppo: (phase==='opposition' || phase==='reveal' || phase==='resolve') ? opponentSlotIndex : null
-    };
-    const tentativeIdx = (placedSlotIndex!==null ? placedSlotIndex : (currentHoverIndex!==null ? currentHoverIndex : null));
-    renderTimeline(activeTimeline, actYears, dragging ? currentHoverIndex : null, marks, tentativeIdx);
-    renderTimeline(miniTimeline, yearsFor(other(activeTeam)), null, {});
+    renderTimeline(activeTimeline, yearsFor(activeTeam), null, (phase==='opposition'));
+    renderTimeline(miniTimeline, yearsFor(other(activeTeam)));
     activeTeamName.textContent = teamObj(activeTeam).name;
     updateTokens(); updateControls();
   }
@@ -244,7 +240,7 @@
     phaseLabel.textContent   = 'Fas: ' + phase;
   }
 
-  // Layout: fit 10 cards + 11 gaps (så att ett aktivt ghost-gap kan expandera utan overflow)
+  // Layout: fit 10 cards + 11 gaps (så att ett aktivt markeringskort får plats utan overflow)
   function computeCardLayout(){
     const wrap = activeTimeline.closest('.timeline-wrap');
     if (!wrap) return;
@@ -254,7 +250,7 @@
     let bestCard = 96, bestGap = 12;
     for (let cw = maxW; cw >= minW; cw -= 1) {
       const gap = Math.max(8, Math.round(cw * 0.12));
-      const total = 10*cw + 11*gap; // 10 kort + 11 gaps (inkl. aktiv ghost)
+      const total = 10*cw + 11*gap; // 10 kort + 11 gaps (inkl. plats för markeringskort)
       if (total <= (w - padding)) { bestCard = cw; bestGap = gap; break; }
     }
     document.documentElement.style.setProperty('--card-w', bestCard + 'px');
