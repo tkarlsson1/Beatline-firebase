@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.516</title>
+  <title>NOTESTREAM v0.517</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1228,137 +1228,10 @@ function setSafeHTML(el, html){
 }
 </style>
 
-
-<style>
-/* Prevent background scroll when modal is open */
-body.modal-open { overflow: hidden; position: fixed; width: 100%; }
-</style>
-
-
-<style>
-/* Generic login modal content fallback */
-#loginModal > div, #authModal > div, #signinModal > div {
-  background:#111; color:#fff; margin:6vh auto; padding:20px;
-  border:1px solid rgba(255,255,255,.15); border-radius:12px; position:relative;
-  width:min(92vw, 600px); max-width:600px; box-sizing:border-box; max-height:80vh; overflow:auto;
-}
-#loginModal .closeBtn, #authModal .closeBtn, #signinModal .closeBtn {
-  color:#ccc; position:absolute; top:10px; right:20px; font-size:28px; font-weight:bold; cursor:pointer; z-index:5000;
-}
-#loginModal .closeBtn:hover, #authModal .closeBtn:hover, #signinModal .closeBtn:hover { color:#fff; }
-</style>
-
-
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-<style>
-/* Safe area for iOS */
-:root { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-/* Lock body scroll when modal open */
-body.modal-open { overflow: hidden; position: fixed; width: 100%; }
-/* Full-bleed screens */
-.screen, .app, .viewport { min-height: calc(var(--vh, 1vh) * 100); }
-</style>
-
-  <meta name="mobile-web-app-capable" content="yes">
-
-<style>
-/* Readme modal dark theme override (high specificity) */
-#readmeModal.modal { background: rgba(0,0,0,.6) !important; }
-#readmeModal.modal #readmeContent {
-  background: #111 !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
-  border-radius: 12px !important;
-  width: min(92vw, 600px) !important;
-  max-width: 600px !important;
-  margin: 6vh auto !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
-  max-height: 80vh !important;
-  overflow: auto !important;
-}
-#readmeModal .closeBtn { color: #ccc !important; }
-#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
-</style>
-
-
-<style>
-/* Force dark theme for Readme modal (robust selector) */
-#readmeModal { background: rgba(0,0,0,.6) !important; }
-#readmeModal > div, 
-#readmeModal .modal-content, 
-#readmeModal #readmeContent {
-  background: #111 !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
-  border-radius: 12px !important;
-  width: min(92vw, 600px) !important;
-  max-width: 600px !important;
-  margin: 6vh auto !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
-  max-height: 80vh !important;
-  overflow: auto !important;
-}
-#readmeModal .closeBtn { color: #ccc !important; position: absolute; top: 10px; right: 20px; }
-#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
-</style>
-
-
-<style>
-/* Thinner divider between Standardlistor and Egna spellistor */
-hr, .divider, .section-divider {
-  border-top-width: 0.5px !important;
-  height: 0 !important;
-}
-/* If the divider is drawn via a top border on a container */
-#standard-vs-egna-divider {
-  border-top: 0.5px solid rgba(255,255,255,.25) !important;
-}
-/* Common pattern: element with border-top around that area */
-.section-header + .section-header,
-h2 + hr, h3 + hr {
-  border-top-width: 0.5px !important;
-}
-</style>
-
-
-
-<style>
-/* Refined scrollbar hiding without touching background */
-html, body { overflow-x: hidden; }
-* { scrollbar-width: none; }                          /* Firefox */
-*::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-*::-webkit-scrollbar-thumb { background: transparent; border: none; }
-body { -ms-overflow-style: none; }                   /* Legacy Edge/IE */
-/* Guard against 100vw overflow causing a gutter */
-:root { --no-gutter-max: 100%; }
-body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
-</style>
-
-
-<style>
-/* Guard: prevent viewport-width gutters; prefer 100% over 100vw */
-:root { --w-guard: 100%; }
-body *, body *::before, body *::after {
-  max-width: var(--w-guard);
-}
-</style>
-
-
-<style>
-/* Guard: stop horizontal overflow on main containers */
-html, body { overflow-x: hidden; }
-#app, #appRoot, main, .screen, .viewport, .container { max-width: 100%; }
-</style>
-
 </head>
 <body>
 <!-- Inloggningsmodal -->
-<div id="loginModal" style="display: none;" class="modal" role="dialog" aria-modal="true" style="display:none; position: fixed; z-index:5000; left:0; top:0; right:0; bottom:0; background: rgba(0,0,0,.6); padding:8px;">
+<div id="loginModal" style="display: none;">
   <div id="loginBox">
     <h2>Logga in</h2>
     <input type="email" id="emailInput" placeholder="Ange e-post" />
@@ -1429,7 +1302,7 @@ html, body { overflow-x: hidden; }
     </div>
     
     <!-- Readme Modal -->
-    <div id="readmeModal" class="modal" role="dialog" aria-modal="true">
+    <div id="readmeModal">
       <div id="readmeContent">
         <span class="closeBtn">&times;</span>
         <h2>NOTESTREAM-BETA</h2>
@@ -1784,119 +1657,6 @@ html, body { overflow-x: hidden; }
       window.openManagePlaylists();
     });
     list.appendChild(item);
-  });
-})();
-</script>
-
-
-<script>
-// Fokusfälla + ESC-stängning för login-modalen
-(function(){ 
-  function getFocusable(container){
-    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  }
-  function trapFocus(modal){
-    const nodes = getFocusable(modal);
-    if (!nodes.length) return;
-    const first = nodes[0];
-    const last = nodes[nodes.length - 1];
-    function onKey(e){
-      if (e.key === 'Escape') {
-        closeModal(modal);
-      } else if (e.key === 'Tab') {
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    }
-    modal.__trapKeyHandler = onKey;
-    modal.addEventListener('keydown', onKey);
-    // Sätt initialt fokus
-    (modal.querySelector('[autofocus]') || first).focus();
-  }
-  function untrapFocus(modal){
-    if (modal.__trapKeyHandler) modal.removeEventListener('keydown', modal.__trapKeyHandler);
-    modal.__trapKeyHandler = null;
-  }
-  function closeModal(modal){
-    // Stäng och lås upp scroll (samma mönster som tidigare)
-    modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    document.body.style.top = '';
-    window.scrollTo(0, 0 + (window.__loginScrollY || 0));
-    modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
-  }
-  // När modalen öppnas: sätt fokusfälla
-  document.addEventListener('modal:open', function(e){
-    const modal = e.target.closest('#loginModal');
-    if (modal) trapFocus(modal);
-  });
-  // När modalen stängs: ta bort fokusfällan
-  document.addEventListener('modal:close', function(e){
-    const modal = e.target.closest('#loginModal');
-    if (modal) untrapFocus(modal);
-  });
-})();
-</script>
-
-
-<script>
-// Set --vh to handle mobile 100vh correctly
-(function(){
-  function setVH(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
-  setVH(); window.addEventListener('resize', setVH);
-})();
-</script>
-
-
-<script>
-// Shared modal manager: focus trap, ESC, and body scroll lock for any .modal
-(function(){
-  let __scrollY = 0;
-  function getFocusable(container){
-    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  }
-  function lockBody(){
-    __scrollY = window.scrollY || window.pageYOffset || 0;
-    document.body.classList.add('modal-open');
-    document.body.style.top = `-${__scrollY}px`;
-  }
-  function unlockBody(){
-    document.body.classList.remove('modal-open');
-    const y = __scrollY || 0;
-    document.body.style.top = '';
-    window.scrollTo(0, y);
-  }
-  document.addEventListener('modal:open', function(e){
-    const modal = e.target.closest('.modal');
-    if (!modal) return;
-    lockBody();
-    const nodes = getFocusable(modal);
-    if (nodes.length){
-      const first = nodes[0];
-      const last = nodes[nodes.length-1];
-      function onKey(ev){
-        if (ev.key === 'Escape'){ 
-          modal.style.display = 'none';
-          unlockBody();
-          modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
-        } else if (ev.key === 'Tab'){
-          if (ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
-          else if (!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
-        }
-      }
-      modal.__trapKeyHandler = onKey;
-      modal.addEventListener('keydown', onKey);
-      (modal.querySelector('[autofocus]') || first).focus();
-    }
-  });
-  document.addEventListener('modal:close', function(e){
-    const modal = e.target.closest('.modal');
-    if (!modal) return;
-    if (modal.__trapKeyHandler){
-      modal.removeEventListener('keydown', modal.__trapKeyHandler);
-      modal.__trapKeyHandler = null;
-    }
-    unlockBody();
   });
 })();
 </script>
