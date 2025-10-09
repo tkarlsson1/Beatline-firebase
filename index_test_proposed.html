@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.602_test</title>
+<title>NOTESTREAM v0.603_test</title>
 <style>
   :root {
     --bg: #0b0f12;
@@ -43,23 +43,22 @@
   .card { width: var(--card-w); height: calc(var(--card-w)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
   .card.start { background: #032934; border-color:#0b939c; font-weight:700; }
   .card .year-vert { 
-    transform: rotate(90deg);  /* 180° från tidigare -90° => +90°, första siffra högst upp */
+    transform: rotate(90deg);
     transform-origin:center; 
     font-weight:600; 
-    letter-spacing:.5px; 
-    font-size: calc(var(--card-w) * 0.6);  /* något mindre och mindre bold */
+    letter-spacing:.4px; 
+    font-size: calc(var(--card-w) * 0.58);
     line-height: 1;
     white-space: nowrap;
   }
-  /* Tentative kort — visar var man har släppt (aktivt lag) */
-  .card.tentative { background: #2d2200; border-color: #ffcc00; }
-  /* Tentative kort — opponentens val */
-  .card.tentative.oppo { background: #002233; border-color: #00a0ff; }
+  /* Tentative kort (aktivt lag) */
+  .tentative-active { background: #2d2200; border-color: var(--accent); }
+  /* Tentative kort (opponent) */
+  .tentative-oppo { background: #001f33; border-color: var(--blue); }
 
-  /* Vi tar bort “streck”-känslan: ghost-gap expanderar inte och visar inget dashed-innehåll */
-  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); }
-  .ghost-gap.active { width: 0; } /* ingen visuell expansion */
-  .ghost { display:none; }        /* inget dashed-ghost */
+  /* Gap utan "streck": vi använder gapen som behållare för ev. tentative-card */
+  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); display:flex; align-items:center; justify-content:center; }
+  .ghost-gap.active { width: var(--card-w); }
 
   .dnd-card { width:140px; height:84px; background:#222; border:2px solid #666; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; box-shadow: 0 10px 22px rgba(0,0,0,.35); }
   .dnd-card.dragging { opacity:.85; cursor:grabbing; transform: scale(1.02); }
@@ -77,7 +76,7 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.602</strong></div>
+    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.603</strong></div>
     <div class="legend">
       <span class="dot active"></span> Aktivas val
       <span class="dot oppo"></span> Opponentens val
@@ -146,7 +145,7 @@
 
   // State
   let phase = 'idle'; // listening|locked|prompt|opposition|reveal|resolve
-  let placedSlotIndex = null;     // active team's chosen slot
+  let placedSlotIndex = null;     // active team's tentative slot
   let opponentWants   = false;
   let opponentSlotIndex = null;
   let dragging = false;
@@ -184,31 +183,9 @@
   const other    = (team)=> team==='A' ? 'B' : 'A';
   const teamObj  = (team)=> team==='A' ? teamA : teamB;
 
-  function renderTimeline(container, years, highlightIndex=null, isOppPhase=false){
-    container.innerHTML = '';
-    // Startår-kort
-    container.appendChild(makeCard('Startår', true));
-    const ys = years.slice().sort((a,b)=>a-b);
-    for (let i=0;i<=ys.length;i++){
-      container.appendChild(makeGap(i));
-      // Tentative preview card (visar "lagt här" där man släppte ELLER där man håller)
-      const tentativeIdx = (isOppPhase ? opponentSlotIndex : placedSlotIndex);
-      const hoverIdx     = currentHoverIndex;
-      // Visa persistent marker om användaren redan släppt någonstans
-      if (tentativeIdx !== null && tentativeIdx === i) {
-        container.appendChild(makeCard('?', false, true, isOppPhase));
-      }
-      // Annars visa temporär “flyttmarkör” medan man drar
-      else if (dragging && hoverIdx !== null && hoverIdx === i){
-        container.appendChild(makeCard('?', false, true, isOppPhase));
-      }
-      if (i<ys.length) container.appendChild(makeCard(String(ys[i])));
-    }
-  }
-
-  function makeCard(val, isStart=false, isTentative=false, isOpp=false){
+  function makeCard(val, classes=''){
     const d = document.createElement('div');
-    d.className = 'card' + (isStart ? ' start' : '') + (isTentative ? (' tentative' + (isOpp ? ' oppo' : '')) : '');
+    d.className = 'card ' + classes;
     const lab = document.createElement('div');
     lab.className = 'year-vert';
     lab.textContent = val;
@@ -216,17 +193,49 @@
     return d;
   }
 
-  function makeGap(i){
+  function makeGap(i, activeTentativeIdx, oppTentativeIdx, hoverIdx, inOpposition){
     const g = document.createElement('div');
     g.className = 'ghost-gap';
     g.dataset.slotIndex = i;
+
+    // Determine if gap should be visually active (reserve width)
+    if (i === hoverIdx || i === activeTentativeIdx || (inOpposition && i === oppTentativeIdx)) {
+      g.classList.add('active');
+    }
+
+    // Insert tentative cards *inside* the gap so width is controlled
+    if (activeTentativeIdx !== null && i === activeTentativeIdx) {
+      g.appendChild(makeCard('?', 'tentative-active'));
+    }
+    if (inOpposition && oppTentativeIdx !== null && i === oppTentativeIdx) {
+      // If both tentative occupy same gap, stack vertically (simple)
+      const c = makeCard('?', 'tentative-oppo');
+      c.style.position = (activeTentativeIdx === i) ? 'absolute' : 'static';
+      if (activeTentativeIdx === i) { c.style.transform = 'translateY(8px)'; }
+      g.style.position = 'relative';
+      g.appendChild(c);
+    }
     return g;
+  }
+
+  function renderTimeline(container, years, inOpposition){
+    container.innerHTML = '';
+    // Startår-kort
+    const start = makeCard('Startår', 'start');
+    container.appendChild(start);
+
+    const ys = years.slice().sort((a,b)=>a-b);
+    for (let i=0;i<=ys.length;i++){
+      const gap = makeGap(i, placedSlotIndex, opponentSlotIndex, dragging ? currentHoverIndex : null, inOpposition);
+      container.appendChild(gap);
+      if (i<ys.length) container.appendChild(makeCard(String(ys[i])));
+    }
   }
 
   function renderAll(){
     computeCardLayout(); // ensure sizes fit 10 kort + 1 gap
-    renderTimeline(activeTimeline, yearsFor(activeTeam), null, (phase==='opposition'));
-    renderTimeline(miniTimeline, yearsFor(other(activeTeam)));
+    renderTimeline(activeTimeline, yearsFor(activeTeam), phase==='opposition');
+    renderTimeline(miniTimeline, yearsFor(other(activeTeam)), false);
     activeTeamName.textContent = teamObj(activeTeam).name;
     updateTokens(); updateControls();
   }
@@ -240,17 +249,17 @@
     phaseLabel.textContent   = 'Fas: ' + phase;
   }
 
-  // Layout: fit 10 cards + 11 gaps (så att ett aktivt markeringskort får plats utan overflow)
+  // Layout: fit 10 cards + 11 gaps
   function computeCardLayout(){
     const wrap = activeTimeline.closest('.timeline-wrap');
     if (!wrap) return;
     const w = wrap.clientWidth || window.innerWidth;
-    const padding = 24; // approx panel padding sum
+    const padding = 24; // approx panel padding
     const maxW = 140, minW = 56;
     let bestCard = 96, bestGap = 12;
     for (let cw = maxW; cw >= minW; cw -= 1) {
       const gap = Math.max(8, Math.round(cw * 0.12));
-      const total = 10*cw + 11*gap; // 10 kort + 11 gaps (inkl. plats för markeringskort)
+      const total = 10*cw + 11*gap; // 10 kort + 11 gaps
       if (total <= (w - padding)) { bestCard = cw; bestGap = gap; break; }
     }
     document.documentElement.style.setProperty('--card-w', bestCard + 'px');
@@ -319,6 +328,7 @@
     phase='reveal'; oppDnD.classList.remove('active');
     const actOK = isCorrectSlot(yearsFor(activeTeam), placedSlotIndex, currentTrackYear);
     const oppOK = opponentWants ? isCorrectSlot(yearsFor(activeTeam), opponentSlotIndex, currentTrackYear) : false;
+
     if (actOK){
       commitToTimeline(activeTeam, currentTrackYear);
       hintText.textContent = `Facit: ${currentTrackYear}. Aktiva korrekt (eller lika) – låten stannar.`;
@@ -329,6 +339,11 @@
       commitToTimeline(activeTeam, currentTrackYear);
       hintText.textContent = `Facit: ${currentTrackYear}. Ingen rätt – aktiva vinner tvisten.`;
     }
+
+    // Viktigt: ta bort tentative-markörer efter reveal så gula/blå "gissa-kortet" inte ligger kvar
+    placedSlotIndex = null;
+    opponentSlotIndex = null;
+
     phase='resolve'; updateControls(); renderAll();
   }
 
