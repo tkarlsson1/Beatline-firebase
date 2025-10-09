@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.608_test</title>
+<title>NOTESTREAM v0.609_test</title>
 <style>
   :root {
     --bg: #0b0f12;
@@ -44,6 +44,8 @@
   .tentative.t1 { background: #2d2200; border-color: var(--team1); }
   .tentative.t2 { background: #001f33; border-color: var(--team2); }
   .tentative.t3 { background: #2a0a0e; border-color: var(--team3); }
+  .tentative { cursor: grab; }
+  .tentative:active { cursor: grabbing; }
 
   /* Gaps: base spacing via width; active gap expands to card width */
   .ghost-gap { width: var(--gap); height: calc(var(--card-w)*var(--card-scale)*1.5); display:flex; align-items:center; justify-content:center; position:relative; transition: width .12s ease; flex: 0 0 auto; }
@@ -59,7 +61,7 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge"><strong>PROTOTYP v0.608</strong></div>
+    <div class="badge"><strong>PROTOTYP v0.609</strong></div>
   </div>
 
   <!-- Centered team list with tokens -->
@@ -138,6 +140,9 @@
   let placedSlotIndex = null, opponentTeamIdx = null, opponentSlotIndex = null;
   let dragging = false, currentHoverIndex = null, currentTrackYear = null;
 
+  // Track source of drag: 'palette' | 'activeTent' | 'oppTent'
+  let dragSource = null;
+
   const activeTimeline = $('activeTimeline'), miniTimeline = $('miniTimeline');
   const songCard = $('songCard'), oppPrompt = $('oppPrompt'), oppDnD = $('oppDnD');
   const promptTimerEl = $('promptTimer'), oppTimerEl = $('oppTimer');
@@ -181,16 +186,42 @@
     return d;
   }
 
+  function makeTentativeCard(teamIdx, who){
+    const c = makeCard('?', 'tentative ' + teamColorClass(teamIdx));
+    c.setAttribute('draggable', 'true');
+    c.addEventListener('dragstart', (e)=>{
+      if (gameOver) { e.preventDefault(); return; }
+      // Only allow moving own tentative in valid phases
+      if (who==='active' && phase!=='listening') { e.preventDefault(); return; }
+      if (who==='opponent' && phase!=='opposition') { e.preventDefault(); return; }
+      dragging = true;
+      dragSource = (who==='active') ? 'activeTent' : 'oppTent';
+      if (e.dataTransfer && e.dataTransfer.setDragImage){
+        const img = new Image(); img.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GQAJFQMc6zL2sQAAAABJRU5ErkJggg==';
+        e.dataTransfer.setDragImage(img,0,0);
+      }
+    });
+    c.addEventListener('dragend', ()=>{
+      dragging = false;
+      if (dragSource==='activeTent') { placedSlotIndex = currentHoverIndex; }
+      else if (dragSource==='oppTent') { opponentSlotIndex = currentHoverIndex; }
+      dragSource = null;
+      renderAll();
+    });
+    return c;
+  }
+
   function makeGap(i, showActive, showOpp, hoverIdx){
     const g = document.createElement('div');
     g.className = 'ghost-gap';
     g.dataset.slotIndex = i;
-    // active width expands via CSS class
     if (i === hoverIdx || i === showActive || i === showOpp) g.classList.add('active');
-    // tentative markers
-    if (showActive !== null && i === showActive) g.appendChild(makeCard('?', 'tentative ' + teamColorClass(activeIdx)));
+
+    if (showActive !== null && i === showActive){
+      g.appendChild(makeTentativeCard(activeIdx, 'active'));
+    }
     if (showOpp !== null && i === showOpp){
-      const c = makeCard('?', 'tentative ' + teamColorClass(opponentTeamIdx));
+      const c = makeTentativeCard(opponentTeamIdx, 'opponent');
       if (showActive === showOpp){ c.style.position = 'absolute'; c.style.transform = 'translateY(8px)'; g.style.position = 'relative'; }
       g.appendChild(c);
     }
@@ -286,7 +317,7 @@
     otherIdxs().forEach(i => {
       const b = document.createElement('button');
       b.textContent = `${teams[i].name} (−1)`;
-      if (!hostMode) b.style.display='none'; // in final, players press from own device; here demo for host
+      if (!hostMode) b.style.display='none'; // demo
       b.onclick = ()=> beginOpposition(i);
       if (teams[i].tokens <= 0) { b.disabled = true; b.style.opacity = .5; }
       oppButtons.appendChild(b);
@@ -357,7 +388,10 @@
   // Drag & Drop
   songCard.addEventListener('dragstart', (e)=>{
     if (!(phase==='listening' || phase==='opposition') || gameOver) { e.preventDefault(); return; }
-    dragging=true;
+    // Only allow from palette if there is no tentative yet for that role
+    if (phase==='listening' && placedSlotIndex!==null) { e.preventDefault(); return; }
+    if (phase==='opposition' && opponentSlotIndex!==null) { e.preventDefault(); return; }
+    dragging=true; dragSource='palette';
     if (e.dataTransfer && e.dataTransfer.setDragImage){
       const img = new Image(); img.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GQAJFQMc6zL2sQAAAABJRU5ErkJggg==';
       e.dataTransfer.setDragImage(img,0,0);
@@ -365,8 +399,11 @@
   });
   songCard.addEventListener('dragend', ()=>{
     dragging=false;
-    if (phase==='listening') placedSlotIndex = currentHoverIndex;
-    else if (phase==='opposition') opponentSlotIndex = currentHoverIndex;
+    if (dragSource==='palette'){
+      if (phase==='listening') placedSlotIndex = currentHoverIndex;
+      else if (phase==='opposition') opponentSlotIndex = currentHoverIndex;
+    }
+    dragSource=null;
     renderAll();
   });
   activeTimeline.addEventListener('dragover', (e)=>{
@@ -400,14 +437,14 @@
 
   function mockRandomYear(){ return randInt(1955, 2023); }
 
-  // Wire buttons (BUG FIX: ensure listeners exist)
+  // Wire buttons
   btnNext.addEventListener('click', startRound);
   btnReroll.addEventListener('click', doReroll);
   btnLock.addEventListener('click', lockPlacement);
   btnReveal.addEventListener('click', doReveal);
   btnNextTurn.addEventListener('click', nextTurn);
-  btnOppNo.addEventListener('click', ()=> beginOpposition(null));              // FIX
-  btnOppLock.addEventListener('click', ()=> {                                   // FIX
+  btnOppNo.addEventListener('click', ()=> beginOpposition(null));
+  btnOppLock.addEventListener('click', ()=> {
     if (phase==='opposition' && opponentTeamIdx!==null && opponentSlotIndex!==null) doReveal();
   });
 
