@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.505</title>
+  <title>NOTESTREAM v0.507</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1228,10 +1228,30 @@ function setSafeHTML(el, html){
 }
 </style>
 
+
+<style>
+/* Prevent background scroll when modal is open */
+body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+</style>
+
+
+<style>
+/* Generic login modal content fallback */
+#loginModal > div, #authModal > div, #signinModal > div {
+  background:#111; color:#fff; margin:6vh auto; padding:20px;
+  border:1px solid rgba(255,255,255,.15); border-radius:12px; position:relative;
+  width:min(92vw, 600px); max-width:600px; box-sizing:border-box; max-height:80vh; overflow:auto;
+}
+#loginModal .closeBtn, #authModal .closeBtn, #signinModal .closeBtn {
+  color:#ccc; position:absolute; top:10px; right:20px; font-size:28px; font-weight:bold; cursor:pointer; z-index:5000;
+}
+#loginModal .closeBtn:hover, #authModal .closeBtn:hover, #signinModal .closeBtn:hover { color:#fff; }
+</style>
+
 </head>
 <body>
 <!-- Inloggningsmodal -->
-<div id="loginModal" style="display: none;">
+<div id="loginModal" style="display: none;" class="modal" role="dialog" aria-modal="true" style="display:none; position: fixed; z-index:5000; left:0; top:0; right:0; bottom:0; background: rgba(0,0,0,.6); padding:8px;">
   <div id="loginBox">
     <h2>Logga in</h2>
     <input type="email" id="emailInput" placeholder="Ange e-post" />
