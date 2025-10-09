@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.607_test</title>
+<title>NOTESTREAM v0.608_test</title>
 <style>
   :root {
     --bg: #0b0f12;
     --txt: #fff;
     --card-w: 96px;      /* computed base */
-    --card-scale: 0.56;  /* 80% of previous 0.70 */
-    --gap: 10px;         /* tighter spacing; recomputed in JS */
+    --card-scale: 0.56;  /* size factor */
+    --gap: 10px;         /* base spacing controlled via ghost-gap */
     --team1: #ffcc00;
     --team2: #00a0ff;
     --team3: #ff4d5a;
@@ -36,7 +36,7 @@
   .row { display:flex; justify-content:center; align-items:center; margin-bottom:8px; gap:8px; flex-wrap:wrap; }
 
   .timeline-wrap { overflow:auto; }
-  .timeline { display:flex; align-items:center; gap: var(--gap); padding: 8px; justify-content: center; }
+  .timeline { display:flex; align-items:center; gap: 0; padding: 8px; justify-content: center; } /* gap controlled by ghost-gap only */
   .card { width: calc(var(--card-w)*var(--card-scale)); height: calc(var(--card-w)*var(--card-scale)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
   .card .year-vert { transform: rotate(90deg); transform-origin:center; font-weight:600; letter-spacing:.35px; font-size: calc(var(--card-w)*var(--card-scale) * 0.58); line-height: 1; white-space: nowrap; }
 
@@ -45,8 +45,8 @@
   .tentative.t2 { background: #001f33; border-color: var(--team2); }
   .tentative.t3 { background: #2a0a0e; border-color: var(--team3); }
 
-  /* Gaps: active gap width = card width, else minimal gap */
-  .ghost-gap { width: var(--gap); height: calc(var(--card-w)*var(--card-scale)*1.5); display:flex; align-items:center; justify-content:center; position:relative; transition: width .12s ease; }
+  /* Gaps: base spacing via width; active gap expands to card width */
+  .ghost-gap { width: var(--gap); height: calc(var(--card-w)*var(--card-scale)*1.5); display:flex; align-items:center; justify-content:center; position:relative; transition: width .12s ease; flex: 0 0 auto; }
   .ghost-gap.active { width: calc(var(--card-w)*var(--card-scale)); }
 
   .mini .timeline { transform: scale(.3); transform-origin: center top; justify-content: center; }
@@ -59,7 +59,7 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge"><strong>PROTOTYP v0.607</strong></div>
+    <div class="badge"><strong>PROTOTYP v0.608</strong></div>
   </div>
 
   <!-- Centered team list with tokens -->
@@ -122,7 +122,7 @@
 
 <script>
 (function(){
-  const hostMode = true; // toggle this to false to simulate player view
+  const hostMode = true; // toggle to false to simulate player view
 
   const $ = (id) => document.getElementById(id);
   const MOCK_MIN_YEAR = 1955, MOCK_MAX_YEAR = 2023;
@@ -185,7 +185,9 @@
     const g = document.createElement('div');
     g.className = 'ghost-gap';
     g.dataset.slotIndex = i;
+    // active width expands via CSS class
     if (i === hoverIdx || i === showActive || i === showOpp) g.classList.add('active');
+    // tentative markers
     if (showActive !== null && i === showActive) g.appendChild(makeCard('?', 'tentative ' + teamColorClass(activeIdx)));
     if (showOpp !== null && i === showOpp){
       const c = makeCard('?', 'tentative ' + teamColorClass(opponentTeamIdx));
@@ -223,7 +225,7 @@
     let bestBase = 96, bestGap = 10;
     for (let base = maxBase; base >= minBase; base -= 1) {
       const cw = base * scale;
-      const gap = Math.max(6, Math.round(cw * 0.12)); // tighter default
+      const gap = Math.max(6, Math.round(cw * 0.12));
       const total = 10*cw + 11*gap;
       if (total <= (w - padding)) { bestBase = base; bestGap = gap; break; }
     }
@@ -284,7 +286,7 @@
     otherIdxs().forEach(i => {
       const b = document.createElement('button');
       b.textContent = `${teams[i].name} (−1)`;
-      if (!hostMode) b.style.display='none';
+      if (!hostMode) b.style.display='none'; // in final, players press from own device; here demo for host
       b.onclick = ()=> beginOpposition(i);
       if (teams[i].tokens <= 0) { b.disabled = true; b.style.opacity = .5; }
       oppButtons.appendChild(b);
@@ -398,12 +400,16 @@
 
   function mockRandomYear(){ return randInt(1955, 2023); }
 
-  // Wire buttons
+  // Wire buttons (BUG FIX: ensure listeners exist)
   btnNext.addEventListener('click', startRound);
   btnReroll.addEventListener('click', doReroll);
   btnLock.addEventListener('click', lockPlacement);
   btnReveal.addEventListener('click', doReveal);
   btnNextTurn.addEventListener('click', nextTurn);
+  btnOppNo.addEventListener('click', ()=> beginOpposition(null));              // FIX
+  btnOppLock.addEventListener('click', ()=> {                                   // FIX
+    if (phase==='opposition' && opponentTeamIdx!==null && opponentSlotIndex!==null) doReveal();
+  });
 
   // Init
   window.addEventListener('resize', computeCardLayout);
