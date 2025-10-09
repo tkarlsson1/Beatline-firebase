@@ -17,3 +17,30 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   event.respondWith(fetch(event.request));
 });
+
+
+// --- NOTESTREAM app-shell cache (added v0.509) ---
+const NS_CACHE = 'ns-appshell-v0-509';
+const NS_ASSETS = [
+  '/', '/index.html', '/manifest.json',
+  '/icons/icon-192.png', '/icons/icon-512.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(NS_CACHE).then(cache => cache.addAll(NS_ASSETS)));
+});
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  event.respondWith(
+    caches.match(req).then(cached => {
+      const net = fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(NS_CACHE).then(c => c.put(req, copy));
+        return res;
+      }).catch(() => cached);
+      return cached || net;
+    })
+  );
+});
