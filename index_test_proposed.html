@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.605_test</title>
+<title>NOTESTREAM v0.606_test</title>
 <style>
   :root {
     --bg: #0b0f12;
     --txt: #fff;
-    --card-w: 96px;
+    --card-w: 96px;     /* base width computed to fit 10 + 1 gap */
+    --card-scale: 0.7;  /* 70% of computed width as requested */
     --gap: 12px;
     /* lagfärger */
     --team1: #ffcc00; /* gul */
@@ -19,7 +20,8 @@
   #app { padding: 14px; display:flex; flex-direction:column; gap:14px; }
   .topbar { display:flex; justify-content:space-between; gap:10px; align-items:center; }
   .badge { background: rgba(0,0,0,.5); padding:.45rem .7rem; border:1px solid rgba(255,255,255,.2); border-radius:999px; }
-  .legend { display:flex; gap:12px; align-items:center; opacity:.9; }
+
+  .legend { display:flex; gap:12px; align-items:center; opacity:.9; flex-wrap:wrap; }
   .legend .chip { display:flex; align-items:center; gap:6px; padding:.2rem .5rem; border:1px solid rgba(255,255,255,.2); border-radius:999px; background:rgba(255,255,255,.05); }
   .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
   .dot.t1 { background: var(--team1); }
@@ -33,20 +35,20 @@
   .stage { display:flex; flex-direction:column; gap:12px; }
   .panel { background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px; }
 
-  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px; }
+  .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px; flex-wrap:wrap; }
   .prompt { display:none; gap:8px; align-items:center; flex-wrap:wrap; }
   .prompt.active { display:flex; }
   .timer { font-variant-numeric: tabular-nums; }
 
   .timeline-wrap { overflow:auto; }
-  .timeline { display:flex; align-items:center; gap: var(--gap); padding: 8px; }
-  .card { width: var(--card-w); height: calc(var(--card-w)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
+  .timeline { display:flex; align-items:center; gap: var(--gap); padding: 8px; justify-content: center; } /* center the flow */
+  .card { width: calc(var(--card-w)*var(--card-scale)); height: calc(var(--card-w)*var(--card-scale)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
   .card .year-vert { 
     transform: rotate(90deg);
     transform-origin:center; 
     font-weight:600; 
     letter-spacing:.4px; 
-    font-size: calc(var(--card-w) * 0.58);
+    font-size: calc(var(--card-w)*var(--card-scale) * 0.58);
     line-height: 1; white-space: nowrap;
   }
   /* Tentative-kort i gapen (per lagfärg) */
@@ -54,18 +56,30 @@
   .tentative.t2 { background: #001f33; border-color: var(--team2); }
   .tentative.t3 { background: #2a0a0e; border-color: var(--team3); }
 
-  /* Gap container: vi visar bara bredd när hover/markerad */
-  .ghost-gap { width:0; height: calc(var(--card-w)*1.5); display:flex; align-items:center; justify-content:center; position:relative; }
-  .ghost-gap.active { width: var(--card-w); }
+  /* Gap container: visar bredd när hover/markerad eller när det finns tentative */
+  .ghost-gap { width:0; height: calc(var(--card-w)*var(--card-scale)*1.5); display:flex; align-items:center; justify-content:center; position:relative; }
+  .ghost-gap.active { width: calc(var(--card-w)*var(--card-scale)); }
+
+  /* Drag handle token */
+  .dnd-palette { display:flex; gap:12px; align-items:center; justify-content:center; }
+  .drag-token { 
+    display:flex; align-items:center; gap:12px;
+    padding:12px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.06); box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    cursor: grab; user-select:none;
+  }
+  .drag-token:active { cursor: grabbing; }
+  .drag-emoji { font-size: 28px; }
+  .drag-label { font-weight: 600; opacity: .9; }
 
   .mini .timeline { transform: scale(.3); transform-origin: left top; }
-  .mini { height: calc((var(--card-w)*1.5) * .3 + 24px); overflow:hidden; }
+  .mini { height: calc((var(--card-w)*var(--card-scale)*1.5) * .3 + 24px); overflow:hidden; }
 </style>
 </head>
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge">Testläge – <strong>PROTOTYP v0.605</strong></div>
+    <div class="badge">Testläge – <strong>PROTOTYP v0.606</strong></div>
     <div class="legend">
       <span class="chip"><span class="dot t1"></span>Lag 1</span>
       <span class="chip"><span class="dot t2"></span>Lag 2</span>
@@ -105,8 +119,11 @@
       </div>
 
       <div class="dnd-palette" id="palette">
-        <div id="songCard" class="dnd-card" draggable="true">🎵 Låt-kort</div>
-        <span id="hintText" class="hint">Dra kortet till rätt mellanrum</span>
+        <div id="songCard" class="drag-token" draggable="true" aria-label="Dra här för att lägga kort">
+          <span class="drag-emoji">🎵</span>
+          <span class="drag-label">Dra härifrån för att lägga kort</span>
+        </div>
+        <span id="hintText" class="hint">Dra till en lucka i tidslinjen</span>
       </div>
     </div>
 
@@ -123,31 +140,27 @@
 (function(){
   const $ = (id) => document.getElementById(id);
 
-  // === Mock konfig för startår (ersätts senare av poolens min/max) ===
   const MOCK_MIN_YEAR = 1955;
   const MOCK_MAX_YEAR = 2023;
   const randInt = (a,b)=> a + Math.floor(Math.random()*(b-a+1));
 
-  // === Tre lag med färger ===
   const teams = [
     { id:1, name:'Lag 1', color:'var(--team1)', tokens:4, years:[] },
     { id:2, name:'Lag 2', color:'var(--team2)', tokens:4, years:[] },
     { id:3, name:'Lag 3', color:'var(--team3)', tokens:4, years:[] },
   ];
-  let activeIdx = 0; // roterar 0->1->2->0...
+  let activeIdx = 0;
   let startYear = null;
   let gameOver = false;
 
-  // === State ===
   let phase = 'idle'; // listening|locked|prompt|opposition|reveal|resolve|gameover
-  let placedSlotIndex = null;        // aktivas tentativ
-  let opponentTeamIdx = null;        // vilket lag (index) opponerar
-  let opponentSlotIndex = null;      // opponen­tens tentativ
+  let placedSlotIndex = null;
+  let opponentTeamIdx = null;
+  let opponentSlotIndex = null;
   let dragging = false;
   let currentHoverIndex = null;
   let currentTrackYear = null;
 
-  // === DOM ===
   const activeTimeline = $('activeTimeline');
   const miniTimeline   = $('miniTimeline');
   const songCard       = $('songCard');
@@ -169,7 +182,6 @@
   const btnOppNo       = $('btnOppNo');
   const btnOppLock     = $('btnOppLock');
 
-  // === Events ===
   btnNext.addEventListener('click', startRound);
   btnReroll.addEventListener('click', doReroll);
   btnLock.addEventListener('click', lockPlacement);
@@ -180,13 +192,11 @@
   window.addEventListener('resize', computeCardLayout);
   window.addEventListener('orientationchange', computeCardLayout);
 
-  // === Helpers ===
   const otherIdxs = ()=> teams.map((_,i)=>i).filter(i => i!==activeIdx);
   const yearsFor  = (idx)=> teams[idx].years.slice().sort((a,b)=>a-b);
   const nextIdx   = (i)=> (i+1) % teams.length;
 
   function teamColorClass(idx){ return idx===0?'t1': idx===1?'t2':'t3'; }
-  function teamColorValue(idx){ return getComputedStyle(document.documentElement).getPropertyValue(idx===0?'--team1':idx===1?'--team2':'--team3'); }
 
   function makeCard(val, classes=''){
     const d = document.createElement('div');
@@ -219,11 +229,8 @@
 
   function renderTimeline(container, years, inOpposition){
     container.innerHTML = '';
-
-    // Bygg ordning: sorterat inkl. startYear i korrekt position (som ett vanligt kort)
     const ys = years.slice().sort((a,b)=>a-b);
     const ordered = insertSorted(ys, startYear);
-
     for (let i=0;i<=ordered.length;i++){
       const g = makeGap(i, placedSlotIndex, inOpposition ? opponentSlotIndex : null, dragging ? currentHoverIndex : null);
       container.appendChild(g);
@@ -245,21 +252,15 @@
   function renderAll(){
     computeCardLayout();
     renderTimeline(activeTimeline, yearsFor(activeIdx), phase==='opposition');
-    // mini visar nästa lags tidslinje
     renderTimeline(miniTimeline, yearsFor(nextIdx(activeIdx)), false);
     activeTeamName.textContent = teams[activeIdx].name;
     startBadge.textContent = startYear ? ('Startår: ' + startYear) : '';
 
-    // Opponera-knappar
     oppButtons.innerHTML = '';
     otherIdxs().forEach(i => {
       const b = document.createElement('button');
       b.textContent = `${teams[i].name} (−1)`;
-      b.style.borderColor = 'rgba(255,255,255,.2)';
-      b.style.background = 'rgba(255,255,255,.06)';
-      b.style.color = '#fff';
       b.onclick = ()=> beginOpposition(i);
-      // disable if no tokens
       if (teams[i].tokens <= 0) { b.disabled = true; b.style.opacity = .5; }
       oppButtons.appendChild(b);
     });
@@ -298,8 +299,8 @@
     if (startYear === null){ startYear = randInt(MOCK_MIN_YEAR, MOCK_MAX_YEAR); }
     phase='listening'; placedSlotIndex=null; opponentTeamIdx=null; opponentSlotIndex=null;
     currentHoverIndex=null; currentTrackYear = mockRandomYear();
-    hintText.textContent='Dra kortet till rätt mellanrum';
-    showCard(true);
+    hintText.textContent='Dra kortet till en lucka';
+    // VISA start direkt: rendera innan något drag skett
     oppPrompt.classList.remove('active'); oppDnD.classList.remove('active');
     renderAll();
   }
@@ -315,7 +316,6 @@
     phase='locked'; renderAll(); startPromptCountdown();
   }
 
-  // 5s prompt (auto reveal om ingen opponerar)
   let promptTimer=null, promptRemaining=0;
   function startPromptCountdown(){
     promptRemaining=5; oppPrompt.classList.add('active'); promptTimerEl.textContent=` ${promptRemaining}s`;
@@ -326,16 +326,12 @@
     },1000);
   }
 
-  // yesTeamIdx: index för laget som opponerar, eller null om ingen
   function beginOpposition(yesTeamIdx){
     oppPrompt.classList.remove('active'); clearInterval(promptTimer);
     if (yesTeamIdx===null){
-      // Ingen opponerar -> direkt reveal
       phase='prompt'; doReveal(); return;
     }
-    // Kolla tokens
     if (teams[yesTeamIdx].tokens <= 0){
-      // om saknar tokens: behandla som ingen opponerar
       phase='prompt'; doReveal(); return;
     }
     teams[yesTeamIdx].tokens--;
@@ -348,7 +344,6 @@
     updateTokensAndControls(); renderAll();
   }
 
-  // 30s för oppositionsdrag
   let oppTimer=null, oppRemaining=0;
   function startOppCountdown(){
     oppRemaining=30; oppTimerEl.textContent=` ${oppRemaining}s`;
@@ -367,9 +362,6 @@
     const actOK = isCorrectSlotAgainstOrdered(ordered, placedSlotIndex, currentTrackYear);
     const oppOK = (opponentTeamIdx!==null) ? isCorrectSlotAgainstOrdered(ordered, opponentSlotIndex, currentTrackYear) : false;
 
-    // Ny logik:
-    // - Aktiva rätt => aktiva får kortet (alltid)
-    // - Aktiva fel  => aktiva får ALDRIG kortet; om opponent är rätt => opponent får kortet; annars discard
     if (actOK){
       commitToTimeline(activeIdx, currentTrackYear);
       hintText.textContent = `Facit: ${currentTrackYear}. ${teams[activeIdx].name} korrekt – behåller.`;
@@ -380,21 +372,21 @@
       hintText.textContent = `Facit: ${currentTrackYear}. Inget lag får kortet.`;
     }
 
-    // Rensa markörer
     placedSlotIndex = null;
     opponentSlotIndex = null;
     opponentTeamIdx = null;
 
-    // Vinstkontroll
     if (teams[activeIdx].years.length >= 11){
       phase='gameover'; gameOver=true;
       alert(`${teams[activeIdx].name} når 11! Spelet är slut.`);
-    } else if (teams.some(t => t.years.length >= 11)){
-      const winner = teams.find(t => t.years.length >= 11);
-      phase='gameover'; gameOver=true;
-      alert(`${winner.name} når 11! Spelet är slut.`);
     } else {
-      phase='resolve';
+      const winner = teams.find(t => t.years.length >= 11);
+      if (winner){
+        phase='gameover'; gameOver=true;
+        alert(`${winner.name} når 11! Spelet är slut.`);
+      } else {
+        phase='resolve';
+      }
     }
 
     updateTokensAndControls(); renderAll();
@@ -409,15 +401,16 @@
 
   function commitToTimeline(teamIdx, year){
     const t = teams[teamIdx];
-    if (t.years.length >= 11) return; // säkerhetsnät
+    if (t.years.length >= 11) return;
     t.years.push(year); t.years.sort((a,b)=>a-b);
   }
 
-  // DnD
+  // DnD från drag-token (hela ytan är "handtag")
   songCard.addEventListener('dragstart', (e)=>{
     if (!(phase==='listening' || phase==='opposition') || gameOver) { e.preventDefault(); return; }
     dragging=true; songCard.classList.add('dragging');
     if (e.dataTransfer && e.dataTransfer.setDragImage){
+      // transparent drag image (vi markerar på gap i stället)
       const img = new Image(); img.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GQAJFQMc6zL2sQAAAABJRU5ErkJggg==';
       e.dataTransfer.setDragImage(img,0,0);
     }
@@ -462,7 +455,7 @@
 
   // Init
   computeCardLayout();
-  startRound();
+  startRound(); // startar direkt så Start-kortet syns omgående
 })();
 </script>
 </body>
