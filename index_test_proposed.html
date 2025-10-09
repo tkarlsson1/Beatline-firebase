@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.600_experiment</title>
+  <title>NOTESTREAM v0.600_test</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1164,6 +1164,18 @@ document.getElementById("addPlaylistButton").addEventListener("click", async () 
         dropdownMenu.style.display = "none";
       });
       dropdownMenu.appendChild(managePlaylistsLink);
+const testDnDLink = document.createElement("a");
+testDnDLink.href = "#";
+testDnDLink.textContent = "Testläge (DnD)";
+testDnDLink.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.getElementById("filter-page").style.display = "none";
+  document.getElementById("result-page").style.display = "none";
+  const t = document.getElementById("timelineTest");
+  if (t) t.style.display = "block";
+  dropdownMenu.style.display = "none";
+});
+dropdownMenu.appendChild(testDnDLink);
 const logoutLink = document.createElement("a");
       logoutLink.href = "#";
       logoutLink.textContent = "Logga ut";
@@ -1339,75 +1351,8 @@ body { -ms-overflow-style: none; }                   /* Legacy Edge/IE */
 body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 </style>
 
-
-<style>
-/* === Experimental theme (scoped to body.exp) === */
-
-/* Layout container for tablet/desktop */
-body.exp #mainContent {
-  width: 100%;
-  max-width: clamp(720px, 88vw, 980px);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-/* Logo sizing: modest on large screens, unchanged on mobile */
-@media (min-width: 1024px) {
-  body.exp img.logo { max-width: 360px; height: auto; }
-}
-
-/* Pills: wrap nicely, limit line length on wide screens */
-body.exp #source-checkbox-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 12px;
-  max-width: 760px;
-}
-body.exp .checkbox-pill {
-  padding: 8px 12px;
-  border-radius: 999px;
-  line-height: 1.2;
-}
-
-/* Inputs: comfortable width; full on mobile */
-body.exp #playlistLinkInput,
-body.exp #playlistNameInput {
-  width: 100%;
-  max-width: 540px;
-}
-
-/* Divider: subtle and consistent */
-body.exp .section-divider,
-body.exp #standard-vs-egna-divider {
-  border-top: 0.5px solid rgba(255,255,255,.25);
-  margin: 14px 0;
-}
-
-/* Hamburger dropdown: ensure readable min-width */
-body.exp #dropdownMenu { min-width: 260px; }
-body.exp #dropdownMenu a {
-  white-space: normal;
-  line-height: 1.35;
-}
-
-/* Cards/blocks (gentle elevation) */
-body.exp .card, body.exp .panel, body.exp .section {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-}
-
-/* Modal polish remains; inherit from current styles */
-
-/* Guard: avoid horizontal overflow in experiment */
-body.exp html, body.exp body { overflow-x: hidden; }
-body.exp #app, body.exp main, body.exp .screen, body.exp .viewport, body.exp .container { max-width: 100%; }
-</style>
-
 </head>
-<body class="exp">
+<body>
 <!-- Inloggningsmodal -->
 <div id="loginModal" style="display: none;" class="modal" role="dialog" aria-modal="true" style="display:none; position: fixed; z-index:5000; left:0; top:0; right:0; bottom:0; background: rgba(0,0,0,.6); padding:8px;">
   <div id="loginBox">
@@ -1835,7 +1780,21 @@ body.exp #app, body.exp main, body.exp .screen, body.exp .viewport, body.exp .co
       window.openManagePlaylists();
     });
     list.appendChild(item);
+  const item2 = document.createElement('button');
+  item2.type = 'button';
+  item2.textContent = 'Testläge (DnD)';
+  item2.style.width = '100%'; item2.style.textAlign = 'left'; item2.style.padding = '.55rem .7rem';
+  item2.style.border = 'none'; item2.style.background = 'transparent'; item2.style.color = '#fff'; item2.style.cursor = 'pointer';
+  item2.addEventListener('mouseenter', () => { item2.style.background = 'rgba(255,255,255,.08)'; });
+  item2.addEventListener('mouseleave', () => { item2.style.background = 'transparent'; });
+  item2.addEventListener('click', () => {
+    const dd = document.getElementById('menuDropdown'); if (dd) dd.style.display = 'none';
+    document.getElementById('filter-page').style.display = 'none';
+    document.getElementById('result-page').style.display = 'none';
+    const t = document.getElementById('timelineTest'); if (t) t.style.display = 'block';
   });
+  list.appendChild(item2);
+});
 })();
 </script>
 
@@ -1949,6 +1908,453 @@ body.exp #app, body.exp main, body.exp .screen, body.exp .viewport, body.exp .co
     }
     unlockBody();
   });
+})();
+</script>
+
+
+<style>
+/* === DnD Timeline Test === */
+#timelineTest { display:none; color:#fff; }
+#timelineTest .topbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:12px; }
+#timelineTest .topbar .badge { background: rgba(0,0,0,.5); padding:.5rem .75rem; border-radius:999px; border:1px solid rgba(255,255,255,.2); }
+#timelineTest .stage { display:flex; flex-direction:column; gap:16px; }
+
+/* Active timeline (large) */
+.timeline-container { position:relative; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:12px; overflow:auto; }
+.timeline { display:flex; align-items:center; gap:12px; min-width: 620px; padding:8px; }
+.card { background:#111; border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:.6rem .8rem; min-width:84px; text-align:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); }
+.card.start { background: #032934; border-color:#0b939c; font-weight:700; }
+.slot { width:48px; height:64px; border:2px dashed rgba(255,255,255,.25); border-radius:8px; display:flex; align-items:center; justify-content:center; opacity:.7; transition: all .12s ease; }
+.slot.active { transform: scale(1.08); border-color:#ffcc00; background: rgba(255,204,0,.12); opacity:1; }
+.slot.placed-by-active { background: rgba(255,204,0,.2); border-color:#ffcc00; }
+.slot.placed-by-opponent { background: rgba(0,160,255,.15); border-color:#00a0ff; }
+
+/* Draggable song card */
+.dnd-card { width:140px; height:84px; background:#222; border:2px solid #666; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; box-shadow: 0 10px 22px rgba(0,0,0,.35); }
+.dnd-card.dragging { opacity:.85; cursor:grabbing; transform: scale(1.02); }
+.dnd-palette { display:flex; gap:12px; align-items:center; }
+
+.controls { display:flex; gap:10px; flex-wrap:wrap; }
+.controls button { padding:.55rem .9rem; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:rgba(0,0,0,.5); color:#fff; cursor:pointer; }
+.controls button:hover { background: rgba(255,255,255,.08); }
+
+/* Oppose prompt */
+.prompt { display:none; gap:8px; align-items:center; }
+.prompt.active { display:flex; }
+.timer { font-variant-numeric: tabular-nums; }
+.legend { display:flex; gap:10px; align-items:center; opacity:.9; }
+.legend .dot { width:12px; height:12px; border-radius:999px; display:inline-block; }
+.dot.active { background:#ffcc00; }
+.dot.oppo { background:#00a0ff; }
+.dot.placed { background:#ccc; }
+
+/* Mini timeline */
+.mini { opacity:.95; }
+.mini .timeline { min-width:420px; gap:10px; }
+.mini .card { min-width:64px; padding:.4rem .6rem; }
+.mini .slot { width:28px; height:44px; }
+
+/* Host token controls */
+.token-panel { display:flex; gap:8px; align-items:center; }
+.token-panel .pill { padding:.3rem .6rem; border-radius:999px; border:1px solid rgba(255,255,255,.25); }
+
+@media (orientation: portrait) {
+  #timelineTest .hint { text-align:center; color:#fff; opacity:.8; }
+}
+</style>
+
+<div id="timelineTest" class="container">
+  <div class="topbar">
+    <div class="badge">Testläge (DnD) – <strong>PROTOTYP</strong></div>
+    <div class="legend">
+      <span class="dot active"></span> Aktivas låsta &nbsp;
+      <span class="dot oppo"></span> Opponents förslag &nbsp;
+      <span class="dot placed"></span> Placerade
+    </div>
+    <div class="token-panel">
+      <span>Tokens A: <span id="tokA" class="pill">4</span></span>
+      <button id="tokAplus">+1</button>
+      <span style="margin-left:8px;">Tokens B: <span id="tokB" class="pill">4</span></span>
+      <button id="tokBplus">+1</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="controls">
+      <button id="btnNext">Nästa låt</button>
+      <button id="btnReroll">Byt låt (−1 token)</button>
+      <button id="btnLock" disabled>Lås in</button>
+      <button id="btnReveal" disabled>Reveal</button>
+      <button id="btnNextTurn" disabled>Nästa tur</button>
+      <span id="phaseLabel" class="badge"></span>
+    </div>
+
+    <div class="timeline-container" id="activeWrap">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <strong>Aktivt lag: <span id="activeTeamName">Team A</span></strong>
+        <div class="prompt" id="oppPrompt">
+          <span>Opponera?</span>
+          <button id="btnOppYes">Ja (−1)</button>
+          <button id="btnOppNo">Nej</button>
+          <span class="timer" id="promptTimer"></span>
+        </div>
+        <div class="prompt" id="oppDnD">
+          <span>Opposition DnD</span>
+          <span class="timer" id="oppTimer"></span>
+        </div>
+      </div>
+      <div class="timeline" id="activeTimeline"></div>
+      <div class="dnd-palette" id="palette">
+        <div id="songCard" class="dnd-card" draggable="true">🎵 Låt-kort</div>
+        <span id="hintText" class="hint">Dra kortet till rätt mellanrum</span>
+      </div>
+    </div>
+
+    <div class="timeline-container mini">
+      <strong>Min tidslinje (Team B – mini)</strong>
+      <div class="timeline" id="miniTimeline"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === DnD Timeline Prototype ===
+// Simple two-team mock: Team A active, Team B can oppose.
+// Unlimited rerolls (cost 1 token). Host can grant tokens via + buttons.
+// Deterministic mock years for reveal.
+
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  // Teams & tokens
+  let teamA = { name:'Team A', tokens:4, years:[1978, 1984, 1992, 2001] }; // active start
+  let teamB = { name:'Team B', tokens:4, years:[1969, 1988] };
+
+  let activeTeam = 'A'; // A or B
+  let phase = 'idle';   // listening|locked|prompt|opposition|reveal|resolve
+  let placedSlotIndex = null;     // active team's chosen slot index
+  let opponentWants = false;
+  let opponentSlotIndex = null;
+  let dragging = false;
+  let dragEl = null;
+
+  // Mock track year (reveal)
+  let currentTrackYear = null;
+
+  // DOM refs
+  const activeTimeline = $('activeTimeline');
+  const miniTimeline   = $('miniTimeline');
+  const palette        = $('palette');
+  const songCard       = $('songCard');
+  const phaseLabel     = $('phaseLabel');
+  const oppPrompt      = $('oppPrompt');
+  const oppDnD         = $('oppDnD');
+  const promptTimerEl  = $('promptTimer');
+  const oppTimerEl     = $('oppTimer');
+  const activeTeamName = $('activeTeamName');
+  const hintText       = $('hintText');
+
+  // Controls
+  $('btnNext').addEventListener('click', startRound);
+  $('btnReroll').addEventListener('click', doReroll);
+  $('btnLock').addEventListener('click', lockPlacement);
+  $('btnReveal').addEventListener('click', doReveal);
+  $('btnNextTurn').addEventListener('click', nextTurn);
+
+  $('btnOppYes').addEventListener('click', () => beginOpposition(true));
+  $('btnOppNo').addEventListener('click', () => beginOpposition(false));
+
+  $('tokAplus').addEventListener('click', ()=> { teamA.tokens++; updateTokens(); });
+  $('tokBplus').addEventListener('click', ()=> { teamB.tokens++; updateTokens(); });
+
+  // Render helper
+  function yearsFor(team){ return (team === 'A' ? teamA.years : teamB.years).slice().sort((a,b)=>a-b); }
+  function other(team){ return team === 'A' ? 'B' : 'A'; }
+  function teamObj(team){ return team === 'A' ? teamA : teamB; }
+
+  function renderTimeline(container, years, highlightSlot = null, placedBy = null){
+    container.innerHTML = '';
+    // Start card
+    const startCard = document.createElement('div');
+    startCard.className = 'card start';
+    startCard.textContent = 'Startår';
+    container.appendChild(startCard);
+
+    // Build slots N+1 around N years
+    const ys = years.slice().sort((a,b)=>a-b);
+    const makeCard = (y) => {
+      const c = document.createElement('div');
+      c.className = 'card placed';
+      c.textContent = y;
+      return c;
+    };
+    const makeSlot = (i) => {
+      const s = document.createElement('div');
+      s.className = 'slot';
+      s.dataset.slotIndex = i;
+      if (highlightSlot === i) s.classList.add('active');
+      if (placedBy === 'active' && placedSlotIndex === i) s.classList.add('placed-by-active');
+      if (placedBy === 'oppo'   && opponentSlotIndex === i) s.classList.add('placed-by-opponent');
+      return s;
+    };
+
+    for (let i=0;i<=ys.length;i++){
+      container.appendChild(makeSlot(i));
+      if (i < ys.length){
+        container.appendChild(makeCard(ys[i]));
+      }
+    }
+  }
+
+  function renderAll(){
+    const actYears = yearsFor(activeTeam);
+    renderTimeline(activeTimeline, actYears, dragging ? currentHoverSlotIndex : null, (phase==='locked'||phase==='prompt'||phase==='opposition'||phase==='reveal'||phase==='resolve') ? 'active' : null);
+    const myMini = yearsFor(other(activeTeam));
+    renderTimeline(miniTimeline, myMini);
+    activeTeamName.textContent = teamObj(activeTeam).name;
+    updateTokens();
+    updateControls();
+  }
+
+  function updateTokens(){
+    $('tokA').textContent = teamA.tokens;
+    $('tokB').textContent = teamB.tokens;
+  }
+
+  function updateControls(){
+    $('btnLock').disabled   = (placedSlotIndex === null || phase!=='listening');
+    $('btnReveal').disabled = (phase!=='prompt' && phase!=='opposition' && phase!=='locked');
+    $('btnNextTurn').disabled = (phase!=='resolve');
+    $('btnReroll').disabled = (phase!=='listening' || teamObj(activeTeam).tokens<=0);
+    phaseLabel.textContent = 'Fas: ' + phase;
+  }
+
+  // --- Round flow ---
+  function startRound(){
+    phase = 'listening';
+    placedSlotIndex = null;
+    opponentWants = false;
+    opponentSlotIndex = null;
+    currentTrackYear = mockRandomYear();
+    hintText.textContent = 'Dra kortet till rätt mellanrum';
+    showCard(true);
+    oppPrompt.classList.remove('active');
+    oppDnD.classList.remove('active');
+    renderAll();
+  }
+
+  function doReroll(){
+    const t = teamObj(activeTeam);
+    if (t.tokens <= 0) return;
+    t.tokens--;
+    currentTrackYear = mockRandomYear();
+    hintText.textContent = 'Ny låt dragen (−1 token). Dra igen.';
+    updateTokens();
+  }
+
+  function lockPlacement(){
+    if (placedSlotIndex === null) return;
+    phase = 'locked';
+    renderAll();
+    startPromptCountdown();
+  }
+
+  // 5s prompt
+  let promptTimer = null, promptRemaining = 0;
+  function startPromptCountdown(){
+    promptRemaining = 5;
+    oppPrompt.classList.add('active');
+    promptTimerEl.textContent = ` ${promptRemaining}s`;
+    promptTimer && clearInterval(promptTimer);
+    promptTimer = setInterval(()=>{
+      promptRemaining--;
+      promptTimerEl.textContent = ` ${promptRemaining}s`;
+      if (promptRemaining<=0){
+        clearInterval(promptTimer);
+        beginOpposition(false);
+      }
+    }, 1000);
+  }
+
+  function beginOpposition(yes){
+    oppPrompt.classList.remove('active');
+    if (promptTimer) clearInterval(promptTimer);
+    if (yes){
+      const oppTeam = other(activeTeam);
+      if (teamObj(oppTeam).tokens <= 0){
+        opponentWants = false;
+        phase = 'prompt';
+        $('btnReveal').disabled = false;
+        updateControls();
+        return;
+      }
+      teamObj(oppTeam).tokens--; // draw token immediately
+      opponentWants = true;
+      phase = 'opposition';
+      startOppCountdown();
+      oppDnD.classList.add('active');
+      hintText.textContent = 'Motståndare: dra din markör (blå) till vald slot';
+    } else {
+      opponentWants = false;
+      phase = 'prompt';
+    }
+    updateTokens();
+    updateControls();
+  }
+
+  // 30s opposition
+  let oppTimer = null, oppRemaining = 0;
+  function startOppCountdown(){
+    oppRemaining = 30;
+    oppTimerEl.textContent = ` ${oppRemaining}s`;
+    oppTimer && clearInterval(oppTimer);
+    oppTimer = setInterval(()=>{
+      oppRemaining--;
+      oppTimerEl.textContent = ` ${oppRemaining}s`;
+      if (oppRemaining<=0){
+        clearInterval(oppTimer);
+        doReveal();
+      }
+    }, 1000);
+  }
+
+  function doReveal(){
+    phase = 'reveal';
+    oppDnD.classList.remove('active');
+    const actOK = isCorrectSlot(yearsFor(activeTeam), placedSlotIndex, currentTrackYear);
+    const oppOK = opponentWants ? isCorrectSlot(yearsFor(activeTeam), opponentSlotIndex, currentTrackYear) : false;
+
+    if (actOK){
+      commitToTimeline(activeTeam, currentTrackYear);
+      hintText.textContent = `Facit: ${currentTrackYear}. Aktiva korrekt (eller lika) – låten stannar.`;
+    } else if (opponentWants && oppOK){
+      commitToTimeline(other(activeTeam), currentTrackYear);
+      hintText.textContent = `Facit: ${currentTrackYear}. Opponent korrekt – tar låten.`;
+    } else {
+      commitToTimeline(activeTeam, currentTrackYear);
+      hintText.textContent = `Facit: ${currentTrackYear}. Ingen rätt – aktiva vinner tvisten.`;
+    }
+
+    phase = 'resolve';
+    updateControls();
+    renderAll();
+  }
+
+  function nextTurn(){
+    if (teamA.years.length >= 11){ alert('Team A når 11! Slut.'); return; }
+    if (teamB.years.length >= 11){ alert('Team B når 11! Slut.'); return; }
+    activeTeam = other(activeTeam);
+    startRound();
+  }
+
+  function commitToTimeline(team, year){
+    const t = teamObj(team);
+    t.years.push(year);
+    t.years.sort((a,b)=>a-b);
+  }
+
+  // --- DnD mechanics ---
+  let currentHoverSlotIndex = null;
+
+  function showCard(v){
+    songCard.style.display = v ? 'flex' : 'none';
+    if (v){
+      songCard.classList.remove('dragging');
+      placedSlotIndex = null;
+      currentHoverSlotIndex = null;
+    }
+    updateControls();
+  }
+
+  function nearestSlotIndex(x){
+    const slots = activeTimeline.querySelectorAll('.slot');
+    let best = null, bestDist = Infinity, idx = -1, j=0;
+    slots.forEach(s => {
+      const rect = s.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const dist = Math.abs(x - cx);
+      if (dist < bestDist){
+        bestDist = dist; best = s; idx = j;
+      }
+      j++;
+    });
+    return { idx, el: best };
+  }
+
+  function setActiveSlot(i){
+    currentHoverSlotIndex = i;
+    renderAll();
+  }
+
+  // Mouse
+  songCard.addEventListener('dragstart', (e)=>{
+    if (phase !== 'listening' && phase !== 'opposition') { e.preventDefault(); return; }
+    dragging = true;
+    songCard.classList.add('dragging');
+    if (e.dataTransfer && e.dataTransfer.setDragImage){
+      const img = new Image(); img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GQAJFQMc6zL2sQAAAABJRU5ErkJggg==';
+      e.dataTransfer.setDragImage(img, 0, 0);
+    }
+  });
+  songCard.addEventListener('dragend', ()=>{
+    dragging = false;
+    songCard.classList.remove('dragging');
+    if (phase === 'listening'){
+      placedSlotIndex = currentHoverSlotIndex;
+    } else if (phase === 'opposition'){
+      opponentSlotIndex = currentHoverSlotIndex;
+    }
+    updateControls();
+    renderAll();
+  });
+
+  activeTimeline.addEventListener('dragover', (e)=>{
+    if (!dragging) return;
+    e.preventDefault();
+    const x = e.clientX;
+    const { idx } = nearestSlotIndex(x);
+    if (idx !== -1) setActiveSlot(idx);
+  });
+
+  // Touch fallback
+  function attachTouchDrag(el){
+    let down = false;
+    el.addEventListener('touchstart', (e)=>{
+      if (phase !== 'listening' && phase !== 'opposition') return;
+      down = true; dragging = true; el.classList.add('dragging');
+    }, {passive:true});
+    el.addEventListener('touchmove', (e)=>{
+      if (!down) return;
+      const t = e.touches[0];
+      const x = t.clientX;
+      const { idx } = nearestSlotIndex(x);
+      if (idx !== -1) setActiveSlot(idx);
+    }, {passive:true});
+    el.addEventListener('touchend', ()=>{
+      if (!down) return;
+      down = false; dragging = false; el.classList.remove('dragging');
+      if (phase === 'listening') placedSlotIndex = currentHoverSlotIndex;
+      else if (phase === 'opposition') opponentSlotIndex = currentHoverSlotIndex;
+      updateControls();
+      renderAll();
+    }, {passive:true});
+  }
+  attachTouchDrag(songCard);
+
+  function isCorrectSlot(sortedYears, slotIndex, Y){
+    if (slotIndex === null || slotIndex === undefined) return false;
+    if (sortedYears.length === 0){ return true; } // demo: accept any vs startår-only
+    if (slotIndex === 0) return Y <= sortedYears[0];
+    if (slotIndex === sortedYears.length) return Y >= sortedYears[sortedYears.length-1];
+    const left = sortedYears[slotIndex-1], right = sortedYears[slotIndex];
+    return (left <= Y && Y <= right);
+  }
+
+  function mockRandomYear(){
+    return 1960 + Math.floor(Math.random()*61);
+  }
+
+  renderAll();
 })();
 </script>
 
