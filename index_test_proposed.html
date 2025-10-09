@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NOTESTREAM v0.603_test</title>
+<title>NOTESTREAM v0.604_test</title>
 <style>
   :root {
     --bg: #0b0f12;
     --txt: #fff;
     --accent: #ffcc00;
     --blue: #00a0ff;
-    --card-w: 96px;   /* computed to fit 10 cards + 1 gap */
-    --gap: 12px;      /* computed */
+    --card-w: 96px;
+    --gap: 12px;
   }
   html,body { margin:0; height:100%; background: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
   #app { padding: 14px; display:flex; flex-direction:column; gap:14px; }
@@ -51,12 +51,9 @@
     line-height: 1;
     white-space: nowrap;
   }
-  /* Tentative kort (aktivt lag) */
   .tentative-active { background: #2d2200; border-color: var(--accent); }
-  /* Tentative kort (opponent) */
-  .tentative-oppo { background: #001f33; border-color: var(--blue); }
+  .tentative-oppo   { background: #001f33; border-color: var(--blue); }
 
-  /* Gap utan "streck": vi använder gapen som behållare för ev. tentative-card */
   .ghost-gap { width:0; height: calc(var(--card-w)*1.5); display:flex; align-items:center; justify-content:center; }
   .ghost-gap.active { width: var(--card-w); }
 
@@ -64,7 +61,6 @@
   .dnd-card.dragging { opacity:.85; cursor:grabbing; transform: scale(1.02); }
   .dnd-palette { display:flex; gap:12px; align-items:center; }
 
-  /* Mini timeline ~30% */
   .mini .timeline { transform: scale(.3); transform-origin: left top; }
   .mini { height: calc((var(--card-w)*1.5) * .3 + 24px); overflow:hidden; }
 
@@ -76,7 +72,7 @@
 <body>
 <div id="app">
   <div class="topbar">
-    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.603</strong></div>
+    <div class="badge">Testläge (DnD) – <strong>PROTOTYP v0.604</strong></div>
     <div class="legend">
       <span class="dot active"></span> Aktivas val
       <span class="dot oppo"></span> Opponentens val
@@ -98,6 +94,7 @@
       <button id="btnReveal" disabled>Reveal</button>
       <button id="btnNextTurn" disabled>Nästa tur</button>
       <span id="phaseLabel" class="badge"></span>
+      <span class="badge" id="startBadge"></span>
     </div>
 
     <div class="panel">
@@ -138,12 +135,17 @@
 <script>
 (function(){
   const $ = (id) => document.getElementById(id);
+  // MOCK: tills vi kopplar Spotify/Firebase — sätt årspann manuellt eller från en mockad pool
+  const MOCK_MIN_YEAR = 1955;
+  const MOCK_MAX_YEAR = 2023;
+
   // Teams
-  let teamA = { name:'Team A', tokens:4, years:[1978, 1984, 1992, 2001] };
-  let teamB = { name:'Team B', tokens:4, years:[1969, 1988] };
+  let teamA = { name:'Team A', tokens:4, years:[] };
+  let teamB = { name:'Team B', tokens:4, years:[] };
   let activeTeam = 'A';
 
   // State
+  let startYear = null;
   let phase = 'idle'; // listening|locked|prompt|opposition|reveal|resolve
   let placedSlotIndex = null;     // active team's tentative slot
   let opponentWants   = false;
@@ -163,6 +165,7 @@
   const oppTimerEl     = $('oppTimer');
   const activeTeamName = $('activeTeamName');
   const hintText       = $('hintText');
+  const startBadge     = $('startBadge');
 
   // Controls
   $('btnNext').addEventListener('click', startRound);
@@ -182,6 +185,7 @@
   const yearsFor = (team)=> (team==='A'?teamA.years:teamB.years).slice().sort((a,b)=>a-b);
   const other    = (team)=> team==='A' ? 'B' : 'A';
   const teamObj  = (team)=> team==='A' ? teamA : teamB;
+  const randInt  = (a,b)=> a + Math.floor(Math.random()*(b-a+1));
 
   function makeCard(val, classes=''){
     const d = document.createElement('div');
@@ -193,22 +197,46 @@
     return d;
   }
 
+  // Render timeline with startYear as anchor in the sequence
+  function renderTimeline(container, years, inOpposition){
+    container.innerHTML = '';
+
+    const ys = years.slice().sort((a,b)=>a-b);
+    // Logical sequence: [ ... left side (< start), START, ... right side (> start) ]
+    const left = ys.filter(y => y < startYear);
+    const right= ys.filter(y => y >= startYear);
+
+    // Build order: left..., START, right...
+    const ordered = left.concat([startYear], right);
+
+    // Gaps are between all elements in ordered, plus before first and after last
+    // We want a visible Start card in the middle of the flow (not always left)
+    // So we paint cards in 'ordered', but label startYear specially.
+    for (let i=0;i<=ordered.length;i++){
+      // gap
+      const gapIdx = i; // 0..N
+      const g = makeGap(gapIdx, placedSlotIndex, opponentSlotIndex, dragging ? currentHoverIndex : null, inOpposition);
+      container.appendChild(g);
+      // card after the gap (if any)
+      if (i < ordered.length){
+        const y = ordered[i];
+        const isStart = (y === startYear);
+        container.appendChild(makeCard(isStart ? ('Startår ' + y) : String(y), isStart ? 'start' : ''));
+      }
+    }
+  }
+
   function makeGap(i, activeTentativeIdx, oppTentativeIdx, hoverIdx, inOpposition){
     const g = document.createElement('div');
     g.className = 'ghost-gap';
     g.dataset.slotIndex = i;
-
-    // Determine if gap should be visually active (reserve width)
     if (i === hoverIdx || i === activeTentativeIdx || (inOpposition && i === oppTentativeIdx)) {
       g.classList.add('active');
     }
-
-    // Insert tentative cards *inside* the gap so width is controlled
     if (activeTentativeIdx !== null && i === activeTentativeIdx) {
       g.appendChild(makeCard('?', 'tentative-active'));
     }
     if (inOpposition && oppTentativeIdx !== null && i === oppTentativeIdx) {
-      // If both tentative occupy same gap, stack vertically (simple)
       const c = makeCard('?', 'tentative-oppo');
       c.style.position = (activeTentativeIdx === i) ? 'absolute' : 'static';
       if (activeTentativeIdx === i) { c.style.transform = 'translateY(8px)'; }
@@ -218,25 +246,12 @@
     return g;
   }
 
-  function renderTimeline(container, years, inOpposition){
-    container.innerHTML = '';
-    // Startår-kort
-    const start = makeCard('Startår', 'start');
-    container.appendChild(start);
-
-    const ys = years.slice().sort((a,b)=>a-b);
-    for (let i=0;i<=ys.length;i++){
-      const gap = makeGap(i, placedSlotIndex, opponentSlotIndex, dragging ? currentHoverIndex : null, inOpposition);
-      container.appendChild(gap);
-      if (i<ys.length) container.appendChild(makeCard(String(ys[i])));
-    }
-  }
-
   function renderAll(){
-    computeCardLayout(); // ensure sizes fit 10 kort + 1 gap
+    computeCardLayout();
     renderTimeline(activeTimeline, yearsFor(activeTeam), phase==='opposition');
     renderTimeline(miniTimeline, yearsFor(other(activeTeam)), false);
     activeTeamName.textContent = teamObj(activeTeam).name;
+    startBadge.textContent = startYear ? ('Startår: ' + startYear) : '';
     updateTokens(); updateControls();
   }
 
@@ -249,17 +264,16 @@
     phaseLabel.textContent   = 'Fas: ' + phase;
   }
 
-  // Layout: fit 10 cards + 11 gaps
   function computeCardLayout(){
     const wrap = activeTimeline.closest('.timeline-wrap');
     if (!wrap) return;
     const w = wrap.clientWidth || window.innerWidth;
-    const padding = 24; // approx panel padding
+    const padding = 24;
     const maxW = 140, minW = 56;
     let bestCard = 96, bestGap = 12;
     for (let cw = maxW; cw >= minW; cw -= 1) {
       const gap = Math.max(8, Math.round(cw * 0.12));
-      const total = 10*cw + 11*gap; // 10 kort + 11 gaps
+      const total = 10*cw + 11*gap;
       if (total <= (w - padding)) { bestCard = cw; bestGap = gap; break; }
     }
     document.documentElement.style.setProperty('--card-w', bestCard + 'px');
@@ -268,6 +282,10 @@
 
   // Flow
   function startRound(){
+    if (startYear === null){
+      // Randomize once per game (first round)
+      startYear = randInt(MOCK_MIN_YEAR, MOCK_MAX_YEAR);
+    }
     phase='listening'; placedSlotIndex=null; opponentWants=false; opponentSlotIndex=null;
     currentHoverIndex=null; currentTrackYear = mockRandomYear();
     hintText.textContent='Dra kortet till rätt mellanrum';
@@ -326,8 +344,8 @@
 
   function doReveal(){
     phase='reveal'; oppDnD.classList.remove('active');
-    const actOK = isCorrectSlot(yearsFor(activeTeam), placedSlotIndex, currentTrackYear);
-    const oppOK = opponentWants ? isCorrectSlot(yearsFor(activeTeam), opponentSlotIndex, currentTrackYear) : false;
+    const actOK = isCorrectSlotWithStart(yearsFor(activeTeam), placedSlotIndex, currentTrackYear, startYear);
+    const oppOK = opponentWants ? isCorrectSlotWithStart(yearsFor(activeTeam), opponentSlotIndex, currentTrackYear, startYear) : false;
 
     if (actOK){
       commitToTimeline(activeTeam, currentTrackYear);
@@ -340,7 +358,7 @@
       hintText.textContent = `Facit: ${currentTrackYear}. Ingen rätt – aktiva vinner tvisten.`;
     }
 
-    // Viktigt: ta bort tentative-markörer efter reveal så gula/blå "gissa-kortet" inte ligger kvar
+    // Rensa markörer efter reveal
     placedSlotIndex = null;
     opponentSlotIndex = null;
 
@@ -403,7 +421,6 @@
   attachTouchDrag(songCard);
 
   function nearestIndexByMidpoint(x){
-    // index 0..N of ghost gaps
     const gaps = activeTimeline.querySelectorAll('.ghost-gap');
     let bestIdx=null, bestDist=Infinity;
     gaps.forEach((g, i)=>{
@@ -415,19 +432,32 @@
     return bestIdx;
   }
 
-  function isCorrectSlot(sortedYears, slotIndex, Y){
+  // Correctness using Startår as anchor inside sequence
+  function isCorrectSlotWithStart(teamYears, slotIndex, Y, S){
     if (slotIndex===null || slotIndex===undefined) return false;
-    if (sortedYears.length===0){ return true; } // mot Startår
-    if (slotIndex===0) return Y <= sortedYears[0];
-    if (slotIndex===sortedYears.length) return Y >= sortedYears[sortedYears.length-1];
-    const left = sortedYears[slotIndex-1], right=sortedYears[slotIndex];
-    return (left <= Y && Y <= right);
+    const ys = teamYears.slice().sort((a,b)=>a-b);
+    const left = ys.filter(y => y < S);
+    const right= ys.filter(y => y >= S);
+    const ordered = left.concat([S], right); // cards rendered in this order
+    // Slots: 0 before ordered[0], 1 between 0-1, ..., N after ordered[N-1]
+    if (ordered.length === 1){ // only Startår present
+      if (slotIndex === 0) return Y <= S;
+      if (slotIndex === 1) return Y >= S;
+      return false;
+    }
+    // General case
+    if (slotIndex === 0) return Y <= ordered[0];
+    if (slotIndex === ordered.length) return Y >= ordered[ordered.length-1];
+    const L = ordered[slotIndex-1];
+    const R = ordered[slotIndex];
+    return (L <= Y && Y <= R);
   }
-  function mockRandomYear(){ return 1960 + Math.floor(Math.random()*61); }
 
-  // Init
+  function mockRandomYear(){ return randInt(1955, 2023); }
+
+  // Init a first round for convenience
   computeCardLayout();
-  renderAll();
+  startRound();
 })();
 </script>
 </body>
