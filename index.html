@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.515</title>
+  <title>NOTESTREAM v0.516</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1337,6 +1337,22 @@ body { -ms-overflow-style: none; }                   /* Legacy Edge/IE */
 /* Guard against 100vw overflow causing a gutter */
 :root { --no-gutter-max: 100%; }
 body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
+</style>
+
+
+<style>
+/* Guard: prevent viewport-width gutters; prefer 100% over 100vw */
+:root { --w-guard: 100%; }
+body *, body *::before, body *::after {
+  max-width: var(--w-guard);
+}
+</style>
+
+
+<style>
+/* Guard: stop horizontal overflow on main containers */
+html, body { overflow-x: hidden; }
+#app, #appRoot, main, .screen, .viewport, .container { max-width: 100%; }
 </style>
 
 </head>
