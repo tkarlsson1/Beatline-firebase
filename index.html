@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.512</title>
+  <title>NOTESTREAM v0.513</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1305,6 +1305,24 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 }
 #readmeModal .closeBtn { color: #ccc !important; position: absolute; top: 10px; right: 20px; }
 #readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
+</style>
+
+
+<style>
+/* Thinner divider between Standardlistor and Egna spellistor */
+hr, .divider, .section-divider {
+  border-top-width: 0.5px !important;
+  height: 0 !important;
+}
+/* If the divider is drawn via a top border on a container */
+#standard-vs-egna-divider {
+  border-top: 0.5px solid rgba(255,255,255,.25) !important;
+}
+/* Common pattern: element with border-top around that area */
+.section-header + .section-header,
+h2 + hr, h3 + hr {
+  border-top-width: 0.5px !important;
+}
 </style>
 
 </head>
