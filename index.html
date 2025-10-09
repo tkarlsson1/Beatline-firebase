@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.510</title>
+  <title>NOTESTREAM v0.511</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1260,6 +1260,28 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 /* Full-bleed screens */
 .screen, .app, .viewport { min-height: calc(var(--vh, 1vh) * 100); }
+</style>
+
+  <meta name="mobile-web-app-capable" content="yes">
+
+<style>
+/* Readme modal dark theme override (high specificity) */
+#readmeModal.modal { background: rgba(0,0,0,.6) !important; }
+#readmeModal.modal #readmeContent {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 12px !important;
+  width: min(92vw, 600px) !important;
+  max-width: 600px !important;
+  margin: 6vh auto !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  max-height: 80vh !important;
+  overflow: auto !important;
+}
+#readmeModal .closeBtn { color: #ccc !important; }
+#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
 </style>
 
 </head>
