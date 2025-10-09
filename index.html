@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.507</title>
+  <title>NOTESTREAM v0.508</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1677,6 +1677,56 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
       window.openManagePlaylists();
     });
     list.appendChild(item);
+  });
+})();
+</script>
+
+
+<script>
+// Fokusfälla + ESC-stängning för login-modalen
+(function(){ 
+  function getFocusable(container){
+    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  }
+  function trapFocus(modal){
+    const nodes = getFocusable(modal);
+    if (!nodes.length) return;
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    function onKey(e){
+      if (e.key === 'Escape') {
+        closeModal(modal);
+      } else if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    modal.__trapKeyHandler = onKey;
+    modal.addEventListener('keydown', onKey);
+    // Sätt initialt fokus
+    (modal.querySelector('[autofocus]') || first).focus();
+  }
+  function untrapFocus(modal){
+    if (modal.__trapKeyHandler) modal.removeEventListener('keydown', modal.__trapKeyHandler);
+    modal.__trapKeyHandler = null;
+  }
+  function closeModal(modal){
+    // Stäng och lås upp scroll (samma mönster som tidigare)
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, 0 + (window.__loginScrollY || 0));
+    modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
+  }
+  // När modalen öppnas: sätt fokusfälla
+  document.addEventListener('modal:open', function(e){
+    const modal = e.target.closest('#loginModal');
+    if (modal) trapFocus(modal);
+  });
+  // När modalen stängs: ta bort fokusfällan
+  document.addEventListener('modal:close', function(e){
+    const modal = e.target.closest('#loginModal');
+    if (modal) untrapFocus(modal);
   });
 })();
 </script>
