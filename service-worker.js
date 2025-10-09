@@ -44,3 +44,14 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
+
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  if (req.mode === 'navigate'){
+    event.respondWith(
+      fetch(req).catch(() => caches.match('/offline.html'))
+    );
+  }
+});
