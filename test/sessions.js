@@ -1,15 +1,19 @@
 
-// /test/test_sessions.js
-console.log("TEST sessions bootstrap loaded");
+// /test/sessions.js (fixed)
+console.log("TEST sessions bootstrap loaded (fixed)");
 
 (function(){
-  let db = window.db;
-  let auth = window.auth;
-  if (!db || !auth) {
-    console.warn("db/auth missing on window. Make sure /test/script.js sets window.db and window.auth");
+  // Wait until /test/script.js has exposed window.db & window.auth
+  function waitForFirebase(){
+    return new Promise((resolve) => {
+      const t = setInterval(()=>{
+        if (window.db && window.auth) { clearInterval(t); resolve({db: window.db, auth: window.auth}); }
+      }, 50);
+    });
   }
 
   const el = (id) => document.getElementById(id);
+
   const roleHost     = el("role-host");
   const roleJoin     = el("role-join");
   const panelHost    = el("host-panel");
@@ -21,6 +25,7 @@ console.log("TEST sessions bootstrap loaded");
   const joinBtn      = el("btn-join-room");
   const inputTeam    = el("input-team-name");
   const inputCode    = el("input-room-code");
+  const hostTeamName = el("input-host-team");
 
   const guessSeconds = el("guess-seconds");
   const chWin        = el("challenge-window");
@@ -50,14 +55,18 @@ console.log("TEST sessions bootstrap loaded");
   }
   function clearSubs(){ unsub.forEach(fn=>{ try{fn();}catch{} }); unsub.length=0; }
 
-  roleHost.addEventListener("click", ()=>{
+  roleHost?.addEventListener("click", ()=>{
     isHost = true; panelHost.style.display = ""; panelJoin.style.display = "none";
   });
-  roleJoin.addEventListener("click", ()=>{
+  roleJoin?.addEventListener("click", ()=>{
     isHost = false; panelHost.style.display = "none"; panelJoin.style.display = "";
   });
 
-  createBtn.addEventListener("click", async ()=>{
+  createBtn?.addEventListener("click", async ()=>{
+    const { db, auth } = await waitForFirebase();
+    const uid = auth.currentUser?.uid;
+    if(!uid){ alert("Logga in först för att skapa rum."); return; }
+
     sessionCode = (el("input-custom-code").value || randCode()).toUpperCase();
     const cfg = {
       timers: {
@@ -67,45 +76,63 @@ console.log("TEST sessions bootstrap loaded");
       },
       targetTimelineSize: 11
     };
-    const uid = auth.currentUser?.uid;
-    if(!uid){ alert("Du är inte inloggad."); return; }
-    const session = {
+
+    const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+    await set(ref(db, `sessions/${sessionCode}`), {
       meta:{ hostUid: uid, createdAt: Date.now(), status: "waiting", phase: "lobby", activeTeamId: null, turnIndex: 0 },
       config: cfg, teams: {}, scoreboard: {}, timers: null, turn: null
-    };
-    const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
-    await set(ref(db, `sessions/${sessionCode}`), session);
-    const hostTeamName = (el("input-host-team").value || "Lag 1").trim();
-    await set(ref(db, `sessions/${sessionCode}/teams/host`), { name: hostTeamName, tokens: 4, members: { [uid]: true } });
-    myTeamId = "host"; codeDisplay.textContent = sessionCode; panelRoom.style.display = ""; attachSessionListeners();
+    });
+
+    // host joins as team
+    const teamName = (hostTeamName?.value || "Lag 1").trim();
+    await set(ref(db, `sessions/${sessionCode}/teams/host`), { name: teamName, tokens: 4, members: { [uid]: true } });
+
+    myTeamId = "host";
+    codeDisplay.textContent = sessionCode;
+    panelRoom.style.display = "";
+    attachSessionListeners(db);
   });
 
-  joinBtn.addEventListener("click", async ()=>{
+  joinBtn?.addEventListener("click", async ()=>{
+    const { db, auth } = await waitForFirebase();
+    const uid = auth.currentUser?.uid;
+    if(!uid){ alert("Logga in först för att gå med i rum."); return; }
+
     sessionCode = inputCode.value.trim().toUpperCase();
     const teamName = (inputTeam.value || "Lag").trim();
-    const uid = auth.currentUser?.uid;
-    if(!uid){ alert("Du är inte inloggad."); return; }
     const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
     myTeamId = `t_${uid.slice(-6)}`;
     await set(ref(db, `sessions/${sessionCode}/teams/${myTeamId}`), { name: teamName, tokens: 4, members: { [uid]: true } });
-    codeDisplay.textContent = sessionCode; panelRoom.style.display = ""; attachSessionListeners();
+
+    codeDisplay.textContent = sessionCode;
+    panelRoom.style.display = "";
+    attachSessionListeners(db);
   });
 
-  startBtn.addEventListener("click", async ()=>{
-    if(!isHost) return;
-    const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+  startBtn?.addEventListener("click", async ()=>{
+    const { db, auth } = await waitForFirebase();
+    const uid = auth.currentUser?.uid;
+    if(!uid){ alert("Logga in först."); return; }
     const duration = (parseInt(guessSeconds.value,10)||90) * 1000;
-    await update(ref(db, `sessions/${sessionCode}`), {
-      'meta.phase': 'place',
-      'meta.status': 'playing',
-      'meta.activeTeamId': 'host',
-      'timers': { phase: 'place', startedAt: Date.now(), durationMs: duration }
+
+    const { ref, update, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+    // FIX: update child nodes directly (no dotted keys)
+    await update(ref(db, `sessions/${sessionCode}/meta`), {
+      phase: 'place',
+      status: 'playing',
+      activeTeamId: 'host'
+    });
+    // timers is its own child
+    await set(ref(db, `sessions/${sessionCode}/timers`), {
+      phase: 'place',
+      startedAt: Date.now(),
+      durationMs: duration
     });
   });
 
-  async function attachSessionListeners(){
+  async function attachSessionListeners(db){
     clearSubs();
-    const { ref, onValue, off } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+    const { ref, onValue, off, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
     const mref = ref(db, `sessions/${sessionCode}/meta`);
     const tref = ref(db, `sessions/${sessionCode}/timers`);
     const teamref = ref(db, `sessions/${sessionCode}/teams`);
@@ -138,6 +165,19 @@ console.log("TEST sessions bootstrap loaded");
     unsub.push(()=>off(tref, 'value', un2));
     unsub.push(()=>off(teamref, 'value', un3));
     unsub.push(()=>off(placementRef, 'value', un4));
+
+    // Build timeline click slots (once)
+    if (!timelineWrap.dataset.built){
+      timelineWrap.dataset.built = "1";
+      for(let i=0;i<11;i++){
+        const slot = document.createElement("div");
+        slot.className = "slot"; slot.dataset.idx = String(i);
+        slot.addEventListener("click", async ()=>{
+          await set(placementRef, { teamId: myTeamId||'team', index: i });
+        });
+        timelineWrap.appendChild(slot);
+      }
+    }
   }
 
   function renderScoreboard(teams){
@@ -149,18 +189,5 @@ console.log("TEST sessions bootstrap loaded");
       <div class="small">Medlemmar: ${t.members?Object.keys(t.members).length:0}</div>`;
       scoreboard.appendChild(div);
     });
-  }
-
-  // Build timeline click slots
-  const SLOTS = 11;
-  for(let i=0;i<SLOTS;i++){
-    const slot = document.createElement("div");
-    slot.className = "slot"; slot.dataset.idx = String(i);
-    slot.addEventListener("click", async ()=>{
-      if(!sessionCode) return;
-      const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
-      await set(ref(db, `sessions/${sessionCode}/turn/placement`), { teamId: myTeamId||'team', index: i });
-    });
-    timelineWrap.appendChild(slot);
   }
 })();
