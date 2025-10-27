@@ -24,13 +24,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 window.app = app;
 const db = getDatabase(app, "https://notestreamfire.europe-west1.firebasedatabase.app");
-// === DEBUG: DB options ===
-try {
-  console.log("Firebase app options", app?.options);
-  console.log("Resolved databaseURL", app?.options?.databaseURL);
-} catch(e){ console.warn("App options inspect failed", e); }
-// === END DEBUG ===
-
 const auth = getAuth(app);
 
 // Globala variabler för låtdatabasen
