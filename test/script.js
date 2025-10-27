@@ -1,5 +1,6 @@
 console.log("%cNOTESTREAM /test v0.521","font-weight:bold");
 console.log("Using TEST RTDB:", "https://notestreamfire.europe-west1.firebasedatabase.app");
+
 // Importera Firebase-moduler och initiera appen
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -27,10 +28,10 @@ window.app = app;
 const db = getDatabase(app, "https://notestreamfire.europe-west1.firebasedatabase.app");
 const auth = getAuth(app);
 
-
 // Expose for /test sessions
 window.db = db;
 window.auth = auth;
+
 // Globala variabler för låtdatabasen
 let standardSongs = [];
 let userPlaylistSongs = [];
@@ -119,6 +120,7 @@ function mergeSongs() {
 function updateAllaCheckbox() {
   const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
   const allaBox = document.querySelector('input[name="source"][value="alla"]');
+  if (!allaBox) return;
   let allChecked = true;
   nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
   allaBox.checked = allChecked;
@@ -127,6 +129,7 @@ function updateAllaCheckbox() {
 // Populera checkboxarna baserat på låtdata
 function populateSourceCheckboxes() {
   const container = document.getElementById("source-checkbox-container");
+  if (!container) return;
   container.innerHTML = "";
 
   // Checkbox för "Alla låtar"
@@ -223,16 +226,17 @@ function populateSourceCheckboxes() {
 
 // Uppdatera låträknaren
 function updateSongCount() {
-  const startYear = parseInt(document.getElementById("startYear").value);
-  const endYear = parseInt(document.getElementById("endYear").value);
+  const startYearEl = document.getElementById("startYear");
+  const endYearEl = document.getElementById("endYear");
+  if (!startYearEl || !endYearEl) return;
+  const startYear = parseInt(startYearEl.value);
+  const endYear = parseInt(endYearEl.value);
   const filteredSongCount = sourceFilteredSongs.filter(song =>
     parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
   ).length;
   const songCountElement = document.getElementById("selectedSongCount");
   if (songCountElement) {
     songCountElement.textContent = `Valda låtar: ${filteredSongCount}`;
-  } else {
-    console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
   }
 }
 
@@ -253,6 +257,7 @@ window.updateYearSelection = function() {
 
   const startYearDropdown = document.getElementById("startYear");
   const endYearDropdown = document.getElementById("endYear");
+  if (!startYearDropdown || !endYearDropdown) return;
 
   startYearDropdown.innerHTML = "";
   endYearDropdown.innerHTML = "";
@@ -297,8 +302,12 @@ window.updateYearSelection = function() {
 };
 
 window.filterSongs = function() {
-  const startYear = parseInt(document.getElementById("startYear").value);
-  const endYear = parseInt(document.getElementById("endYear").value);
+  const startYearEl = document.getElementById("startYear");
+  const endYearEl = document.getElementById("endYear");
+  if (!startYearEl || !endYearEl) return false;
+
+  const startYear = parseInt(startYearEl.value);
+  const endYear = parseInt(endYearEl.value);
   
   currentFilteredSongs = sourceFilteredSongs.filter(song =>
     parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
@@ -311,15 +320,18 @@ window.filterSongs = function() {
     return true;
   } else {
     alert("Inga låtar hittades i den valda perioden.");
-    document.getElementById("song-display").innerHTML = "";
+    const sd = document.getElementById("song-display");
+    if (sd) sd.innerHTML = "";
     return false;
   }
 };
 
 window.applyFilter = function() {
   if (filterSongs()) {
-    (function(__n){return __n||{};}(document.getElementById("filter-page"))).style.display = "none";
-    (function(__n){return __n||{};}(document.getElementById("result-page"))).style.display = "block";
+    const fp = document.getElementById("filter-page");
+    const rp = document.getElementById("result-page");
+    if (fp) fp.style.display = "none";
+    if (rp) rp.style.display = "block";
     updateSongCount();
   }
 };
@@ -339,11 +351,13 @@ window.nextSong = function() {
 window.restart = function() {
   shownSongs = [];
   currentSong = null;
-  document.getElementById("song-display").innerHTML = "";
+  const sd = document.getElementById("song-display");
+  if (sd) sd.innerHTML = "";
 };
 
 function displaySong(song) {
   const songDisplay = document.getElementById("song-display");
+  if (!songDisplay) return;
   songDisplay.innerHTML = `
     <div id="qrcode-${song.qr}" class="qrcode"></div>
     <button class="answer-button" onclick="revealDetails()">Visa svar</button>
@@ -360,12 +374,16 @@ function displaySong(song) {
 window.generateQRCode = function(qr) {
   const spotifyUrl = `https://open.spotify.com/track/${qr}`;
   const qrElement = document.getElementById(`qrcode-${qr}`);
+  if (!qrElement) return;
   qrElement.innerHTML = "";
-  new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
+  if (typeof QRCode !== "undefined") {
+    new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
+  }
 };
 
 window.revealDetails = function() {
-  (function(__n){return __n||{};}(document.getElementById("song-details"))).style.display = "block";
+  const sd = document.getElementById("song-details");
+  if (sd) sd.style.display = "block";
 };
 
 window.goToFilter = function() {
@@ -373,8 +391,10 @@ window.goToFilter = function() {
   checkboxes.forEach(checkbox => { checkbox.checked = false; });
   updateYearSelection();
   restart();
-  (function(__n){return __n||{};}(document.getElementById("result-page"))).style.display = "none";
-  (function(__n){return __n||{};}(document.getElementById("filter-page"))).style.display = "block";
+  const rp = document.getElementById("result-page");
+  const fp = document.getElementById("filter-page");
+  if (rp) rp.style.display = "none";
+  if (fp) fp.style.display = "block";
 };
 
 // Spotify-token och caching
@@ -451,9 +471,13 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
   }
 }
 
-(function(__n){return __n&&__n.addEventListener?__n:null;}(document.getElementById("addPlaylistButton"))).addEventListener("click", async () => {
-  const playlistName = document.getElementById("playlistNameInput").value.trim();
-  const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+// ✅ SÄKER BIND: kör endast om knappen finns i denna vy
+document.getElementById("addPlaylistButton")?.addEventListener("click", async () => {
+  const nameEl = document.getElementById("playlistNameInput");
+  const linkEl = document.getElementById("playlistLinkInput");
+  if (!nameEl || !linkEl) return;
+  const playlistName = nameEl.value.trim();
+  const playlistLink = linkEl.value.trim();
   if (!playlistName || !playlistLink) {
     alert("Fyll i både spellistans namn och länk!");
     return;
@@ -499,7 +523,8 @@ document.addEventListener("DOMContentLoaded", function() {
   lasForstLink.textContent = "Läs först";
   lasForstLink.addEventListener("click", (e) => {
     e.preventDefault();
-    (function(__n){return __n||{};}(document.getElementById("readmeModal"))).style.display = "block";
+    const rm = document.getElementById("readmeModal");
+    if (rm) rm.style.display = "block";
     dropdownMenu.style.display = "none";
   });
   dropdownMenu.appendChild(lasForstLink);
@@ -522,7 +547,8 @@ document.addEventListener("DOMContentLoaded", function() {
     signOut(auth)
       .then(() => {
         console.log("Utloggad!");
-        (function(__n){return __n||{};}(document.getElementById("loginModal"))).style.display = "flex";
+        const lm = document.getElementById("loginModal");
+        if (lm) lm.style.display = "flex";
         dropdownMenu.style.display = "none";
       })
       .catch((error) => {
