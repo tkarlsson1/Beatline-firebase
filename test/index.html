@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.518</title>
+  <title>NOTESTREAM v0.519 (test)</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1339,6 +1339,10 @@ body { -ms-overflow-style: none; }                   /* Legacy Edge/IE */
 body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 </style>
 
+
+  <style id="TEST-BANNER">.test-banner{position:fixed;top:0;left:0;right:0;font:12px/1.4 system-ui;background:#ffed;backdrop-filter:saturate(150%) blur(2px);padding:.25rem .5rem;text-align:center;z-index:9999}body{padding-top:1.25rem}</style>
+  <div class="test-banner">TEST-ENVIRON: /test — DB: notestreamfire</div>
+
 </head>
 <body>
 <!-- Inloggningsmodal -->
@@ -1403,7 +1407,13 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
     </div>
     
     <!-- Feedback Modal -->
-    
+    <div id="feedbackModal">
+      <div>
+        <span id="closeFeedback">&times;</span>
+        <h2>Lämna feedback</h2>
+        <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
+        <button id="submitFeedback">Skicka feedback</button>
+      </div>
     </div>
     
     <!-- Readme Modal -->
@@ -1534,7 +1544,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
   </script>
   <script>
  if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js")
+      navigator.serviceWorker.register("/test/service-worker.test.js")
         .then(registration => {
           console.log("Service Worker registrerad med scope:", registration.scope);
         })

@@ -1,3 +1,4 @@
+console.log("Using TEST RTDB:", "https://notestreamfire.europe-west1.firebasedatabase.app");
 // Importera Firebase-moduler och initiera appen
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -22,7 +23,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 window.app = app;
-const db = getDatabase(app);
+const db = getDatabase(app, "https://notestreamfire.europe-west1.firebasedatabase.app");
 const auth = getAuth(app);
 
 // Globala variabler för låtdatabasen
