@@ -1,57 +1,47 @@
-// service-worker.js
-
-// Vid "install" behöver vi inte cacha något – vi hoppar direkt över vänteläget.
-self.addEventListener("install", event => {
-  console.log("Service Worker installed");
-  self.skipWaiting();
-});
-
-// Vid "activate" säkerställer vi att vi kontrollerar våra klienter direkt.
-self.addEventListener("activate", event => {
-  console.log("Service Worker activated");
-  event.waitUntil(clients.claim());
-});
-
-// Vid varje "fetch" anrop, hämtar vi alltid direkt från nätverket.
-// Ingen cache används alls, ingen fallback.
-self.addEventListener("fetch", event => {
-  event.respondWith(fetch(event.request));
-});
-
-
-// --- NOTESTREAM app-shell cache (added v0.509) ---
-const NS_CACHE = 'ns-appshell-v0-509';
+// service-worker.js (consolidated)
+// Notestream PWA — unified cache & offline fallback
+const NS_CACHE = 'ns-appshell-v1-2025-10-27';
 const NS_ASSETS = [
   '/', '/index.html', '/manifest.json',
-  '/icons/icon-192.png', '/icons/icon-512.png'
+  '/offline.html',
+  '/icon.png', '/icon-maskable.png', '/favicon.png'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(NS_CACHE).then(cache => cache.addAll(NS_ASSETS)));
-});
-
-self.addEventListener('fetch', event => {
-  const req = event.request;
-  if (req.method !== 'GET') return;
-  event.respondWith(
-    caches.match(req).then(cached => {
-      const net = fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(NS_CACHE).then(c => c.put(req, copy));
-        return res;
-      }).catch(() => cached);
-      return cached || net;
-    })
+  event.waitUntil(
+    caches.open(NS_CACHE).then(cache => cache.addAll(NS_ASSETS))
   );
+  self.skipWaiting();
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== NS_CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
 
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
-  if (req.mode === 'navigate'){
+
+  // HTML navigations: go network first, fall back to offline.html
+  if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req).catch(() => caches.match('/offline.html'))
     );
+    return;
   }
+
+  // For other GETs: stale-while-revalidate
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    const network = fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(NS_CACHE).then(cache => cache.put(req, copy));
+      return res;
+    }).catch(() => cached);
+    return cached || network;
+  })());
 });
