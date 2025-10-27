@@ -1,100 +1,100 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.536</title>
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NOTESTREAM TEST v0.521</title>
+  <link rel="stylesheet" href="/test/styles.css">
 </head>
 <body>
   <div class="container">
-    <header class="panel hstack space-between">
-      <div class="hstack gap-8">
-        <span class="badge">/test</span>
-        <span class="badge accent">RTDB: notestreamfire</span>
+    <div class="toolbar">
+      <div class="kicker">NOTESTREAM /test</div>
+      <div class="hstack">
+        <button id="role-host" class="primary">Host</button>
+        <button id="role-join" class="ghost">Join</button>
       </div>
-      <div class="muted">Prototyp</div>
-    </header>
+    </div>
 
-    <main class="grid grid-2">
-      <!-- VÄNSTER: Roller + Rum -->
-      <section class="panel" id="left-col">
-        <h2 class="title">Välj roll</h2>
-        <div class="controls">
-          <button id="role-host">Jag är värd</button>
-          <button id="role-join" class="secondary">Jag går med</button>
-        </div>
-
-        <div id="host-panel" class="stack gap-10 hidden">
-          <div class="hstack gap-8">
-            <button id="btn-new-room">Skapa nytt rum</button>
-            <input id="input-custom-code" placeholder="Egen kod (valfritt)" maxlength="6" />
-          </div>
-          <div class="info">
-            Rumskod: <strong id="room-code-display">—</strong>
-          </div>
-        </div>
-
-        <div id="join-panel" class="stack gap-10 hidden">
-          <input id="input-join-code" placeholder="Ange rumskod" maxlength="6" />
-          <button id="btn-join-room">Gå med</button>
-        </div>
-
-        <div id="room-panel" class="stack gap-10 hidden">
-          <div class="info">
-            Aktivt rum: <strong id="room-code-active">—</strong>
-          </div>
-          <div id="phase-controls" class="controls wrap">
-            <button id="action-place">Starta placering</button>
-            <button id="action-challenge-window" class="secondary">Starta utmanings-fönster</button>
-            <button id="action-challenge-place" class="secondary">Starta utmaning</button>
-            <button id="action-reveal" class="warn">Avslöja</button>
-            <button id="btn-lock-place" class="ghost">Lås placering</button>
-            <button id="btn-lock-challenge" class="ghost">Lås utmaning</button>
-            <button id="action-hint" class="ghost">Tips</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- HÖGER: Tidslinje -->
-      <section class="panel">
-        <h2 class="title">Tidslinje</h2>
-        <div id="timeline" class="timeline">
-          <div id="pin" class="pin" draggable="false">◆</div>
-          <div class="slots" id="slots">
-            <!-- 11 platser -->
-            <div class="slot" data-index="0">0</div>
-            <div class="slot" data-index="1">1</div>
-            <div class="slot" data-index="2">2</div>
-            <div class="slot" data-index="3">3</div>
-            <div class="slot" data-index="4">4</div>
-            <div class="slot" data-index="5">5</div>
-            <div class="slot" data-index="6">6</div>
-            <div class="slot" data-index="7">7</div>
-            <div class="slot" data-index="8">8</div>
-            <div class="slot" data-index="9">9</div>
-            <div class="slot" data-index="10">10</div>
+    <div class="grid grid-2">
+      <div class="vstack">
+        <div class="panel" id="host-panel" style="display:none;">
+          <h2>Starta rum</h2>
+          <div class="vstack">
+            <label for="input-host-team">Lagnamn (host)</label>
+            <input id="input-host-team" type="text" placeholder="Lag 1">
+            <label for="input-custom-code">Eget rums-kod (valfritt)</label>
+            <input id="input-custom-code" type="text" placeholder="t.ex. ABCD">
+            <div class="hstack">
+              <div class="card" style="flex:1;">
+                <div class="small">Gissningstid (sek)</div>
+                <input id="guess-seconds" type="number" value="90" min="10" step="5">
+              </div>
+              <div class="card" style="flex:1;">
+                <div class="small">Challenge-fönster (sek)</div>
+                <input id="challenge-window" type="number" value="10" min="5" step="5">
+              </div>
+              <div class="card" style="flex:1;">
+                <div class="small">Utmanarens tid (sek)</div>
+                <input id="challenge-place" type="number" value="20" min="5" step="5">
+              </div>
+            </div>
+            <div class="hstack">
+              <button id="btn-create-room" class="primary">Skapa rum</button>
+            </div>
           </div>
         </div>
 
-        <div id="action-row" class="controls">
-          <button id="btn-center-pin" class="ghost">Centrera markör</button>
-          <span id="phase-indicator" class="badge">Fas: —</span>
+        <div class="panel" id="join-panel" style="display:none;">
+          <h2>Gå med i rum</h2>
+          <div class="vstack">
+            <label for="input-team-name">Lagnamn</label>
+            <input id="input-team-name" type="text" placeholder="Lag 2">
+            <label for="input-room-code">Rums-kod</label>
+            <input id="input-room-code" type="text" placeholder="ABCD">
+            <div class="hstack">
+              <button id="btn-join-room" class="primary">Gå med</button>
+            </div>
+          </div>
         </div>
-      </section>
-    </main>
+
+        <div class="panel" id="room-panel" style="display:none;">
+          <div class="room-header">
+            <div>Rum: <span class="room-code" id="room-code-display">—</span></div>
+            <div class="right timer">
+              <span id="timer-phase">—</span>
+              <span id="timer-left">0:00</span>
+            </div>
+          </div>
+          <div class="hstack" style="gap:10px; margin-bottom:10px;">
+            <div>Aktivt lag: <strong id="active-team">—</strong></div>
+            <div class="right">
+              <button id="btn-start-game" class="primary">Starta gissning</button>
+            </div>
+          </div>
+          <div class="timeline" id="timeline"></div>
+          <div class="hstack" id="action-row" style="gap:8px; margin-top:10px;">
+            <button id="btn-lock-guess" class="primary" style="display:none;">Lås in (gissning)</button>
+            <button id="btn-challenge" class="ghost" style="display:none;">Utmana</button>
+            <button id="btn-lock-challenge" class="primary" style="display:none;">Lås in (utmaning)</button>
+            <span class="small" id="action-hint"></span>
+          </div>
+        </div>
+      </div>
+      <div class="vstack">
+        <div class="panel">
+          <h2>Lag</h2>
+          <div id="scoreboard"></div>
+        </div>
+        <div class="footer">
+          Logga in först på denna enhet. Host styr faser & timers.
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script type="module" src="/script.js"></script>
-  <script type="module" src="/sessions.js"></script>
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js")
-        .then(r => console.log("SW registrerad:", r.scope))
-        .catch(e => console.error("SW fel:", e));
-    }
-  </script>
+  <!-- Earlier wiring: non-module scripts -->
+  <script src="/test/script.js?v=1"></script>
+  <script src="/test/sessions.js?v=2"></script>
 </body>
 </html>

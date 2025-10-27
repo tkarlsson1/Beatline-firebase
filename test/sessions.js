@@ -1,188 +1,110 @@
-// /test sessions – minimal fungerande
-import { ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+// /test/sessions.js — v2 (earlier state, before DnD/auto-timeouts)
+console.log("TEST sessions bootstrap loaded");
 
-const $ = (id) => document.getElementById(id);
-const ns = window.ns; // { app, db }
+const el = (id) => document.getElementById(id);
 
-// UI element
-const roleHost = $("role-host");
-const roleJoin = $("role-join");
-const hostPanel = $("host-panel");
-const joinPanel = $("join-panel");
-const roomPanel = $("room-panel");
-const codeDisplay = $("room-code-display");
-const codeActive = $("room-code-active");
+const roleHost     = el("role-host");
+const roleJoin     = el("role-join");
+const panelHost    = el("host-panel");
+const panelJoin    = el("join-panel");
+const panelRoom    = el("room-panel");
+const codeDisplay  = el("room-code-display");
 
-const btnNewRoom = $("btn-new-room");
-const inputCustomCode = $("input-custom-code");
-const inputJoinCode = $("input-join-code");
-const btnJoinRoom = $("btn-join-room");
+const createBtn    = el("btn-create-room");
+const startBtn     = el("btn-start-game");
+const joinBtn      = el("btn-join-room");
+const inputTeam    = el("input-team-name");
+const inputCode    = el("input-room-code");
+const hostTeamName = el("input-host-team");
 
-const actionPlace = $("action-place");
-const actionChallengeWindow = $("action-challenge-window");
-const actionChallengePlace = $("action-challenge-place");
-const actionReveal = $("action-reveal");
-const btnLockPlace = $("btn-lock-place");
-const btnLockChallenge = $("btn-lock-challenge");
-const actionHint = $("action-hint");
+const guessSeconds = el("guess-seconds");
+const chWin        = el("challenge-window");
+const chPlace      = el("challenge-place");
 
-const timeline = $("timeline");
-const slots = $("slots");
-const pin = $("pin");
-const centerBtn = $("btn-center-pin");
-const phaseIndicator = $("phase-indicator");
+const timerPhase   = el("timer-phase");
+const timerLeft    = el("timer-left");
+const scoreboard   = el("scoreboard");
+const timelineWrap = el("timeline");
+const activeTeamLbl= el("active-team");
 
-// app state
-let currentCode = null;
-let role = null; // "host" | "join"
-let phase = "idle"; // "place" | "challenge_window" | "challenge_place" | "reveal"
-let locked = { place:false, challenge:false };
+const btnLockGuess = el("btn-lock-guess");
+const btnChallenge = el("btn-challenge");
+const btnLockCh    = el("btn-lock-challenge");
+const actionHint   = el("action-hint");
 
-// helpers
-function randCode(n = 4) {
-  const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "";
-  for (let i=0;i<n;i++) s += a[Math.floor(Math.random()*a.length)];
-  return s;
+let sessionCode = null;
+let myTeamId = null;
+let isSessionHost = false;
+let currentPhase = "lobby";
+let activeTeamId = null;
+
+function msToClock(ms){
+  const s = Math.max(0, Math.floor(ms/1000)), m = Math.floor(s/60), r = s%60;
+  return `${m}:${r.toString().padStart(2,"0")}`;
 }
-
-// layout helpers
-function show(el){ el.classList.remove("hidden"); }
-function hide(el){ el.classList.add("hidden"); }
-function setPhase(p){
-  phase = p;
-  phaseIndicator.textContent = `Fas: ${p.replace("_"," ")}`;
-  update(ref(ns.db, `/test/sessions/${currentCode}`), { phase:p });
-}
-function setLocked(kind, v){
-  locked[kind] = v;
-  update(ref(ns.db, `/test/sessions/${currentCode}`), { [`locked_${kind}`]: !!v });
-}
-
-// RTDB binding for room
-function bindRoom(code){
-  const roomRef = ref(ns.db, `/test/sessions/${code}`);
-  onValue(roomRef, (snap)=>{
-    const data = snap.val() || {};
-    // synka fas + lås
-    if (data.phase && data.phase !== phase){
-      phase = data.phase;
-      phaseIndicator.textContent = `Fas: ${phase.replace("_"," ")}`;
-    }
-    if (typeof data.locked_place === "boolean") locked.place = data.locked_place;
-    if (typeof data.locked_challenge === "boolean") locked.challenge = data.locked_challenge;
-
-    // synka pin position (om finns)
-    if (typeof data.pinIndex === "number"){
-      movePinToIndex(data.pinIndex, false);
-    }
+function waitForFirebase(){
+  return new Promise(res=>{
+    const t = setInterval(()=>{
+      if (window.db && window.auth){ clearInterval(t); res({db:window.db, auth:window.auth}); }
+    }, 30);
   });
 }
 
-// DnD pin -> slot
-let dragging = false;
-let slotRects = [];
-function cacheSlotRects(){
-  slotRects = [...document.querySelectorAll(".slot")].map((el, idx) => {
-    const r = el.getBoundingClientRect();
-    return { el, idx, left:r.left, right:r.right, mid:(r.left+r.right)/2 };
+// Role toggles
+roleHost && roleHost.addEventListener("click", ()=>{ panelHost.style.display=""; panelJoin.style.display="none"; });
+roleJoin && roleJoin.addEventListener("click", ()=>{ panelHost.style.display="none"; panelJoin.style.display=""; });
+
+// Create room (HOST)
+createBtn && createBtn.addEventListener("click", async ()=>{
+  const {db,auth} = await waitForFirebase();
+  const uid = auth.currentUser?.uid;
+  if(!uid){ alert("Logga in först."); return; }
+  sessionCode = (document.getElementById("input-custom-code").value || "TEST").toUpperCase();
+
+  const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+  await set(ref(db, `sessions/${sessionCode}`), {
+    meta:{ hostUid: uid, createdAt: Date.now(), status:"waiting", phase:"lobby", activeTeamId:null, turnIndex:0 },
+    config:{ timers:{ guessSeconds: Number(guessSeconds?.value||90), challengeWindow: Number(chWin?.value||10), challengePlace: Number(chPlace?.value||20) }, targetTimelineSize: 11 },
+    teams:{}, scoreboard:{}, timers:null, turn:null
   });
-}
-function nearestSlotIndex(x){
-  let best = 0, bestd = Infinity;
-  for (const s of slotRects){
-    const d = Math.abs(x - s.mid);
-    if (d < bestd){ bestd = d; best = s.idx; }
-  }
-  return best;
-}
-function movePinToIndex(idx, write=true){
-  const target = slots.querySelector(`.slot[data-index="${idx}"]`);
-  if (!target) return;
-  const r = target.getBoundingClientRect();
-  const cont = slots.getBoundingClientRect();
-  const mid = (r.left + r.right)/2;
-  const offset = mid - cont.left;
-  pin.style.left = `${offset}px`;
-  pin.style.transform = `translateX(-50%)`;
-  // highlight
-  document.querySelectorAll(".slot").forEach(s => s.classList.remove("active"));
-  target.classList.add("active");
-  if (write && currentCode){
-    update(ref(ns.db, `/test/sessions/${currentCode}`), { pinIndex: idx });
-  }
-}
 
-function beginDrag(){
-  if (phase !== "place" || locked.place) return;
-  dragging = true;
-  timeline.classList.add("dragging");
-  cacheSlotRects();
-}
-function onMove(e){
-  if (!dragging) return;
-  const x = (e.touches?.[0]?.clientX ?? e.clientX);
-  const idx = nearestSlotIndex(x);
-  movePinToIndex(idx);
-}
-function endDrag(){
-  if (!dragging) return;
-  dragging = false;
-  timeline.classList.remove("dragging");
-}
-
-// wire events
-roleHost.addEventListener("click", ()=>{
-  role = "host";
-  show(hostPanel); hide(joinPanel);
-});
-roleJoin.addEventListener("click", ()=>{
-  role = "join";
-  hide(hostPanel); show(joinPanel);
+  const tName = (hostTeamName?.value || "Lag 1").trim();
+  await set(ref(db, `sessions/${sessionCode}/teams/host`), { name:tName, tokens:4, members:{ [uid]:true } });
+  myTeamId = "host";
+  codeDisplay && (codeDisplay.textContent = sessionCode);
+  panelRoom && (panelRoom.style.display = "");
 });
 
-btnNewRoom.addEventListener("click", ()=>{
-  const code = (inputCustomCode.value || randCode(4)).toUpperCase();
-  currentCode = code;
-  codeDisplay.textContent = code;
-  codeActive.textContent = code;
-  show(roomPanel);
-  set(ref(ns.db, `/test/sessions/${code}`), {
-    createdAt: Date.now(),
-    phase: "idle",
-    pinIndex: 5,
-    locked_place:false,
-    locked_challenge:false
-  });
-  bindRoom(code);
-  movePinToIndex(5, false);
+// Join room (TEAM)
+joinBtn && joinBtn.addEventListener("click", async ()=>{
+  const {db,auth} = await waitForFirebase();
+  const uid = auth.currentUser?.uid;
+  if(!uid){ alert("Logga in först."); return; }
+  sessionCode = inputCode.value.trim().toUpperCase();
+  const tName = (inputTeam.value || "Lag").trim();
+
+  const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+  myTeamId = `t_${uid.slice(-6)}`;
+  await set(ref(db, `sessions/${sessionCode}/teams/${myTeamId}`), { name:tName, tokens:4, members:{ [uid]:true } });
+  codeDisplay && (codeDisplay.textContent = sessionCode);
+  panelRoom && (panelRoom.style.display = "");
 });
 
-btnJoinRoom.addEventListener("click", ()=>{
-  const code = (inputJoinCode.value || "").toUpperCase();
-  if (!code) { alert("Ange rumskod"); return; }
-  currentCode = code;
-  codeActive.textContent = code;
-  show(roomPanel);
-  bindRoom(code);
+// Start guess-phase (HOST)
+startBtn && startBtn.addEventListener("click", async ()=>{
+  const {db,auth} = await waitForFirebase();
+  const uid = auth.currentUser?.uid;
+  if(!uid){ return; }
+  const { ref, update, set, get } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+  await update(ref(db, `sessions/${sessionCode}/meta`), { phase:"place", status:"playing", activeTeamId:"host" });
+  const secsSnap = await get(ref(db, `sessions/${sessionCode}/config/timers/guessSeconds`));
+  const secs = (secsSnap.exists()?secsSnap.val():90)|0;
+  await set(ref(db, `sessions/${sessionCode}/timers`), { phase:"place", startedAt:Date.now(), durationMs:secs*1000 });
 });
 
-actionPlace.addEventListener("click", ()=> setPhase("place"));
-actionChallengeWindow.addEventListener("click", ()=> setPhase("challenge_window"));
-actionChallengePlace.addEventListener("click", ()=> setPhase("challenge_place"));
-actionReveal.addEventListener("click", ()=> setPhase("reveal"));
-btnLockPlace.addEventListener("click", ()=> setLocked("place", !locked.place ));
-btnLockChallenge.addEventListener("click", ()=> setLocked("challenge", !locked.challenge ));
-actionHint.addEventListener("click", ()=> alert("Tips: dra markören till rätt plats."));
-
-centerBtn.addEventListener("click", ()=> movePinToIndex(5));
-
-slots.addEventListener("mousedown", beginDrag);
-slots.addEventListener("touchstart", beginDrag, {passive:true});
-window.addEventListener("mousemove", onMove);
-window.addEventListener("touchmove", onMove, {passive:true});
-window.addEventListener("mouseup", endDrag);
-window.addEventListener("touchend", endDrag);
-
-// init visual
-movePinToIndex(5, false);
+// Minimal listeners placeholder (to mirror earlier console behavior)
+(async function minimalListeners(){
+  const {db,auth} = await waitForFirebase();
+  // In the earlier state these were either missing or incomplete.
+  // Keeping it minimal to match the behavior you saw.
+})();
