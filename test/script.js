@@ -1,4 +1,4 @@
-console.log("%cNOTESTREAM /test v0.520","font-weight:bold");
+console.log("%cNOTESTREAM /test v0.521","font-weight:bold");
 console.log("Using TEST RTDB:", "https://notestreamfire.europe-west1.firebasedatabase.app");
 // Importera Firebase-moduler och initiera appen
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -38,6 +38,7 @@ let currentSong = null;
 
 // Funktion för att lyssna på databasändringar (både standard- och användarspellistor)
 function initDataListeners() {
+  try { standardSongs = []; userPlaylistSongs = []; songs = []; sourceFilteredSongs = []; currentFilteredSongs = []; shownSongs = []; } catch(_){}
   // Läs standardspellistor (offentliga)
   onValue(ref(db, 'standardLists'), (snapshot) => {
     if (snapshot.exists()) {
@@ -539,3 +540,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 });
+
+// ---- TEST AUTH BOOTSTRAP ----
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Inloggad användare:", user.email);
+        const loginModal = document.getElementById("loginModal");
+        if (loginModal) loginModal.style.display = "none";
+        try { initDataListeners(); } catch(e){ console.error("initDataListeners fel:", e); }
+      } else {
+        console.log("Ingen användare inloggad (TEST). Visar login-modal om den finns.");
+        const loginModal = document.getElementById("loginModal");
+        if (loginModal) loginModal.style.display = "flex";
+      }
+    });
+  } catch(e){
+    console.warn("Kunde inte starta auth-lyssnare i TEST:", e);
+  }
+});
+// ---- END TEST AUTH BOOTSTRAP ----
