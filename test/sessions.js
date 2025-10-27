@@ -1,6 +1,7 @@
-// /test/sessions.js — v2 (place + challenge window + challenge place + reveal placeholder)
+// /test/sessions.js — v3 (place + challenge_window + challenge_place + reveal placeholder)
+// Nytt i v3: auto-timeouts + pointer-baserad drag/drop för placering & utmaning
 
-console.log("TEST sessions bootstrap v2");
+console.log("TEST sessions bootstrap v3");
 
 const el = (id) => document.getElementById(id);
 
@@ -44,6 +45,11 @@ let currentPhase = "lobby";
 let activeTeamId = null;
 let turnChByTeamId = null;
 
+// Drag state
+let dragging = false;
+let dragPointerId = null;
+let slotRects = null; // array of {el, left, right, mid, idx}
+
 // Helpers
 function randCode(n=4){
   const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -59,6 +65,22 @@ function waitForFirebase(){
   return new Promise(res=>{
     const t = setInterval(()=>{ if (window.db && window.auth){ clearInterval(t); res({db:window.db, auth:window.auth}); } }, 30);
   });
+}
+function computeSlotRects(){
+  const nodes = [...timelineWrap.querySelectorAll(".slot")];
+  return nodes.map(n=>{
+    const r = n.getBoundingClientRect();
+    return { el:n, left:r.left, right:r.right, mid:(r.left+r.right)/2, idx:parseInt(n.dataset.idx,10) };
+  });
+}
+function nearestIndexByX(x){
+  if (!slotRects || slotRects.length===0) return 0;
+  let best = slotRects[0], bestDist = Math.abs(x - slotRects[0].mid);
+  for (let i=1;i<slotRects.length;i++){
+    const d = Math.abs(x - slotRects[i].mid);
+    if (d < bestDist){ best=slotRects[i]; bestDist=d; }
+  }
+  return best.idx;
 }
 
 // Role toggles
@@ -150,6 +172,9 @@ async function attachSessionListeners(){
     btnChallenge.style.display = (currentPhase==="challenge_window" && myTeamId && activeTeamId!==myTeamId ? "" : "none");
     btnLockCh.style.display = (currentPhase==="challenge_place" && myTeamId && turnChByTeamId===myTeamId ? "" : "none");
     actionHint.textContent = isSessionHost ? "Du är Host" : "";
+
+    // Recompute slot rects when phase changes (layout might change)
+    if (timelineWrap.dataset.built === "1") slotRects = computeSlotRects();
   });
   unsub.push(()=>off(mref,"value",un1));
 
@@ -159,7 +184,12 @@ async function attachSessionListeners(){
     function tick(){
       const left = (t.startedAt + t.durationMs) - Date.now();
       timerLeft.textContent = msToClock(left);
-      if(left>0) requestAnimationFrame(tick); else timerLeft.textContent = "0:00";
+      if (left <= 0) {
+        // Auto-timeouts (host only)
+        if (isSessionHost) handleAutoTimeout(t.phase);
+        return;
+      }
+      requestAnimationFrame(tick);
     }
     tick();
   });
@@ -211,22 +241,59 @@ async function attachSessionListeners(){
   });
   unsub.push(()=>off(challengeRef,"value",un5));
 
-  // Build timeline (once)
+  // Build timeline (once) + pointer-based DnD
   if (!timelineWrap.dataset.built){
     timelineWrap.dataset.built = "1";
     for(let i=0;i<11;i++){
       const slot = document.createElement("div");
       slot.className = "slot"; slot.dataset.idx = String(i);
-      slot.addEventListener("click", async ()=>{
-        if (currentPhase==="challenge_place" && myTeamId && myTeamId===turnChByTeamId){
-          await update(challengeRef, { index:i });
-          return;
-        }
-        if (!canPlace){ console.warn("Placering nekad."); return; }
-        await set(placementRef, { teamId: myTeamId||"team", index:i });
-      });
       timelineWrap.appendChild(slot);
     }
+    slotRects = computeSlotRects();
+
+    // Pointer listeners on the whole timeline area
+    timelineWrap.addEventListener("pointerdown", async (ev)=>{
+      // Who is allowed to start drag?
+      const isChallengerPhase = (currentPhase==="challenge_place" && myTeamId && myTeamId===turnChByTeamId);
+      if (!canPlace && !isChallengerPhase) return;
+      dragging = true; dragPointerId = ev.pointerId;
+      timelineWrap.setPointerCapture(ev.pointerId);
+      timelineWrap.classList.add("dragging");
+      slotRects = computeSlotRects(); // refresh
+      const idx = nearestIndexByX(ev.clientX);
+      if (isChallengerPhase){
+        const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+        await update(ref(window.db, `sessions/${sessionCode}/turn/challenge`), { index: idx });
+      } else {
+        const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+        await set(ref(window.db, `sessions/${sessionCode}/turn/placement`), { teamId: myTeamId||"team", index: idx });
+      }
+      highlightSlot(idx);
+    });
+
+    timelineWrap.addEventListener("pointermove", async (ev)=>{
+      if (!dragging || ev.pointerId !== dragPointerId) return;
+      const idx = nearestIndexByX(ev.clientX);
+      highlightSlot(idx);
+      const isChallengerPhase = (currentPhase==="challenge_place" && myTeamId && myTeamId===turnChByTeamId);
+      if (isChallengerPhase){
+        const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+        await update(ref(window.db, `sessions/${sessionCode}/turn/challenge`), { index: idx });
+      } else if (canPlace){
+        const { ref, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+        await set(ref(window.db, `sessions/${sessionCode}/turn/placement`), { teamId: myTeamId||"team", index: idx });
+      }
+    });
+
+    timelineWrap.addEventListener("pointerup", (ev)=>{
+      if (ev.pointerId !== dragPointerId) return;
+      dragging = false; dragPointerId = null;
+      timelineWrap.releasePointerCapture(ev.pointerId);
+      timelineWrap.classList.remove("dragging");
+      clearHighlight();
+    });
+
+    window.addEventListener("resize", ()=>{ if (timelineWrap.dataset.built==="1") slotRects = computeSlotRects(); });
   }
 
   // Buttons
@@ -260,4 +327,40 @@ async function attachSessionListeners(){
       await set(tref, { phase:"reveal", startedAt:Date.now(), durationMs:0 });
     }
   });
+
+  // ---- Auto-timeouts (host only) ----
+  async function handleAutoTimeout(phase){
+    if (!isSessionHost) return;
+    if (phase === "place"){
+      // Auto-lock placement if inte låst, gå vidare till challenge_window
+      const plcSnap = await get(placementRef);
+      if (!plcSnap.exists()) return; // inget att göra
+      if (!plcSnap.val().locked) await update(placementRef, { locked:true });
+      const ws = await get(ref(db, `sessions/${sessionCode}/config/timers/challengeWindow`));
+      const secs = (ws.exists()?ws.val():10)|0;
+      await update(mref, { phase:"challenge_window" });
+      await set(tref, { phase:"challenge_window", startedAt:Date.now(), durationMs:secs*1000 });
+    } else if (phase === "challenge_window"){
+      // Ingen utmaning? Reveal direkt
+      const ch = await get(challengeRef);
+      if (!ch.exists() || ch.val().opted !== true){
+        await update(mref, { phase:"reveal" });
+        await set(tref, { phase:"reveal", startedAt:Date.now(), durationMs:0 });
+      }
+    } else if (phase === "challenge_place"){
+      // Challenger hann inte låsa → reveal ändå
+      await update(mref, { phase:"reveal" });
+      await set(tref, { phase:"reveal", startedAt:Date.now(), durationMs:0 });
+    }
+  }
+
+  // ---- UI helpers ----
+  function clearHighlight(){
+    timelineWrap.querySelectorAll(".slot").forEach(s=>s.classList.remove("active"));
+  }
+  function highlightSlot(idx){
+    clearHighlight();
+    const node = timelineWrap.querySelector(`.slot[data-idx="${idx}"]`);
+    if (node) node.classList.add("active");
+  }
 }
