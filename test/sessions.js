@@ -36,12 +36,19 @@ console.log("TEST sessions bootstrap loaded (fixed)");
   const scoreboard   = el("scoreboard");
   const timelineWrap = el("timeline");
   const activeTeam   = el("active-team");
+  const btnLockGuess = el("btn-lock-guess");
+  const btnChallenge = el("btn-challenge");
+  const btnLockCh    = el("btn-lock-challenge");
+  const actionHint   = el("action-hint");
 
   let sessionCode = null;
   let isHost = false;
   let myTeamId = null;
   let unsub = [];
-  let canPlace = false; // only true for active team during 'place' phase
+  let canPlace = false;
+  let isSessionHost = false;
+  let currentPhase = 'lobby';
+  let activeTeamId = null;
 
 
   function randCode(n=4){
@@ -139,12 +146,22 @@ console.log("TEST sessions bootstrap loaded (fixed)");
     const tref = ref(db, `sessions/${sessionCode}/timers`);
     const teamref = ref(db, `sessions/${sessionCode}/teams`);
     const placementRef = ref(db, `sessions/${sessionCode}/turn/placement`);
+    const challengeRef = ref(db, `sessions/${sessionCode}/turn/challenge`);
+    let turnChByTeamId = null;
 
     const un1 = onValue(mref, snap=>{
       const meta = snap.val(); if(!meta) return;
-      activeTeam.textContent = meta.activeTeamId || "-"; timerPhase.textContent = meta.phase;
+      activeTeam.textContent = meta.activeTeamId || "-";
+      timerPhase.textContent = meta.phase;
+      currentPhase = meta.phase;
+      activeTeamId = meta.activeTeamId || null;
       const uid = (window.auth && window.auth.currentUser) ? window.auth.currentUser.uid : null;
-      canPlace = !!(uid && meta.phase === 'place' && myTeamId && meta.activeTeamId === myTeamId);
+      isSessionHost = !!(uid && meta.hostUid === uid);
+      canPlace = !!(uid && currentPhase === 'place' && myTeamId && activeTeamId === myTeamId);
+
+      btnLockGuess.style.display = (canPlace ? '' : 'none');
+      btnChallenge.style.display = (currentPhase === 'challenge_window' && myTeamId && activeTeamId !== myTeamId ? '' : 'none');
+      // btnLockCh visibility will also depend on challenge.byTeamId listener
     });
     const un2 = onValue(tref, snap=>{
       const t = snap.val(); if(!t){ timerLeft.textContent = "—"; return; }
@@ -169,6 +186,27 @@ console.log("TEST sessions bootstrap loaded (fixed)");
     unsub.push(()=>off(tref, 'value', un2));
     unsub.push(()=>off(teamref, 'value', un3));
     unsub.push(()=>off(placementRef, 'value', un4));
+    const un5 = onValue(challengeRef, snap=>{
+      const ch = snap.val()||null;
+      turnChByTeamId = ch && ch.byTeamId ? ch.byTeamId : null;
+      if(currentPhase === 'challenge_place'){
+        btnLockCh.style.display = (myTeamId && turnChByTeamId === myTeamId) ? '' : 'none';
+      } else {
+        btnLockCh.style.display = 'none';
+      }
+      const idx = ch && typeof ch.index==='number' ? ch.index|0 : null;
+      if (idx !== null) {
+        document.querySelectorAll('.pin.dashed').forEach(p=>p.remove());
+        const el2 = document.querySelector(`.slot[data-idx="${idx}"]`);
+        if (el2) {
+          const pin2 = document.createElement("div");
+          pin2.className = "pin dashed"; pin2.textContent = "UTMANING";
+          el2.appendChild(pin2);
+        }
+      }
+    });
+    unsub.push(()=>off(challengeRef, 'value', un5));
+
 
     // Build timeline click slots (once)
     if (!timelineWrap.dataset.built){
@@ -177,7 +215,13 @@ console.log("TEST sessions bootstrap loaded (fixed)");
         const slot = document.createElement("div");
         slot.className = "slot"; slot.dataset.idx = String(i);
         slot.addEventListener("click", async ()=>{
-          await set(placementRef, { teamId: myTeamId||'team', index: i });
+          if (!canPlace && currentPhase === 'challenge_place') {
+          const { ref, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+          if (myTeamId && myTeamId === turnChByTeamId) { await update(challengeRef, { index: i }); }
+          return;
+        }
+        if (!canPlace) { console.warn("Placering nekad: inte aktivt lag eller fel fas."); return; }
+        await set(placementRef, { teamId: myTeamId||'team', index: i });
         });
         timelineWrap.appendChild(slot);
       }
@@ -194,4 +238,38 @@ console.log("TEST sessions bootstrap loaded (fixed)");
       scoreboard.appendChild(div);
     });
   }
+})
+  btnLockGuess?.addEventListener('click', async ()=>{
+    const { ref, update, set, get } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+    if(currentPhase !== 'place' || !canPlace) return;
+    await update(ref(db, `sessions/${sessionCode}/turn/placement`), { locked: true });
+    if(isSessionHost){
+      const snap = await get(ref(db, `sessions/${sessionCode}/config/timers/challengeWindow`));
+      const secs = (snap.exists() ? snap.val() : 10) | 0;
+      await update(ref(db, `sessions/${sessionCode}/meta`), { phase: 'challenge_window' });
+      await set(ref(db, `sessions/${sessionCode}/timers`), { phase:'challenge_window', startedAt: Date.now(), durationMs: secs*1000 });
+    }
+  });
+
+  btnChallenge?.addEventListener('click', async ()=>{
+    const { ref, set, get, update } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+    if(currentPhase !== 'challenge_window' || (myTeamId && myTeamId === activeTeamId)) return;
+    await set(ref(db, `sessions/${sessionCode}/turn/challenge`), { opted:true, byTeamId: myTeamId, locked:false });
+    if(isSessionHost){
+      const secsSnap = await get(ref(db, `sessions/${sessionCode}/config/timers/challengePlace`));
+      const secs = (secsSnap.exists() ? secsSnap.val() : 20) | 0;
+      await update(ref(db, `sessions/${sessionCode}/meta`), { phase: 'challenge_place' });
+      await set(ref(db, `sessions/${sessionCode}/timers`), { phase:'challenge_place', startedAt: Date.now(), durationMs: secs*1000 });
+    }
+  });
+
+  btnLockCh?.addEventListener('click', async ()=>{
+    const { ref, update, set } = await import("https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js");
+    if(currentPhase !== 'challenge_place' || !myTeamId) return;
+    await update(ref(db, `sessions/${sessionCode}/turn/challenge`), { locked: true });
+    if(isSessionHost){
+      await update(ref(db, `sessions/${sessionCode}/meta`), { phase: 'reveal' });
+      await set(ref(db, `sessions/${sessionCode}/timers`), { phase:'reveal', startedAt: Date.now(), durationMs: 0 });
+    }
+  });
 })();
