@@ -1,6 +1,4 @@
-
-<script type="module">
-// /test/sessions.js — v2 compact (place + challenge window + challenge place + reveal placeholder)
+// /test/sessions.js — v2 (place + challenge window + challenge place + reveal placeholder)
 
 console.log("TEST sessions bootstrap v2");
 
@@ -263,4 +261,3 @@ async function attachSessionListeners(){
     }
   });
 }
-</script>
