@@ -23,13 +23,14 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 window.app = app;
-\1
-// === DEBUG DIAGNOSTICS (TEST) ===
+const db = getDatabase(app, "https://notestreamfire.europe-west1.firebasedatabase.app");
+// === DEBUG: DB options ===
 try {
   console.log("Firebase app options", app?.options);
   console.log("Resolved databaseURL", app?.options?.databaseURL);
 } catch(e){ console.warn("App options inspect failed", e); }
 // === END DEBUG ===
+
 const auth = getAuth(app);
 
 // Globala variabler för låtdatabasen
@@ -44,8 +45,7 @@ let currentSong = null;
 // Funktion för att lyssna på databasändringar (både standard- och användarspellistor)
 function initDataListeners() {
   // Läs standardspellistor (offentliga)
-  console.log("RTDB READ path:", \1);
-onValue(ref(db, \1), (snapshot) => {
+  onValue(ref(db, 'standardLists'), (snapshot) => {
     if (snapshot.exists()) {
       const rawPlaylists = snapshot.val();
       standardSongs = [];
@@ -72,8 +72,7 @@ onValue(ref(db, \1), (snapshot) => {
   
   // Läs användarspellistor baserat på aktuell användares UID
   const userId = auth.currentUser.uid;
-  console.log("RTDB READ path:", \1);
-onValue(ref(db, \1), (snapshot) => {
+  onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     console.log("Hämtar spellistor för användare:", userId);
     if (snapshot.exists()) {
       const userPlaylistsData = snapshot.val();
