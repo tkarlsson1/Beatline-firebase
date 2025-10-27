@@ -24,16 +24,6 @@ const app = initializeApp(firebaseConfig);
 window.app = app;
 const db = getDatabase(app);
 const auth = getAuth(app);
-// Ensure we only start listeners once the user is known
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    initDataListeners(user.uid);
-  } else {
-    // TODO: update UI to show logged-out state if needed
-    console.log("Ingen användare inloggad ännu.");
-  }
-});
-
 
 // Globala variabler för låtdatabasen
 let standardSongs = [];
@@ -45,7 +35,7 @@ let shownSongs = [];
 let currentSong = null;
 
 // Funktion för att lyssna på databasändringar (både standard- och användarspellistor)
-function initDataListeners(userId) {
+function initDataListeners() {
   // Läs standardspellistor (offentliga)
   onValue(ref(db, 'standardLists'), (snapshot) => {
     if (snapshot.exists()) {
@@ -73,6 +63,7 @@ function initDataListeners(userId) {
   });
   
   // Läs användarspellistor baserat på aktuell användares UID
+  const userId = auth.currentUser.uid;
   onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     console.log("Hämtar spellistor för användare:", userId);
     if (snapshot.exists()) {
@@ -443,7 +434,8 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
       return;
     }
-      const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
+    const userId = auth.currentUser.uid;
+    const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
     await set(userPlaylistsRef, { songs: tracks });
     alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
   } catch (error) {
