@@ -107,9 +107,8 @@
     </div>
   </div>
 
-  <!-- Prod base (init Firebase app, sets window.db & window.auth) -->
-  <script src="/test/script.js?v=3"></script>
-  <!-- Sessions module -->
+  <!-- Viktigt: båda skript laddas som ES-moduler och i rätt ordning -->
+  <script type="module" src="/test/script.js?v=4"></script>
   <script type="module" src="/test/sessions.js?v=3"></script>
 </body>
 </html>
