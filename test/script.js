@@ -27,6 +27,10 @@ window.app = app;
 const db = getDatabase(app, "https://notestreamfire.europe-west1.firebasedatabase.app");
 const auth = getAuth(app);
 
+
+// Expose for /test sessions
+window.db = db;
+window.auth = auth;
 // Globala variabler för låtdatabasen
 let standardSongs = [];
 let userPlaylistSongs = [];
@@ -314,8 +318,8 @@ window.filterSongs = function() {
 
 window.applyFilter = function() {
   if (filterSongs()) {
-    document.getElementById("filter-page").style.display = "none";
-    document.getElementById("result-page").style.display = "block";
+    (function(__n){return __n||{};}(document.getElementById("filter-page"))).style.display = "none";
+    (function(__n){return __n||{};}(document.getElementById("result-page"))).style.display = "block";
     updateSongCount();
   }
 };
@@ -361,7 +365,7 @@ window.generateQRCode = function(qr) {
 };
 
 window.revealDetails = function() {
-  document.getElementById("song-details").style.display = "block";
+  (function(__n){return __n||{};}(document.getElementById("song-details"))).style.display = "block";
 };
 
 window.goToFilter = function() {
@@ -369,8 +373,8 @@ window.goToFilter = function() {
   checkboxes.forEach(checkbox => { checkbox.checked = false; });
   updateYearSelection();
   restart();
-  document.getElementById("result-page").style.display = "none";
-  document.getElementById("filter-page").style.display = "block";
+  (function(__n){return __n||{};}(document.getElementById("result-page"))).style.display = "none";
+  (function(__n){return __n||{};}(document.getElementById("filter-page"))).style.display = "block";
 };
 
 // Spotify-token och caching
@@ -447,7 +451,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
   }
 }
 
-document.getElementById("addPlaylistButton").addEventListener("click", async () => {
+(function(__n){return __n&&__n.addEventListener?__n:null;}(document.getElementById("addPlaylistButton"))).addEventListener("click", async () => {
   const playlistName = document.getElementById("playlistNameInput").value.trim();
   const playlistLink = document.getElementById("playlistLinkInput").value.trim();
   if (!playlistName || !playlistLink) {
@@ -495,7 +499,7 @@ document.addEventListener("DOMContentLoaded", function() {
   lasForstLink.textContent = "Läs först";
   lasForstLink.addEventListener("click", (e) => {
     e.preventDefault();
-    document.getElementById("readmeModal").style.display = "block";
+    (function(__n){return __n||{};}(document.getElementById("readmeModal"))).style.display = "block";
     dropdownMenu.style.display = "none";
   });
   dropdownMenu.appendChild(lasForstLink);
@@ -518,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function() {
     signOut(auth)
       .then(() => {
         console.log("Utloggad!");
-        document.getElementById("loginModal").style.display = "flex";
+        (function(__n){return __n||{};}(document.getElementById("loginModal"))).style.display = "flex";
         dropdownMenu.style.display = "none";
       })
       .catch((error) => {
