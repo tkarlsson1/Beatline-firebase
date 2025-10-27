@@ -1,114 +1,114 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NOTESTREAM TEST v0.533</title>
-  <link rel="stylesheet" href="/test/styles.css?v=3">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM v0.522 (test)</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/test/styles.css">
 </head>
 <body>
   <div class="container">
-    <div class="toolbar">
-      <div class="kicker">NOTESTREAM /test</div>
+    <div class="panel hstack" style="justify-content:space-between;">
+      <div class="hstack" style="gap:8px;">
+        <span class="badge">/test</span>
+        <span class="badge">RTDB: <code class="k">notestreamfire</code></span>
+      </div>
       <div class="hstack">
-        <button id="role-host" class="primary">Host</button>
+        <button id="role-host" class="ghost">Host</button>
         <button id="role-join" class="ghost">Join</button>
       </div>
     </div>
 
-    <div class="grid grid-2">
-      <!-- Left: panels -->
-      <div class="vstack">
-        <!-- Host panel -->
-        <div class="panel" id="host-panel" style="display:none;">
-          <h2>Starta rum</h2>
-          <div class="vstack">
-            <label for="input-host-team">Lagnamn (host)</label>
-            <input id="input-host-team" type="text" placeholder="Lag 1">
-
-            <label for="input-custom-code">Eget rums-kod (valfritt)</label>
-            <input id="input-custom-code" type="text" placeholder="t.ex. ABCD">
-
-            <div class="hstack">
-              <div class="card" style="flex:1;">
-                <div class="small">Gissningstid (sek)</div>
-                <input id="guess-seconds" type="number" value="90" min="10" step="5">
-              </div>
-              <div class="card" style="flex:1;">
-                <div class="small">Challenge-fönster (sek)</div>
-                <input id="challenge-window" type="number" value="10" min="5" step="5">
-              </div>
-              <div class="card" style="flex:1;">
-                <div class="small">Utmanarens tid (sek)</div>
-                <input id="challenge-place" type="number" value="20" min="5" step="5">
-              </div>
-            </div>
-
-            <div class="hstack">
-              <button id="btn-create-room" class="primary">Skapa rum</button>
-            </div>
-          </div>
+    <div id="host-panel" class="panel vstack" style="display:none;">
+      <h3>Skapa rum (Host)</h3>
+      <div class="grid2">
+        <div class="vstack">
+          <label>Rumskod (valfritt)</label>
+          <input id="input-custom-code" placeholder="t.ex. K39Q" />
+          <label>Host lag-namn</label>
+          <input id="input-host-team" placeholder="Lag 1" />
         </div>
-
-        <!-- Join panel -->
-        <div class="panel" id="join-panel" style="display:none;">
-          <h2>Gå med i rum</h2>
-          <div class="vstack">
-            <label for="input-team-name">Lagnamn</label>
-            <input id="input-team-name" type="text" placeholder="Lag 2">
-
-            <label for="input-room-code">Rums-kod</label>
-            <input id="input-room-code" type="text" placeholder="ABCD">
-
-            <div class="hstack">
-              <button id="btn-join-room" class="primary">Gå med</button>
-            </div>
+        <div class="vstack">
+          <label>Timers</label>
+          <div class="hstack">
+            <span>Gissning (sek):</span>
+            <input id="guess-seconds" type="number" value="90" min="10" step="5"/>
           </div>
-        </div>
-
-        <!-- Room panel -->
-        <div class="panel" id="room-panel" style="display:none;">
-          <div class="room-header">
-            <div>Rum: <span class="room-code" id="room-code-display">—</span></div>
-            <div class="right timer">
-              <span id="timer-phase">—</span>
-              <span id="timer-left">0:00</span>
-            </div>
+          <div class="hstack">
+            <span>Utmana-fönster (sek):</span>
+            <input id="challenge-window" type="number" value="10" min="5" step="5"/>
           </div>
-
-          <div class="hstack" style="gap:10px; margin-bottom:10px;">
-            <div>Aktivt lag: <strong id="active-team">—</strong></div>
-            <div class="right">
-              <button id="btn-start-game" class="primary">Starta gissning</button>
-            </div>
-          </div>
-
-          <div class="timeline" id="timeline"></div>
-
-          <div class="hstack" id="action-row" style="gap:8px; margin-top:10px;">
-            <button id="btn-lock-guess" class="primary" style="display:none;">Lås in (gissning)</button>
-            <button id="btn-challenge" class="ghost" style="display:none;">Utmana</button>
-            <button id="btn-lock-challenge" class="primary" style="display:none;">Lås in (utmaning)</button>
-            <span class="small" id="action-hint"></span>
+          <div class="hstack">
+            <span>Utmana-placera (sek):</span>
+            <input id="challenge-place" type="number" value="20" min="5" step="5"/>
           </div>
         </div>
       </div>
+      <div class="hstack">
+        <button id="btn-create-room" class="primary">Skapa rum</button>
+        <button id="btn-start-game" class="ghost">Starta gissning</button>
+        <span class="small warning">* Start kräver att du skapat rum först</span>
+      </div>
+    </div>
 
-      <!-- Right: scoreboard -->
-      <div class="vstack">
-        <div class="panel">
-          <h2>Lag</h2>
-          <div id="scoreboard"></div>
+    <div id="join-panel" class="panel vstack" style="display:none;">
+      <h3>Gå med i rum</h3>
+      <div class="grid2">
+        <div class="vstack">
+          <label>Rumskod</label>
+          <input id="input-room-code" placeholder="K39Q" />
         </div>
-        <div class="footer">
-          Logga in först på denna enhet. Host styr faser & timers.
+        <div class="vstack">
+          <label>Lagnamn</label>
+          <input id="input-team-name" placeholder="Lag 2" />
         </div>
+      </div>
+      <div class="hstack"><button id="btn-join-room" class="primary">Gå med</button></div>
+    </div>
+
+    <div id="room-panel" class="panel vstack" style="display:none;">
+      <div class="hstack">
+        <div>Rumskod:</div>
+        <div class="bigcode" id="room-code-display"></div>
+        <div class="right hstack">
+          <div class="timer"><span id="timer-phase">—</span> · <span id="timer-left">0:00</span></div>
+        </div>
+      </div>
+      <div class="hstack" id="action-row" style="gap:8px;">
+        <button id="btn-lock-guess" class="primary" style="display:none;">Lås in (gissning)</button>
+        <button id="btn-challenge" class="ghost" style="display:none;">Utmana</button>
+        <button id="btn-lock-challenge" class="primary" style="display:none;">Lås in (utmaning)</button>
+        <span class="small" id="action-hint"></span>
+      </div>
+
+      <div>
+        <h4>Scoreboard</h4>
+        <div id="scoreboard" class="scoreboard"></div>
+      </div>
+      <hr/>
+      <div class="hstack">
+        <div>Aktivt lag:</div>
+        <strong id="active-team">-</strong>
+      </div>
+      <div>
+        <h4>Tidslinje (demo)</h4>
+        <div id="timeline" class="timeline"></div>
+        <div class="small">Klicka en ruta för att placera lagets markör (demo). Solid = placering.</div>
       </div>
     </div>
   </div>
 
-  <!-- Viktigt: båda skript laddas som ES-moduler och i rätt ordning -->
-  <script type="module" src="/test/script.js?v=5"></script>
-  <script type="module" src="/test/sessions.js?v=3"></script>
+  <script type="module" src="/test/script.js"></script>
+  <script type="module" src="/test/sessions.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/test/service-worker.test.js")
+        .then(r => console.log("Service Worker (test) registrerad:", r.scope))
+        .catch(e => console.error("SW (test) fel:", e));
+    }
+  </script>
 </body>
 </html>
