@@ -41,6 +41,8 @@ console.log("TEST sessions bootstrap loaded (fixed)");
   let isHost = false;
   let myTeamId = null;
   let unsub = [];
+  let canPlace = false; // only true for active team during 'place' phase
+
 
   function randCode(n=4){
     const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -141,6 +143,8 @@ console.log("TEST sessions bootstrap loaded (fixed)");
     const un1 = onValue(mref, snap=>{
       const meta = snap.val(); if(!meta) return;
       activeTeam.textContent = meta.activeTeamId || "-"; timerPhase.textContent = meta.phase;
+      const uid = (window.auth && window.auth.currentUser) ? window.auth.currentUser.uid : null;
+      canPlace = !!(uid && meta.phase === 'place' && myTeamId && meta.activeTeamId === myTeamId);
     });
     const un2 = onValue(tref, snap=>{
       const t = snap.val(); if(!t){ timerLeft.textContent = "—"; return; }
