@@ -1,16 +1,16 @@
-// service-worker.js (consolidated)
-// Notestream PWA — unified cache & offline fallback
-const NS_CACHE = 'ns-appshell-v1-2025-10-27';
+// /test/service-worker.test.js — scoped SW for /test
+const NS_CACHE = 'ns-test-appshell-v0-002';
 const NS_ASSETS = [
-  '/', '/index.html', '/manifest.json',
-  '/offline.html',
-  '/icon.png', '/icon-maskable.png', '/favicon.png'
+  '/test/',
+  '/test/index.html',
+  '/test/offline.html',
+  '/manifest.json',
+  '/icon.png',
+  '/icon-maskable.png'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(NS_CACHE).then(cache => cache.addAll(NS_ASSETS))
-  );
+  event.waitUntil(caches.open(NS_CACHE).then(c => c.addAll(NS_ASSETS)));
   self.skipWaiting();
 });
 
@@ -26,22 +26,18 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  // HTML navigations: go network first, fall back to offline.html
+  // Navigate requests: network first with offline fallback
   if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req).catch(() => caches.match('/offline.html'))
-    );
+    event.respondWith(fetch(req).catch(() => caches.match('/test/offline.html')));
     return;
   }
-
-  // For other GETs: stale-while-revalidate
   event.respondWith((async () => {
     const cached = await caches.match(req);
-    const network = fetch(req).then(res => {
+    const net = fetch(req).then(res => {
       const copy = res.clone();
-      caches.open(NS_CACHE).then(cache => cache.put(req, copy));
+      caches.open(NS_CACHE).then(c => c.put(req, copy));
       return res;
     }).catch(() => cached);
-    return cached || network;
+    return cached || net;
   })());
 });

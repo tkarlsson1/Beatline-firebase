@@ -1,3 +1,4 @@
+console.log("%cNOTESTREAM /test v0.520","font-weight:bold");
 console.log("Using TEST RTDB:", "https://notestreamfire.europe-west1.firebasedatabase.app");
 // Importera Firebase-moduler och initiera appen
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
