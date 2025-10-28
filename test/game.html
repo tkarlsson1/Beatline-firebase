@@ -12,7 +12,34 @@
       color: #e6eef8;
       padding: 2rem;
     }
-    h1 { margin-bottom: 1rem; }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    .team-header {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .team-box {
+      background: #11161d;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      min-width: 120px;
+    }
+    .team-box.active {
+      border-color: #00e0ff;
+      box-shadow: 0 0 8px #00e0ff;
+    }
+    .team-box h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+    }
+    .team-box p {
+      margin: 0.2rem 0;
+      font-size: 0.9rem;
+    }
     .team {
       background: #11161d;
       border: 1px solid rgba(255,255,255,.12);
@@ -35,11 +62,6 @@
       min-width: 80px;
       text-align: center;
     }
-    .active-label {
-      font-weight: bold;
-      color: #00e0ff;
-      margin-bottom: 1rem;
-    }
     button {
       padding: 0.6rem 1rem;
       font-size: 1rem;
@@ -57,7 +79,7 @@
 </head>
 <body>
   <h1>Spel pågår – NOTESTREAM</h1>
-  <div id="activeLabel" class="active-label">Väntar på tur...</div>
+  <div id="teamHeader" class="team-header"></div>
   <div id="gameArea"></div>
   <button id="addYearBtn" style="display:none;">Lägg till år</button>
 
@@ -83,57 +105,65 @@
 
     let activeTeamId = null;
     let myTeamId = null;
+    let allTeams = {};
 
+    const teamHeader = document.getElementById("teamHeader");
     const gameArea = document.getElementById("gameArea");
-    const activeLabel = document.getElementById("activeLabel");
     const addYearBtn = document.getElementById("addYearBtn");
 
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
-
       myTeamId = `team-${user.uid}`;
 
       const metaRef = ref(db, `sessions/${code}/meta`);
       onValue(metaRef, (snapshot) => {
         const meta = snapshot.val();
         activeTeamId = meta?.activeTeamId || null;
-        updateActiveLabel();
         updateAddButton();
+        renderTeamHeader();
+        renderActiveTimeline();
       });
 
       const teamsRef = ref(db, `sessions/${code}/teams`);
       onValue(teamsRef, (snapshot) => {
-        const teams = snapshot.val() || {};
-        renderActiveTimeline(teams);
+        allTeams = snapshot.val() || {};
+        renderTeamHeader();
+        renderActiveTimeline();
       });
     });
 
-    function updateActiveLabel() {
-      if (activeTeamId === myTeamId) {
-        activeLabel.textContent = "Din tur!";
-      } else {
-        activeLabel.textContent = "Väntar på tur...";
-      }
+    function renderTeamHeader() {
+      teamHeader.innerHTML = "";
+      Object.entries(allTeams).forEach(([teamId, team]) => {
+        const box = document.createElement("div");
+        box.className = "team-box" + (teamId === activeTeamId ? " active" : "");
+        box.innerHTML = `
+          <h3>${team.name}</h3>
+          <p>Tokens: ${team.tokens ?? 0}</p>
+          <p>Placerade kort: ${team.years?.length ?? 0}</p>
+        `;
+        teamHeader.appendChild(box);
+      });
     }
 
-    function updateAddButton() {
-      addYearBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none";
-    }
-
-    function renderActiveTimeline(teams) {
+    function renderActiveTimeline() {
       gameArea.innerHTML = "";
-      const team = teams[activeTeamId];
+      const team = allTeams[activeTeamId];
       if (!team) return;
 
       const div = document.createElement("div");
       div.className = "team";
       div.innerHTML = `
-        <h2>${team.name} (${team.tokens} tokens)</h2>
+        <h2>${team.name} – Din tidslinje</h2>
         <div class="timeline" id="timeline-${activeTeamId}">
           ${team.years?.map(y => `<div class="card">${y}</div>`).join("") || ""}
         </div>
       `;
       gameArea.appendChild(div);
+    }
+
+    function updateAddButton() {
+      addYearBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none";
     }
 
     addYearBtn.addEventListener("click", () => {
