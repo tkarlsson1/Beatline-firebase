@@ -101,6 +101,15 @@
         updateTeamList(teams);
       });
 
+      const metaRef = ref(db, `sessions/${code}/meta`);
+      onValue(metaRef, (snapshot) => {
+        const meta = snapshot.val();
+        if (meta?.phase === "place") {
+          localStorage.setItem("sessionCode", code);
+          window.location.href = "game.html";
+        }
+      });
+
       document.getElementById("joinBtn").addEventListener("click", () => {
         const name = document.getElementById("teamName").value.trim();
         if (!name) return alert("Ange ett lagnamn.");
