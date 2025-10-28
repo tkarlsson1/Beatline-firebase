@@ -24,7 +24,8 @@
       display: flex;
       gap: 8px;
       margin-top: 1rem;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      overflow-x: auto;
     }
     .card {
       background: #222;
@@ -34,15 +35,35 @@
       min-width: 80px;
       text-align: center;
     }
+    .active-label {
+      font-weight: bold;
+      color: #00e0ff;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      background: #0b939c;
+      color: white;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background: #0a7c85;
+    }
   </style>
 </head>
 <body>
   <h1>Spel pågår – NOTESTREAM</h1>
+  <div id="activeLabel" class="active-label">Väntar på tur...</div>
   <div id="gameArea"></div>
+  <button id="addYearBtn" style="display:none;">Lägg till år</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -59,34 +80,68 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
     const code = localStorage.getItem("sessionCode") || "—";
+
+    let activeTeamId = null;
+    let myTeamId = null;
+
     const gameArea = document.getElementById("gameArea");
+    const activeLabel = document.getElementById("activeLabel");
+    const addYearBtn = document.getElementById("addYearBtn");
 
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
 
+      myTeamId = `team-${user.uid}`;
+
+      const metaRef = ref(db, `sessions/${code}/meta`);
+      onValue(metaRef, (snapshot) => {
+        const meta = snapshot.val();
+        activeTeamId = meta?.activeTeamId || null;
+        updateActiveLabel();
+        updateAddButton();
+      });
+
       const teamsRef = ref(db, `sessions/${code}/teams`);
       onValue(teamsRef, (snapshot) => {
         const teams = snapshot.val() || {};
-        renderTeams(teams);
+        renderActiveTimeline(teams);
       });
     });
 
-    function renderTeams(teams) {
-      gameArea.innerHTML = "";
-      Object.entries(teams).forEach(([teamId, team]) => {
-        const startYear = team.years?.[0] || "—";
-        const div = document.createElement("div");
-        div.className = "team";
-        div.innerHTML = `
-          <h2>${team.name} (${team.tokens} tokens)</h2>
-          <p>Startår: <strong>${startYear}</strong></p>
-          <div class="timeline" id="timeline-${teamId}">
-            ${team.years?.map(y => `<div class="card">${y}</div>`).join("") || ""}
-          </div>
-        `;
-        gameArea.appendChild(div);
-      });
+    function updateActiveLabel() {
+      if (activeTeamId === myTeamId) {
+        activeLabel.textContent = "Din tur!";
+      } else {
+        activeLabel.textContent = "Väntar på tur...";
+      }
     }
+
+    function updateAddButton() {
+      addYearBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none";
+    }
+
+    function renderActiveTimeline(teams) {
+      gameArea.innerHTML = "";
+      const team = teams[activeTeamId];
+      if (!team) return;
+
+      const div = document.createElement("div");
+      div.className = "team";
+      div.innerHTML = `
+        <h2>${team.name} (${team.tokens} tokens)</h2>
+        <div class="timeline" id="timeline-${activeTeamId}">
+          ${team.years?.map(y => `<div class="card">${y}</div>`).join("") || ""}
+        </div>
+      `;
+      gameArea.appendChild(div);
+    }
+
+    addYearBtn.addEventListener("click", () => {
+      const year = prompt("Vilket år vill du lägga till?");
+      if (!year || isNaN(year)) return alert("Ogiltigt årtal.");
+      const yearsRef = ref(db, `sessions/${code}/teams/${activeTeamId}/years`);
+      push(yearsRef, parseInt(year));
+    });
   </script>
 </body>
 </html>
