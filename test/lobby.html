@@ -91,6 +91,11 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
+    const urlParams = new URLSearchParams(location.search);
+    const minYear = parseInt(urlParams.get("min")) || 1970;
+    const maxYear = parseInt(urlParams.get("max")) || 2020;
+    const selectedLists = urlParams.get("lists")?.split(",") || [];
+
     const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
     const teamList = document.getElementById("teamList");
     const startBtn = document.getElementById("startGameBtn");
@@ -116,7 +121,10 @@
           hostUid: user.uid,
           phase: "waiting",
           activeTeamId: null,
-          createdAt: Date.now()
+          createdAt: Date.now(),
+          minYear,
+          maxYear,
+          selectedLists
         },
         teams: {}
       });
@@ -134,9 +142,11 @@
       if (!name || !auth.currentUser) return alert("Ange ett lagnamn.");
       const teamId = `team-${auth.currentUser.uid}`;
       const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
+      const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
       set(teamRef, {
         name,
         tokens: 4,
+        startYear,
         years: [],
         members: {
           [auth.currentUser.uid]: true
@@ -150,7 +160,7 @@
       teamList.innerHTML = "";
       Object.values(teams).forEach(team => {
         const li = document.createElement("li");
-        li.textContent = `${team.name} (${team.tokens} tokens)`;
+        li.textContent = `${team.name} (${team.tokens} tokens) – Startår: ${team.startYear ?? "?"}`;
         teamList.appendChild(li);
       });
     }
