@@ -3,7 +3,7 @@ import { getDatabase, ref, set, update, onValue, push } from "https://www.gstati
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "DIN_API_KEY",
+  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
   authDomain: "notestreamfire.firebaseapp.com",
   databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
   projectId: "notestreamfire",
