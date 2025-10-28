@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.558</title>
+  <title>NOTESTREAM v0.559</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1896,25 +1896,32 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 </script>
 <script>
   document.getElementById("startGameBtn").addEventListener("click", () => {
-    const startYear = document.getElementById("startYear").value;
-    const endYear = document.getElementById("endYear").value;
+  const startYear = document.getElementById("startYear").value;
+  const endYear = document.getElementById("endYear").value;
 
-    const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
-      .map(cb => cb.value)
-      .filter(v => v !== "alla");
+  const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
+    .map(cb => cb.value)
+    .filter(v => v !== "alla");
 
-    if (selectedSources.length === 0) {
-      alert("Välj minst en spellista innan du startar.");
-      return;
-    }
+  if (!startYear || !endYear || selectedSources.length === 0) {
+    alert("Välj minst en spellista och ett årsspann.");
+    return;
+  }
 
-    const params = new URLSearchParams();
-    params.set("min", startYear);
-    params.set("max", endYear);
-    params.set("lists", selectedSources.join(","));
+  const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+  const sessionRef = window.firebaseRef(window.firebaseDb, `sessions/${sessionCode}/meta`);
 
-    window.location.href = `lobby.html?${params.toString()}`;
+  window.firebaseSet(sessionRef, {
+    minYear: parseInt(startYear),
+    maxYear: parseInt(endYear),
+    selectedLists: selectedSources,
+    phase: "waiting",
+    createdAt: Date.now()
+  }).then(() => {
+    window.location.href = `lobby.html?code=${sessionCode}`;
   });
+});
+
 </script>
 </body>
 </html>
