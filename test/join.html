@@ -48,6 +48,12 @@
     .team-list li {
       margin-bottom: 0.5rem;
     }
+    #countdown {
+      font-size: 3rem;
+      margin-top: 2rem;
+      font-weight: bold;
+      color: #00e0ff;
+    }
   </style>
 </head>
 <body>
@@ -64,6 +70,8 @@
     <h2>Lag i sessionen</h2>
     <ul class="team-list" id="teamList"></ul>
   </div>
+
+  <div id="countdown"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -105,8 +113,7 @@
       onValue(metaRef, (snapshot) => {
         const meta = snapshot.val();
         if (meta?.phase === "place") {
-          localStorage.setItem("sessionCode", code);
-          window.location.href = "game.html";
+          startCountdown();
         }
       });
 
@@ -136,6 +143,26 @@
         li.textContent = `${team.name} (${team.tokens} tokens)`;
         list.appendChild(li);
       });
+    }
+
+    function startCountdown() {
+      const countdownEl = document.getElementById("countdown");
+      let count = 5;
+      countdownEl.textContent = count;
+
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countdownEl.textContent = count;
+        } else {
+          countdownEl.textContent = "GO!";
+          clearInterval(interval);
+          setTimeout(() => {
+            localStorage.setItem("sessionCode", code);
+            window.location.href = "game.html";
+          }, 800);
+        }
+      }, 1000);
     }
   </script>
 </body>
