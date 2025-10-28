@@ -146,6 +146,7 @@
         box.innerHTML = `
           <h3>${team.name}</h3>
           <p>Tokens: ${team.tokens ?? 0}</p>
+          <p>Startår: ${team.startYear ?? "?"}</p>
           <p>Placerade kort: ${team.years ? Object.keys(team.years).length : 0}</p>
         `;
         teamHeader.appendChild(box);
@@ -162,6 +163,7 @@
       const yearCards = Object.values(team.years || {}).map(y => `<div class="card">${y}</div>`).join("");
       div.innerHTML = `
         <h2>${team.name} – Tidslinje</h2>
+        <p>Startår: ${team.startYear ?? "?"}</p>
         <div class="timeline" id="timeline-${activeTeamId}">
           ${yearCards}
         </div>
