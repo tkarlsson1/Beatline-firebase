@@ -97,7 +97,7 @@
     document.getElementById("sessionCode").textContent = sessionCode;
 
     new QRCode(document.getElementById("qr"), {
-      text: `${location.origin}/join.html?code=${sessionCode}`,
+      text: `${location.origin}/test/join.html?code=${sessionCode}`,
       width: 160,
       height: 160
     });
@@ -124,50 +124,44 @@
       if (!user) return;
 
       const sessionRef = ref(db, `sessions/${sessionCode}`);
-      // Endast uppdatera meta om nod inte redan innehåller värden, eller uppdatera utan att skriva över teams
-      update(ref(db, `sessions/${sessionCode}/meta`), {
-        hostUid: user.uid,
-        phase: "waiting",
-        activeTeamId: null,
-        createdAt: Date.now()
-      }).catch(e => console.warn('meta update failed', e));
+      set(sessionRef, {
+        meta: {
+          hostUid: user.uid,
+          phase: "waiting",
+          activeTeamId: null,
+          createdAt: Date.now()
+        },
+        teams: {}
+      });
 
       const teamsRef = ref(db, `sessions/${sessionCode}/teams`);
       onValue(teamsRef, (snapshot) => {
         const teams = snapshot.val() || {};
         updateTeamList(teams);
-        if (startBtn) startBtn.disabled = Object.keys(teams).length === 0;
+        startBtn.disabled = Object.keys(teams).length === 0;
       });
     });
 
-    const joinButton = document.getElementById("joinBtn");
-    if (joinButton) {
-      joinButton.addEventListener("click", () => {
-        const name = document.getElementById("teamName").value.trim();
-        if (!name) return alert("Ange ett lagnamn.");
-        if (!auth.currentUser) return alert("Autentisering saknas.");
-        const teamId = `team-${auth.currentUser.uid}`;
-        const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
-        const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
-        set(teamRef, {
-          name,
-          tokens: 4,
-          startYear,
-          years: [],
-          members: {
-            [auth.currentUser.uid]: true
-          }
-        }).then(() => {
-          document.getElementById("teamName").value = "";
-        }).catch(e => {
-          console.error('join set failed', e);
-          alert('Kunde inte gå med i sessionen just nu.');
-        });
+    document.getElementById("joinBtn").addEventListener("click", () => {
+      const name = document.getElementById("teamName").value.trim();
+      if (!name || !auth.currentUser) return alert("Ange ett lagnamn.");
+      const teamId = `team-${auth.currentUser.uid}`;
+      const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
+      const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
+      set(teamRef, {
+        name,
+        tokens: 4,
+        startYear,
+        years: [],
+        members: {
+          [auth.currentUser.uid]: true
+        }
+      }).then(() => {
+        document.getElementById("teamName").value = "";
       });
-    }
+    });
 
     function updateTeamList(teams) {
-      if (!teamList) return;
       teamList.innerHTML = "";
       Object.values(teams).forEach(team => {
         const li = document.createElement("li");
@@ -176,28 +170,22 @@
       });
     }
 
-    if (startBtn) {
-      startBtn.addEventListener("click", () => {
-        const teamsRef = ref(db, `sessions/${sessionCode}/teams`);
-        onValue(teamsRef, (snapshot) => {
-          const teams = snapshot.val() || {};
-          const teamIds = Object.keys(teams);
-          if (teamIds.length === 0) return;
-          const randomTeamId = teamIds[Math.floor(Math.random() * teamIds.length)];
-          const metaRef = ref(db, `sessions/${sessionCode}/meta`);
-          update(metaRef, {
-            phase: "place",
-            activeTeamId: randomTeamId
-          }).then(() => {
-            localStorage.setItem("sessionCode", sessionCode);
-            window.location.href = "game.html";
-          }).catch(e => {
-            console.error('meta update failed', e);
-            alert('Kunde inte starta spelet.');
-          });
-        }, { onlyOnce: true });
-      });
-    }
+    startBtn.addEventListener("click", () => {
+      const teamsRef = ref(db, `sessions/${sessionCode}/teams`);
+      onValue(teamsRef, (snapshot) => {
+        const teams = snapshot.val();
+        const teamIds = Object.keys(teams);
+        const randomTeamId = teamIds[Math.floor(Math.random() * teamIds.length)];
+        const metaRef = ref(db, `sessions/${sessionCode}/meta`);
+        update(metaRef, {
+          phase: "place",
+          activeTeamId: randomTeamId
+        }).then(() => {
+          localStorage.setItem("sessionCode", sessionCode);
+          window.location.href = "game.html";
+        });
+      }, { onlyOnce: true });
+    });
   </script>
 </body>
 </html>

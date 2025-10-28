@@ -99,6 +99,7 @@
     import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
+    // Firebase-konfiguration (samma som lobby/join)
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
       authDomain: "notestreamfire.firebaseapp.com",
@@ -189,13 +190,12 @@
     }
 
     function renderTeamHeader() {
-      if (!teamHeader) return;
       teamHeader.innerHTML = "";
       Object.entries(allTeams).forEach(([teamId, team]) => {
         const box = document.createElement("div");
         box.className = "team-box" + (teamId === activeTeamId ? " active" : "");
         box.innerHTML = `
-          <h3>${escapeHTML(team.name)}</h3>
+          <h3>${team.name}</h3>
           <p>Tokens: ${team.tokens ?? 0}</p>
           <p>Startår: ${team.startYear ?? "?"}</p>
           <p>Placerade kort: ${team.years ? Object.keys(team.years).length : 0}</p>
@@ -205,7 +205,6 @@
     }
 
     function renderActiveTimeline() {
-      if (!gameArea) return;
       gameArea.innerHTML = "";
       const team = allTeams[activeTeamId];
       if (!team) {
@@ -213,11 +212,11 @@
         return;
       }
 
-      const yearCards = Object.values(team.years || {}).map(y => `<div class="card">${escapeHTML(String(y))}</div>`).join("");
+      const yearCards = Object.values(team.years || {}).map(y => `<div class="card">${y}</div>`).join("");
       gameArea.innerHTML = `
-        <h2>${escapeHTML(team.name)} – Tidslinje</h2>
+        <h2>${team.name} – Tidslinje</h2>
         <p>Startår: ${team.startYear ?? "?"}</p>
-        <div class="timeline" id="timeline-${escapeHTML(activeTeamId)}">
+        <div class="timeline" id="timeline-${activeTeamId}">
           ${yearCards}
         </div>
       `;
@@ -225,7 +224,6 @@
 
     // Visa nästa låt för det aktiva laget
     function showNextSong() {
-      if (!songArea) return;
       songArea.innerHTML = "";
       if (!activeTeamId || !allTeams[activeTeamId]) {
         songArea.innerHTML = "<p>Inget aktivt lag valt ännu.</p>";
@@ -244,13 +242,13 @@
         : currentSong.source;
 
       const html = `
-        <h2>${escapeHTML(allTeams[activeTeamId].name)}: Gissa låtens år</h2>
-        <p><strong>${escapeHTML(currentSong.artist)}</strong> – ${escapeHTML(currentSong.title)}</p>
+        <h2>${allTeams[activeTeamId].name}: Gissa låtens år</h2>
+        <p><strong>${currentSong.artist}</strong> – ${currentSong.title}</p>
         <div id="qrcode"></div>
         <div style="margin-top:.5rem;" class="muted">Öppna i Spotify via QR-koden</div>
         <div id="reveal" style="display:none; margin-top:1rem;">
-          <p>Rätt år: <strong>${escapeHTML(String(currentSong.year))}</strong></p>
-          <p>Spellista: ${escapeHTML(sourceText)}</p>
+          <p>Rätt år: <strong>${currentSong.year}</strong></p>
+          <p>Spellista: ${sourceText}</p>
         </div>
         <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem;">
           <button id="btnReveal">Visa svar</button>
@@ -261,80 +259,50 @@
       songArea.innerHTML = html;
 
       // Generera QR-kod
-      const qrEl = document.getElementById("qrcode");
-      if (qrEl) {
-        new QRCode(qrEl, {
-          text: spotifyUrl,
-          width: 160,
-          height: 160
-        });
-      }
+      new QRCode(document.getElementById("qrcode"), {
+        text: spotifyUrl,
+        width: 160,
+        height: 160
+      });
 
       // Handlers
-      const btnReveal = document.getElementById("btnReveal");
-      const btnSkip = document.getElementById("btnSkip");
-      const btnPlace = document.getElementById("btnPlace");
+      document.getElementById("btnReveal").addEventListener("click", () => {
+        document.getElementById("reveal").style.display = "block";
+      });
 
-      if (btnReveal) {
-        btnReveal.addEventListener("click", () => {
-          const r = document.getElementById("reveal");
-          if (r) r.style.display = "block";
-        });
-      }
+      document.getElementById("btnSkip").addEventListener("click", () => {
+        showNextSong();
+      });
 
-      if (btnSkip) {
-        btnSkip.addEventListener("click", () => {
-          showNextSong();
-        });
-      }
-
-      if (btnPlace) {
-        btnPlace.addEventListener("click", () => {
-          const y = parseInt(currentSong.year);
-          if (isNaN(y) || y < minYear || y > maxYear) {
-            alert(`Årtalet måste vara mellan ${minYear} och ${maxYear}.`);
-            return;
+      document.getElementById("btnPlace").addEventListener("click", () => {
+        const y = parseInt(currentSong.year);
+        if (isNaN(y) || y < minYear || y > maxYear) {
+          alert(`Årtalet måste vara mellan ${minYear} och ${maxYear}.`);
+          return;
+        }
+        const yearsRef = ref(db, `sessions/${code}/teams/${activeTeamId}/years`);
+        push(yearsRef, y).then(() => {
+          // Efter placering: byt aktivt lag (enkel rotation)
+          const teamIds = Object.keys(allTeams);
+          if (teamIds.length) {
+            const idx = teamIds.indexOf(activeTeamId);
+            const nextId = teamIds[(idx + 1) % teamIds.length];
+            update(ref(db, `sessions/${code}/meta`), {
+              activeTeamId: nextId
+            });
           }
-          const yearsRef = ref(db, `sessions/${code}/teams/${activeTeamId}/years`);
-          push(yearsRef, y).then(() => {
-            // Efter placering: byt aktivt lag (enkel rotation)
-            const teamIds = Object.keys(allTeams);
-            if (teamIds.length) {
-              const idx = teamIds.indexOf(activeTeamId);
-              const nextId = teamIds[(idx + 1) % teamIds.length];
-              update(ref(db, `sessions/${code}/meta`), {
-                activeTeamId: nextId
-              });
-            }
-          }).catch(e => {
-            console.error('push years failed', e);
-            alert('Kunde inte placera årtalet just nu.');
-          });
         });
-      }
+      });
     }
 
     function updateNextButton() {
-      if (!nextSongBtn) return;
       // Bara visa "Nästa låt"-knappen för aktivt lag hos den användaren
       nextSongBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none";
     }
 
-    if (nextSongBtn) {
-      nextSongBtn.addEventListener("click", () => {
-        showNextSong();
-      });
-    }
-
-    // Small escaping util used in template areas
-    function escapeHTML(str){
-      return String(str || '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
-    }
+    nextSongBtn.addEventListener("click", () => {
+      showNextSong();
+    });
   </script>
 </body>
 </html>

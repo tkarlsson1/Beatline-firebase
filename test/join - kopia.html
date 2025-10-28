@@ -81,9 +81,9 @@
     let maxYear = 2025;
 
     onValue(ref(db, `sessions/${sessionCode}/meta`), (snapshot) => {
-      const meta = snapshot.val() || {};
-      minYear = parseInt(meta.minYear) || 1970;
-      maxYear = parseInt(meta.maxYear) || 2025;
+      const meta = snapshot.val();
+      minYear = parseInt(meta?.minYear) || 1970;
+      maxYear = parseInt(meta?.maxYear) || 2025;
     });
 
     signInAnonymously(auth).then(() => {
@@ -93,33 +93,26 @@
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
 
-      const joinBtn = document.getElementById("joinBtn");
-      if (joinBtn) {
-        joinBtn.addEventListener("click", () => {
-          const name = document.getElementById("teamName").value.trim();
-          if (!name) return alert("Ange ett lagnamn.");
-          if (!user) return alert("Autentisering saknas.");
+      document.getElementById("joinBtn").addEventListener("click", () => {
+        const name = document.getElementById("teamName").value.trim();
+        if (!name) return alert("Ange ett lagnamn.");
 
-          const teamId = `team-${user.uid}`;
-          const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
-          const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
+        const teamId = `team-${user.uid}`;
+        const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
+        const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
 
-          set(teamRef, {
-            name,
-            tokens: 4,
-            startYear,
-            years: [],
-            members: {
-              [user.uid]: true
-            }
-          }).then(() => {
-            window.location.href = "game.html";
-          }).catch(e => {
-            console.error('join set failed', e);
-            alert('Kunde inte gå med just nu.');
-          });
+        set(teamRef, {
+          name,
+          tokens: 4,
+          startYear,
+          years: [],
+          members: {
+            [user.uid]: true
+          }
+        }).then(() => {
+          window.location.href = "game.html";
         });
-      }
+      });
     });
   </script>
 </body>
