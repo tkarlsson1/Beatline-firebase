@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.555</title>
+  <title>NOTESTREAM v0.556</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -611,67 +611,72 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       }
       
       // Registreringsfunktion
-  const registerButton = document.getElementById("registerButton");
-  if (registerButton) {
-    registerButton.addEventListener("click", () => {
-      const email = document.getElementById("regEmail").value.trim();
-      const password = document.getElementById("regPassword").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log("Registrering lyckades:", userCredential.user.email);
-          document.getElementById("registerError").style.display = "none";
-          document.getElementById("registerModal").style.display = "none";
-        })
-        .catch((error) => {
-          console.error("Registreringsfel:", error);
-          document.getElementById("registerError").style.display = "block";
-          document.getElementById("registerError").textContent = error.message;
-        });
+const registerButton = document.getElementById("registerButton");
+if (registerButton) {
+  registerButton.addEventListener("click", () => {
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        console.log("Registrering lyckades:", userCredential.user.email);
+        document.getElementById("registerError").style.display = "none";
+        document.getElementById("registerModal").style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Registreringsfel:", error);
+        document.getElementById("registerError").style.display = "block";
+        document.getElementById("registerError").textContent = error.message;
+      });
+  });
+}
+
+// 🔽 MARKERING: NY KOD FÖR STARTA SPEL-KNAPP MED FIREBASE
+const startBtn = document.getElementById("startGameBtn");
+if (startBtn) {
+  startBtn.addEventListener("click", () => {
+    const startYear = document.getElementById("startYear")?.value;
+    const endYear = document.getElementById("endYear")?.value;
+
+    const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
+      .map(cb => cb.value)
+      .filter(v => v !== "alla");
+
+    if (!startYear || !endYear || selectedSources.length === 0) {
+      alert("Välj minst en spellista och ett årsspann.");
+      return;
+    }
+
+    const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const sessionRef = window.firebaseRef(window.firebaseDb, `sessions/${sessionCode}/meta`);
+    window.firebaseSet(sessionRef, {
+      minYear: parseInt(startYear),
+      maxYear: parseInt(endYear),
+      selectedLists: selectedSources,
+      phase: "waiting",
+      createdAt: Date.now()
+    }).then(() => {
+      window.location.href = `lobby.html?code=${sessionCode}`;
     });
-  }
+  });
+}
+// 🔼 SLUT PÅ NY KOD
 
-  // MARKERING: NY KOD FÖR STARTA SPEL-KNAPP
-  const startBtn = document.getElementById("startGameBtn");
-  if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      const startYear = document.getElementById("startYear")?.value;
-      const endYear = document.getElementById("endYear")?.value;
-
-      const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
-        .map(cb => cb.value)
-        .filter(v => v !== "alla");
-
-      if (!startYear || !endYear || selectedSources.length === 0) {
-        alert("Välj minst en spellista och ett årsspann.");
-        return;
-      }
-
-      const params = new URLSearchParams();
-      params.set("min", startYear);
-      params.set("max", endYear);
-      params.set("lists", selectedSources.join(","));
-
-      window.location.href = `lobby.html?${params.toString()}`;
-    });
-  }
-  // MARKERING: SLUT PÅ NY KOD
-
-  // Glömt lösenord-funktion
-      const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-      if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          const email = document.getElementById("emailInput").value.trim();
-          if (!email) {
-            alert("Ange din e-postadress för att återställa lösenordet.");
-            return;
-          }
-          sendPasswordResetEmail(auth, email)
-            .then(() => {
-              alert("En återställningslänk har skickats till din e-post.");
-            })
-            .catch((error) => {
-              console.error("Fel vid återställning av lösenord:", error);
+// ✅ 30 rader efter
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+if (forgotPasswordLink) {
+  forgotPasswordLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("emailInput").value.trim();
+    if (!email) {
+      alert("Ange din e-postadress för att återställa lösenordet.");
+      return;
+    }
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        alert("En återställningslänk har skickats till din e-post.");
+      })
+      .catch((error) => {
+        console.error("Fel vid återställning av lösenord:", error);
               alert("Fel: " + error.message);
             });
         });
