@@ -113,7 +113,6 @@
 
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
-      myTeamId = `team-${user.uid}`;
 
       const metaRef = ref(db, `sessions/${code}/meta`);
       onValue(metaRef, (snapshot) => {
@@ -127,6 +126,13 @@
       const teamsRef = ref(db, `sessions/${code}/teams`);
       onValue(teamsRef, (snapshot) => {
         allTeams = snapshot.val() || {};
+
+        // Hitta vilket lag du tillhör via members
+        myTeamId = Object.entries(allTeams).find(([id, team]) =>
+          team.members?.[user.uid] === true
+        )?.[0];
+
+        updateAddButton();
         renderTeamHeader();
         renderActiveTimeline();
       });
@@ -154,7 +160,7 @@
       const div = document.createElement("div");
       div.className = "team";
       div.innerHTML = `
-        <h2>${team.name} – Din tidslinje</h2>
+        <h2>${team.name} – Tidslinje</h2>
         <div class="timeline" id="timeline-${activeTeamId}">
           ${team.years?.map(y => `<div class="card">${y}</div>`).join("") || ""}
         </div>
