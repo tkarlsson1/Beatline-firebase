@@ -5,11 +5,11 @@ if (!window.ns) window.ns = {};
 /* classic block #1 */
 function escapeHTML(str){
   return String(str)
-;.replace(/&/g,'&amp;')
-;.replace(/</g,'&lt;')
-;.replace(/>/g,'&gt;')
-;.replace(/"/g,'&quot;')
-;.replace(/'/g,'&#39;');
+.replace(/&/g,'&amp;')
+.replace(/</g,'&lt;')
+.replace(/>/g,'&gt;')
+.replace(/"/g,'&quot;')
+.replace(/'/g,'&#39;');
 }
 function setSafeHTML(el, html){
 }
@@ -63,13 +63,12 @@ document.addEventListener("DOMContentLoaded", function() {
         alert("Feedback kan inte vara tom!");
         return;
     }
-
-;.then(() => {
+.then(() => {
             alert("Tack för din feedback!");
             document.getElementById("feedbackText").value = "";
             document.getElementById("feedbackModal").style.display = "none";
         })
-;.catch((error) => {
+.catch((error) => {
             console.error("Fel vid lagring av feedback:", error);
             alert("Något gick fel. Försök igen senare.");
         });
@@ -82,11 +81,11 @@ document.addEventListener("DOMContentLoaded", function() {
               return;
           }
           updateCustomYear(currentPlaylistName, currentSpotifyID, newYear)
-;.then(() => {
+.then(() => {
                   console.log("Uppdatering lyckades, stänger modal.");
                   closeEditYearModal();
               })
-;.catch((error) => {
+.catch((error) => {
                   console.error("Fel vid uppdatering av customYear:", error);
               });
       });
@@ -98,10 +97,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 /* classic block #3 */
 if ("serviceWorker" in navigator) {
-;.then(registration => {
+.then(registration => {
           console.log("Service Worker registrerad med scope:", registration.scope);
         })
-;.catch(error => {
+.catch(error => {
           console.error("Service Worker misslyckades:", error);
         });
     }
