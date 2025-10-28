@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.561</title>
+  <title>NOTESTREAM v0.562</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -447,15 +447,16 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
-    const firebaseConfig = {
-      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-      authDomain: "beatlinefirebase.firebaseapp.com",
-      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "beatlinefirebase",
-      storageBucket: "beatlinefirebase.firebasedatabase.app",
-      messagingSenderId: "196231817325",
-      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-    };
+ const firebaseConfig = {
+  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+  authDomain: "notestreamfire.firebaseapp.com",
+  databaseURL: "https://notestreamfire-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "notestreamfire",
+  storageBucket: "notestreamfire.appspot.com",
+  messagingSenderId: "196231817325",
+  appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+};
+
     
     // Initiera Firebase
     const app = initializeApp(firebaseConfig);
