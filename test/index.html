@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.553</title>
+  <title>NOTESTREAM v0.554</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -611,42 +611,52 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       }
       
       // Registreringsfunktion
-      const registerButton = document.getElementById("registerButton");
-      if (registerButton) {
-        registerButton.addEventListener("click", () => {
-          const email = document.getElementById("regEmail").value.trim();
-          const password = document.getElementById("regPassword").value;
-          createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-              console.log("Registrering lyckades:", userCredential.user.email);
-              document.getElementById("registerError").style.display = "none";
-              document.getElementById("registerModal").style.display = "none";
-            })
-            .catch((error) => {
-              console.error("Registreringsfel:", error);
-              document.getElementById("registerError").style.display = "block";
-              document.getElementById("registerError").textContent = error.message;
-            });
-        });
-      }
-      
-      // Växla mellan modaler
-      const showRegisterBtn = document.getElementById("showRegister");
-      if (showRegisterBtn) {
-        showRegisterBtn.addEventListener("click", () => {
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("registerModal").style.display = "flex";
-        });
-      }
-      const showLoginBtn = document.getElementById("showLogin");
-      if (showLoginBtn) {
-        showLoginBtn.addEventListener("click", () => {
+  const registerButton = document.getElementById("registerButton");
+  if (registerButton) {
+    registerButton.addEventListener("click", () => {
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log("Registrering lyckades:", userCredential.user.email);
+          document.getElementById("registerError").style.display = "none";
           document.getElementById("registerModal").style.display = "none";
-          document.getElementById("loginModal").style.display = "flex";
+        })
+        .catch((error) => {
+          console.error("Registreringsfel:", error);
+          document.getElementById("registerError").style.display = "block";
+          document.getElementById("registerError").textContent = error.message;
         });
+    });
+  }
+
+  // MARKERING: NY KOD FÖR STARTA SPEL-KNAPP
+  const startBtn = document.getElementById("startGameBtn");
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      const startYear = document.getElementById("startYear")?.value;
+      const endYear = document.getElementById("endYear")?.value;
+
+      const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
+        .map(cb => cb.value)
+        .filter(v => v !== "alla");
+
+      if (!startYear || !endYear || selectedSources.length === 0) {
+        alert("Välj minst en spellista och ett årsspann.");
+        return;
       }
-      
-      // Glömt lösenord-funktion
+
+      const params = new URLSearchParams();
+      params.set("min", startYear);
+      params.set("max", endYear);
+      params.set("lists", selectedSources.join(","));
+
+      window.location.href = `lobby.html?${params.toString()}`;
+    });
+  }
+  // MARKERING: SLUT PÅ NY KOD
+
+  // Glömt lösenord-funktion
       const forgotPasswordLink = document.getElementById("forgotPasswordLink");
       if (forgotPasswordLink) {
         forgotPasswordLink.addEventListener("click", (e) => {
@@ -1391,7 +1401,8 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
       <button id="addPlaylistButton">Lägg till</button>
       </div>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
-      <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
+      <button id="startGameBtn" onclick="applyFilter()" class="start-button">Starta spel</button>
+
       
     </div>
     
