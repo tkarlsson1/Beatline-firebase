@@ -93,7 +93,7 @@
 
     const urlParams = new URLSearchParams(location.search);
     const minYear = parseInt(urlParams.get("min")) || 1970;
-    const maxYear = parseInt(urlParams.get("max")) || 2020;
+    const maxYear = parseInt(urlParams.get("max")) || 2025;
     const selectedLists = urlParams.get("lists")?.split(",") || [];
 
     const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
