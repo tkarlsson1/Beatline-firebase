@@ -1,35 +1,16 @@
 <!doctype html>
 <html lang="sv">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Offline – NOTESTREAM</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      background: #0b0f14;
-      color: #e6eef8;
-      font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    }
-    .card {
-      background: #0f151d;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      padding: 24px;
-      max-width: 520px;
-    }
-    .muted {
-      color: #a8b3c2;
-    }
-  </style>
-</head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline – Notestream</title>
+<link rel="stylesheet" href="/assets/css/style.css">
 <body>
-  <div class="card" role="main">
-    <h1>Du är offline</h1>
-    <p class="muted">Kontrollera din anslutning och försök igen.</p>
-  </div>
+  <main class="view">
+    <section class="card">
+      <h2>Du är offline</h2>
+      <p>Vissa funktioner kräver uppkoppling. Försök igen när du har internet.</p>
+      <button class="btn" onclick="location.reload()">Försök igen</button>
+    </section>
+  </main>
 </body>
 </html>

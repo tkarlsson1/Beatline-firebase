@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM – Lobby</title>
+  <style>
+    body { margin:0; font-family:system-ui, sans-serif; background:#0b0f14; color:#e6eef8; display:flex; flex-direction:column; align-items:center; padding:2rem; }
+    .panel { background:#11161d; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:1.5rem; max-width:480px; width:100%; margin-bottom:2rem; }
+    input, button { padding:.6rem; font-size:1rem; border-radius:6px; border:none; margin-top:.5rem; width:100%; box-sizing:border-box; }
+    button { background:#0b939c; color:white; cursor:pointer; }
+    button:hover{ background:#0a7c85; }
+    #qr{ margin:1rem auto; width:160px; height:160px; }
+  </style>
+</head>
+<body>
+  <h1>Lobby – NOTESTREAM</h1>
+  <div class="panel">
+    <label for="teamName">Ange lagnamn:</label>
+    <input type="text" id="teamName" placeholder="Lag 1" />
+    <button id="joinBtn">Gå med i session</button>
+  </div>
+
+  <div class="panel">
+    <h2>Sessionkod: <span id="sessionCode">—</span></h2>
+    <div id="qr"></div>
+    <ul id="teamList"></ul>
+    <button id="startGameBtn" disabled>Starta spel</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "notestreamfire.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "notestreamfire",
+      storageBucket: "notestreamfire.appspot.com",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    const urlParams = new URLSearchParams(location.search);
+    const sessionCode = urlParams.get("code") || localStorage.getItem("sessionCode") || "XXXX";
+    document.getElementById("sessionCode").textContent = sessionCode;
+
+    new QRCode(document.getElementById("qr"), { text: `${location.origin}/join.html?code=${sessionCode}`, width:160, height:160 });
+
+    let minYear = 1970, maxYear = 2025, selectedLists = [];
+
+    onValue(ref(db, `sessions/${sessionCode}/meta`), snapshot => {
+      const meta = snapshot.val() || {};
+      minYear = parseInt(meta.minYear) || 1970;
+      maxYear = parseInt(meta.maxYear) || 2025;
+      selectedLists = Array.isArray(meta.selectedLists) ? meta.selectedLists : [];
+    });
+
+    signInAnonymously(auth).catch(()=>{});
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      // Uppdatera meta utan att skriva över teams
+      update(ref(db, `sessions/${sessionCode}/meta`), { hostUid: user.uid, phase: "waiting", activeTeamId: null, createdAt: Date.now() }).catch(()=>{});
+      const teamsRef = ref(db, `sessions/${sessionCode}/teams`);
+      onValue(teamsRef, snapshot => {
+        const teams = snapshot.val() || {};
+        updateTeamList(teams);
+        document.getElementById("startGameBtn").disabled = Object.keys(teams).length === 0;
+      });
+    });
+
+    document.getElementById("joinBtn")?.addEventListener("click", () => {
+      const name = document.getElementById("teamName")?.value.trim();
+      if (!name) return alert("Ange ett lagnamn.");
+      if (!auth.currentUser) return alert("Autentisering saknas.");
+      const teamId = `team-${auth.currentUser.uid}`;
+      set(ref(db, `sessions/${sessionCode}/teams/${teamId}`), { name, tokens:4, startYear: Math.floor(Math.random()*(maxYear-minYear+1))+minYear, years: [], members: { [auth.currentUser.uid]: true } })
+        .then(()=>{ document.getElementById("teamName").value = ""; window.location.href = "game.html"; })
+        .catch(e => { console.error(e); alert("Kunde inte gå med i sessionen just nu."); });
+    });
+
+    function updateTeamList(teams){
+      const ul = document.getElementById("teamList"); if (!ul) return;
+      ul.innerHTML = "";
+      Object.values(teams).forEach(team => {
+        const li = document.createElement("li"); li.textContent = `${team.name} (${team.tokens} tokens) – Startår: ${team.startYear ?? "?"}`; ul.appendChild(li);
+      });
+    }
+
+    document.getElementById("startGameBtn")?.addEventListener("click", () => {
+      onValue(ref(db, `sessions/${sessionCode}/teams`), snapshot => {
+        const teams = snapshot.val() || {}; const teamIds = Object.keys(teams);
+        if (teamIds.length === 0) return alert("Inga lag anslutna.");
+        const randomTeam = teamIds[Math.floor(Math.random()*teamIds.length)];
+        update(ref(db, `sessions/${sessionCode}/meta`), { phase: "place", activeTeamId: randomTeam }).then(()=>{
+          localStorage.setItem("sessionCode", sessionCode);
+          window.location.href = "game.html";
+        }).catch(e=>{ console.error(e); alert("Kunde inte starta spelet."); });
+      }, { onlyOnce: true });
+    });
+  </script>
+</body>
+</html>

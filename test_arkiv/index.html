@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM v0.566</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :where(a,button,[role="button"],.answer-button,.edit-icon):focus{outline:3px solid rgba(0,0,0,.6);outline-offset:2px}
+    html, body { overflow-x: hidden; }
+    body { font-family: 'Manrope', sans-serif; background: url('background.jpg') no-repeat center center fixed; background-size: cover; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .container { padding: 2rem; max-width: 500px; width: 100%; margin: 2rem 1rem; position: relative; z-index: 1; }
+    .logo { display: block; margin: 0 auto 1.5rem auto; max-width: 80%; height: auto; }
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 5000; }
+    .modal-content { background: #fff; padding: 1.5rem; border-radius: 5px; text-align: center; max-width: 300px; width: 90%; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .close { float: right; cursor: pointer; font-size: 1.5rem; margin-top: -0.5rem; margin-right: -0.5rem; color: #333; }
+    #newYearInput { width: 80%; padding: 0.5rem; margin: 1rem 0; border: 1px solid #ccc; border-radius: 4px; }
+    #saveYearButton { padding: 0.5rem 1rem; background-color: #0b939c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-family: 'Manrope', sans-serif; }
+    #saveYearButton:hover { background-color: #0a7c85; }
+    select, button { padding: 0.5rem; font-size: 1rem; margin-bottom: 1rem; background: #032934; color: #fff; border: 1px solid #fff; border-radius: 4px; font-family: 'Manrope', sans-serif; }
+    select, button { border: none !important; }
+    #startYear, #endYear { width: 80px; }
+    #song-display { text-align: center; margin: 1.5rem 0; }
+    .qrcode { width: 160px; height: 160px; border: 5px solid black; border-radius: 10px; display: block; margin: 0 auto 1rem auto; }
+    #result-page { display: none; position: relative; padding-bottom: 10px; }
+    #source-checkbox-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.7rem 0.5rem; margin-bottom: 2rem; }
+    .checkbox-pill input[type="checkbox"] { display: none; }
+    .checkbox-pill label { cursor: pointer; padding: 0.5rem 0.5rem; border: 3px solid #032934; border-radius: 8px; background-color: #032934; color: #fff; }
+    .checkbox-pill input[type="checkbox"]:checked + label { background-color: #0b939c; color: #fff; border-color: #0b939c; }
+    .start-button { background: linear-gradient(to right, #fb1820, #ff6310); border: none; border-radius: 8px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all 0.3s ease-in-out; display: block; margin: 0 auto; }
+    .start-button:hover { transform: scale(1.03); }
+    body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "notestreamfire.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "notestreamfire",
+      storageBucket: "notestreamfire.appspot.com",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.app = app;
+    const db = getDatabase(app);
+    window.firebaseDb = db;
+    window.firebaseRef = ref;
+    window.firebaseSet = set;
+    const auth = getAuth(app);
+    window.auth = auth;
+
+    // Globals
+    window.currentPlaylistName = null;
+    window.currentSpotifyID = null;
+
+    // Safe HTML utilities
+    function escapeHTML(str){
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function setSafeHTML(el, html){
+      if (!el) return;
+      el.innerHTML = String(html).replace(/<script/gi,'&lt;script');
+    }
+    window.escapeHTML = escapeHTML;
+    window.setSafeHTML = setSafeHTML;
+
+    // State arrays
+    let standardSongs = [], userPlaylistSongs = [], songs = [], sourceFilteredSongs = [], currentFilteredSongs = [], shownSongs = [], currentSong = null;
+
+    // Attach UI handlers after DOM ready
+    document.addEventListener("DOMContentLoaded", () => {
+      // Try anonymous sign-in to expose auth for saved-user flows if no credentials
+      signInAnonymously(auth).catch(()=>{});
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("Autentiserad:", user.uid);
+          initDataListeners();
+        } else {
+          console.log("Ingen användare inloggad.");
+          // show login modal if desired
+        }
+      });
+
+      // Start-knapp binding (konsekvent id)
+      document.getElementById("startGameBtn")?.addEventListener("click", async () => {
+        const startYear = document.getElementById("startYear")?.value;
+        const endYear = document.getElementById("endYear")?.value;
+        const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked')).map(cb => cb.value).filter(v => v !== "alla");
+        if (!startYear || !endYear || selectedSources.length === 0) { alert("Välj minst en spellista och ett årsspann."); return; }
+        if (!window.auth || !window.auth.currentUser) { alert("Du måste vara inloggad för att starta en session."); return; }
+        const sessionCode = Math.random().toString(36).substring(2,6).toUpperCase();
+        const sessionRef = window.firebaseRef(window.firebaseDb, `sessions/${sessionCode}/meta`);
+        await window.firebaseSet(sessionRef, {
+          minYear: parseInt(startYear),
+          maxYear: parseInt(endYear),
+          selectedLists: selectedSources,
+          phase: "waiting",
+          createdAt: Date.now(),
+          hostUid: window.auth.currentUser.uid
+        });
+        localStorage.setItem("sessionCode", sessionCode);
+        window.location.href = `lobby.html?code=${sessionCode}`;
+      });
+
+      // Add playlist button
+      document.getElementById("addPlaylistButton")?.addEventListener("click", async () => {
+        const playlistName = document.getElementById("playlistNameInput")?.value.trim();
+        const playlistLink = document.getElementById("playlistLinkInput")?.value.trim();
+        if (!playlistName || !playlistLink) { alert("Fyll i både spellistans namn och länk!"); return; }
+        await addPlaylistToFirebase(playlistName, playlistLink);
+      });
+
+      // Modal handlers
+      document.getElementById("closeModal")?.addEventListener("click", closeEditYearModal);
+      document.getElementById("saveYearButton")?.addEventListener("click", () => {
+        const newYear = document.getElementById("newYearInput")?.value.trim();
+        if (!/^\d{4}$/.test(newYear)) { alert("Ange ett giltigt årtal med 4 siffror."); return; }
+        updateCustomYear(window.currentPlaylistName, window.currentSpotifyID, newYear).then(closeEditYearModal).catch(()=>{});
+      });
+
+      // Hamburger menu and other UI built later (existing code)
+    });
+
+    // DATA: init listeners
+    function initDataListeners(){
+      // standard lists
+      onValue(ref(db, 'standardLists'), (snapshot) => {
+        const raw = snapshot.val() || {};
+        standardSongs = [];
+        for (const playlistName in raw) {
+          const playlistData = raw[playlistName];
+          if (playlistData.songs) {
+            for (const trackId in playlistData.songs) {
+              standardSongs.push({ qr: trackId, ...playlistData.songs[trackId], source: [playlistName] });
+            }
+          }
+        }
+        mergeSongs();
+      });
+
+      // Attach user playlists listener only when currentUser exists
+      if (window.auth && window.auth.currentUser) attachUserPlaylistsListener();
+      onAuthStateChanged(auth, (user) => { if (user) attachUserPlaylistsListener(); });
+    }
+
+    function attachUserPlaylistsListener(){
+      if (!window.auth || !window.auth.currentUser) return;
+      const userId = window.auth.currentUser.uid;
+      onValue(ref(db, `userPlaylists/${userId}`), (snapshot) => {
+        const data = snapshot.val() || {};
+        userPlaylistSongs = [];
+        for (const playlistName in data) {
+          const playlistData = data[playlistName];
+          if (playlistData.songs) {
+            for (const trackId in playlistData.songs) {
+              userPlaylistSongs.push({ qr: trackId, ...playlistData.songs[trackId], source: [playlistName] });
+            }
+          }
+        }
+        mergeSongs();
+      });
+    }
+
+    function mergeSongs(){
+      const merged = {};
+      standardSongs.forEach(song => { merged[song.qr] = { ...song, source: [...song.source] }; });
+      userPlaylistSongs.forEach(song => {
+        if (merged[song.qr]) merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
+        else { const yearToUse = song.customYear ? song.customYear : song.year; merged[song.qr] = { ...song, year: yearToUse, source: [...song.source] }; }
+      });
+      songs = Object.values(merged);
+      populateSourceCheckboxes();
+    }
+
+    function populateSourceCheckboxes(){
+      const container = document.getElementById("source-checkbox-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const allDiv = document.createElement("div");
+      allDiv.className = "checkbox-pill";
+      const checkboxAll = document.createElement("input"); checkboxAll.type = "checkbox"; checkboxAll.name = "source"; checkboxAll.value = "alla"; checkboxAll.id = "source-alla";
+      checkboxAll.addEventListener("change", function(){ document.querySelectorAll('input[name="source"]').forEach(chk => chk.checked = this.checked); updateYearSelection(); });
+      const labelAll = document.createElement("label"); labelAll.htmlFor = "source-alla"; labelAll.textContent = "Alla låtar";
+      allDiv.appendChild(checkboxAll); allDiv.appendChild(labelAll);
+      container.appendChild(allDiv);
+
+      const standardHeading = document.createElement("p"); standardHeading.className = "subheading"; standardHeading.textContent = "Standardlistor";
+      container.appendChild(standardHeading);
+
+      const standardSources = Array.from(new Set(standardSongs.map(s => s.source[0]).filter(Boolean))).sort();
+      standardSources.forEach(source => {
+        const div = document.createElement("div"); div.className = "checkbox-pill";
+        const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.name = "source"; checkbox.value = source; checkbox.id = "standard-" + source.replace(/\s+/g,'-').toLowerCase();
+        checkbox.addEventListener("change", () => { updateSongCount(); });
+        const label = document.createElement("label"); label.htmlFor = checkbox.id; label.textContent = source;
+        div.appendChild(checkbox); div.appendChild(label); container.appendChild(div);
+      });
+
+      const divider = document.createElement("div"); divider.className = "divider"; container.appendChild(divider);
+      const userHeading = document.createElement("p"); userHeading.className = "subheading"; userHeading.textContent = "Egna spellistor"; container.appendChild(userHeading);
+
+      const userSources = Array.from(new Set(userPlaylistSongs.map(s => s.source[0]).filter(Boolean))).filter(src => !standardSources.includes(src)).sort();
+      userSources.forEach(source => {
+        const div = document.createElement("div"); div.className = "checkbox-pill";
+        const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.name = "source"; checkbox.value = source; checkbox.id = "user-" + source.replace(/\s+/g,'-').toLowerCase();
+        checkbox.addEventListener("change", () => { updateSongCount(); });
+        const label = document.createElement("label"); label.htmlFor = checkbox.id; label.textContent = source;
+        div.appendChild(checkbox); div.appendChild(label); container.appendChild(div);
+      });
+    }
+
+    function updateSongCount(){
+      const startEl = document.getElementById("startYear"); const endEl = document.getElementById("endYear");
+      const s = startEl ? parseInt(startEl.value) : NaN; const e = endEl ? parseInt(endEl.value) : NaN;
+      const count = sourceFilteredSongs.filter(song => { const y = parseInt(song.year); return !isNaN(y) && !isNaN(s) && !isNaN(e) && y >= s && y <= e; }).length;
+      const el = document.getElementById("selectedSongCount"); if (el) el.textContent = `Valda låtar: ${count}`;
+    }
+
+    window.updateYearSelection = function(){
+      const checked = Array.from(document.querySelectorAll('input[name="source"]:checked')).map(cb => cb.value);
+      let selected = checked;
+      if (checked.includes("alla")) {
+        const std = Array.from(new Set(standardSongs.map(s=>s.source[0]).filter(Boolean))); const usr = Array.from(new Set(userPlaylistSongs.map(s=>s.source[0]).filter(Boolean)));
+        selected = [...new Set([...std, ...usr])];
+      }
+      sourceFilteredSongs = songs.filter(song => song.source && song.source.some(src => selected.includes(src)));
+      const start = document.getElementById("startYear"); const end = document.getElementById("endYear");
+      if (!start || !end) return;
+      start.innerHTML = ""; end.innerHTML = "";
+      const thisYear = new Date().getFullYear();
+      for (let y = 1950; y <= thisYear; y++){ const o1 = document.createElement("option"); o1.value = y; o1.textContent = y; if (y===1950) o1.selected = true; start.appendChild(o1); const o2 = document.createElement("option"); o2.value = y; o2.textContent = y; if (y===thisYear) o2.selected = true; end.appendChild(o2); }
+      start.addEventListener("change", updateSongCount); end.addEventListener("change", updateSongCount);
+      updateSongCount();
+    };
+
+    window.filterSongs = function(){
+      const s = parseInt(document.getElementById("startYear")?.value); const e = parseInt(document.getElementById("endYear")?.value);
+      currentFilteredSongs = sourceFilteredSongs.filter(song => { const y = parseInt(song.year); return !isNaN(y) && y >= s && y <= e; });
+      updateSongCount();
+      shownSongs = [];
+      if (currentFilteredSongs.length > 0) { nextSong(); return true; }
+      alert("Inga låtar hittades i den valda perioden.");
+      document.getElementById("song-display").innerHTML = ""; return false;
+    };
+
+    window.applyFilter = function(){ if (filterSongs()){ document.getElementById("filter-page").style.display = "none"; document.getElementById("result-page").style.display = "block"; updateSongCount(); } };
+
+    window.nextSong = function(){
+      const remaining = currentFilteredSongs.filter(s => !shownSongs.includes(s));
+      if (remaining.length === 0) { alert("Inga fler låtar, tryck på menyvalet 'Startsida' för att börja om."); return; }
+      currentSong = remaining[Math.floor(Math.random()*remaining.length)];
+      shownSongs.push(currentSong);
+      displaySong(currentSong);
+    };
+
+    function displaySong(song){
+      if (!song) return;
+      const displayYear = song.customYear ? song.customYear : song.year;
+      const isUserSong = !(song.source && song.source.some(src => standardSongs.map(s=>s.source[0]).includes(src)));
+      const sd = document.getElementById("song-display"); if (!sd) return;
+      sd.innerHTML = `
+        <div id="qrcode-${escapeHTML(song.qr)}" class="qrcode"></div>
+        <button class="answer-button" onclick="revealDetails()">Visa svar</button>
+        <div id="song-details" style="display:none; margin-top:1rem; font-weight:bold;">
+          <div style="text-align:center; width:100%;">
+            <span style="display:inline-block; position:relative;">
+              <span class="year-text" style="font-size:4em; color:#fff;">${escapeHTML(displayYear)}</span>
+              ${isUserSong ? `<i class="edit-icon" onclick="openEditYearModal('${escapeHTML(song.source[0])}','${escapeHTML(song.qr)}','${escapeHTML(displayYear)}')">✎</i>` : ``}
+            </span>
+          </div>
+          <div class="info" style="font-size:1.4em; color:#fff;">${escapeHTML(song.artist)}<br>${escapeHTML(song.title)}</div>
+        </div>
+      `;
+      generateQRCode(song.qr);
+      const pi = document.getElementById("playlist-info"); if (pi) { pi.innerText = "Spellistor: " + (Array.isArray(song.source) ? song.source.join(", ") : song.source); pi.style.display = "none"; }
+    }
+
+    window.generateQRCode = function(qr){
+      const el = document.getElementById(`qrcode-${qr}`); if (!el) return; el.innerHTML = ""; new QRCode(el, { text: `https://open.spotify.com/track/${qr}`, width:160, height:160 });
+    };
+
+    window.revealDetails = function(){ const d = document.getElementById("song-details"); if (d) d.style.display = "block"; const pi = document.getElementById("playlist-info"); if (pi) pi.style.display = "block"; };
+
+    // Playlist import functions (uses backend-token)
+    async function getBackendSpotifyToken(){
+      const cached = localStorage.getItem('spotifyToken'); const expiry = localStorage.getItem('spotifyTokenExpiry');
+      if (cached && expiry && Date.now() < Number(expiry)) return cached;
+      try {
+        const res = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', { method: 'POST' });
+        if (!res.ok) { const t = await res.text().catch(()=>null); throw new Error(`HTTP ${res.status} ${t||''}`); }
+        const data = await res.json(); const token = data.access_token; const expiresIn = data.expires_in; const expiryTime = Date.now() + (expiresIn*1000) - 60000;
+        localStorage.setItem('spotifyToken', token); localStorage.setItem('spotifyTokenExpiry', expiryTime.toString()); return token;
+      } catch (err) { console.error(err); return null; }
+    }
+
+    async function fetchSpotifyPlaylist(playlistUrl){
+      const playlistId = playlistUrl.split("/playlist/")[1]?.split("?")[0]; if (!playlistId) throw new Error('Ogiltig playlist-URL');
+      const token = await getBackendSpotifyToken(); if (!token) throw new Error('Inget token');
+      let tracks = {}; let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+      while (nextUrl){
+        const resp = await fetch(nextUrl, { headers: { Authorization: `Bearer ${token}` }});
+        const data = await resp.json();
+        (data.items || []).forEach(item => {
+          const trackId = item.track?.id; if (!trackId) return;
+          tracks[trackId] = { title: item.track.name, artist: item.track.artists.map(a=>a.name).join(", "), year: item.track.album.release_date ? item.track.album.release_date.substring(0,4) : null };
+        });
+        nextUrl = data.next;
+      }
+      return tracks;
+    }
+
+    async function addPlaylistToFirebase(playlistName, playlistUrl){
+      try {
+        if (!window.auth || !window.auth.currentUser) { alert('Logga in först'); return; }
+        const tracks = await fetchSpotifyPlaylist(playlistUrl);
+        if (!tracks || Object.keys(tracks).length === 0) { alert('Ingen data hämtades från spellistan.'); return; }
+        const uid = window.auth.currentUser.uid; await set(ref(db, `userPlaylists/${uid}/${playlistName}`), { songs: tracks });
+        alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
+      } catch (err) { console.error(err); alert('Fel vid lagring av spellistan.'); }
+    }
+
+    // Edit year modal helpers
+    function openEditYearModal(playlistName, spotifyID, currentYear){
+      window.currentPlaylistName = playlistName; window.currentSpotifyID = spotifyID;
+      const inp = document.getElementById("newYearInput"); if (inp) inp.value = currentYear; const modal = document.getElementById("editYearModal"); if (modal) modal.style.display = "flex";
+    }
+    function closeEditYearModal(){ const modal = document.getElementById("editYearModal"); if (modal) modal.style.display = "none"; }
+    async function updateCustomYear(playlistName, spotifyID, newYear){
+      if (!window.auth || !window.auth.currentUser) throw new Error('Not authenticated');
+      const uid = window.auth.currentUser.uid;
+      const songRef = ref(db, `userPlaylists/${uid}/${playlistName}/songs/${spotifyID}`);
+      await set(songRef, { ...( (await (await fetch('/__dummy__')).json?.()) || {} ) }).catch(()=>{}); // noop placeholder: real update happens with update() below
+      // Use update to set customYear (keeping other fields)
+      try {
+        await window.firebaseSet(ref(db, `userPlaylists/${uid}/${playlistName}/songs/${spotifyID}/customYear`), newYear);
+      } catch(e){
+        // fallback to update
+        await (await import('https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js')).update(songRef, { customYear: newYear }).catch(()=>{});
+      }
+      mergeSongs();
+    }
+    window.openEditYearModal = openEditYearModal; window.closeEditYearModal = closeEditYearModal; window.updateCustomYear = updateCustomYear;
+
+    // Service worker registration (relative path)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').then(reg => console.log('SW registered', reg.scope)).catch(err => console.warn('SW failed', err));
+    }
+  </script>
+
+  <meta name="theme-color" content="#111111">
+</head>
+<body>
+  <div class="container" id="mainContent">
+    <img src="logga.png" alt="Notestream-beta logo" class="logo" />
+    <div id="filter-page">
+      <div id="source-checkbox-container"></div>
+      <div style="display:flex; justify-content:center; gap:1rem;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <label for="startYear">Från år:</label><select id="startYear"></select>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <label for="endYear">Till år:</label><select id="endYear"></select>
+        </div>
+      </div>
+      <div id="spotify-import" style="text-align:center; margin-top:1rem;">
+        <h3>Lägg till Spotify-spellista</h3>
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="width:40%; margin:6px;">
+        <input type="text" id="playlistNameInput" placeholder="Spellistans namn" style="width:40%; margin:6px;">
+        <button id="addPlaylistButton">Lägg till</button>
+      </div>
+      <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
+      <button id="startGameBtn" class="start-button">Starta spel</button>
+    </div>
+
+    <div id="result-page">
+      <div id="song-display"></div>
+      <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
+      <p id="playlist-info" style="display:none; text-align:center; color:#fff;"></p>
+    </div>
+  </div>
+
+  <div id="editYearModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3>Redigera årtal</h3>
+      <input id="newYearInput" type="text" placeholder="Ange nytt årtal">
+      <button id="saveYearButton">Spara</button>
+    </div>
+  </div>
+</body>
+</html>

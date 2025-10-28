@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM – Spel</title>
+  <style>
+    body { margin:0; font-family:system-ui, sans-serif; background:#0b0f14; color:#e6eef8; padding:2rem; }
+    .team-header { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem; }
+    .team-box { background:#11161d; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:.8rem 1rem; min-width:160px; }
+    .team-box.active { border-color:#00e0ff; box-shadow:0 0 8px #00e0ff; }
+    .panel { background:#11161d; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:1rem; margin-bottom:1.5rem; }
+    .timeline { display:flex; gap:8px; margin-top:1rem; overflow-x:auto; }
+    .card { background:#222; border:1px solid rgba(255,255,255,.2); border-radius:8px; padding:1rem; min-width:80px; text-align:center; }
+    button { padding:.6rem 1rem; font-size:1rem; border-radius:6px; border:none; background:#0b939c; color:#fff; cursor:pointer; margin-top:1rem; }
+    button:hover{ background:#0a7c85; }
+  </style>
+</head>
+<body>
+  <h1>Spel pågår – NOTESTREAM</h1>
+  <div id="teamHeader" class="team-header"></div>
+  <div class="row" style="display:flex; gap:1rem; flex-wrap:wrap;">
+    <div id="gameArea" class="panel" style="flex:1 1 340px;"></div>
+    <div id="songArea" class="panel" style="flex:1 1 340px;"></div>
+  </div>
+  <div class="panel">
+    <button id="nextSongBtn" style="display:none;">Nästa låt</button>
+    <span id="listsInfo" style="opacity:.8; font-size:.9rem;"></span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "notestreamfire.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "notestreamfire",
+      storageBucket: "notestreamfire.appspot.com",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+    const code = localStorage.getItem("sessionCode") || "—";
+
+    let activeTeamId = null, myTeamId = null, allTeams = {}, minYear=1970, maxYear=2025, selectedLists = [], allSongs = [], currentSong = null;
+
+    const teamHeader = document.getElementById("teamHeader"); const gameArea = document.getElementById("gameArea"); const songArea = document.getElementById("songArea");
+    const nextSongBtn = document.getElementById("nextSongBtn"); const listsInfo = document.getElementById("listsInfo");
+
+    onValue(ref(db, `sessions/${code}/meta`), snapshot => {
+      const meta = snapshot.val() || {};
+      activeTeamId = meta.activeTeamId || null; minYear = parseInt(meta.minYear) || 1970; maxYear = parseInt(meta.maxYear) || 2025;
+      selectedLists = Array.isArray(meta.selectedLists) ? meta.selectedLists : [];
+      listsInfo.textContent = selectedLists.length ? `Spellistor: ${selectedLists.join(", ")} | År: ${minYear}–${maxYear}` : "Inga listor valda";
+      renderTeamHeader(); renderActiveTimeline(); updateNextButton(); loadSongs();
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      onValue(ref(db, `sessions/${code}/teams`), snapshot => {
+        allTeams = snapshot.val() || {};
+        myTeamId = Object.entries(allTeams).find(([id, team]) => team.members?.[user.uid] === true)?.[0] || null;
+        renderTeamHeader(); renderActiveTimeline(); updateNextButton();
+      });
+    });
+
+    function loadSongs(){
+      onValue(ref(db, "standardLists"), (snapshot) => {
+        const raw = snapshot.val() || {}; const pool = [];
+        for (const listName of selectedLists) {
+          const list = raw[listName]; if (!list || !list.songs) continue;
+          for (const trackId in list.songs) {
+            const song = list.songs[trackId]; const y = parseInt(song.year);
+            if (!isNaN(y) && y >= minYear && y <= maxYear) pool.push({...song, qr: trackId, source: listName});
+          }
+        }
+        allSongs = pool; showNextSong();
+      }, { onlyOnce: true });
+    }
+
+    function renderTeamHeader(){
+      if (!teamHeader) return; teamHeader.innerHTML = "";
+      Object.entries(allTeams).forEach(([teamId, team]) => {
+        const box = document.createElement("div"); box.className = "team-box" + (teamId===activeTeamId ? " active" : "");
+        box.innerHTML = `<h3>${escapeHTML(team.name)}</h3><p>Tokens: ${team.tokens ?? 0}</p><p>Startår: ${team.startYear ?? "?"}</p><p>Placerade kort: ${team.years ? Object.keys(team.years).length : 0}</p>`;
+        teamHeader.appendChild(box);
+      });
+    }
+
+    function renderActiveTimeline(){
+      if (!gameArea) return; gameArea.innerHTML = "";
+      const team = allTeams[activeTeamId];
+      if (!team) { gameArea.innerHTML = "<p>Väntar på att ett aktivt lag ska väljas...</p>"; return; }
+      const yearCards = Object.values(team.years || {}).map(y => `<div class="card">${escapeHTML(String(y))}</div>`).join("");
+      gameArea.innerHTML = `<h2>${escapeHTML(team.name)} – Tidslinje</h2><p>Startår: ${team.startYear ?? "?"}</p><div class="timeline">${yearCards}</div>`;
+    }
+
+    function showNextSong(){
+      if (!songArea) return; songArea.innerHTML = "";
+      if (!activeTeamId || !allTeams[activeTeamId]) { songArea.innerHTML = "<p>Inget aktivt lag valt ännu.</p>"; return; }
+      if (allSongs.length === 0) { songArea.innerHTML = "<p>Inga låtar hittades i valda listor och årsspann.</p>"; return; }
+      currentSong = allSongs[Math.floor(Math.random()*allSongs.length)];
+      const spotifyUrl = `https://open.spotify.com/track/${currentSong.qr}`;
+      const sourceText = Array.isArray(currentSong.source) ? currentSong.source.join(", ") : currentSong.source;
+      songArea.innerHTML = `<h2>${escapeHTML(allTeams[activeTeamId].name)}: Gissa låtens år</h2><p><strong>${escapeHTML(currentSong.artist)}</strong> – ${escapeHTML(currentSong.title)}</p><div id="qrcode"></div><div style="margin-top:.5rem;" class="muted">Öppna i Spotify via QR-koden</div><div id="reveal" style="display:none; margin-top:1rem;"><p>Rätt år: <strong>${escapeHTML(String(currentSong.year))}</strong></p><p>Spellista: ${escapeHTML(sourceText)}</p></div><div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem;"><button id="btnReveal">Visa svar</button><button id="btnPlace">Placera år på tidslinjen</button><button id="btnSkip">Ny låt</button></div>`;
+      const qrEl = document.getElementById("qrcode"); if (qrEl) new QRCode(qrEl, { text: spotifyUrl, width:160, height:160 });
+      document.getElementById("btnReveal")?.addEventListener("click", ()=>{ const r=document.getElementById("reveal"); if (r) r.style.display="block"; });
+      document.getElementById("btnSkip")?.addEventListener("click", ()=> showNextSong());
+      document.getElementById("btnPlace")?.addEventListener("click", ()=> {
+        const y = parseInt(currentSong.year); if (isNaN(y) || y < minYear || y > maxYear) { alert(`Årtalet måste vara mellan ${minYear} och ${maxYear}.`); return; }
+        push(ref(db, `sessions/${code}/teams/${activeTeamId}/years`), y).then(()=> {
+          const teamIds = Object.keys(allTeams); if (teamIds.length) { const idx = teamIds.indexOf(activeTeamId); const nextId = teamIds[(idx+1)%teamIds.length]; update(ref(db, `sessions/${code}/meta`), { activeTeamId: nextId }); }
+        }).catch(e=>{ console.error(e); alert('Kunde inte placera årtalet.'); });
+      });
+    }
+
+    function updateNextButton(){ if (!nextSongBtn) return; nextSongBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none"; }
+    nextSongBtn?.addEventListener("click", ()=> showNextSong());
+
+    function escapeHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  </script>
+</body>
+</html>
