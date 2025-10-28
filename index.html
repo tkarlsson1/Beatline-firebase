@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.518</title>
+  <title>NOTESTREAM v0.560</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -452,7 +452,7 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       authDomain: "beatlinefirebase.firebaseapp.com",
       databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "beatlinefirebase",
-      storageBucket: "beatlinefirebase.firebasestorage.app",
+      storageBucket: "beatlinefirebase.firebasedatabase.app",
       messagingSenderId: "196231817325",
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
@@ -611,57 +611,72 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       }
       
       // Registreringsfunktion
-      const registerButton = document.getElementById("registerButton");
-      if (registerButton) {
-        registerButton.addEventListener("click", () => {
-          const email = document.getElementById("regEmail").value.trim();
-          const password = document.getElementById("regPassword").value;
-          createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-              console.log("Registrering lyckades:", userCredential.user.email);
-              document.getElementById("registerError").style.display = "none";
-              document.getElementById("registerModal").style.display = "none";
-            })
-            .catch((error) => {
-              console.error("Registreringsfel:", error);
-              document.getElementById("registerError").style.display = "block";
-              document.getElementById("registerError").textContent = error.message;
-            });
-        });
-      }
-      
-      // Växla mellan modaler
-      const showRegisterBtn = document.getElementById("showRegister");
-      if (showRegisterBtn) {
-        showRegisterBtn.addEventListener("click", () => {
-          document.getElementById("loginModal").style.display = "none";
-          document.getElementById("registerModal").style.display = "flex";
-        });
-      }
-      const showLoginBtn = document.getElementById("showLogin");
-      if (showLoginBtn) {
-        showLoginBtn.addEventListener("click", () => {
-          document.getElementById("registerModal").style.display = "none";
-          document.getElementById("loginModal").style.display = "flex";
-        });
-      }
-      
-      // Glömt lösenord-funktion
-      const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-      if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          const email = document.getElementById("emailInput").value.trim();
-          if (!email) {
-            alert("Ange din e-postadress för att återställa lösenordet.");
-            return;
-          }
-          sendPasswordResetEmail(auth, email)
-            .then(() => {
-              alert("En återställningslänk har skickats till din e-post.");
-            })
-            .catch((error) => {
-              console.error("Fel vid återställning av lösenord:", error);
+const registerButton = document.getElementById("registerButton");
+if (registerButton) {
+  registerButton.addEventListener("click", () => {
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        console.log("Registrering lyckades:", userCredential.user.email);
+        document.getElementById("registerError").style.display = "none";
+        document.getElementById("registerModal").style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Registreringsfel:", error);
+        document.getElementById("registerError").style.display = "block";
+        document.getElementById("registerError").textContent = error.message;
+      });
+  });
+}
+
+// 🔝 MARKERING: NY KOD FÖR STARTA SPEL-KNAPP MED FIREBASE
+const startBtn = document.getElementById("startGameBtn");
+if (startBtn) {
+  startBtn.addEventListener("click", () => {
+    const startYear = document.getElementById("startYear")?.value;
+    const endYear = document.getElementById("endYear")?.value;
+
+    const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
+      .map(cb => cb.value)
+      .filter(v => v !== "alla");
+
+    if (!startYear || !endYear || selectedSources.length === 0) {
+      alert("Välj minst en spellista och ett årsspann.");
+      return;
+    }
+
+    const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const sessionRef = window.firebaseRef(window.firebaseDb, `sessions/${sessionCode}/meta`);
+    window.firebaseSet(sessionRef, {
+      minYear: parseInt(startYear),
+      maxYear: parseInt(endYear),
+      selectedLists: selectedSources,
+      phase: "waiting",
+      createdAt: Date.now()
+    }).then(() => {
+      window.location.href = `lobby.html?code=${sessionCode}`;
+    });
+  });
+}
+// 🧾 SLUT PÅ NY KOD
+
+// ✅ 30 rader efter
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+if (forgotPasswordLink) {
+  forgotPasswordLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("emailInput").value.trim();
+    if (!email) {
+      alert("Ange din e-postadress för att återställa lösenordet.");
+      return;
+    }
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        alert("En återställningslänk har skickats till din e-post.");
+      })
+      .catch((error) => {
+        console.error("Fel vid återställning av lösenord:", error);
               alert("Fel: " + error.message);
             });
         });
@@ -708,10 +723,10 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
-      
+
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
-      
+
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
@@ -732,12 +747,12 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       allDiv.appendChild(labelAll);
       allHeader.appendChild(allDiv);
       container.appendChild(allHeader);
-      
+
       const standardHeading = document.createElement("p");
       standardHeading.className = "subheading";
       standardHeading.textContent = "Standardlistor";
       container.appendChild(standardHeading);
-      
+
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -762,16 +777,16 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
           container.appendChild(div);
         });
       }
-      
+
       let divider = document.createElement("div");
       divider.className = "divider";
       container.appendChild(divider);
-      
+
       const userHeading = document.createElement("p");
       userHeading.className = "subheading";
       userHeading.textContent = "Egna spellistor";
       container.appendChild(userHeading);
-      
+
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -798,7 +813,7 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
         });
       }
     }
-    
+
    function updateSongCount() {
     const startYear = parseInt(document.getElementById("startYear").value);
     const endYear = parseInt(document.getElementById("endYear").value);
@@ -815,6 +830,7 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
         console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
     }
 }
+
 
 window.updateYearSelection = function() {
     const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
@@ -881,6 +897,7 @@ for (let year = 1950; year <= thisYear; year++) {
 
     updateSongCount(); // ✅ Behåll detta här – säkerställer att låträknaren uppdateras vid spellisteval!
 };
+
 
 
 
@@ -1085,7 +1102,6 @@ window.goToFilter = function() {
     }
 }
 
-    
 document.getElementById("addPlaylistButton").addEventListener("click", async () => {
     const playlistName = document.getElementById("playlistNameInput").value.trim();
     const playlistLink = document.getElementById("playlistLinkInput").value.trim();
@@ -1195,7 +1211,7 @@ const logoutLink = document.createElement("a");
       });
     });
   </script>
-
+  
   <meta name="theme-color" content="#111111">
   <meta property="og:title" content="Låtårsquiz">
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
@@ -1308,6 +1324,7 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 </style>
 
 
+
 <style>
 /* Thinner divider between Standardlistor and Egna spellistor */
 hr, .divider, .section-divider {
@@ -1391,7 +1408,8 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
       <button id="addPlaylistButton">Lägg till</button>
       </div>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
-      <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
+      <button id="startGameBtn" onclick="applyFilter()" class="start-button">Starta spel</button>
+
       
     </div>
     
@@ -1476,6 +1494,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
         }
       });
      
+
 
 
       // Feedback-hantering
@@ -1588,7 +1607,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
         </div>
       </div>
     </div>
-
 
 <script>
 // === Hantera spellistor (via hamburgermenyn) ===
@@ -1766,7 +1784,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 })();
 </script>
 
-
 <script>
 // Fokusfälla + ESC-stängning för login-modalen
 (function(){ 
@@ -1816,7 +1833,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 })();
 </script>
 
-
 <script>
 // Set --vh to handle mobile 100vh correctly
 (function(){
@@ -1824,8 +1840,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
   setVH(); window.addEventListener('resize', setVH);
 })();
 </script>
-
-
 <script>
 // Shared modal manager: focus trap, ESC, and body scroll lock for any .modal
 (function(){

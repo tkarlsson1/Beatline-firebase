@@ -449,10 +449,10 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
     
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-      authDomain: "beatlinefirebase.firebaseapp.com",
-      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "beatlinefirebase",
-      storageBucket: "beatlinefirebase.firebasestorage.app",
+      authDomain: "notestreamfire.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "notestreamfire",
+      storageBucket: "notestreamfire.appspot.com",
       messagingSenderId: "196231817325",
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
@@ -997,7 +997,6 @@ songDisplay.innerHTML = `
 
 
 
-
 window.generateQRCode = function(qr) {
     const spotifyUrl = `https://open.spotify.com/track/${qr}`;
     const qrElement = document.getElementById(`qrcode-${qr}`);
@@ -1329,11 +1328,9 @@ hr, .divider, .section-divider {
   border-top-width: 0.5px !important;
   height: 0 !important;
 }
-/* If the divider is drawn via a top border on a container */
 #standard-vs-egna-divider {
   border-top: 0.5px solid rgba(255,255,255,.25) !important;
 }
-/* Common pattern: element with border-top around that area */
 .section-header + .section-header,
 h2 + hr, h3 + hr {
   border-top-width: 0.5px !important;
@@ -1605,7 +1602,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
       </div>
     </div>
 
-
 <script>
 // === Hantera spellistor (via hamburgermenyn) ===
 (function(){
@@ -1782,64 +1778,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 })();
 </script>
 
-
-<script>
-// Fokusfälla + ESC-stängning för login-modalen
-(function(){ 
-  function getFocusable(container){
-    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  }
-  function trapFocus(modal){
-    const nodes = getFocusable(modal);
-    if (!nodes.length) return;
-    const first = nodes[0];
-    const last = nodes[nodes.length - 1];
-    function onKey(e){
-      if (e.key === 'Escape') {
-        closeModal(modal);
-      } else if (e.key === 'Tab') {
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    }
-    modal.__trapKeyHandler = onKey;
-    modal.addEventListener('keydown', onKey);
-    // Sätt initialt fokus
-    (modal.querySelector('[autofocus]') || first).focus();
-  }
-  function untrapFocus(modal){
-    if (modal.__trapKeyHandler) modal.removeEventListener('keydown', modal.__trapKeyHandler);
-    modal.__trapKeyHandler = null;
-  }
-  function closeModal(modal){
-    // Stäng och lås upp scroll (samma mönster som tidigare)
-    modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
-    document.body.style.top = '';
-    window.scrollTo(0, 0 + (window.__loginScrollY || 0));
-    modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
-  }
-  // När modalen öppnas: sätt fokusfälla
-  document.addEventListener('modal:open', function(e){
-    const modal = e.target.closest('#loginModal');
-    if (modal) trapFocus(modal);
-  });
-  // När modalen stängs: ta bort fokusfällan
-  document.addEventListener('modal:close', function(e){
-    const modal = e.target.closest('#loginModal');
-    if (modal) untrapFocus(modal);
-  });
-})();
-</script>
-
-
-<script>
-// Set --vh to handle mobile 100vh correctly
-(function(){
-  function setVH(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
-  setVH(); window.addEventListener('resize', setVH);
-})();
-</script>
 
 
 <script>
