@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM – Gå med i spel</title>
+  <title>NOTESTREAM – Gå med</title>
   <style>
     body {
       margin: 0;
@@ -15,7 +15,9 @@
       align-items: center;
       padding: 2rem;
     }
-    h1 { margin-bottom: 1rem; }
+    h1 {
+      margin-bottom: 1rem;
+    }
     .panel {
       background: #11161d;
       border: 1px solid rgba(255,255,255,.12);
@@ -42,36 +44,16 @@
     button:hover {
       background: #0a7c85;
     }
-    .team-list {
-      margin-top: 1rem;
-    }
-    .team-list li {
-      margin-bottom: 0.5rem;
-    }
-    #countdown {
-      font-size: 3rem;
-      margin-top: 2rem;
-      font-weight: bold;
-      color: #00e0ff;
-    }
   </style>
 </head>
 <body>
   <h1>Gå med i spel</h1>
 
   <div class="panel">
-    <p>Sessionkod: <strong id="sessionCode">—</strong></p>
-    <label for="teamName">Ditt lagnamn:</label>
-    <input type="text" id="teamName" placeholder="Lag 2" />
+    <label for="teamName">Lagnamn:</label>
+    <input type="text" id="teamName" placeholder="Ditt lag" />
     <button id="joinBtn">Gå med</button>
   </div>
-
-  <div class="panel">
-    <h2>Lag i sessionen</h2>
-    <ul class="team-list" id="teamList"></ul>
-  </div>
-
-  <div id="countdown"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -92,78 +74,46 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code")?.toUpperCase() || "—";
-    document.getElementById("sessionCode").textContent = code;
+    const urlParams = new URLSearchParams(location.search);
+    const sessionCode = urlParams.get("code") || "XXXX";
+
+    let minYear = 1970;
+    let maxYear = 2025;
+
+    onValue(ref(db, `sessions/${sessionCode}/meta`), (snapshot) => {
+      const meta = snapshot.val();
+      minYear = parseInt(meta?.minYear) || 1970;
+      maxYear = parseInt(meta?.maxYear) || 2025;
+    });
 
     signInAnonymously(auth).then(() => {
       console.log("Anonymt inloggad");
     });
 
     onAuthStateChanged(auth, (user) => {
-      if (!user || code === "—") return;
-
-      const teamsRef = ref(db, `sessions/${code}/teams`);
-      onValue(teamsRef, (snapshot) => {
-        const teams = snapshot.val() || {};
-        updateTeamList(teams);
-      });
-
-      const metaRef = ref(db, `sessions/${code}/meta`);
-      onValue(metaRef, (snapshot) => {
-        const meta = snapshot.val();
-        if (meta?.phase === "place") {
-          startCountdown();
-        }
-      });
+      if (!user) return;
 
       document.getElementById("joinBtn").addEventListener("click", () => {
         const name = document.getElementById("teamName").value.trim();
         if (!name) return alert("Ange ett lagnamn.");
+
         const teamId = `team-${user.uid}`;
-        const teamRef = ref(db, `sessions/${code}/teams/${teamId}`);
+        const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
+        const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
+
         set(teamRef, {
           name,
           tokens: 4,
+          startYear,
           years: [],
           members: {
             [user.uid]: true
           }
         }).then(() => {
-          document.getElementById("teamName").value = "";
+          window.location.href = "game.html";
         });
       });
     });
-
-    function updateTeamList(teams) {
-      const list = document.getElementById("teamList");
-      list.innerHTML = "";
-      Object.values(teams).forEach(team => {
-        const li = document.createElement("li");
-        li.textContent = `${team.name} (${team.tokens} tokens)`;
-        list.appendChild(li);
-      });
-    }
-
-    function startCountdown() {
-      const countdownEl = document.getElementById("countdown");
-      let count = 5;
-      countdownEl.textContent = count;
-
-      const interval = setInterval(() => {
-        count--;
-        if (count > 0) {
-          countdownEl.textContent = count;
-        } else {
-          countdownEl.textContent = "GO!";
-          clearInterval(interval);
-          setTimeout(() => {
-            localStorage.setItem("sessionCode", code);
-            window.location.href = "game.html";
-          }, 800);
-        }
-      }, 1000);
-    }
   </script>
 </body>
 </html>

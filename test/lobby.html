@@ -92,13 +92,7 @@
     const auth = getAuth(app);
 
     const urlParams = new URLSearchParams(location.search);
-    const minYear = parseInt(urlParams.get("min")) || 1970;
-    const maxYear = parseInt(urlParams.get("max")) || 2025;
-    const selectedLists = urlParams.get("lists")?.split(",") || [];
-
-    const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-    const teamList = document.getElementById("teamList");
-    const startBtn = document.getElementById("startGameBtn");
+    const sessionCode = urlParams.get("code") || "XXXX";
 
     document.getElementById("sessionCode").textContent = sessionCode;
 
@@ -106,6 +100,20 @@
       text: `${location.origin}/test/join.html?code=${sessionCode}`,
       width: 160,
       height: 160
+    });
+
+    const teamList = document.getElementById("teamList");
+    const startBtn = document.getElementById("startGameBtn");
+
+    let minYear = 1970;
+    let maxYear = 2025;
+    let selectedLists = [];
+
+    onValue(ref(db, `sessions/${sessionCode}/meta`), (snapshot) => {
+      const meta = snapshot.val();
+      minYear = parseInt(meta?.minYear) || 1970;
+      maxYear = parseInt(meta?.maxYear) || 2025;
+      selectedLists = Array.isArray(meta?.selectedLists) ? meta.selectedLists : [];
     });
 
     signInAnonymously(auth).then(() => {
@@ -121,10 +129,7 @@
           hostUid: user.uid,
           phase: "waiting",
           activeTeamId: null,
-          createdAt: Date.now(),
-          minYear,
-          maxYear,
-          selectedLists
+          createdAt: Date.now()
         },
         teams: {}
       });
