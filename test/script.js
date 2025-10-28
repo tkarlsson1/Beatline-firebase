@@ -8,7 +8,7 @@ import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gsta
 
 // Konfiguration för NOTESTREAMFIRE-projektet
 const firebaseConfig = {
-  apiKey: "AIzaSyDUMMYKEYFORNOTESTREAM",
+  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
   authDomain: "notestreamfire.firebaseapp.com",
   databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
   projectId: "notestreamfire",
