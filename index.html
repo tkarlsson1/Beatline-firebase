@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.560</title>
+  <title>NOTESTREAM v0.508</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -452,7 +452,7 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       authDomain: "beatlinefirebase.firebaseapp.com",
       databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "beatlinefirebase",
-      storageBucket: "beatlinefirebase.firebasedatabase.app",
+      storageBucket: "beatlinefirebase.firebasestorage.app",
       messagingSenderId: "196231817325",
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
@@ -611,72 +611,57 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
       }
       
       // Registreringsfunktion
-const registerButton = document.getElementById("registerButton");
-if (registerButton) {
-  registerButton.addEventListener("click", () => {
-    const email = document.getElementById("regEmail").value.trim();
-    const password = document.getElementById("regPassword").value;
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log("Registrering lyckades:", userCredential.user.email);
-        document.getElementById("registerError").style.display = "none";
-        document.getElementById("registerModal").style.display = "none";
-      })
-      .catch((error) => {
-        console.error("Registreringsfel:", error);
-        document.getElementById("registerError").style.display = "block";
-        document.getElementById("registerError").textContent = error.message;
-      });
-  });
-}
-
-// 🔝 MARKERING: NY KOD FÖR STARTA SPEL-KNAPP MED FIREBASE
-const startBtn = document.getElementById("startGameBtn");
-if (startBtn) {
-  startBtn.addEventListener("click", () => {
-    const startYear = document.getElementById("startYear")?.value;
-    const endYear = document.getElementById("endYear")?.value;
-
-    const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
-      .map(cb => cb.value)
-      .filter(v => v !== "alla");
-
-    if (!startYear || !endYear || selectedSources.length === 0) {
-      alert("Välj minst en spellista och ett årsspann.");
-      return;
-    }
-
-    const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-    const sessionRef = window.firebaseRef(window.firebaseDb, `sessions/${sessionCode}/meta`);
-    window.firebaseSet(sessionRef, {
-      minYear: parseInt(startYear),
-      maxYear: parseInt(endYear),
-      selectedLists: selectedSources,
-      phase: "waiting",
-      createdAt: Date.now()
-    }).then(() => {
-      window.location.href = `lobby.html?code=${sessionCode}`;
-    });
-  });
-}
-// 🧾 SLUT PÅ NY KOD
-
-// ✅ 30 rader efter
-const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-if (forgotPasswordLink) {
-  forgotPasswordLink.addEventListener("click", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("emailInput").value.trim();
-    if (!email) {
-      alert("Ange din e-postadress för att återställa lösenordet.");
-      return;
-    }
-    sendPasswordResetEmail(auth, email)
-      .then(() => {
-        alert("En återställningslänk har skickats till din e-post.");
-      })
-      .catch((error) => {
-        console.error("Fel vid återställning av lösenord:", error);
+      const registerButton = document.getElementById("registerButton");
+      if (registerButton) {
+        registerButton.addEventListener("click", () => {
+          const email = document.getElementById("regEmail").value.trim();
+          const password = document.getElementById("regPassword").value;
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log("Registrering lyckades:", userCredential.user.email);
+              document.getElementById("registerError").style.display = "none";
+              document.getElementById("registerModal").style.display = "none";
+            })
+            .catch((error) => {
+              console.error("Registreringsfel:", error);
+              document.getElementById("registerError").style.display = "block";
+              document.getElementById("registerError").textContent = error.message;
+            });
+        });
+      }
+      
+      // Växla mellan modaler
+      const showRegisterBtn = document.getElementById("showRegister");
+      if (showRegisterBtn) {
+        showRegisterBtn.addEventListener("click", () => {
+          document.getElementById("loginModal").style.display = "none";
+          document.getElementById("registerModal").style.display = "flex";
+        });
+      }
+      const showLoginBtn = document.getElementById("showLogin");
+      if (showLoginBtn) {
+        showLoginBtn.addEventListener("click", () => {
+          document.getElementById("registerModal").style.display = "none";
+          document.getElementById("loginModal").style.display = "flex";
+        });
+      }
+      
+      // Glömt lösenord-funktion
+      const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+      if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const email = document.getElementById("emailInput").value.trim();
+          if (!email) {
+            alert("Ange din e-postadress för att återställa lösenordet.");
+            return;
+          }
+          sendPasswordResetEmail(auth, email)
+            .then(() => {
+              alert("En återställningslänk har skickats till din e-post.");
+            })
+            .catch((error) => {
+              console.error("Fel vid återställning av lösenord:", error);
               alert("Fel: " + error.message);
             });
         });
@@ -723,10 +708,10 @@ if (forgotPasswordLink) {
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
-
+      
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
-
+      
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
@@ -747,12 +732,12 @@ if (forgotPasswordLink) {
       allDiv.appendChild(labelAll);
       allHeader.appendChild(allDiv);
       container.appendChild(allHeader);
-
+      
       const standardHeading = document.createElement("p");
       standardHeading.className = "subheading";
       standardHeading.textContent = "Standardlistor";
       container.appendChild(standardHeading);
-
+      
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -777,16 +762,16 @@ if (forgotPasswordLink) {
           container.appendChild(div);
         });
       }
-
+      
       let divider = document.createElement("div");
       divider.className = "divider";
       container.appendChild(divider);
-
+      
       const userHeading = document.createElement("p");
       userHeading.className = "subheading";
       userHeading.textContent = "Egna spellistor";
       container.appendChild(userHeading);
-
+      
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -813,7 +798,7 @@ if (forgotPasswordLink) {
         });
       }
     }
-
+    
    function updateSongCount() {
     const startYear = parseInt(document.getElementById("startYear").value);
     const endYear = parseInt(document.getElementById("endYear").value);
@@ -830,7 +815,6 @@ if (forgotPasswordLink) {
         console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
     }
 }
-
 
 window.updateYearSelection = function() {
     const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
@@ -897,7 +881,6 @@ for (let year = 1950; year <= thisYear; year++) {
 
     updateSongCount(); // ✅ Behåll detta här – säkerställer att låträknaren uppdateras vid spellisteval!
 };
-
 
 
 
@@ -1102,6 +1085,7 @@ window.goToFilter = function() {
     }
 }
 
+    
 document.getElementById("addPlaylistButton").addEventListener("click", async () => {
     const playlistName = document.getElementById("playlistNameInput").value.trim();
     const playlistLink = document.getElementById("playlistLinkInput").value.trim();
@@ -1211,7 +1195,7 @@ const logoutLink = document.createElement("a");
       });
     });
   </script>
-  
+
   <meta name="theme-color" content="#111111">
   <meta property="og:title" content="Låtårsquiz">
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
@@ -1262,98 +1246,6 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
   color:#ccc; position:absolute; top:10px; right:20px; font-size:28px; font-weight:bold; cursor:pointer; z-index:5000;
 }
 #loginModal .closeBtn:hover, #authModal .closeBtn:hover, #signinModal .closeBtn:hover { color:#fff; }
-</style>
-
-
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-<style>
-/* Safe area for iOS */
-:root { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-/* Lock body scroll when modal open */
-body.modal-open { overflow: hidden; position: fixed; width: 100%; }
-/* Full-bleed screens */
-.screen, .app, .viewport { min-height: calc(var(--vh, 1vh) * 100); }
-</style>
-
-  <meta name="mobile-web-app-capable" content="yes">
-
-<style>
-/* Readme modal dark theme override (high specificity) */
-#readmeModal.modal { background: rgba(0,0,0,.6) !important; }
-#readmeModal.modal #readmeContent {
-  background: #111 !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
-  border-radius: 12px !important;
-  width: min(92vw, 600px) !important;
-  max-width: 600px !important;
-  margin: 6vh auto !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
-  max-height: 80vh !important;
-  overflow: auto !important;
-}
-#readmeModal .closeBtn { color: #ccc !important; }
-#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
-</style>
-
-
-<style>
-/* Force dark theme for Readme modal (robust selector) */
-#readmeModal { background: rgba(0,0,0,.6) !important; }
-#readmeModal > div, 
-#readmeModal .modal-content, 
-#readmeModal #readmeContent {
-  background: #111 !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
-  border-radius: 12px !important;
-  width: min(92vw, 600px) !important;
-  max-width: 600px !important;
-  margin: 6vh auto !important;
-  padding: 20px !important;
-  box-sizing: border-box !important;
-  max-height: 80vh !important;
-  overflow: auto !important;
-}
-#readmeModal .closeBtn { color: #ccc !important; position: absolute; top: 10px; right: 20px; }
-#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
-</style>
-
-
-
-<style>
-/* Thinner divider between Standardlistor and Egna spellistor */
-hr, .divider, .section-divider {
-  border-top-width: 0.5px !important;
-  height: 0 !important;
-}
-/* If the divider is drawn via a top border on a container */
-#standard-vs-egna-divider {
-  border-top: 0.5px solid rgba(255,255,255,.25) !important;
-}
-/* Common pattern: element with border-top around that area */
-.section-header + .section-header,
-h2 + hr, h3 + hr {
-  border-top-width: 0.5px !important;
-}
-</style>
-
-
-
-<style>
-/* Refined scrollbar hiding without touching background */
-html, body { overflow-x: hidden; }
-* { scrollbar-width: none; }                          /* Firefox */
-*::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-*::-webkit-scrollbar-thumb { background: transparent; border: none; }
-body { -ms-overflow-style: none; }                   /* Legacy Edge/IE */
-/* Guard against 100vw overflow causing a gutter */
-:root { --no-gutter-max: 100%; }
-body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 </style>
 
 </head>
@@ -1408,8 +1300,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
       <button id="addPlaylistButton">Lägg till</button>
       </div>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
-      <button id="startGameBtn" onclick="applyFilter()" class="start-button">Starta spel</button>
-
+      <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
       
     </div>
     
@@ -1421,11 +1312,17 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
     </div>
     
     <!-- Feedback Modal -->
-    
+    <div id="feedbackModal">
+      <div>
+        <span id="closeFeedback">&times;</span>
+        <h2>Lämna feedback</h2>
+        <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
+        <button id="submitFeedback">Skicka feedback</button>
+      </div>
     </div>
     
     <!-- Readme Modal -->
-    <div id="readmeModal" class="modal" role="dialog" aria-modal="true">
+    <div id="readmeModal">
       <div id="readmeContent">
         <span class="closeBtn">&times;</span>
         <h2>NOTESTREAM-BETA</h2>
@@ -1494,7 +1391,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
         }
       });
      
-
 
 
       // Feedback-hantering
@@ -1607,6 +1503,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
         </div>
       </div>
     </div>
+
 
 <script>
 // === Hantera spellistor (via hamburgermenyn) ===
@@ -1784,6 +1681,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 })();
 </script>
 
+
 <script>
 // Fokusfälla + ESC-stängning för login-modalen
 (function(){ 
@@ -1829,66 +1727,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
   document.addEventListener('modal:close', function(e){
     const modal = e.target.closest('#loginModal');
     if (modal) untrapFocus(modal);
-  });
-})();
-</script>
-
-<script>
-// Set --vh to handle mobile 100vh correctly
-(function(){
-  function setVH(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
-  setVH(); window.addEventListener('resize', setVH);
-})();
-</script>
-<script>
-// Shared modal manager: focus trap, ESC, and body scroll lock for any .modal
-(function(){
-  let __scrollY = 0;
-  function getFocusable(container){
-    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-  }
-  function lockBody(){
-    __scrollY = window.scrollY || window.pageYOffset || 0;
-    document.body.classList.add('modal-open');
-    document.body.style.top = `-${__scrollY}px`;
-  }
-  function unlockBody(){
-    document.body.classList.remove('modal-open');
-    const y = __scrollY || 0;
-    document.body.style.top = '';
-    window.scrollTo(0, y);
-  }
-  document.addEventListener('modal:open', function(e){
-    const modal = e.target.closest('.modal');
-    if (!modal) return;
-    lockBody();
-    const nodes = getFocusable(modal);
-    if (nodes.length){
-      const first = nodes[0];
-      const last = nodes[nodes.length-1];
-      function onKey(ev){
-        if (ev.key === 'Escape'){ 
-          modal.style.display = 'none';
-          unlockBody();
-          modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
-        } else if (ev.key === 'Tab'){
-          if (ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
-          else if (!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
-        }
-      }
-      modal.__trapKeyHandler = onKey;
-      modal.addEventListener('keydown', onKey);
-      (modal.querySelector('[autofocus]') || first).focus();
-    }
-  });
-  document.addEventListener('modal:close', function(e){
-    const modal = e.target.closest('.modal');
-    if (!modal) return;
-    if (modal.__trapKeyHandler){
-      modal.removeEventListener('keydown', modal.__trapKeyHandler);
-      modal.__trapKeyHandler = null;
-    }
-    unlockBody();
   });
 })();
 </script>

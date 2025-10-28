@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.559</title>
+  <title>NOTESTREAM v0.561</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -449,10 +449,10 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
     
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-      authDomain: "notestreamfire.firebaseapp.com",
-      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
-      projectId: "notestreamfire",
-      storageBucket: "notestreamfire.appspot.com",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      storageBucket: "beatlinefirebase.firebasedatabase.app",
       messagingSenderId: "196231817325",
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
@@ -630,7 +630,7 @@ if (registerButton) {
   });
 }
 
-// 🔽 MARKERING: NY KOD FÖR STARTA SPEL-KNAPP MED FIREBASE
+// 🔝 MARKERING: NY KOD FÖR STARTA SPEL-KNAPP MED FIREBASE
 const startBtn = document.getElementById("startGameBtn");
 if (startBtn) {
   startBtn.addEventListener("click", () => {
@@ -659,7 +659,7 @@ if (startBtn) {
     });
   });
 }
-// 🔼 SLUT PÅ NY KOD
+// 🧾 SLUT PÅ NY KOD
 
 // ✅ 30 rader efter
 const forgotPasswordLink = document.getElementById("forgotPasswordLink");
@@ -723,10 +723,10 @@ if (forgotPasswordLink) {
     function populateSourceCheckboxes() {
       const container = document.getElementById("source-checkbox-container");
       container.innerHTML = "";
-      
+
       const allHeader = document.createElement("div");
       allHeader.className = "allHeader";
-      
+
       const allDiv = document.createElement("div");
       allDiv.classList.add("checkbox-pill");
       allDiv.style.display = "inline-block";
@@ -747,12 +747,12 @@ if (forgotPasswordLink) {
       allDiv.appendChild(labelAll);
       allHeader.appendChild(allDiv);
       container.appendChild(allHeader);
-      
+
       const standardHeading = document.createElement("p");
       standardHeading.className = "subheading";
       standardHeading.textContent = "Standardlistor";
       container.appendChild(standardHeading);
-      
+
       let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
       standardSources.sort();
       if (standardSources.length > 0) {
@@ -777,16 +777,16 @@ if (forgotPasswordLink) {
           container.appendChild(div);
         });
       }
-      
+
       let divider = document.createElement("div");
       divider.className = "divider";
       container.appendChild(divider);
-      
+
       const userHeading = document.createElement("p");
       userHeading.className = "subheading";
       userHeading.textContent = "Egna spellistor";
       container.appendChild(userHeading);
-      
+
       let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
       userSources = userSources.filter(src => !standardSources.includes(src));
       userSources.sort();
@@ -813,7 +813,7 @@ if (forgotPasswordLink) {
         });
       }
     }
-    
+
    function updateSongCount() {
     const startYear = parseInt(document.getElementById("startYear").value);
     const endYear = parseInt(document.getElementById("endYear").value);
@@ -830,6 +830,7 @@ if (forgotPasswordLink) {
         console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
     }
 }
+
 
 window.updateYearSelection = function() {
     const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
@@ -896,6 +897,7 @@ for (let year = 1950; year <= thisYear; year++) {
 
     updateSongCount(); // ✅ Behåll detta här – säkerställer att låträknaren uppdateras vid spellisteval!
 };
+
 
 
 
@@ -994,6 +996,7 @@ songDisplay.innerHTML = `
     playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
   }
 }
+
 
 
 
@@ -1099,7 +1102,6 @@ window.goToFilter = function() {
     }
 }
 
-    
 document.getElementById("addPlaylistButton").addEventListener("click", async () => {
     const playlistName = document.getElementById("playlistNameInput").value.trim();
     const playlistLink = document.getElementById("playlistLinkInput").value.trim();
@@ -1209,7 +1211,7 @@ const logoutLink = document.createElement("a");
       });
     });
   </script>
-
+  
   <meta name="theme-color" content="#111111">
   <meta property="og:title" content="Låtårsquiz">
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
@@ -1322,15 +1324,18 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 </style>
 
 
+
 <style>
 /* Thinner divider between Standardlistor and Egna spellistor */
 hr, .divider, .section-divider {
   border-top-width: 0.5px !important;
   height: 0 !important;
 }
+/* If the divider is drawn via a top border on a container */
 #standard-vs-egna-divider {
   border-top: 0.5px solid rgba(255,255,255,.25) !important;
 }
+/* Common pattern: element with border-top around that area */
 .section-header + .section-header,
 h2 + hr, h3 + hr {
   border-top-width: 0.5px !important;
@@ -1489,6 +1494,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
         }
       });
      
+
 
 
       // Feedback-hantering
@@ -1778,8 +1784,62 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
 })();
 </script>
 
+<script>
+// Fokusfälla + ESC-stängning för login-modalen
+(function(){ 
+  function getFocusable(container){
+    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  }
+  function trapFocus(modal){
+    const nodes = getFocusable(modal);
+    if (!nodes.length) return;
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    function onKey(e){
+      if (e.key === 'Escape') {
+        closeModal(modal);
+      } else if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    modal.__trapKeyHandler = onKey;
+    modal.addEventListener('keydown', onKey);
+    // Sätt initialt fokus
+    (modal.querySelector('[autofocus]') || first).focus();
+  }
+  function untrapFocus(modal){
+    if (modal.__trapKeyHandler) modal.removeEventListener('keydown', modal.__trapKeyHandler);
+    modal.__trapKeyHandler = null;
+  }
+  function closeModal(modal){
+    // Stäng och lås upp scroll (samma mönster som tidigare)
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, 0 + (window.__loginScrollY || 0));
+    modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
+  }
+  // När modalen öppnas: sätt fokusfälla
+  document.addEventListener('modal:open', function(e){
+    const modal = e.target.closest('#loginModal');
+    if (modal) trapFocus(modal);
+  });
+  // När modalen stängs: ta bort fokusfällan
+  document.addEventListener('modal:close', function(e){
+    const modal = e.target.closest('#loginModal');
+    if (modal) untrapFocus(modal);
+  });
+})();
+</script>
 
-
+<script>
+// Set --vh to handle mobile 100vh correctly
+(function(){
+  function setVH(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
+  setVH(); window.addEventListener('resize', setVH);
+})();
+</script>
 <script>
 // Shared modal manager: focus trap, ESC, and body scroll lock for any .modal
 (function(){
@@ -1832,34 +1892,6 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
   });
 })();
 </script>
-<script>
-  document.getElementById("startGameBtn").addEventListener("click", () => {
-  const startYear = document.getElementById("startYear").value;
-  const endYear = document.getElementById("endYear").value;
 
-  const selectedSources = Array.from(document.querySelectorAll('input[name="source"]:checked'))
-    .map(cb => cb.value)
-    .filter(v => v !== "alla");
-
-  if (!startYear || !endYear || selectedSources.length === 0) {
-    alert("Välj minst en spellista och ett årsspann.");
-    return;
-  }
-
-  const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-  const sessionRef = window.firebaseRef(window.firebaseDb, `sessions/${sessionCode}/meta`);
-
-  window.firebaseSet(sessionRef, {
-    minYear: parseInt(startYear),
-    maxYear: parseInt(endYear),
-    selectedLists: selectedSources,
-    phase: "waiting",
-    createdAt: Date.now()
-  }).then(() => {
-    window.location.href = `lobby.html?code=${sessionCode}`;
-  });
-});
-
-</script>
 </body>
 </html>
