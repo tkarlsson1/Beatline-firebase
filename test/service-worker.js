@@ -1,74 +1,47 @@
-/* service-worker.js (refactor) */
-const CACHE_VERSION = 'v1.0.0';
-const STATIC_CACHE = `notestream-static-${CACHE_VERSION}`;
-const OFFLINE_URL = '/offline.html';
-
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  OFFLINE_URL,
-  '/assets/css/style.css',
-  '/assets/js/main.js',
-  '/assets/js/menus.js',
-  '/assets/js/ui.js',
-  '/assets/js/util.js',
-  '/assets/js/qr.js',
-  '/assets/js/spotify.js',
-  '/assets/js/data.js',
-  '/assets/js/sw-init.js',
+// service-worker.js (consolidated)
+// Notestream PWA — unified cache & offline fallback
+const NS_CACHE = 'ns-appshell-v1-2025-10-27';
+const NS_ASSETS = [
+  '/', '/index.html', '/manifest.json',
+  '/offline.html',
+  '/icon.png', '/icon-maskable.png', '/favicon.png'
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(STATIC_CACHE);
-    await cache.addAll(STATIC_ASSETS);
-    await self.skipWaiting();
-  })());
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(NS_CACHE).then(cache => cache.addAll(NS_ASSETS))
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map(k => { if(k !== STATIC_CACHE) return caches.delete(k); }));
+    await Promise.all(keys.filter(k => k !== NS_CACHE).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
 
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
 
-  // Bypass caching for APIs (Firebase/Spotify)
-  if (/googleapis\.com|firebaseio\.com|spotify\.com/.test(url.host)) {
-    return; // network-only
-  }
-
-  if (event.request.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const preload = await event.preloadResponse;
-        if (preload) return preload;
-        const net = await fetch(event.request);
-        const cache = await caches.open(STATIC_CACHE);
-        cache.put(event.request, net.clone());
-        return net;
-      } catch (e) {
-        const cache = await caches.open(STATIC_CACHE);
-        const cached = await cache.match(OFFLINE_URL);
-        return cached || new Response('Offline', { status: 503 });
-      }
-    })());
+  // HTML navigations: go network first, fall back to offline.html
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).catch(() => caches.match('/offline.html'))
+    );
     return;
   }
 
-  // Cache-first for static assets
-  if (STATIC_ASSETS.some(p => url.pathname === p)) {
-    event.respondWith((async () => {
-      const cache = await caches.open(STATIC_CACHE);
-      const cached = await cache.match(event.request);
-      if (cached) return cached;
-      const net = await fetch(event.request);
-      cache.put(event.request, net.clone());
-      return net;
-    })());
-  }
+  // For other GETs: stale-while-revalidate
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    const network = fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(NS_CACHE).then(cache => cache.put(req, copy));
+      return res;
+    }).catch(() => cached);
+    return cached || network;
+  })());
 });

@@ -1,16 +1,30 @@
 <!doctype html>
 <html lang="sv">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Offline – Notestream</title>
-<link rel="stylesheet" href="/assets/css/style.css">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOTESTREAM – Offline</title>
+  <meta name="theme-color" content="#111111">
+  <style>
+    html,body{height:100%;margin:0;background:#0b0b0b;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+    .card{width:min(92vw,600px);background:#111;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:20px}
+    h1{margin:0 0 8px;font-size:1.4rem}
+    p{opacity:.9;line-height:1.6}
+    .row{display:flex;gap:8px;margin-top:12px}
+    .btn{appearance:none;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:transparent;color:#fff;padding:.6rem 1rem;cursor:pointer}
+  </style>
+</head>
 <body>
-  <main class="view">
-    <section class="card">
-      <h2>Du är offline</h2>
-      <p>Vissa funktioner kräver uppkoppling. Försök igen när du har internet.</p>
-      <button class="btn" onclick="location.reload()">Försök igen</button>
-    </section>
-  </main>
+  <div class="wrap">
+    <div class="card" role="region" aria-label="Offline">
+      <h1>Du är offline</h1>
+      <p>Det går inte att hämta nytt innehåll just nu. Appens gränssnitt fungerar, men viss data kräver uppkoppling.</p>
+      <div class="row">
+        <button class="btn" onclick="location.reload()">Försök igen</button>
+        <button class="btn" onclick="history.back()">Tillbaka</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
