@@ -156,15 +156,20 @@
     }
 
     startBtn.addEventListener("click", () => {
-      const firstTeamId = Object.keys(teamList.children)[0];
-      const metaRef = ref(db, `sessions/${sessionCode}/meta`);
-      update(metaRef, {
-        phase: "place",
-        activeTeamId: firstTeamId
-      }).then(() => {
-        localStorage.setItem("sessionCode", sessionCode);
-        window.location.href = "game.html";
-      });
+      const teamsRef = ref(db, `sessions/${sessionCode}/teams`);
+      onValue(teamsRef, (snapshot) => {
+        const teams = snapshot.val();
+        const teamIds = Object.keys(teams);
+        const randomTeamId = teamIds[Math.floor(Math.random() * teamIds.length)];
+        const metaRef = ref(db, `sessions/${sessionCode}/meta`);
+        update(metaRef, {
+          phase: "place",
+          activeTeamId: randomTeamId
+        }).then(() => {
+          localStorage.setItem("sessionCode", sessionCode);
+          window.location.href = "game.html";
+        });
+      }, { onlyOnce: true });
     });
   </script>
 </body>
