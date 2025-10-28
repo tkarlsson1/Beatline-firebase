@@ -73,12 +73,35 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { createSession, joinSession, listenToTeams, updatePhase } from "./sessions.js";
 
-    const auth = getAuth();
-    let sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-    let teams = {};
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "notestreamfire.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "notestreamfire",
+      storageBucket: "notestreamfire.appspot.com",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    const sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const teamList = document.getElementById("teamList");
+    const startBtn = document.getElementById("startGameBtn");
+
+    document.getElementById("sessionCode").textContent = sessionCode;
+
+    new QRCode(document.getElementById("qr"), {
+      text: `${location.origin}/test/join.html?code=${sessionCode}`,
+      width: 160,
+      height: 160
+    });
 
     signInAnonymously(auth).then(() => {
       console.log("Anonymt inloggad");
@@ -86,34 +109,44 @@
 
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
-      document.getElementById("sessionCode").textContent = sessionCode;
-      new QRCode(document.getElementById("qr"), {
-        text: `https://notestream.test/join?code=${sessionCode}`,
-        width: 160,
-        height: 160
+
+      const sessionRef = ref(db, `sessions/${sessionCode}`);
+      set(sessionRef, {
+        meta: {
+          hostUid: user.uid,
+          phase: "waiting",
+          activeTeamId: null,
+          createdAt: Date.now()
+        },
+        teams: {}
       });
 
-      createSession(sessionCode).then(() => {
-        console.log("Session skapad:", sessionCode);
-      });
-
-      listenToTeams(sessionCode, (data) => {
-        teams = data;
-        updateTeamList();
-        document.getElementById("startGameBtn").disabled = Object.keys(teams).length === 0;
+      const teamsRef = ref(db, `sessions/${sessionCode}/teams`);
+      onValue(teamsRef, (snapshot) => {
+        const teams = snapshot.val() || {};
+        updateTeamList(teams);
+        startBtn.disabled = Object.keys(teams).length === 0;
       });
     });
 
     document.getElementById("joinBtn").addEventListener("click", () => {
       const name = document.getElementById("teamName").value.trim();
-      if (!name) return alert("Ange ett lagnamn.");
-      joinSession(sessionCode, name).then(() => {
+      if (!name || !auth.currentUser) return alert("Ange ett lagnamn.");
+      const teamId = `team-${auth.currentUser.uid}`;
+      const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
+      set(teamRef, {
+        name,
+        tokens: 4,
+        years: [],
+        members: {
+          [auth.currentUser.uid]: true
+        }
+      }).then(() => {
         document.getElementById("teamName").value = "";
       });
     });
 
-    function updateTeamList() {
-      const teamList = document.getElementById("teamList");
+    function updateTeamList(teams) {
       teamList.innerHTML = "";
       Object.values(teams).forEach(team => {
         const li = document.createElement("li");
@@ -122,9 +155,13 @@
       });
     }
 
-    document.getElementById("startGameBtn").addEventListener("click", () => {
-      const firstTeamId = Object.keys(teams)[0];
-      updatePhase(sessionCode, "place", firstTeamId).then(() => {
+    startBtn.addEventListener("click", () => {
+      const firstTeamId = Object.keys(teamList.children)[0];
+      const metaRef = ref(db, `sessions/${sessionCode}/meta`);
+      update(metaRef, {
+        phase: "place",
+        activeTeamId: firstTeamId
+      }).then(() => {
         localStorage.setItem("sessionCode", sessionCode);
         window.location.href = "game.html";
       });
