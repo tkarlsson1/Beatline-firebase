@@ -1,5 +1,4 @@
 import './app-legacy.js';
-import './firebase-classic.js';
 import './auth.js';
 import './spotify.js';
 import './data.js';
