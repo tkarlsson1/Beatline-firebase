@@ -15,21 +15,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth ? getAuth(app) : null; // getAuth import may differ depending on usage
+const auth = getAuth ? getAuth(app) : null;
 
 export async function createSession(code) {
   if (!auth || !auth.currentUser) throw new Error("Not authenticated");
   const uid = auth.currentUser.uid;
   const sessionRef = ref(db, `sessions/${code}`);
-  // Använd update för att inte radera eventuella teams
-  return update(sessionRef, {
-    meta: {
-      hostUid: uid,
-      phase: "waiting",
-      activeTeamId: null,
-      createdAt: Date.now()
-    }
-  });
+  return update(sessionRef, { meta: { hostUid: uid, phase: "waiting", activeTeamId: null, createdAt: Date.now() } });
 }
 
 export async function joinSession(code, teamName) {
@@ -37,30 +29,17 @@ export async function joinSession(code, teamName) {
   const uid = auth.currentUser.uid;
   const teamId = `team-${uid}`;
   const teamRef = ref(db, `sessions/${code}/teams/${teamId}`);
-  return set(teamRef, {
-    name: teamName,
-    tokens: 4,
-    years: [],
-    members: {
-      [uid]: true
-    }
-  });
+  return set(teamRef, { name: teamName, tokens:4, years: [], members: { [uid]: true } });
 }
 
 export function listenToTeams(code, callback) {
   const teamsRef = ref(db, `sessions/${code}/teams`);
-  onValue(teamsRef, (snapshot) => {
-    const data = snapshot.val() || {};
-    callback(data);
-  });
+  onValue(teamsRef, (snapshot) => callback(snapshot.val() || {}));
 }
 
 export function updatePhase(code, phase, activeTeamId = null) {
   const metaRef = ref(db, `sessions/${code}/meta`);
-  return update(metaRef, {
-    phase,
-    activeTeamId
-  });
+  return update(metaRef, { phase, activeTeamId });
 }
 
 export function addYearToTeam(code, teamId, year) {

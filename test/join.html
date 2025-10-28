@@ -5,50 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NOTESTREAM – Gå med</title>
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #0b0f14;
-      color: #e6eef8;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-    h1 {
-      margin-bottom: 1rem;
-    }
-    .panel {
-      background: #11161d;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      padding: 1.5rem;
-      max-width: 480px;
-      width: 100%;
-      margin-bottom: 2rem;
-    }
-    input, button {
-      padding: 0.6rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: none;
-      margin-top: 0.5rem;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background: #0b939c;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0a7c85;
-    }
+    body { margin:0; font-family:system-ui, sans-serif; background:#0b0f14; color:#e6eef8; display:flex; flex-direction:column; align-items:center; padding:2rem; }
+    .panel { background:#11161d; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:1.5rem; max-width:480px; width:100%; margin-bottom:2rem; }
+    input, button { padding:.6rem; font-size:1rem; border-radius:6px; border:none; margin-top:.5rem; width:100%; box-sizing:border-box; }
+    button { background:#0b939c; color:white; cursor:pointer; }
+    button:hover{ background:#0a7c85; }
   </style>
 </head>
 <body>
   <h1>Gå med i spel</h1>
-
   <div class="panel">
     <label for="teamName">Lagnamn:</label>
     <input type="text" id="teamName" placeholder="Ditt lag" />
@@ -75,51 +40,20 @@
     const auth = getAuth(app);
 
     const urlParams = new URLSearchParams(location.search);
-    const sessionCode = urlParams.get("code") || "XXXX";
+    const sessionCode = urlParams.get("code") || localStorage.getItem("sessionCode") || "XXXX";
+    let minYear=1970, maxYear=2025;
+    onValue(ref(db, `sessions/${sessionCode}/meta`), snap => { const m = snap.val()||{}; minYear = parseInt(m.minYear) || 1970; maxYear = parseInt(m.maxYear)||2025; });
 
-    let minYear = 1970;
-    let maxYear = 2025;
-
-    onValue(ref(db, `sessions/${sessionCode}/meta`), (snapshot) => {
-      const meta = snapshot.val() || {};
-      minYear = parseInt(meta.minYear) || 1970;
-      maxYear = parseInt(meta.maxYear) || 2025;
-    });
-
-    signInAnonymously(auth).then(() => {
-      console.log("Anonymt inloggad");
-    });
-
+    signInAnonymously(auth).catch(()=>{});
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
-
-      const joinBtn = document.getElementById("joinBtn");
-      if (joinBtn) {
-        joinBtn.addEventListener("click", () => {
-          const name = document.getElementById("teamName").value.trim();
-          if (!name) return alert("Ange ett lagnamn.");
-          if (!user) return alert("Autentisering saknas.");
-
-          const teamId = `team-${user.uid}`;
-          const teamRef = ref(db, `sessions/${sessionCode}/teams/${teamId}`);
-          const startYear = Math.floor(Math.random() * (maxYear - minYear + 1)) + minYear;
-
-          set(teamRef, {
-            name,
-            tokens: 4,
-            startYear,
-            years: [],
-            members: {
-              [user.uid]: true
-            }
-          }).then(() => {
-            window.location.href = "game.html";
-          }).catch(e => {
-            console.error('join set failed', e);
-            alert('Kunde inte gå med just nu.');
-          });
-        });
-      }
+      document.getElementById("joinBtn")?.addEventListener("click", () => {
+        const name = document.getElementById("teamName")?.value.trim(); if (!name) return alert("Ange ett lagnamn.");
+        const teamId = `team-${user.uid}`;
+        set(ref(db, `sessions/${sessionCode}/teams/${teamId}`), { name, tokens:4, startYear: Math.floor(Math.random()*(maxYear-minYear+1))+minYear, years: [], members: { [user.uid]: true } })
+          .then(()=>{ window.location.href = "game.html"; })
+          .catch(e=>{ console.error(e); alert("Kunde inte gå med just nu."); });
+      });
     });
   </script>
 </body>

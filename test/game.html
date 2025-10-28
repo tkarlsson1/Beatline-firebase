@@ -5,92 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NOTESTREAM – Spel</title>
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #0b0f14;
-      color: #e6eef8;
-      padding: 2rem;
-    }
-    h1 { margin-bottom: 1rem; }
-    .team-header {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-    .team-box {
-      background: #11161d;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 8px;
-      padding: 0.8rem 1rem;
-      min-width: 160px;
-    }
-    .team-box.active {
-      border-color: #00e0ff;
-      box-shadow: 0 0 8px #00e0ff;
-    }
-    .team-box h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
-    .team-box p { margin: 0.2rem 0; font-size: 0.9rem; }
-    .panel {
-      background: #11161d;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .timeline {
-      display: flex;
-      gap: 8px;
-      margin-top: 1rem;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-    }
-    .card {
-      background: #222;
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 8px;
-      padding: 1rem;
-      min-width: 80px;
-      text-align: center;
-    }
-    button {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: none;
-      background: #0b939c;
-      color: white;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    button:hover { background: #0a7c85; }
-    #songArea { margin-top: 2rem; }
-    #qrcode {
-      margin: 1rem auto;
-      width: 160px;
-      height: 160px;
-    }
-    .row {
-      display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start;
-    }
-    .row > .panel { flex: 1 1 340px; }
-    .muted { opacity: .8; font-size: .9rem; }
+    body { margin:0; font-family:system-ui, sans-serif; background:#0b0f14; color:#e6eef8; padding:2rem; }
+    .team-header { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem; }
+    .team-box { background:#11161d; border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:.8rem 1rem; min-width:160px; }
+    .team-box.active { border-color:#00e0ff; box-shadow:0 0 8px #00e0ff; }
+    .panel { background:#11161d; border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:1rem; margin-bottom:1.5rem; }
+    .timeline { display:flex; gap:8px; margin-top:1rem; overflow-x:auto; }
+    .card { background:#222; border:1px solid rgba(255,255,255,.2); border-radius:8px; padding:1rem; min-width:80px; text-align:center; }
+    button { padding:.6rem 1rem; font-size:1rem; border-radius:6px; border:none; background:#0b939c; color:#fff; cursor:pointer; margin-top:1rem; }
+    button:hover{ background:#0a7c85; }
   </style>
 </head>
 <body>
   <h1>Spel pågår – NOTESTREAM</h1>
-
   <div id="teamHeader" class="team-header"></div>
-
-  <div class="row">
-    <div id="gameArea" class="panel"></div>
-    <div id="songArea" class="panel"></div>
+  <div class="row" style="display:flex; gap:1rem; flex-wrap:wrap;">
+    <div id="gameArea" class="panel" style="flex:1 1 340px;"></div>
+    <div id="songArea" class="panel" style="flex:1 1 340px;"></div>
   </div>
-
   <div class="panel">
     <button id="nextSongBtn" style="display:none;">Nästa låt</button>
-    <span id="listsInfo" class="muted"></span>
+    <span id="listsInfo" style="opacity:.8; font-size:.9rem;"></span>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -114,227 +49,82 @@
     const auth = getAuth(app);
     const code = localStorage.getItem("sessionCode") || "—";
 
-    // State
-    let activeTeamId = null;
-    let myTeamId = null;
-    let allTeams = {};
-    let minYear = 1970;
-    let maxYear = 2025;
-    let selectedLists = [];
-    let allSongs = [];
-    let currentSong = null; // {artist, title, year, qr, source}
+    let activeTeamId = null, myTeamId = null, allTeams = {}, minYear=1970, maxYear=2025, selectedLists = [], allSongs = [], currentSong = null;
 
-    // DOM
-    const teamHeader = document.getElementById("teamHeader");
-    const gameArea = document.getElementById("gameArea");
-    const songArea = document.getElementById("songArea");
-    const nextSongBtn = document.getElementById("nextSongBtn");
-    const listsInfo = document.getElementById("listsInfo");
+    const teamHeader = document.getElementById("teamHeader"); const gameArea = document.getElementById("gameArea"); const songArea = document.getElementById("songArea");
+    const nextSongBtn = document.getElementById("nextSongBtn"); const listsInfo = document.getElementById("listsInfo");
 
-    // Läs meta: activeTeamId, min/max, selectedLists
-    onValue(ref(db, `sessions/${code}/meta`), (snapshot) => {
+    onValue(ref(db, `sessions/${code}/meta`), snapshot => {
       const meta = snapshot.val() || {};
-      activeTeamId = meta.activeTeamId || null;
-      minYear = parseInt(meta.minYear) || 1970;
-      maxYear = parseInt(meta.maxYear) || 2025;
+      activeTeamId = meta.activeTeamId || null; minYear = parseInt(meta.minYear) || 1970; maxYear = parseInt(meta.maxYear) || 2025;
       selectedLists = Array.isArray(meta.selectedLists) ? meta.selectedLists : [];
-
-      listsInfo.textContent = selectedLists.length
-        ? `Spellistor: ${selectedLists.join(", ")} | År: ${minYear}–${maxYear}`
-        : "Inga listor valda";
-
-      renderTeamHeader();
-      renderActiveTimeline();
-      updateNextButton();
-      loadSongs(); // laddar och filtrerar enl. meta
+      listsInfo.textContent = selectedLists.length ? `Spellistor: ${selectedLists.join(", ")} | År: ${minYear}–${maxYear}` : "Inga listor valda";
+      renderTeamHeader(); renderActiveTimeline(); updateNextButton(); loadSongs();
     });
 
-    // Läs lag och vem jag är
     onAuthStateChanged(auth, (user) => {
       if (!user) return;
-      onValue(ref(db, `sessions/${code}/teams`), (snapshot) => {
+      onValue(ref(db, `sessions/${code}/teams`), snapshot => {
         allTeams = snapshot.val() || {};
-        myTeamId = Object.entries(allTeams).find(([id, team]) =>
-          team.members?.[user.uid] === true
-        )?.[0] || null;
-
-        renderTeamHeader();
-        renderActiveTimeline();
-        updateNextButton();
+        myTeamId = Object.entries(allTeams).find(([id, team]) => team.members?.[user.uid] === true)?.[0] || null;
+        renderTeamHeader(); renderActiveTimeline(); updateNextButton();
       });
     });
 
-    // Ladda låtar från standardLists enligt selectedLists + årsspann
-    function loadSongs() {
+    function loadSongs(){
       onValue(ref(db, "standardLists"), (snapshot) => {
-        const raw = snapshot.val() || {};
-        const pool = [];
-
+        const raw = snapshot.val() || {}; const pool = [];
         for (const listName of selectedLists) {
-          const list = raw[listName];
-          if (!list || !list.songs) continue;
+          const list = raw[listName]; if (!list || !list.songs) continue;
           for (const trackId in list.songs) {
-            const song = list.songs[trackId];
-            const y = parseInt(song.year);
-            if (!isNaN(y) && y >= minYear && y <= maxYear) {
-              pool.push({ ...song, qr: trackId, source: listName });
-            }
+            const song = list.songs[trackId]; const y = parseInt(song.year);
+            if (!isNaN(y) && y >= minYear && y <= maxYear) pool.push({...song, qr: trackId, source: listName});
           }
         }
-
-        allSongs = pool;
-        // Visa första låten för aktivt lag om det finns
-        showNextSong();
+        allSongs = pool; showNextSong();
       }, { onlyOnce: true });
     }
 
-    function renderTeamHeader() {
-      if (!teamHeader) return;
-      teamHeader.innerHTML = "";
+    function renderTeamHeader(){
+      if (!teamHeader) return; teamHeader.innerHTML = "";
       Object.entries(allTeams).forEach(([teamId, team]) => {
-        const box = document.createElement("div");
-        box.className = "team-box" + (teamId === activeTeamId ? " active" : "");
-        box.innerHTML = `
-          <h3>${escapeHTML(team.name)}</h3>
-          <p>Tokens: ${team.tokens ?? 0}</p>
-          <p>Startår: ${team.startYear ?? "?"}</p>
-          <p>Placerade kort: ${team.years ? Object.keys(team.years).length : 0}</p>
-        `;
+        const box = document.createElement("div"); box.className = "team-box" + (teamId===activeTeamId ? " active" : "");
+        box.innerHTML = `<h3>${escapeHTML(team.name)}</h3><p>Tokens: ${team.tokens ?? 0}</p><p>Startår: ${team.startYear ?? "?"}</p><p>Placerade kort: ${team.years ? Object.keys(team.years).length : 0}</p>`;
         teamHeader.appendChild(box);
       });
     }
 
-    function renderActiveTimeline() {
-      if (!gameArea) return;
-      gameArea.innerHTML = "";
+    function renderActiveTimeline(){
+      if (!gameArea) return; gameArea.innerHTML = "";
       const team = allTeams[activeTeamId];
-      if (!team) {
-        gameArea.innerHTML = "<p>Väntar på att ett aktivt lag ska väljas...</p>";
-        return;
-      }
-
+      if (!team) { gameArea.innerHTML = "<p>Väntar på att ett aktivt lag ska väljas...</p>"; return; }
       const yearCards = Object.values(team.years || {}).map(y => `<div class="card">${escapeHTML(String(y))}</div>`).join("");
-      gameArea.innerHTML = `
-        <h2>${escapeHTML(team.name)} – Tidslinje</h2>
-        <p>Startår: ${team.startYear ?? "?"}</p>
-        <div class="timeline" id="timeline-${escapeHTML(activeTeamId)}">
-          ${yearCards}
-        </div>
-      `;
+      gameArea.innerHTML = `<h2>${escapeHTML(team.name)} – Tidslinje</h2><p>Startår: ${team.startYear ?? "?"}</p><div class="timeline">${yearCards}</div>`;
     }
 
-    // Visa nästa låt för det aktiva laget
-    function showNextSong() {
-      if (!songArea) return;
-      songArea.innerHTML = "";
-      if (!activeTeamId || !allTeams[activeTeamId]) {
-        songArea.innerHTML = "<p>Inget aktivt lag valt ännu.</p>";
-        return;
-      }
-      if (allSongs.length === 0) {
-        songArea.innerHTML = "<p>Inga låtar hittades i valda listor och årsspann.</p>";
-        return;
-      }
-
-      currentSong = allSongs[Math.floor(Math.random() * allSongs.length)];
+    function showNextSong(){
+      if (!songArea) return; songArea.innerHTML = "";
+      if (!activeTeamId || !allTeams[activeTeamId]) { songArea.innerHTML = "<p>Inget aktivt lag valt ännu.</p>"; return; }
+      if (allSongs.length === 0) { songArea.innerHTML = "<p>Inga låtar hittades i valda listor och årsspann.</p>"; return; }
+      currentSong = allSongs[Math.floor(Math.random()*allSongs.length)];
       const spotifyUrl = `https://open.spotify.com/track/${currentSong.qr}`;
-
-      const sourceText = Array.isArray(currentSong.source)
-        ? currentSong.source.join(", ")
-        : currentSong.source;
-
-      const html = `
-        <h2>${escapeHTML(allTeams[activeTeamId].name)}: Gissa låtens år</h2>
-        <p><strong>${escapeHTML(currentSong.artist)}</strong> – ${escapeHTML(currentSong.title)}</p>
-        <div id="qrcode"></div>
-        <div style="margin-top:.5rem;" class="muted">Öppna i Spotify via QR-koden</div>
-        <div id="reveal" style="display:none; margin-top:1rem;">
-          <p>Rätt år: <strong>${escapeHTML(String(currentSong.year))}</strong></p>
-          <p>Spellista: ${escapeHTML(sourceText)}</p>
-        </div>
-        <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem;">
-          <button id="btnReveal">Visa svar</button>
-          <button id="btnPlace">Placera år på tidslinjen</button>
-          <button id="btnSkip">Ny låt</button>
-        </div>
-      `;
-      songArea.innerHTML = html;
-
-      // Generera QR-kod
-      const qrEl = document.getElementById("qrcode");
-      if (qrEl) {
-        new QRCode(qrEl, {
-          text: spotifyUrl,
-          width: 160,
-          height: 160
-        });
-      }
-
-      // Handlers
-      const btnReveal = document.getElementById("btnReveal");
-      const btnSkip = document.getElementById("btnSkip");
-      const btnPlace = document.getElementById("btnPlace");
-
-      if (btnReveal) {
-        btnReveal.addEventListener("click", () => {
-          const r = document.getElementById("reveal");
-          if (r) r.style.display = "block";
-        });
-      }
-
-      if (btnSkip) {
-        btnSkip.addEventListener("click", () => {
-          showNextSong();
-        });
-      }
-
-      if (btnPlace) {
-        btnPlace.addEventListener("click", () => {
-          const y = parseInt(currentSong.year);
-          if (isNaN(y) || y < minYear || y > maxYear) {
-            alert(`Årtalet måste vara mellan ${minYear} och ${maxYear}.`);
-            return;
-          }
-          const yearsRef = ref(db, `sessions/${code}/teams/${activeTeamId}/years`);
-          push(yearsRef, y).then(() => {
-            // Efter placering: byt aktivt lag (enkel rotation)
-            const teamIds = Object.keys(allTeams);
-            if (teamIds.length) {
-              const idx = teamIds.indexOf(activeTeamId);
-              const nextId = teamIds[(idx + 1) % teamIds.length];
-              update(ref(db, `sessions/${code}/meta`), {
-                activeTeamId: nextId
-              });
-            }
-          }).catch(e => {
-            console.error('push years failed', e);
-            alert('Kunde inte placera årtalet just nu.');
-          });
-        });
-      }
-    }
-
-    function updateNextButton() {
-      if (!nextSongBtn) return;
-      // Bara visa "Nästa låt"-knappen för aktivt lag hos den användaren
-      nextSongBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none";
-    }
-
-    if (nextSongBtn) {
-      nextSongBtn.addEventListener("click", () => {
-        showNextSong();
+      const sourceText = Array.isArray(currentSong.source) ? currentSong.source.join(", ") : currentSong.source;
+      songArea.innerHTML = `<h2>${escapeHTML(allTeams[activeTeamId].name)}: Gissa låtens år</h2><p><strong>${escapeHTML(currentSong.artist)}</strong> – ${escapeHTML(currentSong.title)}</p><div id="qrcode"></div><div style="margin-top:.5rem;" class="muted">Öppna i Spotify via QR-koden</div><div id="reveal" style="display:none; margin-top:1rem;"><p>Rätt år: <strong>${escapeHTML(String(currentSong.year))}</strong></p><p>Spellista: ${escapeHTML(sourceText)}</p></div><div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem;"><button id="btnReveal">Visa svar</button><button id="btnPlace">Placera år på tidslinjen</button><button id="btnSkip">Ny låt</button></div>`;
+      const qrEl = document.getElementById("qrcode"); if (qrEl) new QRCode(qrEl, { text: spotifyUrl, width:160, height:160 });
+      document.getElementById("btnReveal")?.addEventListener("click", ()=>{ const r=document.getElementById("reveal"); if (r) r.style.display="block"; });
+      document.getElementById("btnSkip")?.addEventListener("click", ()=> showNextSong());
+      document.getElementById("btnPlace")?.addEventListener("click", ()=> {
+        const y = parseInt(currentSong.year); if (isNaN(y) || y < minYear || y > maxYear) { alert(`Årtalet måste vara mellan ${minYear} och ${maxYear}.`); return; }
+        push(ref(db, `sessions/${code}/teams/${activeTeamId}/years`), y).then(()=> {
+          const teamIds = Object.keys(allTeams); if (teamIds.length) { const idx = teamIds.indexOf(activeTeamId); const nextId = teamIds[(idx+1)%teamIds.length]; update(ref(db, `sessions/${code}/meta`), { activeTeamId: nextId }); }
+        }).catch(e=>{ console.error(e); alert('Kunde inte placera årtalet.'); });
       });
     }
 
-    // Small escaping util used in template areas
-    function escapeHTML(str){
-      return String(str || '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
-    }
+    function updateNextButton(){ if (!nextSongBtn) return; nextSongBtn.style.display = activeTeamId === myTeamId ? "inline-block" : "none"; }
+    nextSongBtn?.addEventListener("click", ()=> showNextSong());
+
+    function escapeHTML(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   </script>
 </body>
 </html>
