@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM – Spel</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0b0f14;
+      color: #e6eef8;
+      padding: 2rem;
+    }
+    h1 { margin-bottom: 1rem; }
+    .team {
+      background: #11161d;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .timeline {
+      display: flex;
+      gap: 8px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: #222;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      padding: 1rem;
+      min-width: 80px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spel pågår – NOTESTREAM</h1>
+  <div id="gameArea"></div>
+
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+    const auth = getAuth();
+    const db = getDatabase();
+    const code = localStorage.getItem("sessionCode") || "—";
+    const gameArea = document.getElementById("gameArea");
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+
+      const teamsRef = ref(db, `sessions/${code}/teams`);
+      onValue(teamsRef, (snapshot) => {
+        const teams = snapshot.val() || {};
+        renderTeams(teams);
+      });
+    });
+
+    function renderTeams(teams) {
+      gameArea.innerHTML = "";
+      Object.entries(teams).forEach(([teamId, team]) => {
+        const startYear = team.years?.[0] || "—";
+        const div = document.createElement("div");
+        div.className = "team";
+        div.innerHTML = `
+          <h2>${team.name} (${team.tokens} tokens)</h2>
+          <p>Startår: <strong>${startYear}</strong></p>
+          <div class="timeline" id="timeline-${teamId}">
+            ${team.years?.map(y => `<div class="card">${y}</div>`).join("") || ""}
+          </div>
+        `;
+        gameArea.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>

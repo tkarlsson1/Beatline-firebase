@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOTESTREAM – Lobby</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0b0f14;
+      color: #e6eef8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 { margin-bottom: 1rem; }
+    .panel {
+      background: #11161d;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 480px;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    input, button {
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      margin-top: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background: #0b939c;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0a7c85;
+    }
+    #qr {
+      margin: 1rem auto;
+      width: 160px;
+      height: 160px;
+    }
+    .team-list {
+      margin-top: 1rem;
+    }
+    .team-list li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lobby – NOTESTREAM</h1>
+
+  <div class="panel">
+    <label for="teamName">Ange lagnamn:</label>
+    <input type="text" id="teamName" placeholder="Lag 1" />
+    <button id="joinBtn">Gå med i session</button>
+  </div>
+
+  <div class="panel">
+    <h2>Sessionkod: <span id="sessionCode">—</span></h2>
+    <div id="qr"></div>
+    <ul class="team-list" id="teamList"></ul>
+    <button id="startGameBtn" disabled>Starta spel</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module">
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { createSession, joinSession, listenToTeams, updatePhase } from "./sessions.js";
+
+    const auth = getAuth();
+    let sessionCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    let teams = {};
+
+    signInAnonymously(auth).then(() => {
+      console.log("Anonymt inloggad");
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      document.getElementById("sessionCode").textContent = sessionCode;
+      new QRCode(document.getElementById("qr"), {
+        text: `https://notestream.test/join?code=${sessionCode}`,
+        width: 160,
+        height: 160
+      });
+
+      createSession(sessionCode).then(() => {
+        console.log("Session skapad:", sessionCode);
+      });
+
+      listenToTeams(sessionCode, (data) => {
+        teams = data;
+        updateTeamList();
+        document.getElementById("startGameBtn").disabled = Object.keys(teams).length === 0;
+      });
+    });
+
+    document.getElementById("joinBtn").addEventListener("click", () => {
+      const name = document.getElementById("teamName").value.trim();
+      if (!name) return alert("Ange ett lagnamn.");
+      joinSession(sessionCode, name).then(() => {
+        document.getElementById("teamName").value = "";
+      });
+    });
+
+    function updateTeamList() {
+      const teamList = document.getElementById("teamList");
+      teamList.innerHTML = "";
+      Object.values(teams).forEach(team => {
+        const li = document.createElement("li");
+        li.textContent = `${team.name} (${team.tokens} tokens)`;
+        teamList.appendChild(li);
+      });
+    }
+
+    document.getElementById("startGameBtn").addEventListener("click", () => {
+      const firstTeamId = Object.keys(teams)[0];
+      updatePhase(sessionCode, "place", firstTeamId).then(() => {
+        localStorage.setItem("sessionCode", sessionCode);
+        window.location.href = "game.html";
+      });
+    });
+  </script>
+</body>
+</html>
