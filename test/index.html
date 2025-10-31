@@ -4,35 +4,1560 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.585</title>
+  <title>NOTESTREAM v0.586</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
+  <style>
+/* Accessible focus styles */
+:where(a,button,[role="button"],.answer-button,.edit-icon):focus{outline:3px solid rgba(0,0,0,.6);outline-offset:2px}
+
+    /* Grundläggande sidstil */
+     html, body {
+      overflow-x: hidden;
+    }
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      margin: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 1.5rem auto;
+      max-width: 80%;
+      height: auto;
+    }
+    /* --- NY CSS för redigeringsmodalen --- */
+  .edit-icon {
+  cursor: pointer;
+  margin-left: 0.5rem;
+  font-size: 0.8em;
+  color: #0b939c;
+}
+
+.edit-icon:hover {
+  color: #0a7c85;
+}
+
+  /* Grundläggande modal-stil */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);  /* Dämpad bakgrund */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+  }
   
+  /* Modalinnehållet */
+  .modal-content {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 300px;
+    width: 90%;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  /* Stängningsikonen */
+  .close {
+    float: right;
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-top: -0.5rem;
+    margin-right: -0.5rem;
+    color: #333;
+  }
+  
+  /* Inputfältet för årtalet */
+  #newYearInput {
+    width: 80%;
+    padding: 0.5rem;
+    margin: 1rem 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Spara-knappen */
+  #saveYearButton {
+    padding: 0.5rem 1rem;
+    background-color: #0b939c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+  }
+  #saveYearButton:hover {
+    background-color: #0a7c85;
+  }
+  /* --- Slut på modal CSS --- */
+    /* Standardknappar i filterformuläret */
+    select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      background: #032934;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      font-family: 'Manrope', sans-serif;
+    }
+    select, button { border: none !important; }
+    button:hover,
+    button:active,
+    button:focus { background: #032934; }
+    /* Årtalsfältens bredd */
+    #startYear, #endYear { width: 80px; }
+    #song-display {
+      text-align: center;
+      margin: 1.5rem 0;
+    }
+    #song-display canvas,
+    #song-display img {
+      display: block;
+      margin: 0 auto;
+    }
+    .qrcode {
+      width: 160px;
+      height: 160px;
+      border: 5px solid black;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto 1rem auto;
+    }
+    /* Resultatsida – med extra padding nedtill */
+    #result-page {
+      display: none;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    /* Checkbox-pills */
+    #source-checkbox-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.7rem 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .checkbox-pill { position: relative; }
+    .checkbox-pill input[type="checkbox"] { display: none; }
+    .checkbox-pill label {
+      cursor: pointer;
+      padding: 0.5rem 0.5rem;
+      border: 3px solid #032934;
+      border-radius: 8px;
+      background-color: #032934;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      color: #fff;
+      font-size: 1rem;
+      user-select: none;
+      font-family: 'Manrope', sans-serif;
+    }
+    .checkbox-pill input[type="checkbox"]:checked + label {
+      background-color: #0b939c;
+      color: #fff;
+      border-color: #0b939c;
+    }
+    #filter-page label { color: #fff; }
+    /* Spotify-spellisteimport */
+    #spotify-import {
+      margin-bottom: 2rem;
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      color: #fff;
+    }
+    #spotify-import input, #playlistTypeInput {
+      width: 40%;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: #032934;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Manrope', sans-serif;
+    }
+    #spotify-import button {
+      width: 40%;
+      padding: 0.5rem;
+      font-family: 'Manrope', sans-serif;
+    }
+    /* Menyheader och menyknapp */
+    #menuContainer {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 3000;
+    }
+    #menuButton {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+  #menuContainer {
+    right: 5px; /* Justering för att menyn ska ligga inom skärmen */
+  }
+}
+    #dropdownMenu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 2.5rem;
+      background: #032934;
+      border: 1px solid #fff;
+      border-radius: 4px;
+    }
+    #dropdownMenu a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+    #dropdownMenu a:hover { background: #0b939c; }
+    /* Divider och rubriker */
+    .divider { height: 2px; background-color: #fff; width: 100%; margin: 0.5rem 0; }
+    .subheading { display: block; width: 100%; text-align: center; font-size: 0.8rem; color: #fff; margin: 0.5rem 0; }
+    /* Modal: Readme */
+    #readmeModal {
+      display: none;
+      position: fixed;
+      z-index: 4000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    #readmeContent {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 8px;
+      position: relative;
+      font-family: 'Manrope', sans-serif;
+    }
+    .closeBtn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      cursor: pointer;
+      z-index: 5000;
+    }
+    .closeBtn:hover, .closeBtn:focus { color: black; text-decoration: none; }
+    /* Inloggnings- och registreringsmodaler */
+    #loginModal, #registerModal {
+      position: fixed;
+      z-index: 2000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #loginBox, #registerBox {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      width: 80%;
+      max-width: 300px;
+      font-family: 'Manrope', sans-serif;
+    }
+    #loginBox input, #registerBox input {
+      width: 80%;
+      padding: 0.5rem;
+      margin: 1rem 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    #loginBox button, #registerBox button {
+      padding: 0.4rem 0.8rem;
+      font-size: 1rem;
+      background-color: #0b939c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+    }
+    /* Felmeddelanden */
+    .error {
+      color: red;
+      display: none;
+      font-size: 0.9rem;
+    }
+    /* Feedback-modal */
+    #feedbackModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    #feedbackModal > div {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      position: relative;
+      font-family: 'Manrope', sans-serif;
+    }
+    #closeFeedback {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #aaa;
+    }
+    #closeFeedback:hover, #closeFeedback:focus { color: black; text-decoration: none; }
+    #feedbackText {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      font-family: 'Manrope', sans-serif;
+    }
+    #submitFeedback {
+      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      background-color: #ff9800;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+    }
+    /* Övriga knappar: Nästa låt och Visa svar */
+    .next-song-button, .answer-button {
+      display: block;
+      margin: 0 auto;
+      width: 128px;
+      background: #032934;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+    }
+    .next-song-button { margin-bottom: 1rem; }
+      .edit-icon {
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 0.8em;
+    color: #0b939c;
+  }
+  
+  .edit-icon:hover {
+    color: #0a7c85;
+  }
+    .answer-button:hover, .answer-button:active, .answer-button:focus { background: #032934; 
+    }
+    .start-button {
+    background: linear-gradient(to right, #fb1820, #ff6310); /* Anpassa färgerna */
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: block;
+    margin: 0 auto;
+}
+
+.start-button:hover {
+    background: linear-gradient(to right, #e52e71, #ff8a00);
+    transform: scale(1.05);
+}
+select {
+    background-color: #032934; /* Bakgrundsfärg för hela dropdownen */
+    color: #fff;
+    border: none;
+}
+
+/* Förhindra att hela listan ändras när den är öppen */
+select:focus, select:hover {
+    background-color: #032934 !important;
+    color: #fff;
+}
+  </style>
   
   <!-- Inkludera QRCodeJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <!-- Importera Firebase SDK:er via moduler -->
-  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      storageBucket: "beatlinefirebase.firebasestorage.app",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
+    
+    // Initiera Firebase
+    const app = initializeApp(firebaseConfig);
+    window.app = app;
+
+    const db = getDatabase(app);
+    // Expose Firebase APIs for non-module scripts
+    window.firebaseDb = db;
+    window.firebaseRef = ref;
+    window.firebasePush = push;
+    window.firebaseOnValue = onValue;
+    window.firebaseSet = set;
+    window.firebaseUpdate = update;
+    window.firebaseGet = get;
+
+    const auth = getAuth(app);
+    window.auth = auth;
+
+    // Gör de globala variablerna tillgängliga
+    window.currentPlaylistName = null;
+    window.currentSpotifyID = null;
+
+    // Funktion för att öppna modal med redigeringsläge för customYear
+    function openEditYearModal(playlistName, spotifyID, currentYear) {
+      window.currentPlaylistName = playlistName;
+      window.currentSpotifyID = spotifyID;
+      document.getElementById("newYearInput").value = currentYear;
+      document.getElementById("editYearModal").style.display = "flex";
+    }
+    // Exponera funktionen globalt
+    window.openEditYearModal = openEditYearModal;
+    
+    // Funktion för att stänga redigeringsmodalen
+    function closeEditYearModal() {
+      document.getElementById("editYearModal").style.display = "none";
+    }
+    window.closeEditYearModal = closeEditYearModal;
+
+    // Funktion för att uppdatera customYear i databasen
+    function updateCustomYear(playlistName, spotifyID, newYear) {
+      const songRef = ref(db, `userPlaylists/${window.auth.currentUser.uid}/${playlistName}/songs/${spotifyID}`);
+      return update(songRef, { customYear: newYear })
+        .then(() => {
+          console.log("customYear uppdaterades till", newYear);
+          mergeSongs(); // Uppdaterar låtlistan så att ändringen syns
+        })
+        .catch((error) => {
+          console.error("Fel vid uppdatering av customYear:", error);
+          alert("Något gick fel vid uppdatering: " + error.message);
+          throw error;
+        });
+    }
+    window.updateCustomYear = updateCustomYear;
+
+    // Variabler för dataläsning (solo + input till multiplayer)
+    let standardSongs = [];
+    let userPlaylistSongs = [];
+    let songs = [];
+    let sourceFilteredSongs = [];
+    let currentFilteredSongs = [];
+    let shownSongs = [];
+    let currentSong = null;
+
+    // Multiplayer/session-state
+    window.isHost = false;
+    window.sessionId = null;
+
+    // Funktion för att sätta fast databashanteringslyssnare – körs endast när en användare är inloggad.
+    function initDataListeners() {
+      // Läs standardspellistor (offentliga)
+      onValue(ref(db, 'standardLists'), (snapshot) => {
+        if (snapshot.exists()) {
+          const rawPlaylists = snapshot.val();
+          standardSongs = [];
+          for (const playlistName in rawPlaylists) {
+            const playlistData = rawPlaylists[playlistName];
+            if (playlistData.songs) {
+              const tracks = playlistData.songs;
+              for (const trackId in tracks) {
+                standardSongs.push({
+                  qr: trackId,
+                  ...tracks[trackId],
+                  source: [playlistName]
+                });
+              }
+            }
+          }
+          mergeSongs();
+        } else {
+          console.error("Inga standardspellistor hittades i 'standardLists'.");
+          standardSongs = [];
+          mergeSongs();
+        }
+      });
+      
+      // Läs användarspellistor endast för den inloggade användarens UID
+      const userId = window.window.auth.currentUser.uid;
+      onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
+        console.log("Hämtar spellistor för användare:", userId);
+        if (snapshot.exists()) {
+            const userPlaylistsData = snapshot.val();
+            userPlaylistSongs = [];
+
+            for (const playlistName in userPlaylistsData) { // Iterera genom varje spellista
+                const playlistData = userPlaylistsData[playlistName];
+                if (playlistData.songs) {
+                    const tracks = playlistData.songs;
+                    for (const trackId in tracks) {
+                        userPlaylistSongs.push({
+                            qr: trackId,
+                            ...tracks[trackId],
+                            source: [playlistName] // Spara spellistans namn för filtrering
+                        });
+                    }
+                }
+            }
+            
+            console.log("Hämtade användarspellistor:", userPlaylistSongs);
+            mergeSongs(); // Uppdatera samtliga låtar
+        } else {
+            console.log("Inga användarspellistor hittades för UID:", userId);
+            userPlaylistSongs = [];
+            mergeSongs();
+        }
+      });
+    }
+    
+    // Vänta tills DOM är laddad
+    document.addEventListener("DOMContentLoaded", () => {
+      // Hantera autentiseringsstatus: om användaren är inloggad, initiera data, annars visa inloggningsmodal.
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("Inloggad användare:", user.email);
+          document.getElementById("loginModal").style.display = "none";
+          document.getElementById("registerModal").style.display = "none";
+          initDataListeners();
+          // Om URL innehåller ?join=... försök auto-ansluta efter inloggning
+          if (typeof maybeAutoJoinFromURL === "function") {
+            maybeAutoJoinFromURL();
+          }
+        } else {
+          console.log("Ingen användare inloggad.");
+          document.getElementById("loginModal").style.display = "flex";
+        }
+      });
+      
+      // Inloggningsfunktion
+      const loginButton = document.getElementById("loginButton");
+      if (loginButton) {
+        loginButton.addEventListener("click", () => {
+          const email = document.getElementById("emailInput").value.trim();
+          const password = document.getElementById("passwordInput").value;
+          signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log("Inloggning lyckades:", userCredential.user.email);
+              document.getElementById("loginError").style.display = "none";
+            })
+            .catch((error) => {
+              console.error("Inloggningsfel:", error);
+              document.getElementById("loginError").style.display = "block";
+            });
+        });
+      }
+      
+      // Registreringsfunktion
+      const registerButton = document.getElementById("registerButton");
+      if (registerButton) {
+        registerButton.addEventListener("click", () => {
+          const email = document.getElementById("regEmail").value.trim();
+          const password = document.getElementById("regPassword").value;
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log("Registrering lyckades:", userCredential.user.email);
+              document.getElementById("registerError").style.display = "none";
+              document.getElementById("registerModal").style.display = "none";
+            })
+            .catch((error) => {
+              console.error("Registreringsfel:", error);
+              document.getElementById("registerError").style.display = "block";
+              document.getElementById("registerError").textContent = error.message;
+            });
+        });
+      }
+      
+      // Växla mellan modaler
+      const showRegisterBtn = document.getElementById("showRegister");
+      if (showRegisterBtn) {
+        showRegisterBtn.addEventListener("click", () => {
+          document.getElementById("loginModal").style.display = "none";
+          document.getElementById("registerModal").style.display = "flex";
+        });
+      }
+      const showLoginBtn = document.getElementById("showLogin");
+      if (showLoginBtn) {
+        showLoginBtn.addEventListener("click", () => {
+          document.getElementById("registerModal").style.display = "none";
+          document.getElementById("loginModal").style.display = "flex";
+        });
+      }
+      
+      // Glömt lösenord-funktion
+      const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+      if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const email = document.getElementById("emailInput").value.trim();
+          if (!email) {
+            alert("Ange din e-postadress för att återställa lösenordet.");
+            return;
+          }
+          sendPasswordResetEmail(auth, email)
+            .then(() => {
+              alert("En återställningslänk har skickats till din e-post.");
+            })
+            .catch((error) => {
+              console.error("Fel vid återställning av lösenord:", error);
+              alert("Fel: " + error.message);
+            });
+        });
+      }
+    });
+    
+    // Funktioner för att hantera spellistor (solo + filter)
+    function mergeSongs() {
+      const merged = {};
+      // Först, bearbeta standardlistorna.
+      standardSongs.forEach(song => {
+        merged[song.qr] = { ...song, source: [...song.source] };
+      });
+      // Sedan, bearbeta användarspellistor.
+      userPlaylistSongs.forEach(song => {
+        if (merged[song.qr]) {
+          merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
+        } else {
+          const yearToUse = song.customYear ? song.customYear : song.year;
+          merged[song.qr] = { ...song, year: yearToUse, source: [...song.source] };
+        }
+      });
+      songs = Object.values(merged);
+      console.log("Sammankopplade låtar (unika spår):", songs.length);
+      populateSourceCheckboxes();
+    }
+    
+    function updateAllaCheckbox() {
+      const nonAlla = document.querySelectorAll('input[name="source"]:not([value="alla"])');
+      const allaBox = document.querySelector('input[name="source"][value="alla"]');
+      let allChecked = true;
+      nonAlla.forEach(chk => { if (!chk.checked) { allChecked = false; } });
+      allaBox.checked = allChecked;
+    }
+    
+    function populateSourceCheckboxes() {
+      const container = document.getElementById("source-checkbox-container");
+      container.innerHTML = "";
+      
+      const allHeader = document.createElement("div");
+      allHeader.className = "allHeader";
+      
+      const allDiv = document.createElement("div");
+      allDiv.classList.add("checkbox-pill");
+      allDiv.style.display = "inline-block";
+      const checkboxAll = document.createElement("input");
+      checkboxAll.type = "checkbox";
+      checkboxAll.name = "source";
+      checkboxAll.value = "alla";
+      checkboxAll.id = "source-alla";
+      checkboxAll.addEventListener("change", function() {
+        const allSourceCheckboxes = document.querySelectorAll('input[name="source"]');
+        allSourceCheckboxes.forEach(chk => { chk.checked = this.checked; });
+        updateYearSelection();
+      });
+      const labelAll = document.createElement("label");
+      labelAll.setAttribute("for", "source-alla");
+      labelAll.textContent = "Alla låtar";
+      allDiv.appendChild(checkboxAll);
+      allDiv.appendChild(labelAll);
+      allHeader.appendChild(allDiv);
+      container.appendChild(allHeader);
+      
+      const standardHeading = document.createElement("p");
+      standardHeading.className = "subheading";
+      standardHeading.textContent = "Standardlistor";
+      container.appendChild(standardHeading);
+      
+      let standardSources = Array.from(new Set(standardSongs.map(song => song.source[0])));
+      standardSources.sort();
+      if (standardSources.length > 0) {
+        standardSources.forEach(source => {
+          const div = document.createElement("div");
+          div.classList.add("checkbox-pill");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "source";
+          checkbox.value = source;
+          const id = "standard-" + source.replace(/\s+/g, '-').toLowerCase();
+          checkbox.id = id;
+          checkbox.addEventListener("change", function() {
+            updateAllaCheckbox();
+            updateYearSelection();
+          });
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.textContent = source;
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          container.appendChild(div);
+        });
+      }
+      
+      let divider = document.createElement("div");
+      divider.className = "divider";
+      container.appendChild(divider);
+      
+      const userHeading = document.createElement("p");
+      userHeading.className = "subheading";
+      userHeading.textContent = "Egna spellistor";
+      container.appendChild(userHeading);
+      
+      let userSources = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
+      userSources = userSources.filter(src => !standardSources.includes(src));
+      userSources.sort();
+      if (userSources.length > 0) {
+        userSources.forEach(source => {
+          const div = document.createElement("div");
+          div.classList.add("checkbox-pill");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "source";
+          checkbox.value = source;
+          const id = "user-" + source.replace(/\s+/g, '-').toLowerCase();
+          checkbox.id = id;
+          checkbox.addEventListener("change", function() {
+            updateAllaCheckbox();
+            updateYearSelection();
+          });
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.textContent = source;
+          div.appendChild(checkbox);
+          div.appendChild(label);
+          container.appendChild(div);
+        });
+      }
+    }
+    
+    function updateSongCount() {
+      const startYear = parseInt(document.getElementById("startYear").value);
+      const endYear = parseInt(document.getElementById("endYear").value);
+      const filteredSongCount = sourceFilteredSongs.filter(song =>
+          parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
+      ).length;
+      const songCountElement = document.getElementById("selectedSongCount");
+      if (songCountElement) {
+          songCountElement.textContent = `Valda låtar: ${filteredSongCount}`;
+      } else {
+          console.error("Elementet 'selectedSongCount' hittades inte i DOM.");
+      }
+    }
+
+    window.updateYearSelection = function() {
+      const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
+      let selectedSources = Array.from(checkedBoxes).map(cb => cb.value);
+      
+      if (selectedSources.includes("alla")) {
+          const allStandard = Array.from(new Set(standardSongs.map(song => song.source[0])));
+          const allUser = Array.from(new Set(userPlaylistSongs.map(song => song.source[0])));
+          selectedSources = [...new Set([...allStandard, ...allUser, "alla"])];
+      }
+
+      sourceFilteredSongs = songs.filter(song =>
+          song.source.some(src => selectedSources.includes(src))
+      );
+
+      const startYearDropdown = document.getElementById("startYear");
+      const endYearDropdown = document.getElementById("endYear");
+
+      startYearDropdown.innerHTML = "";
+      endYearDropdown.innerHTML = "";
+
+      const thisYear = new Date().getFullYear();
+      for (let year = 1950; year <= thisYear; year++) {
+          const optionStart = document.createElement("option");
+          optionStart.value = year;
+          optionStart.textContent = year;
+          if (year === 1950) optionStart.selected = true;
+          startYearDropdown.appendChild(optionStart);
+
+          const optionEnd = document.createElement("option");
+          optionEnd.value = year;
+          optionEnd.textContent = year;
+          if (year === 2025) optionEnd.selected = true;
+          endYearDropdown.appendChild(optionEnd);
+
+          optionStart.addEventListener("mouseenter", function() {
+              optionStart.style.backgroundColor = "#0b939c";
+              optionStart.style.color = "#fff";
+          });
+          optionStart.addEventListener("mouseleave", function() {
+              optionStart.style.backgroundColor = "#032934";
+          });
+          optionEnd.addEventListener("mouseenter", function() {
+              optionEnd.style.backgroundColor = "#0b939c";
+              optionEnd.style.color = "#fff";
+          });
+          optionEnd.addEventListener("mouseleave", function() {
+              optionEnd.style.backgroundColor = "#032934";
+          });
+      }
+
+      startYearDropdown.addEventListener("change", function() {
+          updateSongCount();
+      });
+      endYearDropdown.addEventListener("change", function() {
+          updateSongCount();
+      });
+
+      updateSongCount();
+    };
+
+    window.filterSongs = function() {
+      const startYear = parseInt(document.getElementById("startYear").value);
+      const endYear = parseInt(document.getElementById("endYear").value);
+      
+      currentFilteredSongs = sourceFilteredSongs.filter(song =>
+          parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
+      );
+
+      updateSongCount();
+
+      shownSongs = [];
+      if (currentFilteredSongs.length > 0) {
+          // Solo-läge: väljer första låt — men sidan visas inte i multiplayer-flödet.
+          nextSong();
+          return true;
+      } else {
+          alert("Inga låtar hittades i den valda perioden.");
+          const sd = document.getElementById("song-display");
+          if (sd) sd.innerHTML = "";
+          return false;
+      }
+    };
+
+    // *** ÄNDRAD: Starta MULTIPLAYER istället för solo-resultatsida ***
+    window.applyFilter = function() {
+      if (!filterSongs()) return;
+      // Skapa session och öppna lobby (HOST-flöde)
+      createSessionFromFilter().then((sid) => {
+        showLobby(sid);
+      }).catch(e => {
+        console.error("Kunde inte skapa session:", e);
+        alert("Kunde inte skapa session. Försök igen.");
+      });
+    };
+
+    window.nextSong = function() {
+      const remainingSongs = currentFilteredSongs.filter(song => !shownSongs.includes(song));
+      if (remainingSongs.length === 0) {
+          alert("Inga fler låtar, tryck på menyvalet 'Startsida' för att börja om.");
+          return;
+      }
+      const randomIndex = Math.floor(Math.random() * remainingSongs.length);
+      currentSong = remainingSongs[randomIndex];
+      shownSongs.push(currentSong);
+      const playlistInfo = document.getElementById("playlist-info");
+      if (playlistInfo) playlistInfo.style.display = "none";
+      displaySong(currentSong);
+    };
+
+    window.restart = function() {
+      shownSongs = [];
+      currentSong = null;
+      const sd = document.getElementById("song-display");
+      if (sd) sd.innerHTML = "";
+    };
+
+    function displaySong(song) {
+      const displayYear = song.customYear ? song.customYear : song.year;
+      const standardListNames = (typeof standardSongs !== "undefined" && standardSongs.length)
+        ? Array.from(new Set(standardSongs.map(s => s.source[0])))
+        : [];
+      const isUserSong = !song.source.some(src => standardListNames.includes(src));
+      const songDisplay = document.getElementById("song-display");
+      songDisplay.innerHTML = `
+        <div id="qrcode-${song.qr}" class="qrcode"></div>
+        <button class="answer-button" onclick="revealDetails()">Visa svar</button>
+        <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+          <div class="year-container" style="text-align: center; width: 100%;">
+            <span style="display: inline-block; position: relative;">
+              <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+                ${displayYear}
+              </span>
+              ${
+                isUserSong 
+                  ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
+                       onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
+                  : ``
+              }
+            </span>
+          </div>
+          <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
+            ${song.artist}<br>${song.title}
+          </div>
+        </div>
+      `;
+      generateQRCode(song.qr);
+      const playlistInfoElement = document.getElementById("playlist-info");
+      if (playlistInfoElement) {
+        playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
+      }
+    }
+
+    window.generateQRCode = function(qr) {
+      const spotifyUrl = `https://open.spotify.com/track/${qr}`;
+      const qrElement = document.getElementById(`qrcode-${qr}`);
+      if (!qrElement) return;
+      qrElement.innerHTML = "";
+      new QRCode(qrElement, { text: spotifyUrl, width: 160, height: 160 });
+    };
+
+    window.revealDetails = function() {
+      const details = document.getElementById("song-details");
+      if (details) details.style.display = "block";
+      const playlistInfo = document.getElementById("playlist-info");
+      if (playlistInfo) playlistInfo.style.display = "block";
+    };
+
+    window.goToFilter = function() {
+      const checkboxes = document.querySelectorAll('input[name="source"]');
+      checkboxes.forEach(checkbox => { checkbox.checked = false; });
+      updateYearSelection();
+      restart();
+      document.getElementById("result-page").style.display = "none";
+      document.getElementById("filter-page").style.display = "block";
+    };
+
+    /***** NY SPOTIFY TOKEN OCH CACHING DEL *****/
+    async function getBackendSpotifyToken() {
+      console.log("getBackendSpotifyToken: Kontrollerar om cachat token finns...");
+      const cachedToken = localStorage.getItem('spotifyToken');
+      const tokenExpiry = localStorage.getItem('spotifyTokenExpiry');
+      if (cachedToken && tokenExpiry && Date.now() < Number(tokenExpiry)) {
+        console.log("Använder cachad token från backend:", cachedToken);
+        return cachedToken;
+      }
+      try {
+        console.log("Begär nytt token via backend...");
+        const response = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', {
+          method: 'POST'
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP-fel: ${response.status}`);
+        }
+        const data = await response.json();
+        const token = data.access_token;
+        const expiresIn = data.expires_in;
+        const expiryTime = Date.now() + (expiresIn * 1000) - (60 * 1000);
+        localStorage.setItem('spotifyToken', token);
+        localStorage.setItem('spotifyTokenExpiry', expiryTime.toString());
+        console.log("Hämtat nytt token via backend:", token);
+        return token;
+      } catch (error) {
+        console.error("Fel vid hämtning av token via backend:", error);
+        return null;
+      }
+    }
+    
+    async function fetchSpotifyPlaylist(playlistUrl) {
+      console.log("fetchSpotifyPlaylist: Playlist URL mottagen:", playlistUrl);
+      const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
+      console.log("fetchSpotifyPlaylist: Extraherat playlist-ID:", playlistId);
+      const token = await getBackendSpotifyToken();
+      let tracks = {};
+      let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+      while (nextUrl) {
+        const response = await fetch(nextUrl, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await response.json();
+        data.items.forEach(item => {
+          const trackId = item.track.id;
+          tracks[trackId] = {
+            title: item.track.name,
+            artist: item.track.artists.map(artist => artist.name).join(", "),
+            year: item.track.album.release_date ? item.track.album.release_date.substring(0, 4) : null
+          };
+        });
+        nextUrl = data.next;
+      }
+      return tracks;
+    }
+    
+    // Skriv användarspellistor under userPlaylists/<uid>/<playlistName>
+    async function addPlaylistToFirebase(playlistName, playlistUrl) {
+      try {
+          console.log("Försöker hämta spellista:", playlistName);
+          const tracks = await fetchSpotifyPlaylist(playlistUrl); // Hämta låtarna
+          if (!tracks || Object.keys(tracks).length === 0) {
+              alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
+              return;
+          }
+          const userId = window.window.auth.currentUser.uid; // Endast lägga till i userPlaylists
+          const userPlaylistsRef = ref(db, `userPlaylists/${userId}/${playlistName}`);
+          await set(userPlaylistsRef, { songs: tracks });
+          alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
+      } catch (error) {
+          console.error("Fel vid lagring av spellista:", error);
+          alert("Något gick fel vid lagring av spellistan.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const addBtn = document.getElementById("addPlaylistButton");
+      if (addBtn) {
+        addBtn.addEventListener("click", async () => {
+          const playlistName = document.getElementById("playlistNameInput").value.trim();
+          const playlistLink = document.getElementById("playlistLinkInput").value.trim();
+          if (!playlistName || !playlistLink) {
+              alert("Fyll i både spellistans namn och länk!");
+              return;
+          }
+          await addPlaylistToFirebase(playlistName, playlistLink);
+        });
+      }
+    });
+
+    /***** MENY: Skapa en hamburgermeny i högra hörnet *****/
+    document.addEventListener("DOMContentLoaded", function() {
+      const menuContainer = document.createElement("div");
+      menuContainer.id = "menuContainer";
+      menuContainer.style.position = "fixed";
+      menuContainer.style.top = "10px";
+      menuContainer.style.right = "2vw";
+      menuContainer.style.zIndex = "9999";
+      menuContainer.style.width = "60px";
+
+      const menuButton = document.createElement("button");
+      menuButton.id = "menuButton";
+      menuButton.innerHTML = "&#9776;"; // Hamburger-ikon
+      menuButton.style.background = "none";
+      menuButton.style.border = "none";
+      menuButton.style.color = "#fff";
+      menuButton.style.fontSize = "2rem";
+      menuButton.style.cursor = "pointer";
+      menuButton.style.zIndex = "9999";
+      menuContainer.appendChild(menuButton);
+      
+      const dropdownMenu = document.createElement("div");
+      dropdownMenu.id = "dropdownMenu";
+      dropdownMenu.style.display = "none";
+      dropdownMenu.style.position = "absolute";
+      dropdownMenu.style.right = "0";
+      dropdownMenu.style.top = "2.5rem";
+      dropdownMenu.style.background = "#032934";
+      dropdownMenu.style.border = "1px solid #fff";
+      dropdownMenu.style.borderRadius = "4px";
+      dropdownMenu.style.zIndex = "9999";
+      dropdownMenu.style.width = "max-content";
+      
+      // Menyalternativ
+      const lasForstLink = document.createElement("a");
+      lasForstLink.href = "#";
+      lasForstLink.textContent = "Läs först";
+      lasForstLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("readmeModal").style.display = "block";
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(lasForstLink);
+      
+      const startpageLink = document.createElement("a");
+      startpageLink.href = "#";
+      startpageLink.textContent = "Startsida";
+      startpageLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        goToFilter();
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(startpageLink);
+      
+      const managePlaylistsLink = document.createElement("a");
+      managePlaylistsLink.href = "#";
+      managePlaylistsLink.textContent = "Hantera spellistor";
+      managePlaylistsLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.openManagePlaylists && window.openManagePlaylists();
+        dropdownMenu.style.display = "none";
+      });
+      dropdownMenu.appendChild(managePlaylistsLink);
+
+      const logoutLink = document.createElement("a");
+      logoutLink.href = "#";
+      logoutLink.textContent = "Logga ut";
+      logoutLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        signOut(auth)
+          .then(() => {
+            console.log("Utloggad!");
+            document.getElementById("loginModal").style.display = "flex";
+            dropdownMenu.style.display = "none";
+          })
+          .catch((error) => {
+            console.error("Fel vid utloggning:", error);
+          });
+      });
+      dropdownMenu.appendChild(logoutLink);
+      
+      menuContainer.appendChild(dropdownMenu);
+      document.body.appendChild(menuContainer);
+      
+      menuButton.addEventListener("click", () => {
+        dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+      });
+      
+      document.addEventListener("click", (event) => {
+        if (!menuContainer.contains(event.target)) {
+          dropdownMenu.style.display = "none";
+        }
+      });
+    });
+
+    /* ===============================
+       === MULTIPLAYER (Lobby/Game) ===
+       =============================== */
+
+    function setPage(id){
+      ["filter-page","result-page","lobby-page","join-page","game-page"].forEach(pid=>{
+        const el = document.getElementById(pid);
+        if (el) el.style.display = (pid===id) ? "block" : "none";
+      });
+    }
+
+    function currentStartEndYears(){
+      const startYear = parseInt(document.getElementById("startYear").value);
+      const endYear = parseInt(document.getElementById("endYear").value);
+      return {startYear, endYear};
+    }
+
+    function joinURL(sessionId){
+      const base = location.origin + location.pathname;
+      return `${base}?join=${encodeURIComponent(sessionId)}`;
+    }
+
+    // === SESSION: skapa från filter (HOST) ===
+    async function createSessionFromFilter(){
+      if (!auth.currentUser) throw new Error("Inte inloggad.");
+      if (!currentFilteredSongs || !currentFilteredSongs.length) throw new Error("Inga filtrerade låtar.");
+      const {startYear, endYear} = currentStartEndYears();
+
+      // Bygg deck + songMap
+      const deck = currentFilteredSongs.map(s => s.qr);
+      const songMap = {};
+      currentFilteredSongs.forEach(s => {
+        const yr = s.customYear ? s.customYear : s.year;
+        songMap[s.qr] = { title: s.title || "", artist: s.artist || "", year: yr || "" };
+      });
+
+      const sessionRef = push(ref(db, 'sessions'));
+      const sid = sessionRef.key;
+      await set(sessionRef, {
+        createdAt: Date.now(),
+        status: "lobby",
+        hostId: auth.currentUser.uid,
+        settings: { startYear, endYear },
+        songMap,
+        deck,
+        shown: {},
+        current: null,
+        teams: {},
+        turn: { order: [], activeIndex: 0 }
+      });
+      window.sessionId = sid;
+      window.isHost = true;
+      localStorage.setItem("sessionId", sid);
+      localStorage.setItem("role", "host");
+      return sid;
+    }
+    window.createSessionFromFilter = createSessionFromFilter;
+
+    // === LOBBY ===
+    function showLobby(sid){
+      setPage("lobby-page");
+      window.sessionId = sid;
+      window.isHost = true;
+
+      // Render QR & länk
+      const q = document.getElementById("lobby-qr");
+      if (q){ q.innerHTML = ""; new QRCode(q, { text: joinURL(sid), width: 160, height: 160 }); }
+      const p = document.getElementById("lobby-link");
+      if (p) p.textContent = joinURL(sid);
+
+      // Start-knapp
+      const btn = document.getElementById("startGameButton");
+      if (btn && !btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", async () => {
+          try{ await startGameHost(); }catch(e){ console.error(e); alert("Kunde inte starta spelet."); }
+        });
+      }
+      // Lyssna på session
+      listenToSession(sid);
+    }
+    window.showLobby = showLobby;
+
+    // === JOIN ===
+    function showJoinPage(sid){
+      setPage("join-page");
+      window.sessionId = sid;
+      window.isHost = false;
+      localStorage.setItem("role","player");
+      const btn = document.getElementById("joinSubmit");
+      if (btn && !btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", async () => {
+          const name = (document.getElementById("joinTeamName").value || "").trim();
+          if (!name){ alert("Ange lagnamn."); return; }
+          try{
+            const teamRef = push(ref(db, `sessions/${sid}/teams`));
+            const teamId = teamRef.key;
+            await set(teamRef, { name, tokens: 3, score: 0, timeline: [] });
+            localStorage.setItem("teamId", teamId);
+            // Efter join: stanna i lobby tills host startar
+            listenToSession(sid);
+          }catch(e){
+            console.error(e);
+            alert("Kunde inte gå med i spelet.");
+          }
+        });
+      }
+    }
+    window.showJoinPage = showJoinPage;
+
+    function maybeAutoJoinFromURL(){
+      const params = new URLSearchParams(location.search);
+      const sid = params.get("join");
+      if (!sid) return;
+      const saved = localStorage.getItem("sessionId");
+      if (saved === sid){
+        listenToSession(sid);
+        return;
+      }
+      showJoinPage(sid);
+    }
+    window.maybeAutoJoinFromURL = maybeAutoJoinFromURL;
+
+    // === SESSION-LYSSNARE ===
+    function listenToSession(sid){
+      const sref = ref(db, `sessions/${sid}`);
+      onValue(sref, (snap) => {
+        if (!snap.exists()) return;
+        const session = snap.val();
+        renderLobbyTeams(session);
+        if (session.status === "lobby"){
+          setPage("lobby-page");
+        } else if (session.status === "playing" || session.status === "finished"){
+          renderGame(session);
+          setPage("game-page");
+        }
+      });
+    }
+    window.listenToSession = listenToSession;
+
+    function renderLobbyTeams(session){
+      const list = document.getElementById("team-list");
+      if (!list) return;
+      const teams = session.teams ? Object.entries(session.teams) : [];
+      list.innerHTML = teams.length ? "" : "<p>Inga lag ännu – scanna QR och gå med.</p>";
+      teams.forEach(([tid, t]) => {
+        const item = document.createElement("div");
+        item.style.padding = ".4rem .6rem";
+        item.style.marginBottom = ".3rem";
+        item.style.background = "rgba(3,41,52,.6)";
+        item.style.color = "#fff";
+        item.style.borderRadius = "8px";
+        item.textContent = t.name + (t.score ? ` • ${t.score}p` : "");
+        list.appendChild(item);
+      });
+    }
+
+    // === STARTA SPEL (HOST) ===
+    async function startGameHost(){
+      if (!window.sessionId) throw new Error("Ingen session.");
+      const sid = window.sessionId;
+      const teamsSnap = await get(ref(db, `sessions/${sid}/teams`));
+      const teams = teamsSnap.val() || {};
+      const order = Object.keys(teams);
+      if (!order.length){ alert("Minst ett lag krävs."); return; }
+      // Välj första låten som ej visats
+      const sessSnap = await get(ref(db, `sessions/${sid}`));
+      const sess = sessSnap.val();
+      const deck = sess.deck || [];
+      const shown = sess.shown || {};
+      const nextId = deck.find(id => !shown[id]);
+      if (!nextId){ alert("Deck tomt."); return; }
+      const updates = {};
+      updates[`sessions/${sid}/status`] = "playing";
+      updates[`sessions/${sid}/turn`] = { order, activeIndex: 0 };
+      updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
+      updates[`sessions/${sid}/shown/${nextId}`] = true;
+      await update(ref(db), updates);
+    }
+    window.startGameHost = startGameHost;
+
+    // === GAME RENDER ===
+    function renderGame(session){
+      renderTeamsHeader(session);
+      renderActiveSong(session);
+      renderHostControls(session);
+    }
+
+    function renderTeamsHeader(session){
+      const wrap = document.getElementById("teams-header");
+      if (!wrap) return;
+      wrap.innerHTML = "";
+      const order = (session.turn && session.turn.order) || Object.keys(session.teams||{});
+      const activeIdx = session.turn ? session.turn.activeIndex : 0;
+      order.forEach((tid, idx) => {
+        const t = session.teams[tid];
+        const chip = document.createElement("div");
+        chip.style.display = "inline-block";
+        chip.style.padding = ".35rem .6rem";
+        chip.style.margin = ".2rem";
+        chip.style.borderRadius = "999px";
+        chip.style.border = "1px solid rgba(255,255,255,.6)";
+        chip.style.color = "#fff";
+        chip.style.background = idx===activeIdx ? "#0b939c" : "rgba(3,41,52,.7)";
+        chip.textContent = `${t.name} • ${t.score||0}p • 🔥${t.tokens??3}`;
+        wrap.appendChild(chip);
+      });
+    }
+
+    function renderActiveSong(session){
+      const cont = document.getElementById("game-song-display");
+      if (!cont) return;
+      cont.innerHTML = "";
+      const cur = session.current;
+      if (!cur || !cur.trackId){
+        cont.innerHTML = "<p style='color:#fff; text-align:center;'>Ingen låt vald ännu.</p>";
+        return;
+      }
+      const meta = session.songMap && session.songMap[cur.trackId] || { title:"", artist:"", year:"" };
+      const song = { qr: cur.trackId, title: meta.title, artist: meta.artist, year: meta.year, source:["spel"] };
+      displaySongGame(song, !!cur.revealed);
+    }
+
+    function renderHostControls(session){
+      const hc = document.getElementById("host-controls");
+      if (!hc) return;
+      hc.style.display = window.isHost ? "block" : "none";
+      if (!window.isHost) return;
+
+      const revealBtn = document.getElementById("revealButton");
+      const awardBtn = document.getElementById("awardActiveButton");
+      const nextBtn = document.getElementById("nextSongButtonGame");
+
+      if (revealBtn && !revealBtn._bound){
+        revealBtn._bound = true;
+        revealBtn.addEventListener("click", async ()=>{
+          const sid = window.sessionId;
+          const curSnap = await get(ref(db, `sessions/${sid}/current`));
+          if (!curSnap.exists()) return;
+          await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+        });
+      }
+      if (awardBtn && !awardBtn._bound){
+        awardBtn._bound = true;
+        awardBtn.addEventListener("click", async ()=>{
+          const sid = window.sessionId;
+          const sSnap = await get(ref(db, `sessions/${sid}`));
+          if (!sSnap.exists()) return;
+          const sess = sSnap.val();
+          const order = sess.turn.order;
+          const activeIdx = sess.turn.activeIndex;
+          const activeTid = order[activeIdx];
+          const trackId = sess.current?.trackId;
+          if (!activeTid || !trackId) return;
+          const yr = sess.songMap?.[trackId]?.year || "";
+          const updates = {};
+          const teamPath = `sessions/${sid}/teams/${activeTid}`;
+          const team = sess.teams[activeTid];
+          const newScore = (team.score||0) + 1;
+          updates[`${teamPath}/score`] = newScore;
+          const tl = team.timeline || [];
+          tl.push({ trackId, year: yr });
+          updates[`${teamPath}/timeline`] = tl;
+          await update(ref(db), updates);
+        });
+      }
+      if (nextBtn && !nextBtn._bound){
+        nextBtn._bound = true;
+        nextBtn.addEventListener("click", async ()=>{
+          await hostNextSong();
+        });
+      }
+    }
+
+    async function hostNextSong(){
+      const sid = window.sessionId;
+      const sSnap = await get(ref(db, `sessions/${sid}`));
+      if (!sSnap.exists()) return;
+      const sess = sSnap.val();
+      const deck = sess.deck || [];
+      const shown = sess.shown || {};
+      const nextId = deck.find(id => !shown[id]);
+      const order = sess.turn.order;
+      const nextIdx = (sess.turn.activeIndex + 1) % order.length;
+      const updates = {};
+      if (nextId){
+        updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
+        updates[`sessions/${sid}/shown/${nextId}`] = true;
+      } else {
+        updates[`sessions/${sid}/status`] = "finished";
+      }
+      updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
+      await update(ref(db), updates);
+    }
+    window.hostNextSong = hostNextSong;
+
+    // === GAME: rendering för låt (separat från solo) ===
+    function displaySongGame(song, revealed){
+      const songDisplay = document.getElementById("game-song-display");
+      songDisplay.innerHTML = `
+        <div id="game-qrcode-${song.qr}" class="qrcode"></div>
+        <button class="answer-button" id="gameRevealBtn" ${revealed?"style='display:none'":""}>Visa svar</button>
+        <div id="game-song-details" style="display:${revealed?"block":"none"}; margin-top: 1rem; font-weight: bold;">
+          <div class="year-container" style="text-align:center; width:100%;">
+            <span class="year-text" style="font-size: 3em; color:#fff; text-shadow:0 0 8px #000;">${song.year||""}</span>
+          </div>
+          <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">
+            ${song.artist||""}<br>${song.title||""}
+          </div>
+        </div>
+      `;
+      // QR för Spotify-URL
+      const el = document.getElementById(`game-qrcode-${song.qr}`);
+      if (el){ el.innerHTML = ""; new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width: 160, height: 160 }); }
+      // Lokal "visa svar"-knapp — host uppdaterar DB
+      const rb = document.getElementById("gameRevealBtn");
+      if (rb){
+        rb.addEventListener("click", ()=>{
+          if (window.isHost){
+            const revealBtn = document.getElementById("revealButton");
+            if (revealBtn) revealBtn.click();
+          }
+        });
+      }
+    }
+    window.displaySongGame = displaySongGame;
+
+  </script>
 
   <meta name="theme-color" content="#111111">
   <meta property="og:title" content="Låtårsquiz">
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
   <meta name="twitter:card" content="summary_large_image">
+<script>
+// Helper to escape HTML to mitigate XSS when using innerHTML
+function escapeHTML(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function setSafeHTML(el, html){
+  el.innerHTML = String(html).replace(/<script/gi,'&lt);script');
+}
+</script>
 
 
+<style>
+/* Responsive tweaks for Manage Playlists modal */
+#managePlaylistsModal .modal-content { width: min(92vw, 600px); max-width: 600px; box-sizing: border-box; }
+#managePlaylistsList .playlist-row { overflow: hidden; }
+#managePlaylistsList .playlist-row strong,
+#managePlaylistsList .playlist-row span { overflow-wrap: anywhere; word-break: break-word; }
+@media (max-width: 480px) {
+  #managePlaylistsModal .modal-content { width: 92vw !important; margin: 8vh auto !important; padding: 16px !important; }
+  #managePlaylistsList .playlist-row { gap: .6rem !important; }
+}
+</style>
 
 
+<style>
+/* Prevent background scroll when modal is open */
+body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+</style>
 
 
+<style>
+/* Generic login modal content fallback */
+#loginModal > div, #authModal > div, #signinModal > div {
+  background:#111; color:#fff; margin:6vh auto; padding:20px;
+  border:1px solid rgba(255,255,255,.15); border-radius:12px; position:relative;
+  width:min(92vw, 600px); max-width:600px; box-sizing:border-box; max-height:80vh; overflow:auto;
+}
+#loginModal .closeBtn, #authModal .closeBtn, #signinModal .closeBtn {
+  color:#ccc; position:absolute; top:10px; right:20px; font-size:28px; font-weight:bold; cursor:pointer; z-index:5000;
+}
+#loginModal .closeBtn:hover, #authModal .closeBtn:hover, #signinModal .closeBtn:hover { color:#fff; }
+</style>
 
-
-
-
-
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <!-- Inloggningsmodal -->
@@ -68,32 +1593,59 @@
     <div id="filter-page">
       <div id="source-checkbox-container"></div>
       <div style="display: flex; justify-content: center; gap: 1rem;">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="startYear">Från år:</label>
-        <select id="startYear"></select>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-        <label for="endYear">Till år:</label>
-        <select id="endYear"></select>
-    </div>
-</div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <label for="startYear">Från år:</label>
+            <select id="startYear"></select>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <label for="endYear">Till år:</label>
+            <select id="endYear"></select>
+        </div>
+      </div>
       <!-- Spotify-spellisteimport -->
       <div id="spotify-import">
         <h3>Lägg till Spotify-spellista</h3>
-        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="margin-right: 2px" style="margin-left: 2px">
+        <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" style="margin-right: 2px">
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
-      <button id="addPlaylistButton">Lägg till</button>
+        <button id="addPlaylistButton">Lägg till</button>
       </div>
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
       <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
-      
     </div>
     
-    <!-- Resultatsida -->
+    <!-- Resultatsida (solo-läge finns kvar men används inte av "Starta spel") -->
     <div id="result-page">
       <div id="song-display"></div>
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
       <p id="playlist-info" style="display: none; text-align: center; font-size: 0.85rem; color: #fff; margin-top: 0.2rem;"></p>
+    </div>
+
+    <!-- Lobby-sida (HOST + PLAYERS ser vilka lag som anslutit) -->
+    <div id="lobby-page" style="display:none; text-align:center;">
+      <h2 style="color:#fff;">Lobby</h2>
+      <div id="lobby-qr" class="qrcode" aria-label="QR-kod för att gå med"></div>
+      <p id="lobby-link" style="color:#fff; font-size:.9rem; word-break:break-all;"></p>
+      <h3 style="color:#fff; margin-top:1rem;">Lag</h3>
+      <div id="team-list" style="max-width:400px; margin:0 auto;"></div>
+      <button id="startGameButton" class="start-button" style="margin-top:1rem;">Starta spel</button>
+    </div>
+
+    <!-- Join-sida (för ?join=) -->
+    <div id="join-page" style="display:none; text-align:center;">
+      <h2 style="color:#fff;">Gå med i spel</h2>
+      <input id="joinTeamName" type="text" placeholder="Lagnamn" style="width:60%; padding:.5rem; margin:.5rem auto; background:#032934; color:#fff; border:0; border-radius:6px;">
+      <button id="joinSubmit" class="start-button">Gå med</button>
+    </div>
+
+    <!-- Game-sida -->
+    <div id="game-page" style="display:none;">
+      <div id="teams-header" style="text-align:center; margin:.4rem 0;"></div>
+      <div id="game-song-display" style="text-align:center; margin:1rem 0;"></div>
+      <div id="host-controls" style="text-align:center; margin-top:.8rem; display:none;">
+        <button id="revealButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Visa svar</button>
+        <button id="awardActiveButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Ge låten till aktivt lag</button>
+        <button id="nextSongButtonGame" class="next-song-button" style="display:inline-block;">Nästa låt</button>
+      </div>
     </div>
     
     <!-- Feedback Modal -->
@@ -115,7 +1667,7 @@
           Test och säg vad du tycker!<br>
           Tankar kring allt från färg på text till funktioner uppskattas. 
         </p>
-    <p>
+        <p>
           För att spela får du först göra några val:<br>
           • Vilka förinställda spellistor vill du inkludera?<br>
           • Vilka av dina egna spellistor vill du inkludera låtar från?<br>
@@ -133,44 +1685,380 @@
           • Spotify-genererade listor för dig stämmer oftast bra i årtal<br>
           • Spotify-genererade listor behöver först sparas som en av dina listor för att kunna laddas in. Lägg till i annan lista -> skapa ny<br>
         </p>
-      
       </div>
     </div>
   </div>
+
   <div id="editYearModal" class="modal" style="display: none;" role="dialog" aria-modal="true">
-  <div class="modal-content">
-    <span id="closeModal" class="close">&times;</span>
-    <h3>Redigera årtal</h3>
-    <input id="newYearInput" type="text" placeholder="Ange nytt årtal">
-    <button id="saveYearButton">Spara</button>
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3>Redigera årtal</h3>
+      <input id="newYearInput" type="text" placeholder="Ange nytt årtal">
+      <button id="saveYearButton">Spara</button>
+    </div>
   </div>
-</div>
+
   <!-- Vanligt script för modal- och feedbackhantering -->
-  
-  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Växla mellan inloggnings- och registreringsmodaler
+      const showRegisterBtn = document.getElementById("showRegister");
+      const showLoginBtn = document.getElementById("showLogin");
+      if (showRegisterBtn) {
+        showRegisterBtn.addEventListener("click", () => {
+          document.getElementById("loginModal").style.display = "none";
+          document.getElementById("registerModal").style.display = "flex";
+        });
+      }
+      if (showLoginBtn) {
+        showLoginBtn.addEventListener("click", () => {
+          document.getElementById("registerModal").style.display = "none";
+          document.getElementById("loginModal").style.display = "flex";
+        });
+      }
+      
+      // Readme Modal
+      const readmeModal = document.getElementById("readmeModal");
+      const closeBtn = document.querySelector(".closeBtn");
+      closeBtn.addEventListener("click", function() {
+        readmeModal.style.display = "none";
+      });
+      window.addEventListener("click", function(event) {
+        if (event.target == readmeModal) {
+          readmeModal.style.display = "none";
+        }
+      });
 
+      // Feedback-hantering
+      document.getElementById("feedbackButton")?.addEventListener("click", function() {
+        document.getElementById("feedbackModal").style.display = "block";
+      });
+      document.getElementById("closeFeedback")?.addEventListener("click", function() {
+        document.getElementById("feedbackModal").style.display = "none";
+      });
+      window.addEventListener("click", function(event) {
+        if (event.target == document.getElementById("feedbackModal")) {
+          document.getElementById("feedbackModal").style.display = "none";
+        }
+      });
+      document.getElementById("submitFeedback")?.addEventListener("click", function() {
+        const feedbackText = document.getElementById("feedbackText").value.trim();
+        if (feedbackText.length === 0) {
+            alert("Feedback kan inte vara tom!");
+            return;
+        }
+        const feedbackRef = window.firebaseRef(window.firebaseDb, 'feedback');
+        window.firebasePush(feedbackRef, { text: feedbackText, timestamp: Date.now() })
+            .then(() => {
+                alert("Tack för din feedback!");
+                document.getElementById("feedbackText").value = "";
+                document.getElementById("feedbackModal").style.display = "none";
+            })
+            .catch((error) => {
+                console.error("Fel vid lagring av feedback:", error);
+                alert("Något gick fel. Försök igen senare.");
+            });
+      });
 
+      document.getElementById("saveYearButton").addEventListener("click", function() {
+        const newYear = document.getElementById("newYearInput").value.trim();
+        console.log("Save-knappen klickad, nytt år:", newYear);
+        if (!/^\d{4}$/.test(newYear)) {
+            alert("Ange ett giltigt årtal med 4 siffror.");
+            return;
+        }
+        console.log("Uppdaterar customYear för playlist:", currentPlaylistName, "spotifyID:", currentSpotifyID);
+        updateCustomYear(currentPlaylistName, currentSpotifyID, newYear)
+            .then(() => {
+                console.log("Uppdatering lyckades, stänger modal.");
+                closeEditYearModal();
+            })
+            .catch((error) => {
+                console.error("Fel vid uppdatering av customYear:", error);
+            });
+      });
+      document.getElementById("closeModal").addEventListener("click", function() {
+        console.log("Stänger modal via stäng-knappen.");
+        closeEditYearModal();
+      });
+    });
+  </script>
 
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js")
+        .then(registration => {
+          console.log("Service Worker registrerad med scope:", registration.scope);
+        })
+        .catch(error => {
+          console.error("Service Worker misslyckades:", error);
+        });
+    }
+  </script>
 
-    <!-- Manage Playlists Modal -->
-    <div id="managePlaylistsModal" class="modal" role="dialog" aria-modal="true" style="display:none; text-align:left; padding:8px;">
-      <div class="modal-content" style="width:min(92vw, 600px); max-width:600px; margin:6vh auto; background:#111; color:#fff; padding:20px; border-radius:12px; box-sizing:border-box; max-height:80vh; overflow:auto;">
-        <span id="closeManagePlaylists" class="closeBtn" aria-label="Stäng">&times;</span>
-        <h2>Hantera spellistor</h2>
-        <p id="managePlaylistsInfo" style="opacity:.9; margin-top:.5rem;"></p>
-        <div id="managePlaylistsList" style="margin-top: 1rem;">
-          <!-- Dynamiskt innehåll -->
-        </div>
+  <script>
+  // A11y: modal focus trap and ESC close
+  (function(){
+    function trapFocus(modal){
+      const focusable = modal.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!focusable.length) return;
+      let first = focusable[0], last = focusable[focusable.length - 1];
+      function keydown(e){
+        if (e.key === 'Escape') {
+          modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
+        }
+        if (e.key !== 'Tab') return;
+        if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      }
+      modal.addEventListener('keydown', keydown);
+      modal.__cleanup = () => modal.removeEventListener('keydown', keydown);
+    }
+    document.addEventListener('modal:open', e => {
+      const modal = e.target.closest('.modal');
+      if (modal) {
+        trapFocus(modal);
+        (modal.querySelector('[autofocus]') || modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') || modal).focus();
+      }
+    });
+    document.addEventListener('modal:close', e => {
+      const modal = e.target.closest('.modal');
+      if (modal && modal.__cleanup) modal.__cleanup();
+    });
+  })();
+  </script>
+
+  <!-- Manage Playlists Modal -->
+  <div id="managePlaylistsModal" class="modal" role="dialog" aria-modal="true" style="display:none; text-align:left; padding:8px;">
+    <div class="modal-content" style="width:min(92vw, 600px); max-width:600px; margin:6vh auto; background:#111; color:#fff; padding:20px; border-radius:12px; box-sizing:border-box; max-height:80vh; overflow:auto;">
+      <span id="closeManagePlaylists" class="closeBtn" aria-label="Stäng">&times;</span>
+      <h2>Hantera spellistor</h2>
+      <p id="managePlaylistsInfo" style="opacity:.9; margin-top:.5rem;"></p>
+      <div id="managePlaylistsList" style="margin-top: 1rem;">
+        <!-- Dynamiskt innehåll -->
       </div>
     </div>
+  </div>
 
+  <script>
+  // === Hantera spellistor (via hamburgermenyn) ===
+  (function(){
+    function qs(id){ return document.getElementById(id); }
+    function show(el){ el.style.display = 'block'; el.dispatchEvent(new CustomEvent('modal:open', {bubbles:true})); }
+    function hide(el){ el.style.display = 'none'; el.dispatchEvent(new CustomEvent('modal:close', {bubbles:true})); }
 
+    async function fetchUserPlaylists(){
+      if (!window.auth || !window.auth.currentUser) return null;
+      return new Promise((resolve, reject) => {
+        const userId = window.window.auth.currentUser.uid;
+        const userRef = window.firebaseRef(window.firebaseDb, 'userPlaylists/' + userId);
+        window.firebaseOnValue(userRef, (snap) => {
+          const val = snap.val() || {};
+          resolve(val);
+        }, (err) => reject(err), { onlyOnce: true });
+      });
+    }
 
+    function renderPlaylists(listMap){
+      const container = qs('managePlaylistsList');
+      container.innerHTML = '';
+      container.style.textAlign = "left";
 
+      const keys = Object.keys(listMap || {});
+      if (!keys.length){
+        container.innerHTML = '<p>Du har inga egna spellistor ännu.</p>';
+        return;
+      }
+      keys.forEach((name) => {
+        const item = document.createElement('div');
+        item.className = 'playlist-row';
+        item.style.display = 'flex';
+        item.style.width = '100%';
+        item.style.alignItems = 'center';
+        item.style.justifyContent = 'space-between';
+        item.style.gap = '1rem';
+        item.style.padding = '.6rem .4rem';
+        item.style.borderBottom = '1px solid rgba(255,255,255,.1)';
+        // Left: name + count
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'flex-start';
+        left.style.textAlign = 'left';
+        left.style.flexDirection = 'column';
+        const title = document.createElement('strong');
+        title.style.display = 'block';
+        title.style.textAlign = 'left';
+        title.textContent = name;
+        left.appendChild(title);
+        const meta = document.createElement('span');
+        meta.style.display = 'block';
+        meta.style.textAlign = 'left';
+        const songCount = listMap[name] && listMap[name].songs ? Object.keys(listMap[name].songs).length : 0;
+        meta.textContent = songCount + ' låtar';
+        meta.style.opacity = '.8';
+        meta.style.fontSize = '.9rem';
+        left.appendChild(meta);
+        // Right: delete button
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.textContent = 'Ta bort';
+        del.className = 'btn-delete-playlist';
+        del.style.padding = '.4rem .7rem';
+        del.style.borderRadius = '8px';
+        del.style.border = '1px solid rgba(255,255,255,.2)';
+        del.style.background = 'transparent';
+        del.style.color = '#fff';
+        del.style.cursor = 'pointer';
+        del.addEventListener('click', async () => {
+          if (!confirm('Ta bort spellistan "' + name + '"? Detta går inte att ångra.')) return;
+          try {
+            const userId = window.window.auth.currentUser.uid;
+            const refToList = window.firebaseRef(window.firebaseDb, 'userPlaylists/' + userId + '/' + name);
+            await window.firebaseSet(refToList, null); // delete node
+            // Optimistisk uppdatering
+            item.remove();
+            if (!qs('managePlaylistsList').children.length){
+              qs('managePlaylistsList').innerHTML = '<p>Du har inga egna spellistor ännu.</p>';
+            }
+          } catch(e){
+            console.error('Kunde inte ta bort:', e);
+            alert('Kunde inte ta bort. Kolla nätverk och behörigheter.');
+          }
+        });
+        item.appendChild(left);
+        item.appendChild(del);
+        container.appendChild(item);
+      });
+    }
 
+    window.openManagePlaylists = async function(){
+      const modal = qs('managePlaylistsModal');
+      const info = qs('managePlaylistsInfo');
+      info.textContent = '';
+      if (!window.auth || !window.auth.currentUser){
+        info.textContent = 'Du behöver vara inloggad för att hantera dina spellistor.';
+        qs('managePlaylistsList').innerHTML = '';
+        show(modal);
+        return;
+      }
+      try {
+        info.textContent = 'Hämtar dina spellistor...';
+        const data = await fetchUserPlaylists();
+        info.textContent = '';
+        renderPlaylists(data);
+        show(modal);
+      } catch(e){
+        console.error(e);
+        info.textContent = 'Kunde inte hämta spellistor just nu.';
+        show(modal);
+      }
+    };
 
+    // Close handlers
+    document.addEventListener('click', function(e){
+      if (e.target && (e.target.id === 'closeManagePlaylists')){
+        hide(qs('managePlaylistsModal'));
+      }
+      if (e.target && e.target.id === 'managePlaylistsModal'){
+        hide(qs('managePlaylistsModal'));
+      }
+    });
 
-  <script src="script.js"></script>
-  <script type="module" src="assets/js/app-main.js"></script>
+    // Add entry to hamburger menu after it is built
+    document.addEventListener('DOMContentLoaded', function(){
+      const menu = document.getElementById('menuContainer') || document.querySelector('#menuContainer');
+      const dropdown = document.getElementById('menuDropdown') || document.querySelector('#menuDropdown');
+      const host = dropdown || menu;
+      if (!host) return;
+      let list = host.querySelector('.menu-items');
+      if (!list){
+        list = document.createElement('div');
+        list.className = 'menu-items';
+        if (!dropdown){
+          const dd = document.createElement('div');
+          dd.id = 'menuDropdown';
+          dd.style.background = 'rgba(20,20,20,.96)';
+          dd.style.backdropFilter = 'blur(8px)';
+          dd.style.border = '1px solid rgba(255,255,255,.15)';
+          dd.style.borderRadius = '12px';
+          dd.style.position = 'absolute';
+          dd.style.right = '0';
+          dd.style.top = '60px';
+          dd.style.minWidth = '220px';
+          dd.style.padding = '.6rem';
+          dd.style.display = 'none';
+          dd.appendChild(list);
+          menu && menu.appendChild(dd);
+        } else {
+          dropdown.appendChild(list);
+        }
+      }
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.textContent = 'Hantera spellistor';
+      item.style.width = '100%';
+      item.style.textAlign = 'left';
+      item.style.padding = '.55rem .7rem';
+      item.style.border = 'none';
+      item.style.background = 'transparent';
+      item.style.color = '#fff';
+      item.style.cursor = 'pointer';
+      item.addEventListener('mouseenter', () => { item.style.background = 'rgba(255,255,255,.08)'; });
+      item.addEventListener('mouseleave', () => { item.style.background = 'transparent'; });
+      item.addEventListener('click', () => {
+        const dd = document.getElementById('menuDropdown');
+        if (dd) dd.style.display = 'none';
+        window.openManagePlaylists();
+      });
+      list.appendChild(item);
+    });
+  })();
+  </script>
+
+  <script>
+  // Fokusfälla + ESC-stängning för login-modalen
+  (function(){ 
+    function getFocusable(container){
+      return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    }
+    function trapFocus(modal){
+      const nodes = getFocusable(modal);
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      function onKey(e){
+        if (e.key === 'Escape') {
+          closeModal(modal);
+        } else if (e.key === 'Tab') {
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+      modal.__trapKeyHandler = onKey;
+      modal.addEventListener('keydown', onKey);
+      (modal.querySelector('[autofocus]') || first).focus();
+    }
+    function untrapFocus(modal){
+      if (modal.__trapKeyHandler) modal.removeEventListener('keydown', modal.__trapKeyHandler);
+      modal.__trapKeyHandler = null;
+    }
+    function closeModal(modal){
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      document.body.style.top = '';
+      window.scrollTo(0, 0 + (window.__loginScrollY || 0));
+      modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
+    }
+    document.addEventListener('modal:open', function(e){
+      const modal = e.target.closest('#loginModal');
+      if (modal) trapFocus(modal);
+    });
+    document.addEventListener('modal:close', function(e){
+      const modal = e.target.closest('#loginModal');
+      if (modal) untrapFocus(modal);
+    });
+  })();
+  </script>
+
 </body>
 </html>
