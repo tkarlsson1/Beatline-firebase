@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.597</title>
+  <title>NOTESTREAM v0.515</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -447,15 +447,15 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
-const firebaseConfig = {
-  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-  authDomain: "beatlinefirebase.firebaseapp.com",
-  databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "beatlinefirebase",
-  storageBucket: "beatlinefirebase.firebasestorage.app",
-  messagingSenderId: "196231817325",
-  appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      storageBucket: "beatlinefirebase.firebasestorage.app",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
     
     // Initiera Firebase
     const app = initializeApp(firebaseConfig);
@@ -1248,6 +1248,97 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 #loginModal .closeBtn:hover, #authModal .closeBtn:hover, #signinModal .closeBtn:hover { color:#fff; }
 </style>
 
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<style>
+/* Safe area for iOS */
+:root { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+/* Lock body scroll when modal open */
+body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+/* Full-bleed screens */
+.screen, .app, .viewport { min-height: calc(var(--vh, 1vh) * 100); }
+</style>
+
+  <meta name="mobile-web-app-capable" content="yes">
+
+<style>
+/* Readme modal dark theme override (high specificity) */
+#readmeModal.modal { background: rgba(0,0,0,.6) !important; }
+#readmeModal.modal #readmeContent {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 12px !important;
+  width: min(92vw, 600px) !important;
+  max-width: 600px !important;
+  margin: 6vh auto !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  max-height: 80vh !important;
+  overflow: auto !important;
+}
+#readmeModal .closeBtn { color: #ccc !important; }
+#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
+</style>
+
+
+<style>
+/* Force dark theme for Readme modal (robust selector) */
+#readmeModal { background: rgba(0,0,0,.6) !important; }
+#readmeModal > div, 
+#readmeModal .modal-content, 
+#readmeModal #readmeContent {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.15) !important;
+  border-radius: 12px !important;
+  width: min(92vw, 600px) !important;
+  max-width: 600px !important;
+  margin: 6vh auto !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  max-height: 80vh !important;
+  overflow: auto !important;
+}
+#readmeModal .closeBtn { color: #ccc !important; position: absolute; top: 10px; right: 20px; }
+#readmeModal .closeBtn:hover, #readmeModal .closeBtn:focus { color: #fff !important; }
+</style>
+
+
+<style>
+/* Thinner divider between Standardlistor and Egna spellistor */
+hr, .divider, .section-divider {
+  border-top-width: 0.5px !important;
+  height: 0 !important;
+}
+/* If the divider is drawn via a top border on a container */
+#standard-vs-egna-divider {
+  border-top: 0.5px solid rgba(255,255,255,.25) !important;
+}
+/* Common pattern: element with border-top around that area */
+.section-header + .section-header,
+h2 + hr, h3 + hr {
+  border-top-width: 0.5px !important;
+}
+</style>
+
+
+
+<style>
+/* Refined scrollbar hiding without touching background */
+html, body { overflow-x: hidden; }
+* { scrollbar-width: none; }                          /* Firefox */
+*::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+*::-webkit-scrollbar-thumb { background: transparent; border: none; }
+body { -ms-overflow-style: none; }                   /* Legacy Edge/IE */
+/* Guard against 100vw overflow causing a gutter */
+:root { --no-gutter-max: 100%; }
+body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
+</style>
+
 </head>
 <body>
 <!-- Inloggningsmodal -->
@@ -1307,36 +1398,6 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
     <!-- Resultatsida -->
     <div id="result-page">
       <div id="song-display"></div>
-
-
-<!-- Lobby-sida (HOST + PLAYERS ser vilka lag som anslutit) -->
-<div id="lobby-page" style="display:none; text-align:center;">
-  <h2 style="color:#fff;">Lobby</h2>
-  <div id="lobby-qr" class="qrcode" aria-label="QR-kod för att gå med"></div>
-  <p id="lobby-link" style="color:#fff; font-size:.9rem; word-break:break-all;"></p>
-  <h3 style="color:#fff; margin-top:1rem;">Lag</h3>
-  <div id="team-list" style="max-width:400px; margin:0 auto;"></div>
-  <button id="startGameButton" class="start-button" style="margin-top:1rem;">Starta spel</button>
-</div>
-
-<!-- Join-sida (för ?join=) -->
-<div id="join-page" style="display:none; text-align:center;">
-  <h2 style="color:#fff;">Gå med i spel</h2>
-  <input id="joinTeamName" type="text" placeholder="Lagnamn" style="width:60%; padding:.5rem; margin:.5rem auto; background:#032934; color:#fff; border:0; border-radius:6px;">
-  <button id="joinSubmit" class="start-button">Gå med</button>
-</div>
-
-<!-- Game-sida -->
-<div id="game-page" style="display:none;">
-  <div id="teams-header" style="text-align:center; margin:.4rem 0;"></div>
-  <div id="game-song-display" style="text-align:center; margin:1rem 0;"></div>
-  <div id="host-controls" style="text-align:center; margin-top:.8rem; display:none;">
-    <button id="revealButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Visa svar</button>
-    <button id="awardActiveButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Ge låten till aktivt lag</button>
-    <button id="nextSongButtonGame" class="next-song-button" style="display:inline-block;">Nästa låt</button>
-  </div>
-</div>
-
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
       <p id="playlist-info" style="display: none; text-align: center; font-size: 0.85rem; color: #fff; margin-top: 0.2rem;"></p>
     </div>
@@ -1352,7 +1413,7 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
     </div>
     
     <!-- Readme Modal -->
-    <div id="readmeModal">
+    <div id="readmeModal" class="modal" role="dialog" aria-modal="true">
       <div id="readmeContent">
         <span class="closeBtn">&times;</span>
         <h2>NOTESTREAM-BETA</h2>
@@ -1762,354 +1823,66 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 </script>
 
 
-<script type="module">
-  import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+<script>
+// Set --vh to handle mobile 100vh correctly
+(function(){
+  function setVH(){ document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
+  setVH(); window.addEventListener('resize', setVH);
+})();
+</script>
 
-  const app = window.app || undefined;
-  const db = getDatabase(app);
-  const auth = getAuth(app);
 
-  // Globals used/overridden
-  window.isHost = false;
-  window.sessionId = null;
-
-  // Pages toggler
-  function setPage(id){
-    ["filter-page","result-page","lobby-page","join-page","game-page"].forEach(pid=>{
-      const el = document.getElementById(pid);
-      if (el) el.style.display = (pid===id) ? "block" : "none";
-    });
+<script>
+// Shared modal manager: focus trap, ESC, and body scroll lock for any .modal
+(function(){
+  let __scrollY = 0;
+  function getFocusable(container){
+    return container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
   }
-
-  function currentStartEndYears(){
-    const s = document.getElementById("startYear");
-    const e = document.getElementById("endYear");
-    const startYear = s ? parseInt(s.value) : 1950;
-    const endYear   = e ? parseInt(e.value) : new Date().getFullYear();
-    return {startYear, endYear};
+  function lockBody(){
+    __scrollY = window.scrollY || window.pageYOffset || 0;
+    document.body.classList.add('modal-open');
+    document.body.style.top = `-${__scrollY}px`;
   }
-
-  function joinURL(sessionId){
-    const base = location.origin + location.pathname;
-    return `${base}?join=${encodeURIComponent(sessionId)}`;
+  function unlockBody(){
+    document.body.classList.remove('modal-open');
+    const y = __scrollY || 0;
+    document.body.style.top = '';
+    window.scrollTo(0, y);
   }
-
-  async function createSessionFromFilter(){
-    if (!auth.currentUser) throw new Error("Inte inloggad.");
-    if (!window.currentFilteredSongs || !window.currentFilteredSongs.length) throw new Error("Inga filtrerade låtar.");
-    const {startYear, endYear} = currentStartEndYears();
-
-    const deck = window.currentFilteredSongs.map(s => s.qr);
-    const songMap = {};
-    window.currentFilteredSongs.forEach(s => {
-      const yr = s.customYear ? s.customYear : s.year;
-      songMap[s.qr] = { title: s.title || "", artist: s.artist || "", year: yr || "" };
-    });
-
-    const sessionRef = push(ref(db, 'sessions'));
-    const sid = sessionRef.key;
-    await set(sessionRef, {
-      createdAt: Date.now(),
-      status: "lobby",
-      hostId: auth.currentUser.uid,
-      settings: { startYear, endYear },
-      songMap,
-      deck,
-      shown: {},
-      current: null,
-      teams: {},
-      turn: { order: [], activeIndex: 0 }
-    });
-    window.sessionId = sid;
-    window.isHost = true;
-    localStorage.setItem("sessionId", sid);
-    localStorage.setItem("role", "host");
-    return sid;
-  }
-  window.createSessionFromFilter = createSessionFromFilter;
-
-  function showLobby(sid){
-    setPage("lobby-page");
-    window.sessionId = sid;
-    window.isHost = true;
-
-    const q = document.getElementById("lobby-qr");
-    if (q){ q.innerHTML = ""; new QRCode(q, { text: joinURL(sid), width: 160, height: 160 }); }
-    const p = document.getElementById("lobby-link");
-    if (p) p.textContent = joinURL(sid);
-
-    const btn = document.getElementById("startGameButton");
-    if (btn && !btn._bound){
-      btn._bound = true;
-      btn.addEventListener("click", async () => {
-        try{ await startGameHost(); }catch(e){ console.error(e); alert("Kunde inte starta spelet."); }
-      });
-    }
-    listenToSession(sid);
-  }
-  window.showLobby = showLobby;
-
-  function showJoinPage(sid){
-    setPage("join-page");
-    window.sessionId = sid;
-    window.isHost = false;
-    localStorage.setItem("role","player");
-    const btn = document.getElementById("joinSubmit");
-    if (btn && !btn._bound){
-      btn._bound = true;
-      btn.addEventListener("click", async () => {
-        const name = (document.getElementById("joinTeamName").value || "").trim();
-        if (!name){ alert("Ange lagnamn."); return; }
-        try{
-          const teamRef = push(ref(db, `sessions/${sid}/teams`));
-          const teamId = teamRef.key;
-          await set(teamRef, { name, tokens: 3, score: 0, timeline: [] });
-          localStorage.setItem("teamId", teamId);
-          listenToSession(sid);
-        }catch(e){
-          console.error(e);
-          alert("Kunde inte gå med i spelet.");
+  document.addEventListener('modal:open', function(e){
+    const modal = e.target.closest('.modal');
+    if (!modal) return;
+    lockBody();
+    const nodes = getFocusable(modal);
+    if (nodes.length){
+      const first = nodes[0];
+      const last = nodes[nodes.length-1];
+      function onKey(ev){
+        if (ev.key === 'Escape'){ 
+          modal.style.display = 'none';
+          unlockBody();
+          modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
+        } else if (ev.key === 'Tab'){
+          if (ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
+          else if (!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
         }
-      });
-    }
-  }
-  window.showJoinPage = showJoinPage;
-
-  function maybeAutoJoinFromURL(){
-    const params = new URLSearchParams(location.search);
-    const sid = params.get("join");
-    if (!sid) return;
-    const saved = localStorage.getItem("sessionId");
-    if (saved === sid){
-      listenToSession(sid);
-      return;
-    }
-    showJoinPage(sid);
-  }
-  window.maybeAutoJoinFromURL = maybeAutoJoinFromURL;
-
-  function listenToSession(sid){
-    const sref = ref(db, `sessions/${sid}`);
-    onValue(sref, (snap) => {
-      if (!snap.exists()) return;
-      const session = snap.val();
-      renderLobbyTeams(session);
-      if (session.status === "lobby"){
-        setPage("lobby-page");
-      } else if (session.status === "playing" || session.status === "finished"){
-        renderGame(session);
-        setPage("game-page");
       }
-    });
-  }
-  window.listenToSession = listenToSession;
-
-  function renderLobbyTeams(session){
-    const list = document.getElementById("team-list");
-    if (!list) return;
-    const teams = session.teams ? Object.entries(session.teams) : [];
-    list.innerHTML = teams.length ? "" : "<p>Inga lag ännu – scanna QR och gå med.</p>";
-    teams.forEach(([tid, t]) => {
-      const item = document.createElement("div");
-      item.style.padding = ".4rem .6rem";
-      item.style.marginBottom = ".3rem";
-      item.style.background = "rgba(3,41,52,.6)";
-      item.style.color = "#fff";
-      item.style.borderRadius = "8px";
-      item.textContent = t.name + (t.score ? ` • ${t.score}p` : "");
-      list.appendChild(item);
-    });
-  }
-
-  async function startGameHost(){
-    if (!window.sessionId) throw new Error("Ingen session.");
-    const sid = window.sessionId;
-    const teamsSnap = await get(ref(db, `sessions/${sid}/teams`));
-    const teams = teamsSnap.val() || {};
-    const order = Object.keys(teams);
-    if (!order.length){ alert("Minst ett lag krävs."); return; }
-    const sessSnap = await get(ref(db, `sessions/${sid}`));
-    const sess = sessSnap.val();
-    const deck = sess.deck || [];
-    const shown = sess.shown || {};
-    const nextId = deck.find(id => !shown[id]);
-    if (!nextId){ alert("Deck tomt."); return; }
-    const updates = {};
-    updates[`sessions/${sid}/status`] = "playing";
-    updates[`sessions/${sid}/turn`] = { order, activeIndex: 0 };
-    updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
-    updates[`sessions/${sid}/shown/${nextId}`] = true;
-    await update(ref(db), updates);
-  }
-  window.startGameHost = startGameHost;
-
-  function renderGame(session){
-    renderTeamsHeader(session);
-    renderActiveSong(session);
-    renderHostControls(session);
-  }
-
-  function renderTeamsHeader(session){
-    const wrap = document.getElementById("teams-header");
-    if (!wrap) return;
-    wrap.innerHTML = "";
-    const order = (session.turn && session.turn.order) || Object.keys(session.teams||{});
-    const activeIdx = session.turn ? session.turn.activeIndex : 0;
-    order.forEach((tid, idx) => {
-      const t = session.teams[tid];
-      const chip = document.createElement("div");
-      chip.style.display = "inline-block";
-      chip.style.padding = ".35rem .6rem";
-      chip.style.margin = ".2rem";
-      chip.style.borderRadius = "999px";
-      chip.style.border = "1px solid rgba(255,255,255,.6)";
-      chip.style.color = "#fff";
-      chip.style.background = idx===activeIdx ? "#0b939c" : "rgba(3,41,52,.7)";
-      chip.textContent = `${t.name} • ${t.score||0}p • 🔥${t.tokens??3}`;
-      wrap.appendChild(chip);
-    });
-  }
-
-  function renderActiveSong(session){
-    const cont = document.getElementById("game-song-display");
-    if (!cont) return;
-    cont.innerHTML = "";
-    const cur = session.current;
-    if (!cur || !cur.trackId){
-      cont.innerHTML = "<p style='color:#fff; text-align:center;'>Ingen låt vald ännu.</p>";
-      return;
-    }
-    const meta = session.songMap && session.songMap[cur.trackId] || { title:"", artist:"", year:"" };
-    const song = { qr: cur.trackId, title: meta.title, artist: meta.artist, year: meta.year, source:["spel"] };
-    displaySongGame(song, !!cur.revealed);
-  }
-
-  function renderHostControls(session){
-    const hc = document.getElementById("host-controls");
-    if (!hc) return;
-    hc.style.display = window.isHost ? "block" : "none";
-    if (!window.isHost) return;
-
-    const revealBtn = document.getElementById("revealButton");
-    const awardBtn = document.getElementById("awardActiveButton");
-    const nextBtn = document.getElementById("nextSongButtonGame");
-
-    if (revealBtn && !revealBtn._bound){
-      revealBtn._bound = true;
-      revealBtn.addEventListener("click", async ()=>{
-        const sid = window.sessionId;
-        const curSnap = await get(ref(db, `sessions/${sid}/current`));
-        if (!curSnap.exists()) return;
-        await update(ref(db, `sessions/${sid}/current`), { revealed: true });
-      });
-    }
-    if (awardBtn && !awardBtn._bound){
-      awardBtn._bound = true;
-      awardBtn.addEventListener("click", async ()=>{
-        const sid = window.sessionId;
-        const sSnap = await get(ref(db, `sessions/${sid}`));
-        if (!sSnap.exists()) return;
-        const sess = sSnap.val();
-        const order = sess.turn.order;
-        const activeIdx = sess.turn.activeIndex;
-        const activeTid = order[activeIdx];
-        const trackId = sess.current?.trackId;
-        if (!activeTid || !trackId) return;
-        const yr = sess.songMap?.[trackId]?.year || "";
-        const updates = {};
-        const teamPath = `sessions/${sid}/teams/${activeTid}`;
-        const team = sess.teams[activeTid];
-        const newScore = (team.score||0) + 1;
-        updates[`${teamPath}/score`] = newScore;
-        const tl = team.timeline || [];
-        tl.push({ trackId, year: yr });
-        updates[`${teamPath}/timeline`] = tl;
-        await update(ref(db), updates);
-      });
-    }
-    if (nextBtn && !nextBtn._bound){
-      nextBtn._bound = true;
-      nextBtn.addEventListener("click", async ()=>{
-        await hostNextSong();
-      });
-    }
-  }
-
-  async function hostNextSong(){
-    const sid = window.sessionId;
-    const sSnap = await get(ref(db, `sessions/${sid}`));
-    if (!sSnap.exists()) return;
-    const sess = sSnap.val();
-    const deck = sess.deck || [];
-    const shown = sess.shown || {};
-    const nextId = deck.find(id => !shown[id]);
-    const order = sess.turn.order;
-    const nextIdx = (sess.turn.activeIndex + 1) % order.length;
-    const updates = {};
-    if (nextId){
-      updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
-      updates[`sessions/${sid}/shown/${nextId}`] = true;
-    } else {
-      updates[`sessions/${sid}/status`] = "finished";
-    }
-    updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
-    await update(ref(db), updates);
-  }
-  window.hostNextSong = hostNextSong;
-
-  function displaySongGame(song, revealed){
-    const songDisplay = document.getElementById("game-song-display");
-    songDisplay.innerHTML = `
-      <div id="game-qrcode-${song.qr}" class="qrcode"></div>
-      <button class="answer-button" id="gameRevealBtn" ${revealed?"style='display:none'":""}>Visa svar</button>
-      <div id="game-song-details" style="display:${revealed?"block":"none"}; margin-top: 1rem; font-weight: bold;">
-        <div class="year-container" style="text-align:center; width:100%;">
-          <span class="year-text" style="font-size: 3em; color:#fff; text-shadow:0 0 8px #000;">${song.year||""}</span>
-        </div>
-        <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">
-          ${song.artist||""}<br>${song.title||""}
-        </div>
-      </div>
-    `;
-    const el = document.getElementById(`game-qrcode-${song.qr}`);
-    if (el){ el.innerHTML = ""; new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width: 160, height: 160 }); }
-    const rb = document.getElementById("gameRevealBtn");
-    if (rb){
-      rb.addEventListener("click", ()=>{
-        if (window.isHost){
-          const revealBtn = document.getElementById("revealButton");
-          revealBtn && revealBtn.click();
-        }
-      });
-    }
-  }
-  window.displaySongGame = displaySongGame;
-
-  // Override Starta spel -> goes to lobby
-  const originalApplyFilter = window.applyFilter;
-  window.applyFilter = function(){
-    // Kör ursprunglig filtrering (om den finns)
-    if (typeof originalApplyFilter === "function"){
-      // Vi behöver bara filtreringen, inte navigering; kalla istället filterSongs direkt om finns
-      if (typeof window.filterSongs === "function"){
-        if (!window.filterSongs()) return;
-      }
-    } else if (typeof window.filterSongs === "function"){
-      if (!window.filterSongs()) return;
-    }
-    createSessionFromFilter().then(showLobby).catch(e=>{
-      console.error("Kunde inte skapa session:", e);
-      alert("Kunde inte skapa session. Försök igen.");
-    });
-  };
-
-  // Auto-join om länken har ?join=
-  onAuthStateChanged(auth, (user)=>{
-    if (user) {
-      try { maybeAutoJoinFromURL(); } catch(e){ console.warn(e); }
+      modal.__trapKeyHandler = onKey;
+      modal.addEventListener('keydown', onKey);
+      (modal.querySelector('[autofocus]') || first).focus();
     }
   });
+  document.addEventListener('modal:close', function(e){
+    const modal = e.target.closest('.modal');
+    if (!modal) return;
+    if (modal.__trapKeyHandler){
+      modal.removeEventListener('keydown', modal.__trapKeyHandler);
+      modal.__trapKeyHandler = null;
+    }
+    unlockBody();
+  });
+})();
 </script>
 
 </body>

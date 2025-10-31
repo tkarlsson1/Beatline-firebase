@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.508</title>
+  <title>NOTESTREAM v0.598</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -447,18 +447,14 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
-    const firebaseConfig = {
-  // === TESTENV: Fyll i uppgifterna för DITT TESTPROJEKT från Firebase-konsolen ===
-  // Project settings → Your apps (Web) → "Firebase SDK snippet"
-  apiKey: "YOUR_TEST_API_KEY",
-  authDomain: "YOUR_TEST_PROJECT_ID.firebaseapp.com",
-  // OBS! Anpassa region-delen (t.ex. europe-west1) till din RTDB region
-  databaseURL: "https://YOUR_TEST_PROJECT_ID-default-rtdb.YOUR_REGION.firebasedatabase.app",
-  projectId: "YOUR_TEST_PROJECT_ID",
-  // Vanligtvis: YOUR_TEST_PROJECT_ID.appspot.com (eller firebasestorage.app beroende på din inställning)
-  storageBucket: "YOUR_TEST_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_TEST_SENDER_ID",
-  appId: "YOUR_TEST_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+  authDomain: "beatlinefirebase.firebaseapp.com",
+  databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "beatlinefirebase",
+  storageBucket: "beatlinefirebase.firebasestorage.app",
+  messagingSenderId: "196231817325",
+  appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
 };
     
     // Initiera Firebase
