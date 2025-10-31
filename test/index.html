@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.599</title>
+  <title>NOTESTREAM v0.600</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -447,15 +447,15 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
       sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
- const firebaseConfig = {
-      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+    const firebaseConfig = {
+  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
       authDomain: "beatlinefirebase.firebaseapp.com",
-      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app/",
       projectId: "beatlinefirebase",
       storageBucket: "beatlinefirebase.firebasestorage.app",
       messagingSenderId: "196231817325",
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-    };
+};
     
     // Initiera Firebase
     const app = initializeApp(firebaseConfig);
@@ -693,7 +693,9 @@ onValue(ref(db, 'userPlaylists/' + userId), (snapshot) => {
   });
   
   songs = Object.values(merged);
-  console.log("Sammankopplade låtar (unika spår):", songs.length);
+  
+      window.songs = songs;
+console.log("Sammankopplade låtar (unika spår):", songs.length);
   populateSourceCheckboxes();
 }
     
@@ -830,7 +832,9 @@ window.updateYearSelection = function() {
         song.source.some(src => selectedSources.includes(src))
     );
 
-    const startYearDropdown = document.getElementById("startYear");
+    
+      window.sourceFilteredSongs = sourceFilteredSongs;
+const startYearDropdown = document.getElementById("startYear");
     const endYearDropdown = document.getElementById("endYear");
 
     startYearDropdown.innerHTML = "";
@@ -892,7 +896,9 @@ window.filterSongs = function() {
         parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
     );
 
-    updateSongCount(); // ✅ Uppdatera låträknaren direkt efter att årsfiltreringen ändrats!
+    
+      window.currentFilteredSongs = currentFilteredSongs;
+updateSongCount(); // ✅ Uppdatera låträknaren direkt efter att årsfiltreringen ändrats!
 
     shownSongs = [];
     if (currentFilteredSongs.length > 0) {
@@ -1309,33 +1315,33 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
       <div id="song-display"></div>
 
 
-<!-- Lobby-sida (HOST + PLAYERS ser vilka lag som anslutit) -->
-<div id="lobby-page" style="display:none; text-align:center;">
-  <h2 style="color:#fff;">Lobby</h2>
-  <div id="lobby-qr" class="qrcode" aria-label="QR-kod för att gå med"></div>
-  <p id="lobby-link" style="color:#fff; font-size:.9rem; word-break:break-all;"></p>
-  <h3 style="color:#fff; margin-top:1rem;">Lag</h3>
-  <div id="team-list" style="max-width:400px; margin:0 auto;"></div>
-  <button id="startGameButton" class="start-button" style="margin-top:1rem;">Starta spel</button>
-</div>
+    <!-- Lobby-sida (HOST + PLAYERS ser vilka lag som anslutit) -->
+    <div id="lobby-page" style="display:none; text-align:center;">
+      <h2 style="color:#fff;">Lobby</h2>
+      <div id="lobby-qr" class="qrcode" aria-label="QR-kod för att gå med"></div>
+      <p id="lobby-link" style="color:#fff; font-size:.9rem; word-break:break-all;"></p>
+      <h3 style="color:#fff; margin-top:1rem;">Lag</h3>
+      <div id="team-list" style="max-width:400px; margin:0 auto;"></div>
+      <button id="startGameButton" class="start-button" style="margin-top:1rem;">Starta spel</button>
+    </div>
 
-<!-- Join-sida (för ?join=) -->
-<div id="join-page" style="display:none; text-align:center;">
-  <h2 style="color:#fff;">Gå med i spel</h2>
-  <input id="joinTeamName" type="text" placeholder="Lagnamn" style="width:60%; padding:.5rem; margin:.5rem auto; background:#032934; color:#fff; border:0; border-radius:6px;">
-  <button id="joinSubmit" class="start-button">Gå med</button>
-</div>
+    <!-- Join-sida (för ?join=) -->
+    <div id="join-page" style="display:none; text-align:center;">
+      <h2 style="color:#fff;">Gå med i spel</h2>
+      <input id="joinTeamName" type="text" placeholder="Lagnamn" style="width:60%; padding:.5rem; margin:.5rem auto; background:#032934; color:#fff; border:0; border-radius:6px;">
+      <button id="joinSubmit" class="start-button">Gå med</button>
+    </div>
 
-<!-- Game-sida -->
-<div id="game-page" style="display:none;">
-  <div id="teams-header" style="text-align:center; margin:.4rem 0;"></div>
-  <div id="game-song-display" style="text-align:center; margin:1rem 0;"></div>
-  <div id="host-controls" style="text-align:center; margin-top:.8rem; display:none;">
-    <button id="revealButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Visa svar</button>
-    <button id="awardActiveButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Ge låten till aktivt lag</button>
-    <button id="nextSongButtonGame" class="next-song-button" style="display:inline-block;">Nästa låt</button>
-  </div>
-</div>
+    <!-- Game-sida -->
+    <div id="game-page" style="display:none;">
+      <div id="teams-header" style="text-align:center; margin:.4rem 0;"></div>
+      <div id="game-song-display" style="text-align:center; margin:1rem 0;"></div>
+      <div id="host-controls" style="text-align:center; margin-top:.8rem; display:none;">
+        <button id="revealButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Visa svar</button>
+        <button id="awardActiveButton" class="answer-button" style="display:inline-block; margin-right:.4rem;">Ge låten till aktivt lag</button>
+        <button id="nextSongButtonGame" class="next-song-button" style="display:inline-block;">Nästa låt</button>
+      </div>
+    </div>
 
       <button onclick="nextSong()" class="next-song-button">Nästa låt</button>
       <p id="playlist-info" style="display: none; text-align: center; font-size: 0.85rem; color: #fff; margin-top: 0.2rem;"></p>
@@ -1762,355 +1768,365 @@ body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 </script>
 
 
-<script type="module">
-  import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  <script type="module">
+    import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-  const app = window.app || undefined;
-  const db = getDatabase(app);
-  const auth = getAuth(app);
+    const app = window.app || undefined;
+    const db = getDatabase(app);
+    const auth = getAuth(app);
 
-  // Globals used/overridden
-  window.isHost = false;
-  window.sessionId = null;
+    window.isHost = false;
+    window.sessionId = null;
 
-  // Pages toggler
-  function setPage(id){
-    ["filter-page","result-page","lobby-page","join-page","game-page"].forEach(pid=>{
-      const el = document.getElementById(pid);
-      if (el) el.style.display = (pid===id) ? "block" : "none";
-    });
-  }
-
-  function currentStartEndYears(){
-    const s = document.getElementById("startYear");
-    const e = document.getElementById("endYear");
-    const startYear = s ? parseInt(s.value) : 1950;
-    const endYear   = e ? parseInt(e.value) : new Date().getFullYear();
-    return {startYear, endYear};
-  }
-
-  function joinURL(sessionId){
-    const base = location.origin + location.pathname;
-    return `${base}?join=${encodeURIComponent(sessionId)}`;
-  }
-
-  async function createSessionFromFilter(){
-    if (!auth.currentUser) throw new Error("Inte inloggad.");
-    if (!window.currentFilteredSongs || !window.currentFilteredSongs.length) throw new Error("Inga filtrerade låtar.");
-    const {startYear, endYear} = currentStartEndYears();
-
-    const deck = window.currentFilteredSongs.map(s => s.qr);
-    const songMap = {};
-    window.currentFilteredSongs.forEach(s => {
-      const yr = s.customYear ? s.customYear : s.year;
-      songMap[s.qr] = { title: s.title || "", artist: s.artist || "", year: yr || "" };
-    });
-
-    const sessionRef = push(ref(db, 'sessions'));
-    const sid = sessionRef.key;
-    await set(sessionRef, {
-      createdAt: Date.now(),
-      status: "lobby",
-      hostId: auth.currentUser.uid,
-      settings: { startYear, endYear },
-      songMap,
-      deck,
-      shown: {},
-      current: null,
-      teams: {},
-      turn: { order: [], activeIndex: 0 }
-    });
-    window.sessionId = sid;
-    window.isHost = true;
-    localStorage.setItem("sessionId", sid);
-    localStorage.setItem("role", "host");
-    return sid;
-  }
-  window.createSessionFromFilter = createSessionFromFilter;
-
-  function showLobby(sid){
-    setPage("lobby-page");
-    window.sessionId = sid;
-    window.isHost = true;
-
-    const q = document.getElementById("lobby-qr");
-    if (q){ q.innerHTML = ""; new QRCode(q, { text: joinURL(sid), width: 160, height: 160 }); }
-    const p = document.getElementById("lobby-link");
-    if (p) p.textContent = joinURL(sid);
-
-    const btn = document.getElementById("startGameButton");
-    if (btn && !btn._bound){
-      btn._bound = true;
-      btn.addEventListener("click", async () => {
-        try{ await startGameHost(); }catch(e){ console.error(e); alert("Kunde inte starta spelet."); }
+    function setPage(id){
+      ["filter-page","result-page","lobby-page","join-page","game-page"].forEach(pid=>{
+        const el = document.getElementById(pid);
+        if (el) el.style.display = (pid===id) ? "block" : "none";
       });
     }
-    listenToSession(sid);
-  }
-  window.showLobby = showLobby;
 
-  function showJoinPage(sid){
-    setPage("join-page");
-    window.sessionId = sid;
-    window.isHost = false;
-    localStorage.setItem("role","player");
-    const btn = document.getElementById("joinSubmit");
-    if (btn && !btn._bound){
-      btn._bound = true;
-      btn.addEventListener("click", async () => {
-        const name = (document.getElementById("joinTeamName").value || "").trim();
-        if (!name){ alert("Ange lagnamn."); return; }
-        try{
-          const teamRef = push(ref(db, `sessions/${sid}/teams`));
-          const teamId = teamRef.key;
-          await set(teamRef, { name, tokens: 3, score: 0, timeline: [] });
-          localStorage.setItem("teamId", teamId);
-          listenToSession(sid);
-        }catch(e){
-          console.error(e);
-          alert("Kunde inte gå med i spelet.");
+    function currentStartEndYears(){
+      const s = document.getElementById("startYear");
+      const e = document.getElementById("endYear");
+      const startYear = s ? parseInt(s.value) : 1950;
+      const endYear   = e ? parseInt(e.value) : new Date().getFullYear();
+      return {startYear, endYear};
+    }
+
+    function joinURL(sessionId){
+      const base = location.origin + location.pathname;
+      return `${base}?join=${encodeURIComponent(sessionId)}`;
+    }
+
+    async function createSessionFromFilter(){
+      if (!auth.currentUser) throw new Error("Inte inloggad.");
+      const list = window.currentFilteredSongs || [];
+      if (!list.length) throw new Error("Inga filtrerade låtar.");
+      const {startYear, endYear} = currentStartEndYears();
+
+      const deck = list.map(s => s.qr);
+      const songMap = {};
+      list.forEach(s => {
+        const yr = s.customYear ? s.customYear : s.year;
+        songMap[s.qr] = { title: s.title || "", artist: s.artist || "", year: yr || "" };
+      });
+
+      const sessionRef = push(ref(db, 'sessions'));
+      const sid = sessionRef.key;
+      await set(sessionRef, {
+        createdAt: Date.now(),
+        status: "lobby",
+        hostId: auth.currentUser.uid,
+        settings: { startYear, endYear },
+        songMap,
+        deck,
+        shown: {},
+        current: null,
+        teams: {},
+        turn: { order: [], activeIndex: 0 }
+      });
+      window.sessionId = sid;
+      window.isHost = true;
+      localStorage.setItem("sessionId", sid);
+      localStorage.setItem("role", "host");
+      return sid;
+    }
+    window.createSessionFromFilter = createSessionFromFilter;
+
+    function showLobby(sid){
+      setPage("lobby-page");
+      window.sessionId = sid;
+      window.isHost = true;
+
+      const q = document.getElementById("lobby-qr");
+      if (q){ q.innerHTML = ""; new QRCode(q, { text: joinURL(sid), width: 160, height: 160 }); }
+      const p = document.getElementById("lobby-link");
+      if (p) p.textContent = joinURL(sid);
+
+      const btn = document.getElementById("startGameButton");
+      if (btn && !btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", async () => {
+          try{ await startGameHost(); }catch(e){ console.error(e); alert("Kunde inte starta spelet."); }
+        });
+      }
+      listenToSession(sid);
+    }
+    window.showLobby = showLobby;
+
+    function showJoinPage(sid){
+      setPage("join-page");
+      window.sessionId = sid;
+      window.isHost = false;
+      localStorage.setItem("role","player");
+      const btn = document.getElementById("joinSubmit");
+      if (btn && !btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", async () => {
+          const name = (document.getElementById("joinTeamName").value || "").trim();
+          if (!name){ alert("Ange lagnamn."); return; }
+          try{
+            const teamRef = push(ref(db, `sessions/${sid}/teams`));
+            const teamId = teamRef.key;
+            await set(teamRef, { name, tokens: 3, score: 0, timeline: [] });
+            localStorage.setItem("teamId", teamId);
+            listenToSession(sid);
+          }catch(e){
+            console.error(e);
+            alert("Kunde inte gå med i spelet.");
+          }
+        });
+      }
+    }
+    window.showJoinPage = showJoinPage;
+
+    function maybeAutoJoinFromURL(){
+      const params = new URLSearchParams(location.search);
+      const sid = params.get("join");
+      if (!sid) return;
+      const saved = localStorage.getItem("sessionId");
+      if (saved === sid){
+        listenToSession(sid);
+        return;
+      }
+      showJoinPage(sid);
+    }
+    window.maybeAutoJoinFromURL = maybeAutoJoinFromURL;
+
+    function listenToSession(sid){
+      const sref = ref(db, `sessions/${sid}`);
+      onValue(sref, (snap) => {
+        if (!snap.exists()) return;
+        const session = snap.val();
+        renderLobbyTeams(session);
+        if (session.status === "lobby"){
+          setPage("lobby-page");
+        } else if (session.status === "playing" || session.status === "finished"){
+          renderGame(session);
+          setPage("game-page");
         }
       });
     }
-  }
-  window.showJoinPage = showJoinPage;
+    window.listenToSession = listenToSession;
 
-  function maybeAutoJoinFromURL(){
-    const params = new URLSearchParams(location.search);
-    const sid = params.get("join");
-    if (!sid) return;
-    const saved = localStorage.getItem("sessionId");
-    if (saved === sid){
-      listenToSession(sid);
-      return;
-    }
-    showJoinPage(sid);
-  }
-  window.maybeAutoJoinFromURL = maybeAutoJoinFromURL;
-
-  function listenToSession(sid){
-    const sref = ref(db, `sessions/${sid}`);
-    onValue(sref, (snap) => {
-      if (!snap.exists()) return;
-      const session = snap.val();
-      renderLobbyTeams(session);
-      if (session.status === "lobby"){
-        setPage("lobby-page");
-      } else if (session.status === "playing" || session.status === "finished"){
-        renderGame(session);
-        setPage("game-page");
-      }
-    });
-  }
-  window.listenToSession = listenToSession;
-
-  function renderLobbyTeams(session){
-    const list = document.getElementById("team-list");
-    if (!list) return;
-    const teams = session.teams ? Object.entries(session.teams) : [];
-    list.innerHTML = teams.length ? "" : "<p>Inga lag ännu – scanna QR och gå med.</p>";
-    teams.forEach(([tid, t]) => {
-      const item = document.createElement("div");
-      item.style.padding = ".4rem .6rem";
-      item.style.marginBottom = ".3rem";
-      item.style.background = "rgba(3,41,52,.6)";
-      item.style.color = "#fff";
-      item.style.borderRadius = "8px";
-      item.textContent = t.name + (t.score ? ` • ${t.score}p` : "");
-      list.appendChild(item);
-    });
-  }
-
-  async function startGameHost(){
-    if (!window.sessionId) throw new Error("Ingen session.");
-    const sid = window.sessionId;
-    const teamsSnap = await get(ref(db, `sessions/${sid}/teams`));
-    const teams = teamsSnap.val() || {};
-    const order = Object.keys(teams);
-    if (!order.length){ alert("Minst ett lag krävs."); return; }
-    const sessSnap = await get(ref(db, `sessions/${sid}`));
-    const sess = sessSnap.val();
-    const deck = sess.deck || [];
-    const shown = sess.shown || {};
-    const nextId = deck.find(id => !shown[id]);
-    if (!nextId){ alert("Deck tomt."); return; }
-    const updates = {};
-    updates[`sessions/${sid}/status`] = "playing";
-    updates[`sessions/${sid}/turn`] = { order, activeIndex: 0 };
-    updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
-    updates[`sessions/${sid}/shown/${nextId}`] = true;
-    await update(ref(db), updates);
-  }
-  window.startGameHost = startGameHost;
-
-  function renderGame(session){
-    renderTeamsHeader(session);
-    renderActiveSong(session);
-    renderHostControls(session);
-  }
-
-  function renderTeamsHeader(session){
-    const wrap = document.getElementById("teams-header");
-    if (!wrap) return;
-    wrap.innerHTML = "";
-    const order = (session.turn && session.turn.order) || Object.keys(session.teams||{});
-    const activeIdx = session.turn ? session.turn.activeIndex : 0;
-    order.forEach((tid, idx) => {
-      const t = session.teams[tid];
-      const chip = document.createElement("div");
-      chip.style.display = "inline-block";
-      chip.style.padding = ".35rem .6rem";
-      chip.style.margin = ".2rem";
-      chip.style.borderRadius = "999px";
-      chip.style.border = "1px solid rgba(255,255,255,.6)";
-      chip.style.color = "#fff";
-      chip.style.background = idx===activeIdx ? "#0b939c" : "rgba(3,41,52,.7)";
-      chip.textContent = `${t.name} • ${t.score||0}p • 🔥${t.tokens??3}`;
-      wrap.appendChild(chip);
-    });
-  }
-
-  function renderActiveSong(session){
-    const cont = document.getElementById("game-song-display");
-    if (!cont) return;
-    cont.innerHTML = "";
-    const cur = session.current;
-    if (!cur || !cur.trackId){
-      cont.innerHTML = "<p style='color:#fff; text-align:center;'>Ingen låt vald ännu.</p>";
-      return;
-    }
-    const meta = session.songMap && session.songMap[cur.trackId] || { title:"", artist:"", year:"" };
-    const song = { qr: cur.trackId, title: meta.title, artist: meta.artist, year: meta.year, source:["spel"] };
-    displaySongGame(song, !!cur.revealed);
-  }
-
-  function renderHostControls(session){
-    const hc = document.getElementById("host-controls");
-    if (!hc) return;
-    hc.style.display = window.isHost ? "block" : "none";
-    if (!window.isHost) return;
-
-    const revealBtn = document.getElementById("revealButton");
-    const awardBtn = document.getElementById("awardActiveButton");
-    const nextBtn = document.getElementById("nextSongButtonGame");
-
-    if (revealBtn && !revealBtn._bound){
-      revealBtn._bound = true;
-      revealBtn.addEventListener("click", async ()=>{
-        const sid = window.sessionId;
-        const curSnap = await get(ref(db, `sessions/${sid}/current`));
-        if (!curSnap.exists()) return;
-        await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+    function renderLobbyTeams(session){
+      const list = document.getElementById("team-list");
+      if (!list) return;
+      const teams = session.teams ? Object.entries(session.teams) : [];
+      list.innerHTML = teams.length ? "" : "<p>Inga lag ännu – scanna QR och gå med.</p>";
+      teams.forEach(([tid, t]) => {
+        const item = document.createElement("div");
+        item.style.padding = ".4rem .6rem";
+        item.style.marginBottom = ".3rem";
+        item.style.background = "rgba(3,41,52,.6)";
+        item.style.color = "#fff";
+        item.style.borderRadius = "8px";
+        item.textContent = t.name + (t.score ? ` • ${t.score}p` : "");
+        list.appendChild(item);
       });
     }
-    if (awardBtn && !awardBtn._bound){
-      awardBtn._bound = true;
-      awardBtn.addEventListener("click", async ()=>{
-        const sid = window.sessionId;
-        const sSnap = await get(ref(db, `sessions/${sid}`));
-        if (!sSnap.exists()) return;
-        const sess = sSnap.val();
-        const order = sess.turn.order;
-        const activeIdx = sess.turn.activeIndex;
-        const activeTid = order[activeIdx];
-        const trackId = sess.current?.trackId;
-        if (!activeTid || !trackId) return;
-        const yr = sess.songMap?.[trackId]?.year || "";
-        const updates = {};
-        const teamPath = `sessions/${sid}/teams/${activeTid}`;
-        const team = sess.teams[activeTid];
-        const newScore = (team.score||0) + 1;
-        updates[`${teamPath}/score`] = newScore;
-        const tl = team.timeline || [];
-        tl.push({ trackId, year: yr });
-        updates[`${teamPath}/timeline`] = tl;
-        await update(ref(db), updates);
-      });
-    }
-    if (nextBtn && !nextBtn._bound){
-      nextBtn._bound = true;
-      nextBtn.addEventListener("click", async ()=>{
-        await hostNextSong();
-      });
-    }
-  }
 
-  async function hostNextSong(){
-    const sid = window.sessionId;
-    const sSnap = await get(ref(db, `sessions/${sid}`));
-    if (!sSnap.exists()) return;
-    const sess = sSnap.val();
-    const deck = sess.deck || [];
-    const shown = sess.shown || {};
-    const nextId = deck.find(id => !shown[id]);
-    const order = sess.turn.order;
-    const nextIdx = (sess.turn.activeIndex + 1) % order.length;
-    const updates = {};
-    if (nextId){
+    async function startGameHost(){
+      if (!window.sessionId) throw new Error("Ingen session.");
+      const sid = window.sessionId;
+      const teamsSnap = await get(ref(db, `sessions/${sid}/teams`));
+      const teams = teamsSnap.val() || {};
+      const order = Object.keys(teams);
+      if (!order.length){ alert("Minst ett lag krävs."); return; }
+      const sessSnap = await get(ref(db, `sessions/${sid}`));
+      const sess = sessSnap.val();
+      const deck = sess.deck || [];
+      const shown = sess.shown || {};
+      const nextId = deck.find(id => !shown[id]);
+      if (!nextId){ alert("Deck tomt."); return; }
+      const updates = {};
+      updates[`sessions/${sid}/status`] = "playing";
+      updates[`sessions/${sid}/turn`] = { order, activeIndex: 0 };
       updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
       updates[`sessions/${sid}/shown/${nextId}`] = true;
-    } else {
-      updates[`sessions/${sid}/status`] = "finished";
+      await update(ref(db), updates);
     }
-    updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
-    await update(ref(db), updates);
-  }
-  window.hostNextSong = hostNextSong;
+    window.startGameHost = startGameHost;
 
-  function displaySongGame(song, revealed){
-    const songDisplay = document.getElementById("game-song-display");
-    songDisplay.innerHTML = `
-      <div id="game-qrcode-${song.qr}" class="qrcode"></div>
-      <button class="answer-button" id="gameRevealBtn" ${revealed?"style='display:none'":""}>Visa svar</button>
-      <div id="game-song-details" style="display:${revealed?"block":"none"}; margin-top: 1rem; font-weight: bold;">
-        <div class="year-container" style="text-align:center; width:100%;">
-          <span class="year-text" style="font-size: 3em; color:#fff; text-shadow:0 0 8px #000;">${song.year||""}</span>
-        </div>
-        <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">
-          ${song.artist||""}<br>${song.title||""}
-        </div>
-      </div>
-    `;
-    const el = document.getElementById(`game-qrcode-${song.qr}`);
-    if (el){ el.innerHTML = ""; new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width: 160, height: 160 }); }
-    const rb = document.getElementById("gameRevealBtn");
-    if (rb){
-      rb.addEventListener("click", ()=>{
-        if (window.isHost){
-          const revealBtn = document.getElementById("revealButton");
-          revealBtn && revealBtn.click();
-        }
+    function renderGame(session){
+      renderTeamsHeader(session);
+      renderActiveSong(session);
+      renderHostControls(session);
+    }
+
+    function renderTeamsHeader(session){
+      const wrap = document.getElementById("teams-header");
+      if (!wrap) return;
+      wrap.innerHTML = "";
+      const order = (session.turn && session.turn.order) || Object.keys(session.teams||{});
+      const activeIdx = session.turn ? session.turn.activeIndex : 0;
+      order.forEach((tid, idx) => {
+        const t = session.teams[tid];
+        const chip = document.createElement("div");
+        chip.style.display = "inline-block";
+        chip.style.padding = ".35rem .6rem";
+        chip.style.margin = ".2rem";
+        chip.style.borderRadius = "999px";
+        chip.style.border = "1px solid rgba(255,255,255,.6)";
+        chip.style.color = "#fff";
+        chip.style.background = idx===activeIdx ? "#0b939c" : "rgba(3,41,52,.7)";
+        chip.textContent = `${t.name} • ${t.score||0}p • 🔥${t.tokens??3}`;
+        wrap.appendChild(chip);
       });
     }
-  }
-  window.displaySongGame = displaySongGame;
 
-  // Override Starta spel -> goes to lobby
-  const originalApplyFilter = window.applyFilter;
-  window.applyFilter = function(){
-    // Kör ursprunglig filtrering (om den finns)
-    if (typeof originalApplyFilter === "function"){
-      // Vi behöver bara filtreringen, inte navigering; kalla istället filterSongs direkt om finns
+    function renderActiveSong(session){
+      const cont = document.getElementById("game-song-display");
+      if (!cont) return;
+      cont.innerHTML = "";
+      const cur = session.current;
+      if (!cur || !cur.trackId){
+        cont.innerHTML = "<p style='color:#fff; text-align:center;'>Ingen låt vald ännu.</p>";
+        return;
+      }
+      const meta = session.songMap && session.songMap[cur.trackId] || { title:"", artist:"", year:"" };
+      const song = { qr: cur.trackId, title: meta.title, artist: meta.artist, year: meta.year, source:["spel"] };
+      displaySongGame(song, !!cur.revealed);
+    }
+
+    function renderHostControls(session){
+      const hc = document.getElementById("host-controls");
+      if (!hc) return;
+      hc.style.display = window.isHost ? "block" : "none";
+      if (!window.isHost) return;
+
+      const revealBtn = document.getElementById("revealButton");
+      const awardBtn = document.getElementById("awardActiveButton");
+      const nextBtn = document.getElementById("nextSongButtonGame");
+
+      if (revealBtn && !revealBtn._bound){
+        revealBtn._bound = true;
+        revealBtn.addEventListener("click", async ()=>{
+          const sid = window.sessionId;
+          const curSnap = await get(ref(db, `sessions/${sid}/current`));
+          if (!curSnap.exists()) return;
+          await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+        });
+      }
+      if (awardBtn && !awardBtn._bound){
+        awardBtn._bound = true;
+        awardBtn.addEventListener("click", async ()=>{
+          const sid = window.sessionId;
+          const sSnap = await get(ref(db, `sessions/${sid}`));
+          if (!sSnap.exists()) return;
+          const sess = sSnap.val();
+          const order = sess.turn.order;
+          const activeIdx = sess.turn.activeIndex;
+          const activeTid = order[activeIdx];
+          const trackId = sess.current?.trackId;
+          if (!activeTid || !trackId) return;
+          const yr = sess.songMap?.[trackId]?.year || "";
+          const updates = {};
+          const teamPath = `sessions/${sid}/teams/${activeTid}`;
+          const team = sess.teams[activeTid];
+          const newScore = (team.score||0) + 1;
+          updates[`${teamPath}/score`] = newScore;
+          const tl = team.timeline || [];
+          tl.push({ trackId, year: yr });
+          updates[`${teamPath}/timeline`] = tl;
+          await update(ref(db), updates);
+        });
+      }
+      if (nextBtn && !nextBtn._bound){
+        nextBtn._bound = true;
+        nextBtn.addEventListener("click", async ()=>{
+          await hostNextSong();
+        });
+      }
+    }
+
+    async function hostNextSong(){
+      const sid = window.sessionId;
+      const sSnap = await get(ref(db, `sessions/${sid}`));
+      if (!sSnap.exists()) return;
+      const sess = sSnap.val();
+      const deck = sess.deck || [];
+      const shown = sess.shown || {};
+      const nextId = deck.find(id => !shown[id]);
+      const order = sess.turn.order;
+      const nextIdx = (sess.turn.activeIndex + 1) % order.length;
+      const updates = {};
+      if (nextId){
+        updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
+        updates[`sessions/${sid}/shown/${nextId}`] = true;
+      } else {
+        updates[`sessions/${sid}/status`] = "finished";
+      }
+      updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
+      await update(ref(db), updates);
+    }
+    window.hostNextSong = hostNextSong;
+
+    function displaySongGame(song, revealed){
+      const songDisplay = document.getElementById("game-song-display");
+      songDisplay.innerHTML = `
+        <div id="game-qrcode-${song.qr}" class="qrcode"></div>
+        <button class="answer-button" id="gameRevealBtn" ${revealed?"style='display:none'":""}>Visa svar</button>
+        <div id="game-song-details" style="display:${revealed?"block":"none"}; margin-top: 1rem; font-weight: bold;">
+          <div class="year-container" style="text-align:center; width:100%;">
+            <span class="year-text" style="font-size: 3em; color:#fff; text-shadow:0 0 8px #000;">${song.year||""}</span>
+          </div>
+          <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">
+            ${song.artist||""}<br>${song.title||""}
+          </div>
+        </div>
+      `;
+      const el = document.getElementById(`game-qrcode-${song.qr}`);
+      if (el){ el.innerHTML = ""; new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width: 160, height: 160 }); }
+      const rb = document.getElementById("gameRevealBtn");
+      if (rb){
+        rb.addEventListener("click", ()=>{
+          if (window.isHost){
+            const revealBtn = document.getElementById("revealButton");
+            revealBtn && revealBtn.click();
+          }
+        });
+      }
+    }
+    window.displaySongGame = displaySongGame;
+
+    // Override Starta spel -> goes to lobby
+    const originalApplyFilter = window.applyFilter;
+    window.applyFilter = function(){
+      // Auto-välj 'Alla låtar' om inget är valt
+      try {
+        const any = document.querySelectorAll("input[name='source']:checked").length;
+        if (!any) {
+          const alla = document.getElementById('source-alla');
+          if (alla) { alla.checked = true; }
+          if (typeof window.updateYearSelection === 'function') window.updateYearSelection();
+        }
+      } catch(e) {}
+
+      // Kör filtrering
       if (typeof window.filterSongs === "function"){
         if (!window.filterSongs()) return;
+      } else if (typeof originalApplyFilter === "function"){
+        originalApplyFilter();
       }
-    } else if (typeof window.filterSongs === "function"){
-      if (!window.filterSongs()) return;
-    }
-    createSessionFromFilter().then(showLobby).catch(e=>{
-      console.error("Kunde inte skapa session:", e);
-      alert("Kunde inte skapa session. Försök igen.");
-    });
-  };
+      // Nu ska window.currentFilteredSongs vara satt
+      if (!Array.isArray(window.currentFilteredSongs) || window.currentFilteredSongs.length === 0){
+        alert("Inga låtar hittades i valen. Lägg till en spellista eller välj andra källor/årtal.");
+        return;
+      }
+      createSessionFromFilter().then(showLobby).catch(e=>{
+        console.error("Kunde inte skapa session:", e);
+        alert("Kunde inte skapa session. Kontrollera att du har låtar i dina val.");
+      });
+    };
 
-  // Auto-join om länken har ?join=
-  onAuthStateChanged(auth, (user)=>{
-    if (user) {
-      try { maybeAutoJoinFromURL(); } catch(e){ console.warn(e); }
-    }
-  });
-</script>
+    onAuthStateChanged(auth, (user)=>{
+      if (user) {
+        try { maybeAutoJoinFromURL(); } catch(e){}
+      }
+    });
+  </script>
 
 </body>
 </html>
