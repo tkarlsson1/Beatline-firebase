@@ -1,142 +1,132 @@
+
 /**
- * ui.js — cleaned
- * - Safe XSS helpers
- * - Modal helpers (show/hide), focus trap
- * - Menu hook adds "Hantera spellistor" item safely
+ * ui.js — hamburger menu (ported from legacy inline index.html)
+ * - Always positioned top-right (fixed)
+ * - Same items: Läs först, Startsida, Hantera spellistor, Logga ut
+ * - Works without any HTML changes; builds its own DOM
  */
 (function(){
   if (!window.ns) window.ns = {};
 
-  // XSS-safe helpers
-  function escapeHTML(str){
-    return String(str)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#39;');
-  }
-  function setSafeHTML(el, html){
-    if (!el) return;
-    el.innerHTML = escapeHTML(html ?? '');
-  }
-  window.ns.escapeHTML = escapeHTML;
-  window.ns.setSafeHTML = setSafeHTML;
+  function buildMenu(){
+    // Avoid duplicates
+    if (document.getElementById('menuContainer')) return;
 
-  function qs(id){ return document.getElementById(id); }
-  function show(el){
-    if (!el) return;
-    el.style.display = 'block';
-    el.dispatchEvent(new CustomEvent('modal:open', {bubbles:true}));
-  }
-  function hide(el){
-    if (!el) return;
-    el.style.display = 'none';
-    el.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
-  }
-
-  function getFocusable(container){
-    if (!container) return [];
-    return Array.from(container.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'))
-      .filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
-  }
-
-  // README modal close wiring (guarded)
-  (function initReadmeModal(){
-    const readmeModal = qs('readmeModal');
-    const closeBtn = document.getElementById('closeReadme') || readmeModal?.querySelector('.closeBtn');
-    if (!readmeModal) return;
-    if (closeBtn) closeBtn.addEventListener('click', () => hide(readmeModal));
-    window.addEventListener('click', (e)=>{ if (e.target === readmeModal) hide(readmeModal); });
-  })();
-
-  // Focus trap + ESC close for modals
-  (function initFocusTrap(){
-    document.addEventListener('modal:open', (e)=>{
-      const modal = e.target.closest('.modal');
-      if (!modal) return;
-      const focusable = getFocusable(modal);
-      if (!focusable.length) return;
-      const first = focusable[0], last = focusable[focusable.length - 1];
-      function onKey(ev){
-        if (ev.key === 'Escape'){
-          modal.dispatchEvent(new CustomEvent('modal:close', {bubbles:true}));
-          return;
-        }
-        if (ev.key !== 'Tab') return;
-        if (ev.shiftKey && document.activeElement === first){ ev.preventDefault(); last.focus(); }
-        else if (!ev.shiftKey && document.activeElement === last){ ev.preventDefault(); first.focus(); }
-      }
-      modal.__trapKeyHandler = onKey;
-      modal.addEventListener('keydown', onKey);
-      (modal.querySelector('[autofocus]') || first).focus();
+    const menuContainer = document.createElement('div');
+    menuContainer.id = 'menuContainer';
+    Object.assign(menuContainer.style, {
+      position: 'fixed',
+      top: '10px',
+      right: '2vw',
+      zIndex: '3000',
+      width: '60px'
     });
-    document.addEventListener('modal:close', (e)=>{
-      const modal = e.target.closest('.modal');
-      if (modal && modal.__trapKeyHandler){
-        modal.removeEventListener('keydown', modal.__trapKeyHandler);
-        modal.__trapKeyHandler = null;
-      }
-      document.body.classList.remove('modal-open');
-    });
-  })();
 
-  // Add "Hantera spellistor" to menu/dropdown if containers exist
-  (function initMenuHook(){
-    const menu = document.getElementById('menuContainer') || document.body;
-    let dropdown = document.getElementById('menuDropdown');
-
-    if (!dropdown){
-      dropdown = document.createElement('div');
-      dropdown.id = 'menuDropdown';
-      Object.assign(dropdown.style, {
-        background: 'rgba(20,20,20,.96)',
-        border: '1px solid rgba(255,255,255,.15)',
-        borderRadius: '12px',
-        position: 'absolute',
-        right: '0',
-        top: '60px',
-        minWidth: '220px',
-        padding: '.6rem',
-        display: 'none',
-        backdropFilter: 'blur(8px)'
-      });
-      menu && menu.appendChild(dropdown);
-    }
-
-    let list = dropdown.querySelector('.menu-items');
-    if (!list){
-      list = document.createElement('div');
-      list.className = 'menu-items';
-      dropdown.appendChild(list);
-    }
-
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.textContent = 'Hantera spellistor';
-    Object.assign(item.style, {
-      width: '100%',
-      textAlign: 'left',
-      padding: '.55rem .7rem',
+    const btn = document.createElement('button');
+    btn.id = 'menuButton';
+    btn.setAttribute('aria-label','Meny');
+    btn.setAttribute('aria-haspopup','true');
+    btn.setAttribute('aria-expanded','false');
+    btn.innerHTML = '&#9776;';
+    Object.assign(btn.style, {
+      background: 'none',
       border: 'none',
-      background: 'transparent',
       color: '#fff',
-      cursor: 'pointer'
+      fontSize: '2rem',
+      cursor: 'pointer',
+      lineHeight: '1'
     });
-    item.addEventListener('mouseenter', ()=>{ item.style.background = 'rgba(255,255,255,.08)'; });
-    item.addEventListener('mouseleave', ()=>{ item.style.background = 'transparent'; });
-    item.addEventListener('click', ()=>{
-      dropdown.style.display = 'none';
+    menuContainer.appendChild(btn);
+
+    const dd = document.createElement('div');
+    dd.id = 'dropdownMenu';
+    Object.assign(dd.style, {
+      display: 'none',
+      position: 'absolute',
+      right: '0',
+      top: '2.5rem',
+      background: '#032934',
+      border: '1px solid #fff',
+      borderRadius: '4px',
+      minWidth: '200px'
+    });
+
+    function addLink(text, handler){
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = text;
+      Object.assign(a.style, {
+        display: 'block',
+        padding: '.5rem 1rem',
+        color: '#fff',
+        textDecoration: 'none',
+        fontSize: '1rem'
+      });
+      a.addEventListener('mouseenter', ()=>{ a.style.background = '#0b939c'; });
+      a.addEventListener('mouseleave', ()=>{ a.style.background = 'transparent'; });
+      a.addEventListener('click', (e)=>{ e.preventDefault(); handler(); dd.style.display = 'none'; btn.setAttribute('aria-expanded','false'); });
+      dd.appendChild(a);
+      return a;
+    }
+
+    // === Items (exactly as in legacy) ===
+    addLink('Läs först', () => {
+      const modal = document.getElementById('readmeModal');
+      if (modal) modal.style.display = 'block';
+    });
+
+    addLink('Startsida', () => {
+      if (typeof window.goToFilter === 'function') window.goToFilter();
+    });
+
+    addLink('Hantera spellistor', () => {
       if (typeof window.openManagePlaylists === 'function') window.openManagePlaylists();
-      else {
-        const modal = document.getElementById('managePlaylistsModal');
-        if (modal) show(modal);
+    });
+
+    addLink('Logga ut', () => {
+      try {
+        const a = window.auth;
+        if (a && typeof a.signOut === 'function') {
+          a.signOut().then(()=>{
+            const lm = document.getElementById('loginModal');
+            if (lm) lm.style.display = 'flex';
+          });
+        } else if (window.firebase && window.firebase.auth) {
+          // fallback in case of different auth exposure
+          window.firebase.auth().signOut();
+        }
+      } catch(e){ console.error(e); }
+    });
+
+    menuContainer.appendChild(dd);
+    document.body.appendChild(menuContainer);
+
+    // Toggle behavior
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const open = dd.style.display !== 'block';
+      dd.style.display = open ? 'block' : 'none';
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e)=>{
+      if (!menuContainer.contains(e.target)){
+        dd.style.display = 'none';
+        btn.setAttribute('aria-expanded','false');
       }
     });
 
-    list.appendChild(item);
-  })();
+    // Responsive nudge for very small screens
+    const mql = window.matchMedia('(max-width: 600px)');
+    function adjust(){
+      menuContainer.style.right = mql.matches ? '5px' : '2vw';
+    }
+    mql.addEventListener('change', adjust);
+    adjust();
+  }
 
-  // Export some UI helpers for legacy code if needed
-  window.ns.ui = { show, hide, getFocusable, setSafeHTML, escapeHTML };
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', buildMenu);
+  } else {
+    buildMenu();
+  }
 })();

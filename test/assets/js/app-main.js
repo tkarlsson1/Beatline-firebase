@@ -10,5 +10,3 @@ import { getDatabase, ref, onValue, set, push, update } from "https://www.gstati
 
 // Kick anonymous auth early
 ensureAuthed().catch(()=>{});
-
-import './game.js';

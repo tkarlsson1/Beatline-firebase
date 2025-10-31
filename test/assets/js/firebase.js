@@ -4,7 +4,6 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import { getDatabase, ref, get, set, update, remove, push, child } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
-import { onValue } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
 /** ---- Config (provided by you) ---- */
 const firebaseConfig = {
@@ -95,4 +94,4 @@ export async function updateCustomYear(playlistName, spotifyId, newYear){
 window.ns.updateCustomYear = updateCustomYear;
 
 /** ---- Helpers to expose Firebase pieces if needed ---- */
-export { auth, db, ref, get, set, update, remove, push, child, onValue };
+export { auth, db, ref, get, set, update, remove, push, child };
