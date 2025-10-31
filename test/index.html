@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM – 0.602</title>
+  <title>NOTESTREAM – Multiplayer</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -64,10 +65,20 @@
       display:inline-block; padding:.35rem .6rem; margin:.2rem; border-radius:999px;
       border:1px solid rgba(255,255,255,.6); color:#fff;
     }
+
+    /* Debug badge */
+    #envBadge {
+      position: fixed; bottom: 8px; right: 8px;
+      background: rgba(0,0,0,.7); color: #fff;
+      padding: 6px 10px; border-radius: 8px; font-size: 12px;
+      z-index: 9999; pointer-events: none;
+    }
   </style>
 </head>
 
 <body>
+  <div id="envBadge" aria-live="polite"></div>
+
   <!-- Inloggningsmodal -->
   <div id="loginModal" class="modal" role="dialog" aria-modal="true">
     <div class="modal-content" style="text-align:center;">
@@ -199,13 +210,13 @@
       appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
     };
     const testConfig = {
-      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-      authDomain: "beatlinefirebase.firebaseapp.com",
-      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "beatlinefirebase",
-      storageBucket: "notestreamfire.firebasestorage.app",
-      messagingSenderId: "196231817325",
-      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+      apiKey: "___TEST_API_KEY___",
+      authDomain: "___TEST_AUTH_DOMAIN___",
+      databaseURL: "___TEST_DATABASE_URL___",
+      projectId: "___TEST_PROJECT_ID___",
+      storageBucket: "___TEST_STORAGE_BUCKET___",
+      messagingSenderId: "___TEST_MESSAGING_SENDER_ID___",
+      appId: "___TEST_APP_ID___"
     };
     const useTest = new URLSearchParams(location.search).get('env') === 'test';
     const firebaseConfig = useTest ? testConfig : prodConfig;
@@ -214,13 +225,17 @@
     const db = getDatabase(getApp());
     const auth = getAuth(getApp());
 
-    // Exponera för icke-modulscript om du skulle behöva
+    // Debug badge + globals
+    const opts = getApp().options || {};
+    document.getElementById("envBadge").textContent = `ENV: ${useTest?'test':'prod'} • projectId: ${opts.projectId||'-'} • RTDB: ${opts.databaseURL||'-'}`;
+    console.log("ENV", { env: useTest?'test':'prod', options: opts });
     window.firebaseDb = db;
     window.firebaseRef = ref;
-    window.firebasePush = push;
-    window.firebaseOnValue = onValue;
     window.firebaseSet = set;
     window.firebaseUpdate = update;
+    window.firebasePush = push;
+    window.firebaseAuth = auth;
+    window.firebaseOptions = opts;
 
     /* ===========================
        Tillstånd & util
@@ -245,12 +260,10 @@
     }
 
     function joinURL(sessionId){
-      const base = location.origin + location.pathname + (useTest ? "?env=test" : "");
-      // bevara env=test när du delar
-      const url = new URL(base, location.origin);
-      if (useTest) url.searchParams.set("env","test");
+      const url = new URL(location.href);
+      if (!useTest) { url.searchParams.delete("env"); } else { url.searchParams.set("env", "test"); }
       url.searchParams.set("join", sessionId);
-      return url.toString();
+      return url.origin + url.pathname + "?" + url.searchParams.toString();
     }
 
     function currentStartEndYears(){
@@ -345,7 +358,6 @@
         hide(document.getElementById("loginModal"));
         hide(document.getElementById("registerModal"));
         initDataListeners();
-        // auto-join via ?join=
         maybeAutoJoinFromURL();
       } else {
         show(document.getElementById("loginModal"));
@@ -757,6 +769,7 @@
       }
       if (!document.getElementById("nextSongButtonGame")._bound){
         document.getElementById("nextSongButtonGame")._bound = true;
+        document.getElementById("nextSongButtonGame")._bound = true;
         document.getElementById("nextSongButtonGame").addEventListener("click", hostNextSong);
       }
     }
@@ -807,7 +820,7 @@
     document.getElementById("startButton").addEventListener("click", onStartGame);
 
     /* ===========================
-       Meny & övrigt
+       Meny & debug
        =========================== */
     (function buildMenu(){
       const menuContainer = document.createElement("div"); menuContainer.id="menuContainer";
@@ -816,7 +829,18 @@
       const a1=document.createElement("a"); a1.href="#"; a1.textContent="Läs först"; a1.onclick=(e)=>{e.preventDefault(); document.getElementById("readmeModal").style.display="flex"; dd.style.display="none";}
       const a2=document.createElement("a"); a2.href="#"; a2.textContent="Startsida"; a2.onclick=(e)=>{e.preventDefault(); setPage("filter-page"); dd.style.display="none";}
       const a3=document.createElement("a"); a3.href="#"; a3.textContent="Logga ut";  a3.onclick=(e)=>{e.preventDefault(); signOut(auth).catch(()=>{}); dd.style.display="none";}
-      dd.appendChild(a1); dd.appendChild(a2); dd.appendChild(a3); menuContainer.appendChild(btn); menuContainer.appendChild(dd);
+      const a4=document.createElement("a"); a4.href="#"; a4.textContent="Skrivtest sessions/*"; a4.onclick=async (e)=>{
+        e.preventDefault();
+        try{
+          await set(ref(db, `sessions/__smoketest__`), { ok:true, ts: Date.now(), uid: auth.currentUser?.uid || null });
+          alert("Skrivtest OK – regler tillåter write i sessions/*.");
+        }catch(err){
+          alert("Skrivtest FAIL: " + (err?.message||err));
+          console.error("Skrivtest FAIL", err);
+        } finally { dd.style.display="none"; }
+      };
+      dd.appendChild(a1); dd.appendChild(a2); dd.appendChild(a3); dd.appendChild(a4);
+      menuContainer.appendChild(btn); menuContainer.appendChild(dd);
       document.body.appendChild(menuContainer);
       btn.addEventListener("click", ()=>{ dd.style.display = dd.style.display==="block" ? "none" : "block"; });
       document.addEventListener("click", (ev)=>{ if (!menuContainer.contains(ev.target)) dd.style.display="none"; });
