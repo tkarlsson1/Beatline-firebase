@@ -1,13 +1,12 @@
 
 /**
- * game.js — brings back core game logic after the refactor
- * - Fetches data from Firebase (standard lists + user playlists + custom year overrides)
- * - Builds UI (source checkboxes, year dropdowns)
- * - Provides global functions used by inline HTML: applyFilter(), nextSong()
+ * game.js — core game logic for the test build
+ * - Merges standard + user playlists + customYears
+ * - Rebuilds source checkboxes
+ * - Global functions used by HTML: applyFilter, nextSong, revealDetails, goToFilter, updateYearSelection
  */
-import { auth, db, ref, get, set, update, remove, push, child } from './firebase.js';
+import { auth, db, ref, get } from './firebase.js';
 import { ensureAuthed, updateCustomYear as fbUpdateCustomYear } from './firebase.js';
-import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js'; // for types only
 
 if (!window.ns) window.ns = {};
 
@@ -22,8 +21,6 @@ let shownSongs = [];
 let currentSong = null;
 
 function toKey(str){ return String(str).replace(/[.#$/[\]]/g, '_'); }
-
-// ---------- UI helpers ----------
 function escapeHTML(str){
   return String(str)
     .replace(/&/g,'&amp;')
@@ -32,9 +29,8 @@ function escapeHTML(str){
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
 }
-
-function $(sel){ return document.querySelector(sel); }
-function $id(id){ return document.getElementById(id); }
+const $ = (sel)=>document.querySelector(sel);
+const $id = (id)=>document.getElementById(id);
 
 // Build year dropdowns once
 function buildYearDropdowns(start=1950, end=(new Date().getFullYear())){
@@ -239,7 +235,6 @@ function goToFilter(){
   $id('song-display').innerHTML = '';
   $id('result-page').style.display = 'none';
   $id('filter-page').style.display = 'block';
-  // Keep choices; update count
   updateSongCount();
 }
 window.goToFilter = goToFilter;
@@ -250,6 +245,7 @@ function generateQRCode(qr){
   const el = $id(`qrcode-${qr}`);
   if (!el) return;
   el.innerHTML = '';
+  // QRCode is loaded globally from CDN in index.html
   new QRCode(el, { text: spotifyUrl, width: 160, height: 160 });
 }
 window.generateQRCode = generateQRCode;
@@ -294,7 +290,6 @@ function displaySong(song){
   const artistSafe = escapeHTML(String(song.artist ?? ''));
   const titleSafe = escapeHTML(String(song.title ?? ''));
   const qrSafe = escapeHTML(String(song.qr ?? ''));
-  // Determine if user song only (not in standard)
   const standardListNames = Array.from(new Set(standardSongs.map(s => s.source[0])));
   const isUserSong = !song.source.some(src => standardListNames.includes(src));
 
@@ -324,41 +319,34 @@ function displaySong(song){
 
 // ---------- Data fetch ----------
 async function fetchStandardLists(){
-  // Try 'standardLists'
   const snap = await get(ref(db, 'standardLists'));
-  if (!snap.exists()) return {};
-  return snap.val();
+  return snap.exists() ? snap.val() : {};
 }
 async function fetchCustomYears(){
   const snap = await get(ref(db, 'customYears'));
-  if (!snap.exists()) return {};
-  return snap.val();
+  return snap.exists() ? snap.val() : {};
 }
 async function fetchUserListsAnyPath(uid){
-  // Try legacy path first
   let snap = await get(ref(db, `userPlaylists/${uid}`));
   if (snap.exists()) return snap.val();
-  // Fallback to new path
   snap = await get(ref(db, `users/${uid}/playlists`));
   if (snap.exists()) return snap.val();
   return {};
 }
-
-// Flatten helpers
-function flattenPlaylistsToSongs(playlistsMap, sourceType='user'){
+function flattenPlaylistsToSongs(map){
   const out = [];
-  if (!playlistsMap) return out;
-  for (const playlistName of Object.keys(playlistsMap)){
-    const p = playlistsMap[playlistName] || {};
-    const tracks = p.songs || {};
-    for (const trackId of Object.keys(tracks)){
-      const t = tracks[trackId] || {};
+  if (!map) return out;
+  for (const pname of Object.keys(map)){
+    const p = map[pname] || {};
+    const tracks = p.songs || p.tracks || {};
+    for (const id of Object.keys(tracks)){
+      const t = tracks[id] || {};
       out.push({
-        qr: trackId,
+        qr: id,
         title: t.title,
         artist: t.artist,
         year: parseInt(t.customYear || t.year, 10),
-        source: [playlistName]
+        source: [pname]
       });
     }
   }
@@ -368,7 +356,6 @@ function flattenPlaylistsToSongs(playlistsMap, sourceType='user'){
 // ---------- Init ----------
 async function init(){
   buildYearDropdowns();
-  // Save button for edit year modal
   const saveBtn = $id('saveYearButton');
   if (saveBtn) saveBtn.addEventListener('click', handleSaveYear);
   const closeBtn = $id('closeModal');
@@ -376,26 +363,20 @@ async function init(){
 
   await ensureAuthed();
   const uid = auth.currentUser?.uid || null;
-
-  // Fetch in parallel
   const [stdMap, customMap, userMap] = await Promise.all([
     fetchStandardLists(),
     fetchCustomYears(),
     uid ? fetchUserListsAnyPath(uid) : Promise.resolve({})
   ]);
+
   customYearMap = {};
   Object.keys(customMap || {}).forEach(id => {
-    const entry = customMap[id] || {};
-    const y = parseInt(entry.year, 10);
+    const y = parseInt((customMap[id] || {}).year, 10);
     if (Number.isFinite(y)) customYearMap[id] = { year: y };
   });
 
-  // Build arrays
-  standardSongs = flattenPlaylistsToSongs(stdMap, 'standard');
-  userPlaylistSongs = flattenPlaylistsToSongs(userMap, 'user');
-
-  // Apply overrides for user-only songs
-  userPlaylistSongs = userPlaylistSongs.map(s => {
+  standardSongs = flattenPlaylistsToSongs(stdMap);
+  userPlaylistSongs = flattenPlaylistsToSongs(userMap).map(s => {
     if (customYearMap[s.qr] && !standardSongs.find(o => o.qr === s.qr)){
       return { ...s, year: customYearMap[s.qr].year, customYear: customYearMap[s.qr].year };
     }
@@ -405,7 +386,6 @@ async function init(){
   mergeSongs();
 }
 
-// Run when DOM ready
 if (document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', init);
 } else {
