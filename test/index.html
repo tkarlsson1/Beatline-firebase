@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM – 0.606</title>
+  <title>NOTESTREAM –0.608 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -35,18 +35,12 @@
     #source-checkbox-container { display:flex; flex-wrap:wrap; justify-content:center; gap:1.7rem .5rem; margin-bottom:2rem; }
     .checkbox-pill { position:relative; display:inline-block; }
     .checkbox-pill input[type="checkbox"]{ display:none; }
-    .checkbox-pill label{
-      cursor:pointer; padding:.5rem .5rem; border:3px solid #032934; border-radius:8px; background:#032934; color:#fff; transition:.25s; font-size:1rem;
-    }
+    .checkbox-pill label{ cursor:pointer; padding:.5rem .5rem; border:3px solid #032934; border-radius:8px; background:#032934; color:#fff; transition:.25s; font-size:1rem; }
     .checkbox-pill input[type="checkbox"]:checked + label{ background:#0b939c; border-color:#0b939c; }
     .divider { height:2px; background:#fff; width:100%; margin:.5rem 0; }
     .subheading{ display:block; width:100%; text-align:center; font-size:.8rem; color:#fff; margin:.5rem 0; }
     .next-song-button, .answer-button { display:block; margin:0 auto; width:128px; background:#032934; color:#fff; border:none; border-radius:4px; font-size:1rem; cursor:pointer; }
-    .start-button {
-      background: linear-gradient(to right, #fb1820, #ff6310);
-      border: none; border-radius: 8px; padding: 12px 24px;
-      font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all .2s ease-in-out; display:block; margin:0 auto;
-    }
+    .start-button { background: linear-gradient(to right, #fb1820, #ff6310); border: none; border-radius: 8px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all .2s ease-in-out; display:block; margin:0 auto; }
     .start-button:hover { transform: scale(1.03); }
 
     /* Modaler */
@@ -61,18 +55,10 @@
     #dropdownMenu a{ display:block; padding:.5rem 1rem; color:#fff; text-decoration:none; }
 
     /* Lobby/Game header */
-    #teams-header .chip{
-      display:inline-block; padding:.35rem .6rem; margin:.2rem; border-radius:999px;
-      border:1px solid rgba(255,255,255,.6); color:#fff;
-    }
+    #teams-header .chip{ display:inline-block; padding:.35rem .6rem; margin:.2rem; border-radius:999px; border:1px solid rgba(255,255,255,.6); color:#fff; }
 
     /* Debug badge */
-    #envBadge {
-      position: fixed; bottom: 8px; right: 8px;
-      background: rgba(0,0,0,.7); color: #fff;
-      padding: 6px 10px; border-radius: 8px; font-size: 12px;
-      z-index: 9999; pointer-events: none;
-    }
+    #envBadge { position: fixed; bottom: 8px; right: 8px; background: rgba(0,0,0,.7); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; z-index: 9999; pointer-events: none; }
   </style>
 </head>
 
@@ -191,47 +177,35 @@
     </div>
   </div>
 
- <script type="module">
-  /* ===========================
-     Firebase (single module)
-     =========================== */
-  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  <script type="module">
+    /* ===========================
+       Firebase (single module)
+       =========================== */
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-  // 🔧 Peka alltid på TEST-instansen (notestreamfire)
-  const RTDB_URL = "https://notestreamfire.europe-west1.firebasedatabase.app";
+    // 🔧 Peka alltid på TEST-instansen (notestreamfire)
+    const RTDB_URL = "https://notestreamfire.europe-west1.firebasedatabase.app";
 
-  // ✅ Enda configen (ingen prod/test-växel)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-    authDomain: "beatlinefirebase.firebaseapp.com",
-    databaseURL: RTDB_URL, // <-- viktigt
-    projectId: "beatlinefirebase",
-    storageBucket: "beatlinefirebase.firebasestorage.app",
-    messagingSenderId: "196231817325",
-    appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-  };
+    // ✅ Enda configen (ingen prod/test-växel)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      storageBucket: "beatlinefirebase.firebasestorage.app",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
 
-  // ✅ Init
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const db  = getDatabase(app, RTDB_URL); // <-- tvinga rätt RTDB-instans
-  const auth = getAuth(app);
+    // ✅ Init
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const db  = getDatabase(app, RTDB_URL); // <-- tvinga rätt RTDB-instans
+    const auth = getAuth(app);
 
-  // 🏷️ Liten badge så du ser att du kör mot rätt DB
-  document.getElementById("envBadge").textContent = `RTDB: ${RTDB_URL}`;
-
-    // Debug badge + globals
-    const opts = getApp().options || {};
-    document.getElementById("envBadge").textContent = `ENV: ${useTest?'test':'prod'} • projectId: ${opts.projectId||'-'} • RTDB: ${opts.databaseURL||'-'}`;
-    console.log("ENV", { env: useTest?'test':'prod', options: opts });
-    window.firebaseDb = db;
-    window.firebaseRef = ref;
-    window.firebaseSet = set;
-    window.firebaseUpdate = update;
-    window.firebasePush = push;
-    window.firebaseAuth = auth;
-    window.firebaseOptions = opts;
+    // Badge så du ser att du kör mot rätt DB
+    document.getElementById("envBadge").textContent = `RTDB: ${RTDB_URL}`;
 
     /* ===========================
        Tillstånd & util
@@ -256,10 +230,10 @@
     }
 
     function joinURL(sessionId){
-    const url = new URL(location.href);
-    url.searchParams.set("join", sessionId);
-    return url.origin + url.pathname + "?" + url.searchParams.toString();
-  }
+      const url = new URL(location.href);
+      url.searchParams.set("join", sessionId);
+      return url.origin + url.pathname + "?" + url.searchParams.toString();
+    }
 
     function currentStartEndYears(){
       const s = document.getElementById("startYear");
@@ -330,21 +304,24 @@
       });
 
       // Egna listor (privata per user)
-      const uid = auth.currentUser.uid;
-      onValue(ref(db, `userPlaylists/${uid}`), (snap) => {
-        userPlaylistSongs = [];
-        if (snap.exists()) {
-          const data = snap.val();
-          for (const playlistName in data) {
-            const pl = data[playlistName];
-            if (pl.songs) {
-              for (const trackId in pl.songs) {
-                userPlaylistSongs.push({ qr: trackId, ...pl.songs[trackId], source: [playlistName] });
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const uid = user.uid;
+        onValue(ref(db, `userPlaylists/${uid}`), (snap) => {
+          userPlaylistSongs = [];
+          if (snap.exists()) {
+            const data = snap.val();
+            for (const playlistName in data) {
+              const pl = data[playlistName];
+              if (pl.songs) {
+                for (const trackId in pl.songs) {
+                  userPlaylistSongs.push({ qr: trackId, ...pl.songs[trackId], source: [playlistName] });
+                }
               }
             }
           }
-        }
-        mergeSongs();
+          mergeSongs();
+        });
       });
     }
 
@@ -459,7 +436,6 @@
           <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">${song.artist||""}<br>${song.title||""}</div>
         </div>
       `;
-      // QR till Spotify
       const el = document.getElementById(`qrcode-${song.qr}`);
       el.innerHTML = "";
       new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width:160, height:160 });
@@ -482,7 +458,6 @@
         alert("Inga låtar i det här intervallet. Välj andra källor/årtal eller lägg till en spellista.");
         return false;
       }
-      // solo: välj första, men sidan visas inte i multiplayerflödet
       nextSong();
       return true;
     };
@@ -764,7 +739,6 @@
       }
       if (!document.getElementById("nextSongButtonGame")._bound){
         document.getElementById("nextSongButtonGame")._bound = true;
-        document.getElementById("nextSongButtonGame")._bound = true;
         document.getElementById("nextSongButtonGame").addEventListener("click", hostNextSong);
       }
     }
@@ -792,7 +766,6 @@
        Starta spel (override)
        =========================== */
     async function onStartGame(){
-      // Auto-välj 'Alla låtar' om inget är valt
       if (!document.querySelectorAll("input[name='source']:checked").length){
         const alla = document.getElementById("source-alla");
         if (alla) alla.checked = true;
@@ -806,7 +779,7 @@
       }catch(e){
         console.error(e);
         if (String(e).includes("PERMISSION_DENIED")) {
-          alert("Behörighetsfel i Realtime Database. Tillåt inloggade att skriva under sessions/* i testmiljön (se reglerna).");
+          alert("Behörighetsfel i Realtime Database. Tillåt inloggade att skriva under sessions/* i testinstansen.");
         } else {
           alert("Kunde inte skapa session. Kontrollera att du är inloggad och har låtar i urvalet.");
         }
@@ -815,7 +788,7 @@
     document.getElementById("startButton").addEventListener("click", onStartGame);
 
     /* ===========================
-       Meny & debug
+       Meny & övrigt
        =========================== */
     (function buildMenu(){
       const menuContainer = document.createElement("div"); menuContainer.id="menuContainer";
@@ -824,17 +797,7 @@
       const a1=document.createElement("a"); a1.href="#"; a1.textContent="Läs först"; a1.onclick=(e)=>{e.preventDefault(); document.getElementById("readmeModal").style.display="flex"; dd.style.display="none";}
       const a2=document.createElement("a"); a2.href="#"; a2.textContent="Startsida"; a2.onclick=(e)=>{e.preventDefault(); setPage("filter-page"); dd.style.display="none";}
       const a3=document.createElement("a"); a3.href="#"; a3.textContent="Logga ut";  a3.onclick=(e)=>{e.preventDefault(); signOut(auth).catch(()=>{}); dd.style.display="none";}
-      const a4=document.createElement("a"); a4.href="#"; a4.textContent="Skrivtest sessions/*"; a4.onclick=async (e)=>{
-        e.preventDefault();
-        try{
-          await set(ref(db, `sessions/__smoketest__`), { ok:true, ts: Date.now(), uid: auth.currentUser?.uid || null });
-          alert("Skrivtest OK – regler tillåter write i sessions/*.");
-        }catch(err){
-          alert("Skrivtest FAIL: " + (err?.message||err));
-          console.error("Skrivtest FAIL", err);
-        } finally { dd.style.display="none"; }
-      };
-      dd.appendChild(a1); dd.appendChild(a2); dd.appendChild(a3); dd.appendChild(a4);
+      dd.appendChild(a1); dd.appendChild(a2); dd.appendChild(a3);
       menuContainer.appendChild(btn); menuContainer.appendChild(dd);
       document.body.appendChild(menuContainer);
       btn.addEventListener("click", ()=>{ dd.style.display = dd.style.display==="block" ? "none" : "block"; });
