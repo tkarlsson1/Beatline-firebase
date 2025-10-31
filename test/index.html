@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM – 0.603.1</title>
+  <title>NOTESTREAM – 0.606</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -191,39 +191,35 @@
     </div>
   </div>
 
-  <script type="module">
-    /* ===========================
-       Firebase (single module)
-       =========================== */
-    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+ <script type="module">
+  /* ===========================
+     Firebase (single module)
+     =========================== */
+  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-    // --- ENV switch: default prod, add ?env=test to use testConfig ---
-    const prodConfig = {
-      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-      authDomain: "beatlinefirebase.firebaseapp.com",
-      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "beatlinefirebase",
-      storageBucket: "beatlinefirebase.firebasestorage.app",
-      messagingSenderId: "196231817325",
-      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-    };
-    const testConfig = {
-      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-      authDomain: "beatlinefirebase.firebaseapp.com",
-      databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "beatlinefirebase",
-      storageBucket: "notestreamfire.firebasestorage.app",
-      messagingSenderId: "196231817325",
-      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-    };
-    const useTest = new URLSearchParams(location.search).get('env') === 'test';
-    const firebaseConfig = useTest ? testConfig : prodConfig;
+  // 🔧 Peka alltid på TEST-instansen (notestreamfire)
+  const RTDB_URL = "https://notestreamfire.europe-west1.firebasedatabase.app";
 
-    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    const db = getDatabase(getApp());
-    const auth = getAuth(getApp());
+  // ✅ Enda configen (ingen prod/test-växel)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+    authDomain: "beatlinefirebase.firebaseapp.com",
+    databaseURL: RTDB_URL, // <-- viktigt
+    projectId: "beatlinefirebase",
+    storageBucket: "beatlinefirebase.firebasestorage.app",
+    messagingSenderId: "196231817325",
+    appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+  };
+
+  // ✅ Init
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const db  = getDatabase(app, RTDB_URL); // <-- tvinga rätt RTDB-instans
+  const auth = getAuth(app);
+
+  // 🏷️ Liten badge så du ser att du kör mot rätt DB
+  document.getElementById("envBadge").textContent = `RTDB: ${RTDB_URL}`;
 
     // Debug badge + globals
     const opts = getApp().options || {};
@@ -260,11 +256,10 @@
     }
 
     function joinURL(sessionId){
-      const url = new URL(location.href);
-      if (!useTest) { url.searchParams.delete("env"); } else { url.searchParams.set("env", "test"); }
-      url.searchParams.set("join", sessionId);
-      return url.origin + url.pathname + "?" + url.searchParams.toString();
-    }
+    const url = new URL(location.href);
+    url.searchParams.set("join", sessionId);
+    return url.origin + url.pathname + "?" + url.searchParams.toString();
+  }
 
     function currentStartEndYears(){
       const s = document.getElementById("startYear");
