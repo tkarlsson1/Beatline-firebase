@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM –0.610 (TEST)</title>
+  <title>NOTESTREAM –0.611 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -899,20 +899,43 @@
 
       const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
 
+      
       pins.innerHTML = "";
+      const barRect = bar.getBoundingClientRect();
+      const minPx = 26; // min horizontal spacing between pins
+      const placedPx = []; // already placed pin x (px) for collision checks
+
       sortedTL.forEach(item => {
-        const nx = normalizeYear(session, item.year) * 100;
+        // Desired normalized position from year
+        let nx = normalizeYear(session, item.year);
+        // Convert to px position along the bar
+        let px = nx * barRect.width;
+
+        // Nudge to the right until we have enough spacing from previous pins
+        for (let tries = 0; tries < 50; tries++) {
+          const collides = placedPx.some(prev => Math.abs(px - prev) < minPx);
+          if (!collides) break;
+          px += minPx; // push to the right
+        }
+        // Clamp to bar width bounds
+        if (px < 0) px = 0;
+        if (px > barRect.width) px = barRect.width;
+
+        // Convert back to percent
+        nx = px / barRect.width;
+        placedPx.push(px);
+
         const el = document.createElement("div");
         el.className = "pin";
-        el.style.left = `${nx}%`;
+        el.style.left = `${nx * 100}%`;
+
         const lab = document.createElement("div");
         lab.className = "pin-label";
         lab.textContent = item.year;
         el.appendChild(lab);
         pins.appendChild(el);
       });
-
-      const gaps = buildDropSlots(session, sortedTL);
+const gaps = buildDropSlots(session, sortedTL);
       Array.from(bar.querySelectorAll(".drop-slot")).forEach(n=>n.remove());
 
       gaps.forEach((gap) => {
