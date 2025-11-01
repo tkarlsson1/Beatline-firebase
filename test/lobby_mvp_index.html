@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.614 (TEST)</title>
+  <title>NOTESTREAM –0.615 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -32,78 +32,61 @@
 </head>
 <body>
   <header>
-    <h1>🎵 Beatline – Lobby (MVP)</h1>
+    <h1>🎵 Beatline – Lobby</h1>
     <div id="authBadge" class="mut">…</div>
   </header>
   <main>
-    <!-- START / screen -->
-    <section id="screenStart" class="grid" style="display:none">
-      <div class="card grid cols-2">
-        <div>
-          <h2 style="margin:0 0 8px 0">Skapa lobby</h2>
-          <p class="mut">Välj år och timers. Låtlistor kopplas på startsidan senare – detta är en lobby‑MVP.</p>
-          <div class="grid cols-2">
-            <div>
-              <label>Från år</label>
-              <input id="yearMin" type="number" min="1900" max="2099" value="1960" />
-            </div>
-            <div>
-              <label>Till år</label>
-              <input id="yearMax" type="number" min="1900" max="2099" value="2025" />
-            </div>
-            <div>
-              <label>Drag‑tid (sek)</label>
-              <input id="tDrag" type="number" min="15" max="300" value="90" />
-            </div>
-            <div>
-              <label>Utmaningsfönster (sek)</label>
-              <input id="tClaim" type="number" min="5" max="60" value="10" />
-            </div>
-            <div>
-              <label>Opp‑drag (sek)</label>
-              <input id="tOpp" type="number" min="5" max="120" value="20" />
-            </div>
-            <div>
-              <label>Tokens / lag</label>
-              <input id="tokensPerTeam" type="number" min="0" max="20" value="4" />
-            </div>
-          </div>
-          <div style="margin-top:12px;display:flex;gap:8px">
-            <button id="btnCreate" class="primary">Skapa lobby</button>
-            <button id="btnGotoJoin" class="ghost">Gå till join‑vy</button>
-          </div>
-          <p class="mut" style="margin-top:8px">Max 8 lag • Vinst: 11 kort • Sen ankomst: ej tillåten</p>
-        </div>
-        <div>
-          <h3 style="margin:0 0 8px 0">Spotify (host)</h3>
-          <p id="spStatus" class="mut">Inte kopplad</p>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="btnSpotify" class="ghost">Koppla Spotify</button>
-            <button id="btnPickDevice" class="ghost" disabled>Välj enhet</button>
-          </div>
-          <p class="mut" style="margin-top:8px">Scopes: streaming, read email/private, modify/read playback</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- LOBBY / screen -->
+    <!-- LOBBY / screen (read-only filter; timers/tokens editable) -->
     <section id="screenLobby" class="grid" style="display:none">
       <div class="card">
         <h2 style="margin:0 0 8px 0">Lobby <span class="mut mono" id="lblGameId"></span></h2>
         <div class="row">
-          <div style="flex:1">
+          <div style="flex:1;min-width:280px">
             <label>Join‑länk</label>
             <div class="mono" id="joinUrl" style="word-break:break-all"></div>
             <div class="qr" style="margin-top:8px"><img id="qrImg" alt="QR"/></div>
+            <div style="margin-top:12px">
+              <label>Valt urval (från startsidan)</label>
+              <div id="selSummary" class="mut">Laddar…</div>
+            </div>
           </div>
-          <div style="flex:1">
+          <div style="flex:1;min-width:280px">
             <label>Lag</label>
             <div id="teams" class="teams"></div>
+            <div class="grid cols-2" style="margin-top:12px">
+              <div>
+                <label>Drag‑tid (sek)</label>
+                <input id="tDrag" type="number" min="15" max="300" />
+              </div>
+              <div>
+                <label>Utmaningsfönster (sek)</label>
+                <input id="tClaim" type="number" min="5" max="60" />
+              </div>
+              <div>
+                <label>Opp‑drag (sek)</label>
+                <input id="tOpp" type="number" min="5" max="120" />
+              </div>
+              <div>
+                <label>Tokens / lag</label>
+                <input id="tokensPerTeam" type="number" min="0" max="20" />
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="btnSaveSettings" class="ghost">Spara tider/tokens</button>
+            </div>
+            <hr style="border:none;border-top:1px solid #1f2937;margin:12px 0"/>
+            <h3 style="margin:0 0 8px 0">Spotify (host)</h3>
+            <p id="spStatus" class="mut">Inte kopplad</p>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="btnSpotify" class="ghost">Koppla Spotify</button>
+              <button id="btnPickDevice" class="ghost" disabled>Välj enhet</button>
+            </div>
+            <p class="mut" style="margin-top:8px">Scopes: streaming, read email/private, modify/read playback</p>
             <div style="margin-top:12px;display:flex;gap:8px">
               <button id="btnStart" class="primary" disabled>Starta spel</button>
               <button id="btnLeave" class="ghost">Lämna lobby</button>
             </div>
-            <p id="lobbyHint" class="mut">Koppla Spotify och välj enhet innan start för uppspelning via Connect. QR-fallback finns.</p>
+            <p id="lobbyHint" class="mut">Filtren (år & spellistor) kommer från startsidan och kan inte ändras här.</p>
           </div>
         </div>
       </div>
@@ -127,7 +110,7 @@
     // ==== Firebase (RTDB) init ====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getDatabase, ref, set, get, child, onValue, update, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+    import { getDatabase, ref, set, get, child, onValue, update } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
@@ -145,10 +128,8 @@
     function route() {
       const hash = location.hash.replace(/^#/, "");
       const [path, id] = hash.split("/");
-      showSection("screenStart", !path);
       showSection("screenLobby", path === "lobby");
       showSection("screenJoin", path === "join");
-      if (!path) return;
       if (path === "lobby" && id) loadLobby(id);
       if (path === "join" && id) setupJoin(id);
     }
@@ -164,38 +145,6 @@
     });
     signInAnonymously(auth).catch(console.error);
 
-    // ==== Create Lobby ====
-    const btnCreate = document.getElementById('btnCreate');
-    const btnGotoJoin = document.getElementById('btnGotoJoin');
-    const btnSpotify = document.getElementById('btnSpotify');
-    const btnPickDevice = document.getElementById('btnPickDevice');
-
-    btnCreate.addEventListener('click', async ()=>{
-      const u = auth.currentUser; if(!u) return alert('Inte inloggad');
-      const yearMin = +document.getElementById('yearMin').value;
-      const yearMax = +document.getElementById('yearMax').value;
-      const tDrag = +document.getElementById('tDrag').value;
-      const tClaim = +document.getElementById('tClaim').value;
-      const tOpp = +document.getElementById('tOpp').value;
-      const tokensPerTeam = +document.getElementById('tokensPerTeam').value;
-
-      const gameId = (await push(ref(db, 'games'))).key;
-      const base = ref(db, `games/${gameId}`);
-      await set(child(base, 'phase'), 'lobby');
-      await set(child(base, 'hostId'), u.uid);
-      await set(child(base, 'settings'), {
-        yearMin, yearMax,
-        timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp },
-        tokensPerTeam, winCards: 11, allowLateJoin: false, dedupeKey: 'spotifyId'
-      });
-      location.hash = `lobby/${gameId}`;
-    });
-
-    btnGotoJoin.addEventListener('click', ()=>{
-      const gid = prompt('Ange gameId att joina:');
-      if(gid) location.hash = `join/${gid}`;
-    });
-
     // ==== Lobby view ====
     let lobbyUnsub = null;
     async function loadLobby(gameId){
@@ -204,13 +153,8 @@
       document.getElementById('joinUrl').textContent = joinUrl;
       document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(joinUrl)}`;
 
-      // enable Start when host + >=1 team
-      const startBtn = document.getElementById('btnStart');
-      const leaveBtn = document.getElementById('btnLeave');
-      leaveBtn.onclick = ()=> history.back();
-
-      if(lobbyUnsub) lobbyUnsub();
       const base = ref(db, `games/${gameId}`);
+      if(lobbyUnsub) lobbyUnsub();
       lobbyUnsub = onValue(base, snap=>{
         const v = snap.val()||{};
         // teams list
@@ -223,10 +167,39 @@
           div.textContent = `${t.name || '??'}${t.tokens!=null?' • '+t.tokens+' tok':''}`;
           teamsEl.appendChild(div);
         }
+        // summary (read-only filters from index)
+        const sel = v.settings || {};
+        const summary = [];
+        if(sel.yearMin!=null && sel.yearMax!=null) summary.push(`År: ${sel.yearMin}–${sel.yearMax}`);
+        if(Array.isArray(sel.standardListIds)) summary.push(`Standardlistor: ${sel.standardListIds.length}`);
+        if(Array.isArray(sel.userPlaylistIds)) summary.push(`Egna listor: ${sel.userPlaylistIds.length}`);
+        document.getElementById('selSummary').textContent = summary.length? summary.join(' • ') : 'Inga filter hittades (skrivs från startsidan)';
+
+        // fill timers/tokens inputs from settings
+        document.getElementById('tDrag').value = sel?.timers?.dragSec ?? 90;
+        document.getElementById('tClaim').value = sel?.timers?.challengePromptSec ?? 10;
+        document.getElementById('tOpp').value = sel?.timers?.oppDragSec ?? 20;
+        document.getElementById('tokensPerTeam').value = sel?.tokensPerTeam ?? 4;
+
         const isHost = auth.currentUser && v.hostId === auth.currentUser.uid;
-        startBtn.disabled = !(isHost && teams.length>=1);
-        startBtn.onclick = ()=> alert('Starta spel → (Cloud Function hostStart() kommer i nästa steg)');
+        document.getElementById('btnStart').disabled = !(isHost && teams.length>=1);
       });
+
+      document.getElementById('btnLeave').onclick = ()=> history.back();
+      document.getElementById('btnSaveSettings').onclick = async ()=>{
+        const u = auth.currentUser; if(!u) return alert('Inte inloggad');
+        const tDrag = +document.getElementById('tDrag').value;
+        const tClaim = +document.getElementById('tClaim').value;
+        const tOpp = +document.getElementById('tOpp').value;
+        const tokensPerTeam = +document.getElementById('tokensPerTeam').value;
+        await update(child(base,'settings'), {
+          timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp },
+          tokensPerTeam
+        });
+        alert('Sparat!');
+      };
+
+      document.getElementById('btnStart').onclick = ()=> alert('Starta spel → (Cloud Function hostStart() kommer i nästa steg)');
     }
 
     // ==== Join view ====
@@ -247,18 +220,17 @@
 
     // ==== Spotify PKCE (host) – minimal ====
     const SPOTIFY_CLIENT_ID = '3033344ef55647b8b70ef1dccfa7e65f';
-    const REDIRECT = (()=>{
-      // prefer /spotify/callback if present on this host; fallback to existing pathname + /callback
-      const base = location.origin;
-      return `${base}/spotify/callback`;
-    })();
+    const REDIRECT = `${location.origin}/spotify/callback`;
     const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state';
 
     function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
     async function sha256(txt){const data=new TextEncoder().encode(txt);return await crypto.subtle.digest('SHA-256',data)}
     function randStr(len){const arr=new Uint8Array(len);crypto.getRandomValues(arr);return Array.from(arr).map(b=>('0'+(b%36).toString(36)).slice(-1)).join('');}
 
-    btnSpotify.addEventListener('click', async ()=>{
+    const btnSpotify = document.getElementById('btnSpotify');
+    const btnPickDevice = document.getElementById('btnPickDevice');
+
+    btnSpotify?.addEventListener('click', async ()=>{
       const verifier = randStr(64);
       const challenge = b64url(await sha256(verifier));
       sessionStorage.setItem('sp_verifier', verifier);
@@ -273,7 +245,6 @@
       location.href = url.toString();
     });
 
-    // handle callback inline if we are on /spotify/callback
     (async function handleSpotifyCallback(){
       if(location.pathname !== '/spotify/callback') return;
       const code = new URLSearchParams(location.search).get('code');
@@ -296,8 +267,6 @@
           expires_at: Date.now() + (token.expires_in*1000 - 60000)
         }));
         history.replaceState({},'', location.origin + location.pathname); // drop query
-        // navigate to start or back to lobby hash
-        location.hash = location.hash || '';
         document.getElementById('spStatus').innerHTML = '<span class="ok">Spotify kopplad</span>';
         btnPickDevice.disabled = false;
       }catch(e){ spStatus.innerHTML = '<span class="err">Spotify-koppling misslyckades</span>'; console.error(e); }
@@ -307,7 +276,6 @@
       const raw = localStorage.getItem('sp_token'); if(!raw) throw new Error('Ej inloggad mot Spotify');
       const tok = JSON.parse(raw);
       if(Date.now() < tok.expires_at) return tok.access_token;
-      // refresh
       const res = await fetch('https://accounts.spotify.com/api/token',{
         method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:new URLSearchParams({ grant_type:'refresh_token', refresh_token:tok.refresh_token, client_id:SPOTIFY_CLIENT_ID })
@@ -318,7 +286,7 @@
       return tok.access_token;
     }
 
-    btnPickDevice.addEventListener('click', async ()=>{
+    btnPickDevice?.addEventListener('click', async ()=>{
       try{
         const at = await withToken();
         const r = await fetch('https://api.spotify.com/v1/me/player/devices',{ headers:{ Authorization: 'Bearer '+at }});
@@ -331,9 +299,6 @@
         document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
       }catch(e){ alert('Kunde inte hämta enheter'); console.error(e); }
     });
-
-    // ==== Boot ====
-    document.getElementById('screenStart').style.display = 'block';
 
   </script>
 </body>
