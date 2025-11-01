@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM –0.613 (TEST)</title>
+  <title>NOTESTREAM –0.614 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -38,8 +39,8 @@
     .checkbox-pill input[type="checkbox"]:checked + label{ background:#0b939c; border-color:#0b939c; }
     .divider { height:2px; background:#fff; width:100%; margin:.5rem 0; }
     .subheading{ display:block; width:100%; text-align:center; font-size:.8rem; color:#fff; margin:.5rem 0; }
-    .next-song-button, .answer-button { display:block; margin:0 auto; width:128px; background:#032934; color:#fff; border:none; border-radius:4px; font-size:1rem; cursor:pointer; }
-    .start-button { background: linear-gradient(to right, #fb1820, #ff6310); border: none; border-radius: 8px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all .2s ease-in-out; display:block; margin:0 auto; }
+    .next-song-button, .answer-button { display:block; margin:0 auto; width:180px; background:#032934; color:#fff; border:none; border-radius:8px; font-size:1rem; cursor:pointer; padding:.6rem .8rem; }
+    .start-button { background: linear-gradient(to right, #fb1820, #ff6310); border: none; border-radius: 10px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all .2s ease-in-out; display:block; margin:0 auto; }
     .start-button:hover { transform: scale(1.03); }
 
     /* Modaler */
@@ -73,7 +74,7 @@
       margin: 0 12px;
     }
     .timeline-pins {
-      position: relative; height: 26px; margin-top: 10px;
+      position: relative; height: 26px; margin-top: 10px; z-index: 2;
     }
     .pin {
       position: absolute; top: -9px; width: 10px; height: 26px; background:#0b939c; border-radius: 3px;
@@ -85,10 +86,10 @@
     }
 
     .drop-slot {
-      position: absolute; top: -10px; height: 28px; width: 24px; border: 2px dashed rgba(255,255,255,.5);
-      border-radius: 6px; transform: translateX(-50%); opacity: .7;
+      position: absolute; top: -10px; height: 28px; border: 2px dashed rgba(255,255,255,.6);
+      border-radius: 6px; transform: translateX(-50%); opacity: .7; z-index: 1;
     }
-    .drop-slot.active { border-color: #ffd166; background: rgba(255,209,102,.15); }
+    .drop-slot.active { border-color: #ffd166; background: rgba(255,209,102,.18); }
 
     #current-draggable {
       display: inline-block; padding: 8px 12px; background: #032934; color:#fff; border-radius: 8px; cursor: grab;
@@ -158,7 +159,7 @@
       <button id="startButton" class="start-button">Starta spel</button>
     </div>
 
-    <!-- Resultatsida (solo-läge kvar för bakåtkomp.) -->
+    <!-- Resultatsida (solo-läge) -->
     <div id="result-page">
       <div id="song-display"></div>
       <button id="nextSongSolo" class="next-song-button">Nästa låt</button>
@@ -235,347 +236,344 @@
     </div>
   </div>
 
-<script type="module">
-  /* ===========================
-     Firebase (single module)
-     =========================== */
-  import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  <script type="module">
+    /* ===========================
+       Firebase
+       =========================== */
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-  // 🔧 Peka alltid på TEST-instansen (notestreamfire)
-  const RTDB_URL = "https://notestreamfire.europe-west1.firebasedatabase.app";
+    // ✅ Hårdkodad testinstans
+    const HARDCODED_RTDB = "https://notestreamfire.europe-west1.firebasedatabase.app";
 
-  // ✅ Enda configen (ingen prod/test-växel)
-  const firebaseConfig = {
-    apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-    authDomain: "beatlinefirebase.firebaseapp.com",
-    databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
-    projectId: "beatlinefirebase",
-    storageBucket: "beatlinefirebase.firebasestorage.app",
-    messagingSenderId: "196231817325",
-    appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      storageBucket: "beatlinefirebase.firebasestorage.app",
+      messagingSenderId: "196231817325",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
 
-  // ✅ Init
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  const db  = getDatabase(app, RTDB_URL); // <-- tvinga rätt RTDB-instans
-  const auth = getAuth(app);
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const db  = getDatabase(app, "https://notestreamfire.europe-west1.firebasedatabase.app");
+    const auth = getAuth(app);
 
-  // Badge så du ser att du kör mot rätt DB
-  document.getElementById("envBadge").textContent = `RTDB: ${RTDB_URL}`;
+    document.getElementById("envBadge").textContent = `RTDB: ${HARDCODED_RTDB}`;
 
-  /* ===========================
-     Tillstånd & util
-     =========================== */
-  let standardSongs = [];
-  let userPlaylistSongs = [];
-  let songs = [];
-  let sourceFilteredSongs = [];
-  let currentFilteredSongs = [];
-  let shownSongs = [];
-  let currentSong = null;
-  let selectedSlotIndex = null; // valt gap-index
+    /* ===========================
+       Tillstånd & util
+       =========================== */
+    let standardSongs = [];
+    let userPlaylistSongs = [];
+    let songs = [];
+    let sourceFilteredSongs = [];
+    let currentFilteredSongs = [];
+    let shownSongs = [];
+    let currentSong = null;
+    let selectedSlotIndex = null; // valt gap-index
 
-  // Multiplayer state
-  window.isHost = false;
-  window.sessionId = null;
+    // Multiplayer state
+    window.isHost = false;
+    window.sessionId = null;
 
-  function setPage(id){
-    ["filter-page","result-page","lobby-page","join-page","game-page"].forEach(pid=>{
-      const el = document.getElementById(pid);
-      if (el) el.style.display = (pid===id) ? "block" : "none";
-    });
-  }
-
-  function joinURL(sessionId){
-    const url = new URL(location.href);
-    url.searchParams.set("join", sessionId);
-    return url.origin + url.pathname + "?" + url.searchParams.toString();
-  }
-
-  function currentStartEndYears(){
-    const s = document.getElementById("startYear");
-    const e = document.getElementById("endYear");
-    const startYear = s ? parseInt(s.value) : 1950;
-    const endYear   = e ? parseInt(e.value) : new Date().getFullYear();
-    return {startYear, endYear};
-  }
-
-  /* ===========================
-     Auth UI
-     =========================== */
-  function show(el){ el.style.display = 'flex'; }
-  function hide(el){ el.style.display = 'none'; }
-
-  document.getElementById("showRegister").addEventListener("click", ()=>{ hide(document.getElementById("loginModal")); show(document.getElementById("registerModal")); });
-  document.getElementById("showLogin").addEventListener("click", ()=>{ hide(document.getElementById("registerModal")); show(document.getElementById("loginModal")); });
-  document.getElementById("loginClose").addEventListener("click", ()=> hide(document.getElementById("loginModal")));
-  document.getElementById("registerClose").addEventListener("click", ()=> hide(document.getElementById("registerModal")));
-
-  document.getElementById("loginButton").addEventListener("click", () => {
-    const email = document.getElementById("emailInput").value.trim();
-    const password = document.getElementById("passwordInput").value;
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => document.getElementById("loginError").style.display = "none")
-      .catch(() => document.getElementById("loginError").style.display = "block");
-  });
-
-  document.getElementById("registerButton").addEventListener("click", () => {
-    const email = document.getElementById("regEmail").value.trim();
-    const password = document.getElementById("regPassword").value;
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => hide(document.getElementById("registerModal")))
-      .catch((error) => {
-        const el = document.getElementById("registerError");
-        el.textContent = error.message || "Registrering misslyckades"; el.style.display = "block";
+    function setPage(id){
+      ["filter-page","result-page","lobby-page","join-page","game-page"].forEach(pid=>{
+        const el = document.getElementById(pid);
+        if (el) el.style.display = (pid===id) ? "block" : "none";
       });
-  });
+    }
 
-  document.getElementById("forgotPasswordLink").addEventListener("click", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("emailInput").value.trim();
-    if (!email) return alert("Ange din e‑postadress.");
-    sendPasswordResetEmail(auth, email)
-      .then(() => alert("Återställningslänk skickad."))
-      .catch(err => alert("Fel: " + err.message));
-  });
+    function joinURL(sessionId){
+      const url = new URL(location.href);
+      url.searchParams.set("join", sessionId);
+      return url.origin + url.pathname + "?" + url.searchParams.toString();
+    }
 
-  /* ===========================
-     Data: läs spellistor
-     =========================== */
-  function initDataListeners() {
-    // Standardlistor (offentliga)
-    onValue(ref(db, 'standardLists'), (snapshot) => {
-      standardSongs = [];
-      if (snapshot.exists()) {
-        const raw = snapshot.val();
-        for (const playlistName in raw) {
-          const playlistData = raw[playlistName];
-          if (playlistData.songs) {
-            for (const trackId in playlistData.songs) {
-              standardSongs.push({ qr: trackId, ...playlistData.songs[trackId], source: [playlistName] });
-            }
-          }
-        }
-      }
-      mergeSongs();
+    function currentStartEndYears(){
+      const s = document.getElementById("startYear");
+      const e = document.getElementById("endYear");
+      const startYear = s ? parseInt(s.value) : 1950;
+      const endYear   = e ? parseInt(e.value) : new Date().getFullYear();
+      return {startYear, endYear};
+    }
+
+    /* ===========================
+       Auth UI
+       =========================== */
+    function show(el){ el.style.display = 'flex'; }
+    function hide(el){ el.style.display = 'none'; }
+
+    document.getElementById("showRegister").addEventListener("click", ()=>{ hide(document.getElementById("loginModal")); show(document.getElementById("registerModal")); });
+    document.getElementById("showLogin").addEventListener("click", ()=>{ hide(document.getElementById("registerModal")); show(document.getElementById("loginModal")); });
+    document.getElementById("loginClose").addEventListener("click", ()=> hide(document.getElementById("loginModal")));
+    document.getElementById("registerClose").addEventListener("click", ()=> hide(document.getElementById("registerModal")));
+
+    document.getElementById("loginButton").addEventListener("click", () => {
+      const email = document.getElementById("emailInput").value.trim();
+      const password = document.getElementById("passwordInput").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => document.getElementById("loginError").style.display = "none")
+        .catch(() => document.getElementById("loginError").style.display = "block");
     });
 
-    // Egna listor (privata per user)
-    onAuthStateChanged(auth, (user) => {
-      if (!user) return;
-      const uid = user.uid;
-      onValue(ref(db, `userPlaylists/${uid}`), (snap) => {
-        userPlaylistSongs = [];
-        if (snap.exists()) {
-          const data = snap.val();
-          for (const playlistName in data) {
-            const pl = data[playlistName];
-            if (pl.songs) {
-              for (const trackId in pl.songs) {
-                userPlaylistSongs.push({ qr: trackId, ...pl.songs[trackId], source: [playlistName] });
+    document.getElementById("registerButton").addEventListener("click", () => {
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => hide(document.getElementById("registerModal")))
+        .catch((error) => {
+          const el = document.getElementById("registerError");
+          el.textContent = error.message || "Registrering misslyckades"; el.style.display = "block";
+        });
+    });
+
+    document.getElementById("forgotPasswordLink").addEventListener("click", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("emailInput").value.trim();
+      if (!email) return alert("Ange din e‑postadress.");
+      sendPasswordResetEmail(auth, email)
+        .then(() => alert("Återställningslänk skickad."))
+        .catch(err => alert("Fel: " + err.message));
+    });
+
+    /* ===========================
+       Data: läs spellistor
+       =========================== */
+    function initDataListeners() {
+      // Standardlistor (offentliga)
+      onValue(ref(db, 'standardLists'), (snapshot) => {
+        standardSongs = [];
+        if (snapshot.exists()) {
+          const raw = snapshot.val();
+          for (const playlistName in raw) {
+            const playlistData = raw[playlistName];
+            if (playlistData.songs) {
+              for (const trackId in playlistData.songs) {
+                standardSongs.push({ qr: trackId, ...playlistData.songs[trackId], source: [playlistName] });
               }
             }
           }
         }
         mergeSongs();
       });
-    });
-  }
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      hide(document.getElementById("loginModal"));
-      hide(document.getElementById("registerModal"));
-      initDataListeners();
-      maybeAutoJoinFromURL();
-    } else {
-      show(document.getElementById("loginModal"));
-    }
-  });
-
-  /* ===========================
-     UI bygg: källor + årtal
-     =========================== */
-  function populateSourceCheckboxes() {
-    const container = document.getElementById("source-checkbox-container");
-    container.innerHTML = "";
-
-    // "Alla"
-    const allDiv = document.createElement("div");
-    allDiv.className = "checkbox-pill";
-    const cbAll = document.createElement("input"); cbAll.type = "checkbox"; cbAll.name="source"; cbAll.value="alla"; cbAll.id="source-alla";
-    const lbAll = document.createElement("label"); lbAll.setAttribute("for","source-alla"); lbAll.textContent = "Alla låtar";
-    cbAll.addEventListener("change", function(){
-      container.querySelectorAll('input[name="source"]').forEach(chk => { if (chk!==cbAll) chk.checked = cbAll.checked; });
-      updateYearSelection();
-    });
-    allDiv.appendChild(cbAll); allDiv.appendChild(lbAll); container.appendChild(allDiv);
-
-    const stdHeading = document.createElement("p"); stdHeading.className = "subheading"; stdHeading.textContent = "Standardlistor";
-    container.appendChild(stdHeading);
-
-    const stdSources = Array.from(new Set(standardSongs.map(s => s.source[0]))).sort();
-    stdSources.forEach(source => {
-      const wrap = document.createElement("div"); wrap.className = "checkbox-pill";
-      const cb = document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=source; cb.id="std-"+source.replace(/\s+/g,'-').toLowerCase();
-      const lb = document.createElement("label"); lb.setAttribute("for", cb.id); lb.textContent = source;
-      cb.addEventListener("change", updateYearSelection);
-      wrap.appendChild(cb); wrap.appendChild(lb); container.appendChild(wrap);
-    });
-
-    container.appendChild(document.createElement("div")).className="divider";
-
-    const userHeading = document.createElement("p"); userHeading.className="subheading"; userHeading.textContent="Egna spellistor";
-    container.appendChild(userHeading);
-
-    const usrSources = Array.from(new Set(userPlaylistSongs.map(s => s.source[0]))).filter(x => !stdSources.includes(x)).sort();
-    usrSources.forEach(source => {
-      const wrap = document.createElement("div"); wrap.className = "checkbox-pill";
-      const cb = document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=source; cb.id="usr-"+source.replace(/\s+/g,'-').toLowerCase();
-      const lb = document.createElement("label"); lb.setAttribute("for", cb.id); lb.textContent = source;
-      cb.addEventListener("change", updateYearSelection);
-      wrap.appendChild(cb); wrap.appendChild(lb); container.appendChild(wrap);
-    });
-
-    // År-dropdowns
-    const startDD = document.getElementById("startYear");
-    const endDD = document.getElementById("endYear");
-    startDD.innerHTML = ""; endDD.innerHTML = "";
-    const thisYear = new Date().getFullYear();
-    for (let y = 1950; y <= thisYear; y++){
-      const o1 = document.createElement("option"); o1.value=y; o1.textContent=y; if (y===1950) o1.selected=true;
-      const o2 = document.createElement("option"); o2.value=y; o2.textContent=y; if (y===thisYear) o2.selected=true;
-      startDD.appendChild(o1); endDD.appendChild(o2);
-    }
-    updateSongCount();
-  }
-
-  function mergeSongs(){
-    const merged = {};
-    standardSongs.forEach(s => { merged[s.qr] = { ...s, source:[...s.source] }; });
-    userPlaylistSongs.forEach(s => {
-      if (merged[s.qr]) merged[s.qr].source = [...new Set([...merged[s.qr].source, ...s.source])];
-      else merged[s.qr] = { ...s, year: s.customYear ?? s.year, source:[...s.source] };
-    });
-    songs = Object.values(merged);
-    window.songs = songs;
-    populateSourceCheckboxes();
-  }
-
-  function updateSongCount(){
-    const startYear = parseInt(document.getElementById("startYear").value);
-    const endYear   = parseInt(document.getElementById("endYear").value);
-    const cnt = sourceFilteredSongs.filter(s => +s.year >= startYear && +s.year <= endYear).length;
-    document.getElementById("selectedSongCount").textContent = `Valda låtar: ${cnt}`;
-  }
-
-  window.updateYearSelection = function(){
-    const checked = Array.from(document.querySelectorAll('input[name="source"]:checked')).map(x => x.value);
-    let selected = checked.includes("alla")
-      ? Array.from(new Set([...new Set(standardSongs.map(s=>s.source[0])), ...new Set(userPlaylistSongs.map(s=>s.source[0])), "alla"]))
-      : checked;
-
-    sourceFilteredSongs = songs.filter(song => song.source.some(src => selected.includes(src)));
-    window.sourceFilteredSongs = sourceFilteredSongs;
-    updateSongCount();
-  };
-
-  function displaySong(song){
-    const year = song.customYear ?? song.year;
-    const songDisplay = document.getElementById("song-display");
-    songDisplay.innerHTML = `
-      <div id="qrcode-${song.qr}" class="qrcode"></div>
-      <button class="answer-button" id="revealBtnSolo">Visa svar</button>
-      <div id="song-details" style="display:none; margin-top:1rem; font-weight:bold;">
-        <div class="year-container" style="text-align:center; width:100%;">
-          <span class="year-text" style="font-size:3em; color:#fff; text-shadow:0 0 8px #000;">${year||""}</span>
-        </div>
-        <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">${song.artist||""}<br>${song.title||""}</div>
-      </div>
-    `;
-    const el = document.getElementById(`qrcode-${song.qr}`);
-    el.innerHTML = "";
-    new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width:160, height:160 });
-
-    document.getElementById("revealBtnSolo").addEventListener("click", ()=>{
-      document.getElementById("song-details").style.display = "block";
-      document.getElementById("playlist-info").style.display = "block";
-    });
-    const info = document.getElementById("playlist-info");
-    if (info) info.textContent = "Spellistor: " + (song.source||[]).join(", ");
-  }
-
-  window.filterSongs = function(){
-    const startYear = parseInt(document.getElementById("startYear").value);
-    const endYear   = parseInt(document.getElementById("endYear").value);
-    currentFilteredSongs = sourceFilteredSongs.filter(s => +s.year >= startYear && +s.year <= endYear);
-    window.currentFilteredSongs = currentFilteredSongs;
-    shownSongs = [];
-    if (!currentFilteredSongs.length){
-      alert("Inga låtar i det här intervallet. Välj andra källor/årtal eller lägg till en spellista.");
-      return false;
-    }
-    nextSong();
-    return true;
-  };
-
-  function nextSong(){
-    const rem = currentFilteredSongs.filter(s => !shownSongs.includes(s));
-    if (!rem.length){ alert("Inga fler låtar."); return; }
-    const idx = Math.floor(Math.random() * rem.length);
-    currentSong = rem[idx];
-    shownSongs.push(currentSong);
-    displaySong(currentSong);
-  }
-  document.getElementById("nextSongSolo").addEventListener("click", nextSong);
-
-  /* ===========================
-     Spotify import (enkel)
-     =========================== */
-  async function getBackendSpotifyToken(){
-    const cached = localStorage.getItem('spotifyToken');
-    const exp = +localStorage.getItem('spotifyTokenExpiry');
-    if (cached && exp && Date.now() < exp) return cached;
-    const r = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', { method:'POST' });
-    if (!r.ok) return null;
-    const data = await r.json();
-    const token = data.access_token; const expiresIn = data.expires_in;
-    localStorage.setItem('spotifyToken', token);
-    localStorage.setItem('spotifyTokenExpiry', (Date.now()+expiresIn*1000-60000).toString());
-    return token;
-  }
-
-  async function fetchSpotifyPlaylist(playlistUrl){
-    const playlistId = playlistUrl.split("/playlist/")[1]?.split("?")[0];
-    if (!playlistId) throw new Error("Ogiltig playlist‑länk.");
-    const token = await getBackendSpotifyToken();
-    let tracks = {}, nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-    while (nextUrl){
-      const resp = await fetch(nextUrl, { headers:{ Authorization:`Bearer ${token}` }});
-      const data = await resp.json();
-      (data.items||[]).forEach(item=>{
-        const t = item.track; if (!t || !t.id) return;
-        tracks[t.id] = { title: t.name, artist: t.artists.map(a=>a.name).join(", "), year: t.album.release_date?.slice(0,4) ?? "" };
+      // Egna listor (privata per user)
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const uid = user.uid;
+        onValue(ref(db, `userPlaylists/${uid}`), (snap) => {
+          userPlaylistSongs = [];
+          if (snap.exists()) {
+            const data = snap.val();
+            for (const playlistName in data) {
+              const pl = data[playlistName];
+              if (pl.songs) {
+                for (const trackId in pl.songs) {
+                  userPlaylistSongs.push({ qr: trackId, ...pl.songs[trackId], source: [playlistName] });
+                }
+              }
+            }
+          }
+          mergeSongs();
+        });
       });
-      nextUrl = data.next;
     }
-    return tracks;
-  }
 
-  document.getElementById("addPlaylistButton").addEventListener("click", async ()=>{
-    try{
-      const name = document.getElementById("playlistNameInput").value.trim();
-      const link = document.getElementById("playlistLinkInput").value.trim();
-      if (!name || !link) return alert("Fyll i både namn och länk.");
-      const tracks = await fetchSpotifyPlaylist(link);
-      const uid = auth.currentUser?.uid;
-      if (!uid) return alert("Logga in först.");
-      await set(ref(db, `userPlaylists/${uid}/${name}`), { songs: tracks });
-      alert(`Spellistan "${name}" har lagts till.`);
-    }catch(e){ console.error(e); alert("Kunde inte lägga till spellistan."); }
-  });
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        hide(document.getElementById("loginModal"));
+        hide(document.getElementById("registerModal"));
+        initDataListeners();
+        maybeAutoJoinFromURL();
+      } else {
+        show(document.getElementById("loginModal"));
+      }
+    });
+
+    /* ===========================
+       UI bygg: källor + årtal
+       =========================== */
+    function populateSourceCheckboxes() {
+      const container = document.getElementById("source-checkbox-container");
+      container.innerHTML = "";
+
+      // "Alla"
+      const allDiv = document.createElement("div");
+      allDiv.className = "checkbox-pill";
+      const cbAll = document.createElement("input"); cbAll.type = "checkbox"; cbAll.name="source"; cbAll.value="alla"; cbAll.id="source-alla";
+      const lbAll = document.createElement("label"); lbAll.setAttribute("for","source-alla"); lbAll.textContent = "Alla låtar";
+      cbAll.addEventListener("change", function(){
+        container.querySelectorAll('input[name="source"]').forEach(chk => { if (chk!==cbAll) chk.checked = cbAll.checked; });
+        updateYearSelection();
+      });
+      allDiv.appendChild(cbAll); allDiv.appendChild(lbAll); container.appendChild(allDiv);
+
+      const stdHeading = document.createElement("p"); stdHeading.className = "subheading"; stdHeading.textContent = "Standardlistor";
+      container.appendChild(stdHeading);
+
+      const stdSources = Array.from(new Set(standardSongs.map(s => s.source[0]))).sort();
+      stdSources.forEach(source => {
+        const wrap = document.createElement("div"); wrap.className = "checkbox-pill";
+        const cb = document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=source; cb.id="std-"+source.replace(/\s+/g,'-').toLowerCase();
+        const lb = document.createElement("label"); lb.setAttribute("for", cb.id); lb.textContent = source;
+        cb.addEventListener("change", updateYearSelection);
+        wrap.appendChild(cb); wrap.appendChild(lb); container.appendChild(wrap);
+      });
+
+      container.appendChild(document.createElement("div")).className="divider";
+
+      const userHeading = document.createElement("p"); userHeading.className="subheading"; userHeading.textContent="Egna spellistor";
+      container.appendChild(userHeading);
+
+      const usrSources = Array.from(new Set(userPlaylistSongs.map(s => s.source[0]))).filter(x => !stdSources.includes(x)).sort();
+      usrSources.forEach(source => {
+        const wrap = document.createElement("div"); wrap.className = "checkbox-pill";
+        const cb = document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=source; cb.id="usr-"+source.replace(/\s+/g,'-').toLowerCase();
+        const lb = document.createElement("label"); lb.setAttribute("for", cb.id); lb.textContent = source;
+        cb.addEventListener("change", updateYearSelection);
+        wrap.appendChild(cb); wrap.appendChild(lb); container.appendChild(wrap);
+      });
+
+      // År-dropdowns
+      const startDD = document.getElementById("startYear");
+      const endDD = document.getElementById("endYear");
+      startDD.innerHTML = ""; endDD.innerHTML = "";
+      const thisYear = new Date().getFullYear();
+      for (let y = 1950; y <= thisYear; y++){
+        const o1 = document.createElement("option"); o1.value=y; o1.textContent=y; if (y===1950) o1.selected=true;
+        const o2 = document.createElement("option"); o2.value=y; o2.textContent=y; if (y===thisYear) o2.selected=true;
+        startDD.appendChild(o1); endDD.appendChild(o2);
+      }
+      updateSongCount();
+    }
+
+    function mergeSongs(){
+      const merged = {};
+      standardSongs.forEach(s => { merged[s.qr] = { ...s, source:[...s.source] }; });
+      userPlaylistSongs.forEach(s => {
+        if (merged[s.qr]) merged[s.qr].source = [...new Set([...merged[s.qr].source, ...s.source])];
+        else merged[s.qr] = { ...s, year: s.customYear ?? s.year, source:[...s.source] };
+      });
+      songs = Object.values(merged);
+      window.songs = songs;
+      populateSourceCheckboxes();
+    }
+
+    function updateSongCount(){
+      const startYear = parseInt(document.getElementById("startYear").value);
+      const endYear   = parseInt(document.getElementById("endYear").value);
+      const cnt = sourceFilteredSongs.filter(s => +s.year >= startYear && +s.year <= endYear).length;
+      document.getElementById("selectedSongCount").textContent = `Valda låtar: ${cnt}`;
+    }
+
+    window.updateYearSelection = function(){
+      const checked = Array.from(document.querySelectorAll('input[name="source"]:checked')).map(x => x.value);
+      let selected = checked.includes("alla")
+        ? Array.from(new Set([...new Set(standardSongs.map(s=>s.source[0])), ...new Set(userPlaylistSongs.map(s=>s.source[0])), "alla"]))
+        : checked;
+
+      sourceFilteredSongs = songs.filter(song => song.source.some(src => selected.includes(src)));
+      window.sourceFilteredSongs = sourceFilteredSongs;
+      updateSongCount();
+    };
+
+    function displaySong(song){
+      const year = song.customYear ?? song.year;
+      const songDisplay = document.getElementById("song-display");
+      songDisplay.innerHTML = `
+        <div id="qrcode-${song.qr}" class="qrcode"></div>
+        <button class="answer-button" id="revealBtnSolo">Visa svar</button>
+        <div id="song-details" style="display:none; margin-top:1rem; font-weight:bold;">
+          <div class="year-container" style="text-align:center; width:100%;">
+            <span class="year-text" style="font-size:3em; color:#fff; text-shadow:0 0 8px #000;">${year||""}</span>
+          </div>
+          <div class="info" style="font-size:1.2em; color:#fff; text-shadow:0 0 8px #000;">${song.artist||""}<br>${song.title||""}</div>
+        </div>
+      `;
+      const el = document.getElementById(`qrcode-${song.qr}`);
+      el.innerHTML = "";
+      new QRCode(el, { text: `https://open.spotify.com/track/${song.qr}`, width:160, height:160 });
+
+      document.getElementById("revealBtnSolo").addEventListener("click", ()=>{
+        document.getElementById("song-details").style.display = "block";
+        document.getElementById("playlist-info").style.display = "block";
+      });
+      const info = document.getElementById("playlist-info");
+      if (info) info.textContent = "Spellistor: " + (song.source||[]).join(", ");
+    }
+
+    window.filterSongs = function(){
+      const startYear = parseInt(document.getElementById("startYear").value);
+      const endYear   = parseInt(document.getElementById("endYear").value);
+      currentFilteredSongs = sourceFilteredSongs.filter(s => +s.year >= startYear && +s.year <= endYear);
+      window.currentFilteredSongs = currentFilteredSongs;
+      shownSongs = [];
+      if (!currentFilteredSongs.length){
+        alert("Inga låtar i det här intervallet. Välj andra källor/årtal eller lägg till en spellista.");
+        return false;
+      }
+      nextSong();
+      return true;
+    };
+
+    function nextSong(){
+      const rem = currentFilteredSongs.filter(s => !shownSongs.includes(s));
+      if (!rem.length){ alert("Inga fler låtar."); return; }
+      const idx = Math.floor(Math.random() * rem.length);
+      currentSong = rem[idx];
+      shownSongs.push(currentSong);
+      displaySong(currentSong);
+    }
+    document.getElementById("nextSongSolo").addEventListener("click", nextSong);
+
+    /* ===========================
+       Spotify import (enkel)
+       =========================== */
+    async function getBackendSpotifyToken(){
+      const cached = localStorage.getItem('spotifyToken');
+      const exp = +localStorage.getItem('spotifyTokenExpiry');
+      if (cached && exp && Date.now() < exp) return cached;
+      const r = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', { method:'POST' });
+      if (!r.ok) return null;
+      const data = await r.json();
+      const token = data.access_token; const expiresIn = data.expires_in;
+      localStorage.setItem('spotifyToken', token);
+      localStorage.setItem('spotifyTokenExpiry', (Date.now()+expiresIn*1000-60000).toString());
+      return token;
+    }
+
+    async function fetchSpotifyPlaylist(playlistUrl){
+      const playlistId = playlistUrl.split("/playlist/")[1]?.split("?")[0];
+      if (!playlistId) throw new Error("Ogiltig playlist‑länk.");
+      const token = await getBackendSpotifyToken();
+      let tracks = {}, nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+      while (nextUrl){
+        const resp = await fetch(nextUrl, { headers:{ Authorization:`Bearer ${token}` }});
+        const data = await resp.json();
+        (data.items||[]).forEach(item=>{
+          const t = item.track; if (!t || !t.id) return;
+          tracks[t.id] = { title: t.name, artist: t.artists.map(a=>a.name).join(", "), year: t.album.release_date?.slice(0,4) ?? "" };
+        });
+        nextUrl = data.next;
+      }
+      return tracks;
+    }
+
+    document.getElementById("addPlaylistButton").addEventListener("click", async ()=>{
+      try{
+        const name = document.getElementById("playlistNameInput").value.trim();
+        const link = document.getElementById("playlistLinkInput").value.trim();
+        if (!name || !link) return alert("Fyll i både namn och länk.");
+        const tracks = await fetchSpotifyPlaylist(link);
+        const uid = auth.currentUser?.uid;
+        if (!uid) return alert("Logga in först.");
+        await set(ref(db, `userPlaylists/${uid}/${name}`), { songs: tracks });
+        alert(`Spellistan "${name}" har lagts till.`);
+      }catch(e){ console.error(e); alert("Kunde inte lägga till spellistan."); }
+    });
 
     /* ===========================
        Lobby / Multiplayer
@@ -826,7 +824,7 @@
       await update(ref(db), updates);
     }
 
-    // ===== Timeline helpers =====
+    /* ===== Placement helpers ===== */
     function getActiveTeamInfo(session) {
       const order = (session.turn && session.turn.order) || [];
       const idx = (session.turn && typeof session.turn.activeIndex === 'number') ? session.turn.activeIndex : 0;
@@ -861,194 +859,186 @@
       return gaps;
     }
 
-    
-function isPlacementCorrect(gap, yearNum) {
-  const y = parseInt(yearNum) || 0;
-  const ly = gap.left ? (parseInt(gap.left.year) || 0) : null;
-  const ry = gap.right ? (parseInt(gap.right.year) || 0) : null;
+    function isPlacementCorrect(gap, yearNum) {
+      const y  = parseInt(yearNum) || 0;
+      const ly = gap.left  ? (parseInt(gap.left.year)  || 0) : null;
+      const ry = gap.right ? (parseInt(gap.right.year) || 0) : null;
 
-  // If both sides exist and are equal (e.g., 1970 | 1970), only the exact year fits
-  if (ly !== null && ry !== null && ly === ry) {
-    return y === ly;
-  }
+      if (ly !== null && ry !== null && ly === ry) return y === ly; // endast exakt år
 
-  // Inclusive bounds: allow equal to left or right boundary
-  const leftOK  = (ly === null) || (y >= ly);
-  const rightOK = (ry === null) || (y <= ry);
-  return leftOK && rightOK;
-}
-
-
-    
-function renderTimeline(session) {
-  const wrap = document.getElementById("timeline-wrap");
-  const bar = document.getElementById("timeline-bar");
-  const pins = document.getElementById("timeline-pins");
-  const feedback = document.getElementById("placement-feedback");
-  const startLbl = document.getElementById("tl-start-label");
-  const endLbl = document.getElementById("tl-end-label");
-  const dragInstruction = document.getElementById("drag-instruction");
-  const draggable = document.getElementById("current-draggable");
-
-  if (!wrap || !bar || !pins) return;
-
-  const cur = session.current;
-  const { activeTid, activeTeam } = getActiveTeamInfo(session);
-  const isHostClient = window.isHost === true;
-
-  if (!cur || !cur.trackId) {
-    wrap.style.display = "none";
-    return;
-  }
-  wrap.style.display = "block";
-  feedback.textContent = "";
-  selectedSlotIndex = null;
-
-  const sY = session?.settings?.startYear ?? 1950;
-  const eY = session?.settings?.endYear ?? new Date().getFullYear();
-  startLbl.textContent = sY;
-  endLbl.textContent = eY;
-
-  const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
-
-  pins.innerHTML = "";
-  const barRect = bar.getBoundingClientRect();
-  const levelOffsets = [-8, 0, 8];
-  let pinIndex = 0;
-
-  // Draw pins at exact year X; only vertical staggering to prevent overlap
-  sortedTL.forEach(item => {
-    const nx = normalizeYear(session, item.year);
-    const el = document.createElement("div");
-    el.className = "pin";
-    el.style.left = `${nx * 100}%`;
-
-    const level = levelOffsets[pinIndex % levelOffsets.length];
-    pinIndex++;
-    el.style.top = `${-9 + level}px`;
-
-    const lab = document.createElement("div");
-    lab.className = "pin-label";
-    lab.style.top = `${28 + level}px`;
-    lab.textContent = item.year;
-    el.appendChild(lab);
-    pins.appendChild(el);
-  });
-
-  // Build drop slots using year positions; width reflects gap (min 36px)
-  const gaps = buildDropSlots(session, sortedTL);
-  Array.from(bar.querySelectorAll(".drop-slot")).forEach(n=>n.remove());
-
-  gaps.forEach((gap) => {
-    const leftPos  = gap.left  ? normalizeYear(session, gap.left.year)  : 0;
-    const rightPos = gap.right ? normalizeYear(session, gap.right.year) : 1;
-    const mid = (leftPos + rightPos) / 2;
-
-    const slot = document.createElement("div");
-    slot.className = "drop-slot";
-    slot.style.left = `${mid * 100}%`;
-    slot.dataset.index = String(gap.index);
-
-    const minWidthPx = 36;
-    const gapPx = Math.max(minWidthPx, (rightPos - leftPos) * barRect.width * 0.6);
-    slot.style.width = `${gapPx}px`;
-
-    // Visual hint
-    slot.title = `${gap.left ? gap.left.year : sY} – ${gap.right ? gap.right.year : eY}`;
-
-    if (isHostClient) {
-      slot.addEventListener("dragover", (ev) => {
-        ev.preventDefault();
-        slot.classList.add("active");
-      });
-      slot.addEventListener("dragleave", () => slot.classList.remove("active"));
-      slot.addEventListener("drop", (ev) => {
-        ev.preventDefault();
-        slot.classList.remove("active");
-        selectedSlotIndex = gap.index;
-        const songYear = session.songMap?.[cur.trackId]?.year || "";
-        const ok = isPlacementCorrect(gap, parseInt(songYear));
-        feedback.textContent = ok ? "✅ Rimlig placering (mellan rätt spann)" : "⚠️ Troligen fel placering (utanför rätt spann)";
-      });
+      const leftOK  = (ly === null) || (y >= ly);
+      const rightOK = (ry === null) || (y <= ry);
+      return leftOK && rightOK;
     }
-    bar.appendChild(slot);
-  });
 
-  if (isHostClient) {
-    dragInstruction.textContent = "Aktivt lag: dra kortet till rätt plats i tidslinjen";
-    draggable.style.display = "inline-block";
-  } else {
-    dragInstruction.textContent = "Vänta på att värden placerar låten i tidslinjen";
-    draggable.style.display = "none";
-  }
+    function renderTimeline(session) {
+      const wrap = document.getElementById("timeline-wrap");
+      const bar = document.getElementById("timeline-bar");
+      const pins = document.getElementById("timeline-pins");
+      const feedback = document.getElementById("placement-feedback");
+      const startLbl = document.getElementById("tl-start-label");
+      const endLbl = document.getElementById("tl-end-label");
+      const dragInstruction = document.getElementById("drag-instruction");
+      const draggable = document.getElementById("current-draggable");
 
-  if (isHostClient) {
-    draggable.addEventListener("dragstart", (ev) => {
-      ev.dataTransfer.setData("text/plain", cur.trackId);
-    }, { once: true });
-  }
-}
- 
-async function confirmPlacementHandler(){
-  const sid = window.sessionId;
-  const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
-  const sess = sSnap.val();
+      if (!wrap || !bar || !pins) return;
 
-  const { activeTid, activeTeam } = getActiveTeamInfo(sess);
-  const cur = sess.current;
-  if (!cur || !cur.trackId) return alert("Ingen låt att placera.");
-  if (selectedSlotIndex == null) return alert("Välj en plats på tidslinjen först (släpp kortet i en markerad ruta).");
+      const cur = session.current;
+      const { activeTid, activeTeam } = getActiveTeamInfo(session);
+      const isHostClient = window.isHost === true;
 
-  const songMeta = sess.songMap?.[cur.trackId] || { year: "" };
-  const songYear = parseInt(songMeta.year)||0;
+      if (!cur || !cur.trackId) {
+        wrap.style.display = "none";
+        return;
+      }
+      wrap.style.display = "block";
+      feedback.textContent = "";
+      selectedSlotIndex = null;
 
-  const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
-  const gaps = buildDropSlots(sess, sortedTL);
-  const chosenGap = gaps.find(g => g.index === selectedSlotIndex);
-  if (!chosenGap) return alert("Ogiltig slot.");
+      const sY = session?.settings?.startYear ?? 1950;
+      const eY = session?.settings?.endYear ?? new Date().getFullYear();
+      startLbl.textContent = sY;
+      endLbl.textContent = eY;
 
-  const correct = isPlacementCorrect(chosenGap, songYear);
+      const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
 
-  const newTL = (activeTeam.timeline || []).slice();
-  newTL.push({ trackId: cur.trackId, year: songMeta.year });
+      pins.innerHTML = "";
+      const barRect = bar.getBoundingClientRect();
+      const levelOffsets = [-8, 0, 8];
+      let pinIndex = 0;
 
-  const deck = sess.deck || []; 
-  const shown = sess.shown || {};
-  const nextId = deck.find(id => !shown[id] && id !== cur.trackId);
+      // Pins på exakt år-X; vertikal stege för att undvika överlapp
+      sortedTL.forEach(item => {
+        const nx = normalizeYear(session, item.year);
+        const el = document.createElement("div");
+        el.className = "pin";
+        el.style.left = `${nx * 100}%`;
 
-  const updates = {};
-  const teamPath = `sessions/${sid}/teams/${activeTid}`;
+        const level = levelOffsets[pinIndex % levelOffsets.length];
+        pinIndex++;
+        el.style.top = `${-9 + level}px`;
 
-  if (correct) {
-    updates[`${teamPath}/score`] = (activeTeam.score || 0) + 1;
-  }
-  updates[`${teamPath}/timeline`] = newTL;
-  updates[`sessions/${sid}/shown/${cur.trackId}`] = true;
+        const lab = document.createElement("div");
+        lab.className = "pin-label";
+        lab.style.top = `${28 + level}px`;
+        lab.textContent = item.year;
+        el.appendChild(lab);
+        pins.appendChild(el);
+      });
 
-  const order = sess.turn.order || [];
-  const nextIdx = (sess.turn.activeIndex + 1) % (order.length || 1);
-  updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
+      // Drop-slots mitt i varje gap; bredd speglar gap-storlek, hoppa över micro-gap
+      const gaps = buildDropSlots(session, sortedTL);
+      Array.from(bar.querySelectorAll(".drop-slot")).forEach(n=>n.remove());
 
-  if (nextId) {
-    // 1) markera nuvarande som visad (undvik ancestor/descendant-krock)
-    await update(ref(db, `sessions/${sid}/current`), { revealed: true });
-    // 2) gå vidare till nästa + övriga updates i en separat update()
-    updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
-    await update(ref(db), updates);
-  } else {
-    await update(ref(db, `sessions/${sid}/current`), { revealed: true });
-    updates[`sessions/${sid}/status`] = "finished";
-    await update(ref(db), updates);
-  }
+      gaps.forEach((gap) => {
+        const leftPos  = gap.left  ? normalizeYear(session, gap.left.year)  : 0;
+        const rightPos = gap.right ? normalizeYear(session, gap.right.year) : 1;
 
-  selectedSlotIndex = null;
-  const feedback = document.getElementById("placement-feedback");
-  if (feedback) feedback.textContent = correct ? "✅ Rätt! Poäng till laget." : "❌ Fel placering.";
-}
+        const gapPxExact = (rightPos - leftPos) * barRect.width;
+        if (gapPxExact < 18) return; // hoppa över mikrogap
 
-/* ===========================
+        const mid = (leftPos + rightPos) / 2;
+
+        const slot = document.createElement("div");
+        slot.className = "drop-slot";
+        slot.style.left = `${mid * 100}%`;
+        slot.dataset.index = String(gap.index);
+
+        const SAFE = 22; // px marginal från pins
+        const minW = 28, maxW = 90;
+        const widthPx = Math.max(minW, Math.min(maxW, Math.max(0, gapPxExact - SAFE)));
+        slot.style.width = `${widthPx}px`;
+
+        slot.title = `${gap.left ? gap.left.year : sY} – ${gap.right ? gap.right.year : eY}`;
+
+        if (isHostClient) {
+          slot.addEventListener("dragover", (ev) => { ev.preventDefault(); slot.classList.add("active"); });
+          slot.addEventListener("dragleave", () => slot.classList.remove("active"));
+          slot.addEventListener("drop", (ev) => {
+            ev.preventDefault();
+            slot.classList.remove("active");
+            selectedSlotIndex = gap.index;
+            const songYear = session.songMap?.[cur.trackId]?.year || "";
+            const ok = isPlacementCorrect(gap, parseInt(songYear));
+            feedback.textContent = ok ? "✅ Rimlig placering (mellan rätt spann)" : "⚠️ Troligen fel placering (utanför rätt spann)";
+          });
+        }
+        bar.appendChild(slot);
+      });
+
+      if (isHostClient) {
+        dragInstruction.textContent = "Aktivt lag: dra kortet till rätt plats i tidslinjen";
+        draggable.style.display = "inline-block";
+      } else {
+        dragInstruction.textContent = "Vänta på att värden placerar låten i tidslinjen";
+        draggable.style.display = "none";
+      }
+
+      if (isHostClient) {
+        draggable.addEventListener("dragstart", (ev) => {
+          ev.dataTransfer.setData("text/plain", cur.trackId);
+        }); // inte { once:true } – behövs flera gånger
+      }
+    }
+
+    async function confirmPlacementHandler(){
+      const sid = window.sessionId;
+      const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
+      const sess = sSnap.val();
+
+      const { activeTid, activeTeam } = getActiveTeamInfo(sess);
+      const cur = sess.current;
+      if (!cur || !cur.trackId) return alert("Ingen låt att placera.");
+      if (selectedSlotIndex == null) return alert("Välj en plats på tidslinjen först (släpp kortet i en markerad ruta).");
+
+      const songMeta = sess.songMap?.[cur.trackId] || { year: "" };
+      const songYear = parseInt(songMeta.year)||0;
+
+      const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
+      const gaps = buildDropSlots(sess, sortedTL);
+      const chosenGap = gaps.find(g => g.index === selectedSlotIndex);
+      if (!chosenGap) return alert("Ogiltig slot.");
+
+      const correct = isPlacementCorrect(chosenGap, songYear);
+
+      const newTL = (activeTeam.timeline || []).slice();
+      newTL.push({ trackId: cur.trackId, year: songMeta.year });
+
+      const deck = sess.deck || []; const shown = sess.shown || {};
+      const nextId = deck.find(id => !shown[id] && id !== cur.trackId);
+
+      const updates = {};
+      const teamPath = `sessions/${sid}/teams/${activeTid}`;
+
+      if (correct) {
+        updates[`${teamPath}/score`] = (activeTeam.score || 0) + 1;
+      }
+      updates[`${teamPath}/timeline`] = newTL;
+      updates[`sessions/${sid}/shown/${cur.trackId}`] = true;
+
+      const order = sess.turn.order || [];
+      const nextIdx = (sess.turn.activeIndex + 1) % (order.length || 1);
+      updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
+
+      if (nextId) {
+        // 1) Markera nuvarande som visad
+        await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+        // 2) Gå vidare till nästa
+        updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
+        await update(ref(db), updates);
+      } else {
+        await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+        updates[`sessions/${sid}/status`] = "finished";
+        await update(ref(db), updates);
+      }
+
+      selectedSlotIndex = null;
+      const feedback = document.getElementById("placement-feedback");
+      if (feedback) feedback.textContent = correct ? "✅ Rätt! Poäng till laget." : "❌ Fel placering.";
+    }
+
+    /* ===========================
        Starta spel (override)
-
        =========================== */
     async function onStartGame(){
       if (!document.querySelectorAll("input[name='source']:checked").length){
