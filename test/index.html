@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM –0.611 (TEST)</title>
+  <title>NOTESTREAM –0.612 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -861,12 +861,23 @@
       return gaps;
     }
 
-    function isPlacementCorrect(gap, yearNum) {
-      const y = parseInt(yearNum)||0;
-      const leftOK  = !gap.left  || (y >  parseInt(gap.left.year)||0);
-      const rightOK = !gap.right || (y <  parseInt(gap.right.year)||0);
-      return leftOK && rightOK;
-    }
+    
+function isPlacementCorrect(gap, yearNum) {
+  const y = parseInt(yearNum) || 0;
+  const ly = gap.left ? (parseInt(gap.left.year) || 0) : null;
+  const ry = gap.right ? (parseInt(gap.right.year) || 0) : null;
+
+  // If both sides exist and are equal (e.g., 1970 | 1970), only the exact year fits
+  if (ly !== null && ry !== null && ly === ry) {
+    return y === ly;
+  }
+
+  // Inclusive bounds: allow equal to left or right boundary
+  const leftOK  = (ly === null) || (y >= ly);
+  const rightOK = (ry === null) || (y <= ry);
+  return leftOK && rightOK;
+}
+
 
     function renderTimeline(session) {
       const wrap = document.getElementById("timeline-wrap");
