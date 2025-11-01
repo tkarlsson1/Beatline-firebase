@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM –0.612 (TEST)</title>
+  <title>NOTESTREAM –0.613 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -879,121 +879,118 @@ function isPlacementCorrect(gap, yearNum) {
 }
 
 
-    function renderTimeline(session) {
-      const wrap = document.getElementById("timeline-wrap");
-      const bar = document.getElementById("timeline-bar");
-      const pins = document.getElementById("timeline-pins");
-      const feedback = document.getElementById("placement-feedback");
-      const startLbl = document.getElementById("tl-start-label");
-      const endLbl = document.getElementById("tl-end-label");
-      const dragInstruction = document.getElementById("drag-instruction");
-      const draggable = document.getElementById("current-draggable");
-
-      if (!wrap || !bar || !pins) return;
-
-      const cur = session.current;
-      const { activeTid, activeTeam } = getActiveTeamInfo(session);
-      const isHostClient = window.isHost === true;
-
-      if (!cur || !cur.trackId) {
-        wrap.style.display = "none";
-        return;
-      }
-      wrap.style.display = "block";
-      feedback.textContent = "";
-      selectedSlotIndex = null;
-
-      const sY = session?.settings?.startYear ?? 1950;
-      const eY = session?.settings?.endYear ?? new Date().getFullYear();
-      startLbl.textContent = sY;
-      endLbl.textContent = eY;
-
-      const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
-
-      
-      pins.innerHTML = "";
-      const barRect = bar.getBoundingClientRect();
-      const minPx = 26; // min horizontal spacing between pins
-      const placedPx = []; // already placed pin x (px) for collision checks
-
-      sortedTL.forEach(item => {
-        // Desired normalized position from year
-        let nx = normalizeYear(session, item.year);
-        // Convert to px position along the bar
-        let px = nx * barRect.width;
-
-        // Nudge to the right until we have enough spacing from previous pins
-        for (let tries = 0; tries < 50; tries++) {
-          const collides = placedPx.some(prev => Math.abs(px - prev) < minPx);
-          if (!collides) break;
-          px += minPx; // push to the right
-        }
-        // Clamp to bar width bounds
-        if (px < 0) px = 0;
-        if (px > barRect.width) px = barRect.width;
-
-        // Convert back to percent
-        nx = px / barRect.width;
-        placedPx.push(px);
-
-        const el = document.createElement("div");
-        el.className = "pin";
-        el.style.left = `${nx * 100}%`;
-
-        const lab = document.createElement("div");
-        lab.className = "pin-label";
-        lab.textContent = item.year;
-        el.appendChild(lab);
-        pins.appendChild(el);
-      });
-const gaps = buildDropSlots(session, sortedTL);
-      Array.from(bar.querySelectorAll(".drop-slot")).forEach(n=>n.remove());
-
-      gaps.forEach((gap) => {
-        const leftPos  = gap.left  ? normalizeYear(session, gap.left.year)  : 0;
-        const rightPos = gap.right ? normalizeYear(session, gap.right.year) : 1;
-        const mid = (leftPos + rightPos) / 2;
-
-        const slot = document.createElement("div");
-        slot.className = "drop-slot";
-        slot.style.left = `${mid * 100}%`;
-        slot.dataset.index = String(gap.index);
-
-        if (isHostClient) {
-          slot.addEventListener("dragover", (ev) => {
-            ev.preventDefault();
-            slot.classList.add("active");
-          });
-          slot.addEventListener("dragleave", () => slot.classList.remove("active"));
-          slot.addEventListener("drop", (ev) => {
-            ev.preventDefault();
-            slot.classList.remove("active");
-            selectedSlotIndex = gap.index;
-            const songYear = session.songMap?.[cur.trackId]?.year || "";
-            const ok = isPlacementCorrect(gap, parseInt(songYear));
-            feedback.textContent = ok ? "✅ Rimlig placering (mellan rätt spann)" : "⚠️ Troligen fel placering (utanför rätt spann)";
-          });
-        }
-        bar.appendChild(slot);
-      });
-
-      if (isHostClient) {
-        dragInstruction.textContent = "Aktivt lag: dra kortet till rätt plats i tidslinjen";
-        draggable.style.display = "inline-block";
-      } else {
-        dragInstruction.textContent = "Vänta på att värden placerar låten i tidslinjen";
-        draggable.style.display = "none";
-      }
-
-      if (isHostClient) {
-        draggable.addEventListener("dragstart", (ev) => {
-          ev.dataTransfer.setData("text/plain", cur.trackId);
-        }, { once: true });
-      }
-    }
-
     
+function renderTimeline(session) {
+  const wrap = document.getElementById("timeline-wrap");
+  const bar = document.getElementById("timeline-bar");
+  const pins = document.getElementById("timeline-pins");
+  const feedback = document.getElementById("placement-feedback");
+  const startLbl = document.getElementById("tl-start-label");
+  const endLbl = document.getElementById("tl-end-label");
+  const dragInstruction = document.getElementById("drag-instruction");
+  const draggable = document.getElementById("current-draggable");
+
+  if (!wrap || !bar || !pins) return;
+
+  const cur = session.current;
+  const { activeTid, activeTeam } = getActiveTeamInfo(session);
+  const isHostClient = window.isHost === true;
+
+  if (!cur || !cur.trackId) {
+    wrap.style.display = "none";
+    return;
+  }
+  wrap.style.display = "block";
+  feedback.textContent = "";
+  selectedSlotIndex = null;
+
+  const sY = session?.settings?.startYear ?? 1950;
+  const eY = session?.settings?.endYear ?? new Date().getFullYear();
+  startLbl.textContent = sY;
+  endLbl.textContent = eY;
+
+  const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
+
+  pins.innerHTML = "";
+  const barRect = bar.getBoundingClientRect();
+  const levelOffsets = [-8, 0, 8];
+  let pinIndex = 0;
+
+  // Draw pins at exact year X; only vertical staggering to prevent overlap
+  sortedTL.forEach(item => {
+    const nx = normalizeYear(session, item.year);
+    const el = document.createElement("div");
+    el.className = "pin";
+    el.style.left = `${nx * 100}%`;
+
+    const level = levelOffsets[pinIndex % levelOffsets.length];
+    pinIndex++;
+    el.style.top = `${-9 + level}px`;
+
+    const lab = document.createElement("div");
+    lab.className = "pin-label";
+    lab.style.top = `${28 + level}px`;
+    lab.textContent = item.year;
+    el.appendChild(lab);
+    pins.appendChild(el);
+  });
+
+  // Build drop slots using year positions; width reflects gap (min 36px)
+  const gaps = buildDropSlots(session, sortedTL);
+  Array.from(bar.querySelectorAll(".drop-slot")).forEach(n=>n.remove());
+
+  gaps.forEach((gap) => {
+    const leftPos  = gap.left  ? normalizeYear(session, gap.left.year)  : 0;
+    const rightPos = gap.right ? normalizeYear(session, gap.right.year) : 1;
+    const mid = (leftPos + rightPos) / 2;
+
+    const slot = document.createElement("div");
+    slot.className = "drop-slot";
+    slot.style.left = `${mid * 100}%`;
+    slot.dataset.index = String(gap.index);
+
+    const minWidthPx = 36;
+    const gapPx = Math.max(minWidthPx, (rightPos - leftPos) * barRect.width * 0.6);
+    slot.style.width = `${gapPx}px`;
+
+    // Visual hint
+    slot.title = `${gap.left ? gap.left.year : sY} – ${gap.right ? gap.right.year : eY}`;
+
+    if (isHostClient) {
+      slot.addEventListener("dragover", (ev) => {
+        ev.preventDefault();
+        slot.classList.add("active");
+      });
+      slot.addEventListener("dragleave", () => slot.classList.remove("active"));
+      slot.addEventListener("drop", (ev) => {
+        ev.preventDefault();
+        slot.classList.remove("active");
+        selectedSlotIndex = gap.index;
+        const songYear = session.songMap?.[cur.trackId]?.year || "";
+        const ok = isPlacementCorrect(gap, parseInt(songYear));
+        feedback.textContent = ok ? "✅ Rimlig placering (mellan rätt spann)" : "⚠️ Troligen fel placering (utanför rätt spann)";
+      });
+    }
+    bar.appendChild(slot);
+  });
+
+  if (isHostClient) {
+    dragInstruction.textContent = "Aktivt lag: dra kortet till rätt plats i tidslinjen";
+    draggable.style.display = "inline-block";
+  } else {
+    dragInstruction.textContent = "Vänta på att värden placerar låten i tidslinjen";
+    draggable.style.display = "none";
+  }
+
+  if (isHostClient) {
+    draggable.addEventListener("dragstart", (ev) => {
+      ev.dataTransfer.setData("text/plain", cur.trackId);
+    }, { once: true });
+  }
+}
+ 
 async function confirmPlacementHandler(){
+(){
   const sid = window.sessionId;
   const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
   const sess = sSnap.val();
