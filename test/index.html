@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="description" content="Årsquiz om låtar – multiplayer tidslinje.">
+  <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM –0.615 (TEST)</title>
+  <title>NOTESTREAM –0.616 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -19,35 +18,46 @@
     :root {
       --bg: #0b0f12;
       --txt: #fff;
-      --card-w: 96px;
-      --card-scale: 0.56;
-      --gap: 10px;
       --team1: #ffcc00;
       --team2: #00a0ff;
       --team3: #ff4d5a;
+      --card-w: 96px;
+      --card-scale: .56;
+      --gap: 10px;
     }
-    html, body { margin:0; height:100%; background: var(--bg); color: var(--txt); font-family: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-    body { display:flex; flex-direction:column; align-items:center; }
-    .container { padding: 14px; max-width: 960px; width: 100%; position: relative; z-index: 1; }
+    html, body { overflow-x:hidden; }
+    body {
+      font-family: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; color: var(--txt);
+    }
+    .container { padding: 2rem; max-width: 900px; width: 100%; margin: 2rem 1rem; position: relative; z-index: 1; }
+    .logo { display:block; margin:0 auto 1.5rem auto; max-width: 400px; height:auto; }
 
-    select, button { padding: .5rem; font-size:1rem; margin-bottom:1rem; background:#032934; color:#fff; border:none; border-radius:8px; font-family:'Manrope', sans-serif; }
-    .start-button { background: linear-gradient(to right, #fb1820, #ff6310); border: none; border-radius: 10px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all .2s; display:block; margin:0 auto; }
+    /* --- Restored "pill" filter UI --- */
+    #source-checkbox-container { display:flex; flex-wrap:wrap; justify-content:center; gap:1.0rem .6rem; margin-bottom:1.2rem; }
+    .checkbox-pill { position:relative; display:inline-block; }
+    .checkbox-pill input[type="checkbox"]{ display:none; }
+    .checkbox-pill label{ cursor:pointer; padding:.55rem .8rem; border:3px solid #032934; border-radius:12px; background:#032934; color:#fff; transition:.2s; font-size:1rem; }
+    .checkbox-pill input[type="checkbox"]:checked + label{ background:#0b939c; border-color:#0b939c; }
+    .subheading{ display:block; width:100%; text-align:center; font-size:.9rem; color:#fff; margin:.4rem 0 .2rem 0; opacity:.9; }
+    .divider { height:2px; background:rgba(255,255,255,.25); width:100%; margin:1rem 0; }
+    select { padding:.5rem; font-size:1rem; background:#032934; color:#fff; border:none; border-radius:8px; }
+    .start-button { background: linear-gradient(to right, #fb1820, #ff6310); border: none; border-radius: 10px; padding: 12px 24px; font-size: 18px; font-weight: bold; color: white; cursor: pointer; transition: all .2s ease-in-out; display:block; margin:0 auto; }
     .start-button:hover { transform: scale(1.03); }
-    .qrcode { width:160px; height:160px; border:5px solid black; border-radius:10px; display:block; margin:0 auto 1rem auto; }
 
-    #envBadge { position: fixed; bottom: 8px; right: 8px; background: rgba(0,0,0,.7); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; z-index: 9999; pointer-events: none; }
-
-    /* Prototype-style timeline */
+    /* Cards timeline (prototype style) */
     .panel { background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px; }
     .row { display:flex; justify-content:center; align-items:center; margin-bottom:8px; gap:8px; flex-wrap:wrap; }
     .timeline-wrap { overflow:auto; }
     .timeline { display:flex; align-items:center; gap: 0; padding: 8px; justify-content: center; }
-    .card { width: calc(var(--card-w)*var(--card-scale)); height: calc(var(--card-w)*var(--card-scale)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
+    .card { width: calc(var(--card-w)*var(--card-scale)); height: calc(var(--card-w)*var(--card-scale)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; color:#fff; }
     .card .year-vert { transform: rotate(90deg); transform-origin:center; font-weight:700; letter-spacing:.35px; font-size: calc(var(--card-w)*var(--card-scale) * 0.58); line-height: 1; white-space: nowrap; }
-
     .ghost-gap { width: var(--gap); height: calc(var(--card-w)*var(--card-scale)*1.5); display:flex; align-items:center; justify-content:center; position:relative; transition: width .12s ease; flex: 0 0 auto; border: 2px dashed rgba(255,255,255,.22); border-radius:10px; opacity:.7; }
     .ghost-gap.active { width: calc(var(--card-w)*var(--card-scale)); border-color:#ffd166; background: rgba(255,209,102,.14); }
-
     .draggable { touch-action:none; user-select:none; -webkit-user-select:none; cursor: grab; }
     .draggable:active { cursor: grabbing; }
 
@@ -56,13 +66,14 @@
     .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
     .t1 { background: var(--team1); } .t2 { background: var(--team2); } .t3 { background: var(--team3); }
 
-    .center-controls { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px; }
-    .answer-button { padding:.55rem .9rem; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff; cursor:pointer; }
-    .answer-button:hover { background: rgba(255,255,255,.12); }
-
+    /* Modaler + badges */
     .modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:5000; }
     .modal-content { background:#fff; padding:1.5rem; border-radius:8px; width:min(92vw, 600px); max-height:80vh; overflow:auto; box-sizing:border-box; }
     .closeBtn { color:#333; font-weight:bold; cursor:pointer; font-size:1.5rem; position:absolute; top:10px; right:20px; }
+    #envBadge { position: fixed; bottom: 8px; right: 8px; background: rgba(0,0,0,.7); color: #fff; padding: 6px 10px; border-radius: 8px; font-size: 12px; z-index: 9999; pointer-events: none; }
+
+    /* Inputs i Spotify‑import */
+    .textish { width:40%; padding:.5rem; background:#032934; color:#fff; border:0; border-radius:8px; }
   </style>
 </head>
 
@@ -92,19 +103,36 @@
     </div>
   </div>
 
-  <div class="container">
-    <!-- Startsida -->
+  <div class="container" id="mainContent">
+    <img src="logga.png" alt="Notestream logo" class="logo" />
+
+    <!-- Filter/Startsida (RESTORED DESIGN) -->
     <div id="filter-page">
-      <div id="source-checkbox-container" style="display:flex;flex-wrap:wrap;gap:10px;color:#fff;"></div>
-      <div style="display:flex; justify-content:center; gap:1rem;">
+      <div id="source-checkbox-container"></div>
+      <p class="subheading">Standardlistor</p>
+      <!-- Standardlistor fylls via JS -->
+
+      <div class="divider"></div>
+      <p class="subheading">Egna spellistor</p>
+      <!-- Egna listor fylls via JS -->
+
+      <div style="display:flex; justify-content:center; gap:1rem; margin-top:1rem;">
         <div style="display:flex; flex-direction:column; align-items:center;">
-          <label for="startYear">Från år</label>
+          <label for="startYear">Från år:</label>
           <select id="startYear"></select>
         </div>
         <div style="display:flex; flex-direction:column; align-items:center;">
-          <label for="endYear">Till år</label>
+          <label for="endYear">Till år:</label>
           <select id="endYear"></select>
         </div>
+      </div>
+
+      <!-- Spotify-spellisteimport -->
+      <div id="spotify-import" style="margin: 1.2rem 0 1.6rem 0; text-align:center;">
+        <h3>Lägg till Spotify‑spellista</h3>
+        <input type="text" id="playlistLinkInput" class="textish" placeholder="Klistra in Spotify‑länken">
+        <input type="text" id="playlistNameInput" class="textish" placeholder="Spellistans namn">
+        <button id="addPlaylistButton" class="start-button" style="margin-top:.6rem;">Lägg till</button>
       </div>
 
       <p id="selectedSongCount" style="text-align:center;">Valda låtar: 0</p>
@@ -128,7 +156,7 @@
       <button id="joinSubmit" class="start-button">Gå med</button>
     </div>
 
-    <!-- Game -->
+    <!-- Game (prototype timeline kept) -->
     <div id="game-page" style="display:none;">
       <div class="teams-strip" id="teams-header"></div>
 
@@ -137,21 +165,21 @@
           <div class="timeline" id="activeTimeline"></div>
         </div>
 
-        <div class="center-controls">
+        <div class="row">
           <div id="songCard" class="chip draggable" aria-label="Dra för att lägga kort">
             🎵 Dra för att lägga kort
           </div>
         </div>
 
-        <div class="center-controls">
-          <button id="btnLock" class="answer-button" disabled>Lås in</button>
-          <button id="revealButton" class="answer-button">Visa svar</button>
-          <button id="confirmPlacementButton" class="answer-button">Bekräfta placering</button>
-          <button id="nextSongButtonGame" class="answer-button">Nästa låt</button>
+        <div class="row">
+          <button id="btnLock" class="start-button" disabled style="padding:.5rem 1rem; font-size:1rem;">Lås in</button>
+          <button id="revealButton" class="start-button" style="padding:.5rem 1rem; font-size:1rem;">Visa svar</button>
+          <button id="confirmPlacementButton" class="start-button" style="padding:.5rem 1rem; font-size:1rem;">Bekräfta placering</button>
+          <button id="nextSongButtonGame" class="start-button" style="padding:.5rem 1rem; font-size:1rem;">Nästa låt</button>
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" style="margin-top:10px;">
         <div class="timeline-wrap">
           <div class="timeline" id="miniTimeline"></div>
         </div>
@@ -160,10 +188,12 @@
   </div>
 
   <script type="module">
-    /* Firebase */
+    /* ===========================
+       Firebase (hardcoded RTDB)
+       =========================== */
     import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
@@ -179,51 +209,35 @@
     const auth = getAuth(app);
     document.getElementById("envBadge").textContent = `RTDB: https://notestreamfire.europe-west1.firebasedatabase.app`;
 
-    /* State */
+    /* ===========================
+       State & helpers
+       =========================== */
+    const $ = (id)=>document.getElementById(id);
     let standardSongs = [], userPlaylistSongs = [], songs = [], sourceFilteredSongs = [], currentFilteredSongs = [], shownSongs = [];
     window.isHost = false; window.sessionId = null;
     let selectedSlotIndex = null;
     let dragging = false, activePointerId = null, currentHoverIndex = null;
 
-    function setPage(id){
-      ["filter-page","lobby-page","join-page","game-page"].forEach(pid=>{
-        const el = document.getElementById(pid);
-        if (el) el.style.display = (pid===id) ? "block" : "none";
-      });
-    }
+    function setPage(id){ ["filter-page","lobby-page","join-page","game-page"].forEach(pid=>{$(pid).style.display=(pid===id)?"block":"none";}); }
+    function joinURL(sessionId){ const url = new URL(location.href); url.searchParams.set("join", sessionId); return url.origin + url.pathname + "?" + url.searchParams.toString(); }
+    function currentStartEndYears(){ return { startYear: parseInt($("startYear").value)||1950, endYear: parseInt($("endYear").value)||new Date().getFullYear() }; }
 
-    function joinURL(sessionId){
-      const url = new URL(location.href);
-      url.searchParams.set("join", sessionId);
-      return url.origin + url.pathname + "?" + url.searchParams.toString();
-    }
-
-    function currentStartEndYears(){
-      const s = document.getElementById("startYear"); const e = document.getElementById("endYear");
-      return { startYear: parseInt(s.value)||1950, endYear: parseInt(e.value)||new Date().getFullYear() };
-    }
-
-    /* Auth */
-    const $ = (id)=>document.getElementById(id);
-    function show(el){ el.style.display='flex'; } function hide(el){ el.style.display='none'; }
+    /* ===========================
+       Auth
+       =========================== */
     onAuthStateChanged(auth, (user)=>{
-      if (user){ hide($("loginModal")); hide($("registerModal")); initDataListeners(); maybeAutoJoinFromURL(); }
-      else { show($("loginModal")); }
+      if (user){ $("loginModal").style.display="none"; $("registerModal").style.display="none"; initDataListeners(); maybeAutoJoinFromURL(); }
+      else { $("loginModal").style.display="flex"; }
     });
-    $("loginButton").addEventListener("click", ()=>{
-      const email = $("emailInput").value.trim(); const password = $("passwordInput").value;
-      signInWithEmailAndPassword(auth, email, password).catch(()=>{});
-    });
-    $("registerButton").addEventListener("click", ()=>{
-      const email = $("regEmail").value.trim(); const password = $("regPassword").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(()=>{});
-    });
-    $("loginClose").addEventListener("click", ()=> hide($("loginModal")));
-    $("registerClose").addEventListener("click", ()=> hide($("registerModal")));
-    $("showRegister").addEventListener("click", ()=>{ hide($("loginModal")); show($("registerModal")); });
+    $("loginButton").addEventListener("click", ()=>{ const email=$("emailInput").value.trim(); const password=$("passwordInput").value; signInWithEmailAndPassword(auth, email, password).catch(()=>{}); });
+    $("showRegister").addEventListener("click", ()=>{ $("loginModal").style.display="none"; $("registerModal").style.display="flex"; });
+    $("registerButton").addEventListener("click", ()=>{ const email=$("regEmail").value.trim(); const password=$("regPassword").value; createUserWithEmailAndPassword(auth, email, password).catch(()=>{}); });
 
-    /* Data listeners */
+    /* ===========================
+       Data listeners
+       =========================== */
     function initDataListeners(){
+      // Standardlistor
       onValue(ref(db, 'standardLists'), (snapshot)=>{
         standardSongs = [];
         if (snapshot.exists()) {
@@ -240,6 +254,7 @@
         mergeSongs();
       });
 
+      // Egna listor
       onAuthStateChanged(auth, (user)=>{
         if (!user) return;
         const uid = user.uid;
@@ -273,31 +288,62 @@
     }
 
     function populateSourceCheckboxes(){
-      const container = $("source-checkbox-container"); container.innerHTML = "";
-      const allDiv = document.createElement("div"); const cbAll = document.createElement("input"); cbAll.type="checkbox"; cbAll.name="source"; cbAll.value="alla"; cbAll.id="source-alla";
-      const lbAll = document.createElement("label"); lbAll.htmlFor="source-alla"; lbAll.textContent="Alla låtar";
+      const container = $("source-checkbox-container");
+      container.innerHTML = "";
+
+      // Alla
+      const allDiv = document.createElement("div");
+      allDiv.className = "checkbox-pill";
+      const cbAll = document.createElement("input"); cbAll.type = "checkbox"; cbAll.name="source"; cbAll.value="alla"; cbAll.id="source-alla";
+      const lbAll = document.createElement("label"); lbAll.setAttribute("for","source-alla"); lbAll.textContent = "Alla låtar";
+      cbAll.addEventListener("change", function(){
+        container.querySelectorAll('input[name="source"]').forEach(chk => { if (chk!==cbAll) chk.checked = cbAll.checked; });
+        updateYearSelection();
+      });
       allDiv.appendChild(cbAll); allDiv.appendChild(lbAll); container.appendChild(allDiv);
 
+      const stdHeading = document.createElement("p"); stdHeading.className = "subheading"; stdHeading.textContent = "Standardlistor";
+      container.appendChild(stdHeading);
+
       const stdSources = Array.from(new Set(standardSongs.map(s => s.source[0]))).sort();
-      stdSources.forEach(src=>{
-        const w = document.createElement("div"); const cb=document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=src; cb.id="std-"+src.replace(/\s+/g,'-');
-        const lb=document.createElement("label"); lb.htmlFor=cb.id; lb.textContent=src; w.appendChild(cb); w.appendChild(lb); container.appendChild(w);
-      });
-      const usrSources = Array.from(new Set(userPlaylistSongs.map(s => s.source[0]))).filter(x=>!stdSources.includes(x)).sort();
-      usrSources.forEach(src=>{
-        const w = document.createElement("div"); const cb=document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=src; cb.id="usr-"+src.replace(/\s+/g,'-');
-        const lb=document.createElement("label"); lb.htmlFor=cb.id; lb.textContent=src; w.appendChild(cb); w.appendChild(lb); container.appendChild(w);
+      stdSources.forEach(source => {
+        const wrap = document.createElement("div"); wrap.className = "checkbox-pill";
+        const cb = document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=source; cb.id="std-"+source.replace(/\s+/g,'-').toLowerCase();
+        const lb = document.createElement("label"); lb.setAttribute("for", cb.id); lb.textContent = source;
+        cb.addEventListener("change", updateYearSelection);
+        wrap.appendChild(cb); wrap.appendChild(lb); container.appendChild(wrap);
       });
 
-      const startDD = $("startYear"), endDD = $("endYear"); startDD.innerHTML=""; endDD.innerHTML="";
+      container.appendChild(document.createElement("div")).className="divider";
+
+      const userHeading = document.createElement("p"); userHeading.className="subheading"; userHeading.textContent="Egna spellistor";
+      container.appendChild(userHeading);
+
+      const usrSources = Array.from(new Set(userPlaylistSongs.map(s => s.source[0]))).filter(x => !stdSources.includes(x)).sort();
+      usrSources.forEach(source => {
+        const wrap = document.createElement("div"); wrap.className = "checkbox-pill";
+        const cb = document.createElement("input"); cb.type="checkbox"; cb.name="source"; cb.value=source; cb.id="usr-"+source.replace(/\s+/g,'-').toLowerCase();
+        const lb = document.createElement("label"); lb.setAttribute("for", cb.id); lb.textContent = source;
+        cb.addEventListener("change", updateYearSelection);
+        wrap.appendChild(cb); wrap.appendChild(lb); container.appendChild(wrap);
+      });
+
+      // År-dropdowns
+      const startDD = $("startYear");
+      const endDD = $("endYear");
+      startDD.innerHTML = ""; endDD.innerHTML = "";
       const thisYear = new Date().getFullYear();
-      for (let y=1950; y<=thisYear; y++){ const o1=document.createElement("option"); o1.value=y; o1.textContent=y; if (y===1950) o1.selected=true; startDD.appendChild(o1);
-                                          const o2=document.createElement("option"); o2.value=y; o2.textContent=y; if (y===thisYear) o2.selected=true; endDD.appendChild(o2); }
+      for (let y = 1950; y <= thisYear; y++){
+        const o1 = document.createElement("option"); o1.value=y; o1.textContent=y; if (y===1950) o1.selected=true;
+        const o2 = document.createElement("option"); o2.value=y; o2.textContent=y; if (y===thisYear) o2.selected=true;
+        startDD.appendChild(o1); endDD.appendChild(o2);
+      }
       updateSongCount();
     }
 
     function updateSongCount(){
-      const startYear = parseInt($("startYear").value); const endYear = parseInt($("endYear").value);
+      const startYear = parseInt($("startYear").value);
+      const endYear   = parseInt($("endYear").value);
       const cnt = sourceFilteredSongs.filter(s => +s.year >= startYear && +s.year <= endYear).length;
       $("selectedSongCount").textContent = `Valda låtar: ${cnt}`;
     }
@@ -307,43 +353,113 @@
       let selected = checked.includes("alla")
         ? Array.from(new Set([...new Set(standardSongs.map(s=>s.source[0])), ...new Set(userPlaylistSongs.map(s=>s.source[0])), "alla"]))
         : checked;
+
       sourceFilteredSongs = songs.filter(song => song.source.some(src => selected.includes(src)));
       updateSongCount();
     };
 
+    /* Spotify-import (samma som tidigare; kan kopplas in här om du vill) */
+    async function getBackendSpotifyToken(){
+      const cached = localStorage.getItem('spotifyToken');
+      const exp = +localStorage.getItem('spotifyTokenExpiry');
+      if (cached && exp && Date.now() < exp) return cached;
+      const r = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', { method:'POST' });
+      if (!r.ok) return null;
+      const data = await r.json();
+      const token = data.access_token; const expiresIn = data.expires_in;
+      localStorage.setItem('spotifyToken', token);
+      localStorage.setItem('spotifyTokenExpiry', (Date.now()+expiresIn*1000-60000).toString());
+      return token;
+    }
+    async function fetchSpotifyPlaylist(playlistUrl){
+      const playlistId = playlistUrl.split("/playlist/")[1]?.split("?")[0];
+      if (!playlistId) throw new Error("Ogiltig playlist‑länk.");
+      const token = await getBackendSpotifyToken();
+      let tracks = {}, nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+      while (nextUrl){
+        const resp = await fetch(nextUrl, { headers:{ Authorization:`Bearer ${token}` }});
+        const data = await resp.json();
+        (data.items||[]).forEach(item=>{
+          const t = item.track; if (!t || !t.id) return;
+          tracks[t.id] = { title: t.name, artist: t.artists.map(a=>a.name).join(", "), year: t.album.release_date?.slice(0,4) ?? "" };
+        });
+        nextUrl = data.next;
+      }
+      return tracks;
+    }
+    document.getElementById("addPlaylistButton").addEventListener("click", async ()=>{
+      try{
+        const name = $("playlistNameInput").value.trim();
+        const link = $("playlistLinkInput").value.trim();
+        if (!name || !link) return alert("Fyll i både namn och länk.");
+        const tracks = await fetchSpotifyPlaylist(link);
+        const uid = auth.currentUser?.uid;
+        if (!uid) return alert("Logga in först.");
+        await set(ref(db, `userPlaylists/${uid}/${name}`), { songs: tracks });
+        alert(`Spellistan "${name}" har lagts till.`);
+      }catch(e){ console.error(e); alert("Kunde inte lägga till spellistan."); }
+    });
+
+    /* ===========================
+       Lobby / Multiplayer
+       =========================== */
     window.filterSongs = function(){
-      const startYear = parseInt($("startYear").value), endYear = parseInt($("endYear").value);
+      const startYear = parseInt($("startYear").value);
+      const endYear   = parseInt($("endYear").value);
       currentFilteredSongs = sourceFilteredSongs.filter(s => +s.year >= startYear && +s.year <= endYear);
       shownSongs = [];
-      if (!currentFilteredSongs.length){ alert("Inga låtar i intervallet."); return false; }
+      if (!currentFilteredSongs.length){
+        alert("Inga låtar i det här intervallet. Välj andra källor/årtal eller lägg till en spellista.");
+        return false;
+      }
       return true;
     };
 
-    /* Lobby / Session */
     async function createSessionFromFilter(){
       if (!auth.currentUser) throw new Error("Inte inloggad.");
       const list = window.currentFilteredSongs || [];
       if (!list.length) throw new Error("Inga filtrerade låtar.");
       const {startYear, endYear} = currentStartEndYears();
 
-      const deck = list.map(s=>s.qr);
-      const songMap = {}; list.forEach(s=>{ const yr=s.customYear??s.year; songMap[s.qr] = { title:s.title||"", artist:s.artist||"", year: yr||"" }; });
-
-      const sessionRef = push(ref(db, 'sessions')); const sid = sessionRef.key;
-      await set(sessionRef, {
-        createdAt: Date.now(), status:"lobby", hostId: auth.currentUser.uid,
-        settings:{ startYear, endYear }, songMap, deck, shown:{}, current:null,
-        teams:{}, turn:{ order:[], activeIndex:0 }
+      const deck = list.map(s => s.qr);
+      const songMap = {};
+      list.forEach(s => {
+        const yr = s.customYear ?? s.year;
+        songMap[s.qr] = { title: s.title||"", artist: s.artist||"", year: yr||"" };
       });
-      window.sessionId = sid; window.isHost = true; localStorage.setItem("sessionId", sid); localStorage.setItem("role","host");
+
+      const sessionRef = push(ref(db, 'sessions'));
+      const sid = sessionRef.key;
+      await set(sessionRef, {
+        createdAt: Date.now(),
+        status: "lobby",
+        hostId: auth.currentUser.uid,
+        settings: { startYear, endYear },
+        songMap,
+        deck,
+        shown: {},
+        current: null,
+        teams: {},
+        turn: { order: [], activeIndex: 0 }
+      });
+      window.sessionId = sid;
+      window.isHost = true;
+      localStorage.setItem("sessionId", sid);
+      localStorage.setItem("role", "host");
       return sid;
     }
 
     function renderLobbyTeams(session){
-      const list = $("team-list"); list.innerHTML="";
+      const list = $("team-list");
+      list.innerHTML = "";
       const teams = session.teams ? Object.entries(session.teams) : [];
-      if (!teams.length) list.innerHTML="<p>Inga lag ännu – scanna QR.</p>";
-      teams.forEach(([tid,t])=>{ const item=document.createElement("div"); item.style.padding=".4rem"; item.style.background="rgba(255,255,255,.06)"; item.style.borderRadius="8px"; item.textContent=`${t.name} • ${t.score||0}p`; list.appendChild(item); });
+      if (!teams.length) list.innerHTML = "<p>Inga lag ännu – scanna QR och gå med.</p>";
+      teams.forEach(([tid, t])=>{
+        const item = document.createElement("div");
+        item.style.padding=".4rem .6rem"; item.style.marginBottom=".3rem"; item.style.background="rgba(3,41,52,.6)"; item.style.color="#fff"; item.style.borderRadius="8px";
+        item.textContent = `${t.name}` + (t.score ? ` • ${t.score}p` : "");
+        list.appendChild(item);
+      });
     }
 
     function listenToSession(sid){
@@ -351,48 +467,91 @@
         if (!snap.exists()) return;
         const session = snap.val();
         renderLobbyTeams(session);
-        if (session.status === "lobby"){ setPage("lobby-page"); }
-        else { renderGame(session); setPage("game-page"); }
+        if (session.status === "lobby"){
+          setPage("lobby-page");
+        } else {
+          renderGame(session);
+          setPage("game-page");
+        }
       });
     }
 
     function showLobby(sid){
-      setPage("lobby-page"); window.sessionId=sid; window.isHost=true;
-      const q = $("lobby-qr"); q.innerHTML=""; new QRCode(q, { text: joinURL(sid), width:160, height:160 });
+      setPage("lobby-page");
+      window.sessionId = sid;
+      window.isHost = true;
+
+      const q = $("lobby-qr");
+      q.innerHTML = "";
+      new QRCode(q, { text: joinURL(sid), width: 160, height: 160 });
       $("lobby-link").textContent = joinURL(sid);
+
       const btn = $("startGameButton");
-      if (!btn._bound){ btn._bound=true; btn.addEventListener("click", async ()=>{ try{ await startGameHost(); }catch(e){ alert("Kunde inte starta spelet."); } }); }
+      if (!btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", async ()=>{
+          try{ await startGameHost(); }catch(e){ alert("Kunde inte starta spelet."); }
+        });
+      }
       listenToSession(sid);
     }
 
     function showJoinPage(sid){
-      setPage("join-page"); window.sessionId=sid; window.isHost=false; localStorage.setItem("role","player");
+      setPage("join-page");
+      window.sessionId = sid;
+      window.isHost = false;
+      localStorage.setItem("role","player");
       const btn = $("joinSubmit");
-      if (!btn._bound){ btn._bound=true; btn.addEventListener("click", async ()=>{
-        const name = ($("joinTeamName").value||"").trim(); if (!name) return alert("Ange lagnamn.");
-        const teamRef = push(ref(db, `sessions/${sid}/teams`)); const teamId = teamRef.key;
-        await set(teamRef, { name, tokens: 3, score: 0, timeline: [] }); localStorage.setItem("teamId", teamId); listenToSession(sid);
-      });}
+      if (!btn._bound){
+        btn._bound = true;
+        btn.addEventListener("click", async ()=>{
+          const name = ($("joinTeamName").value||"").trim();
+          if (!name) return alert("Ange lagnamn.");
+          const teamRef = push(ref(db, `sessions/${sid}/teams`));
+          const teamId = teamRef.key;
+          await set(teamRef, { name, tokens: 3, score: 0, timeline: [] });
+          localStorage.setItem("teamId", teamId);
+          listenToSession(sid);
+        });
+      }
     }
 
     function maybeAutoJoinFromURL(){
-      const p = new URLSearchParams(location.search); const sid = p.get("join"); if (!sid) return;
-      if (localStorage.getItem("sessionId") === sid){ listenToSession(sid); return; } showJoinPage(sid);
+      const p = new URLSearchParams(location.search);
+      const sid = p.get("join");
+      if (!sid) return;
+      if (localStorage.getItem("sessionId") === sid){ listenToSession(sid); return; }
+      showJoinPage(sid);
     }
 
     async function startGameHost(){
       const sid = window.sessionId;
-      const teamsSnap = await get(ref(db, `sessions/${sid}/teams`)); const teams = teamsSnap.val() || {}; const order = Object.keys(teams);
+      const teamsSnap = await get(ref(db, `sessions/${sid}/teams`));
+      const teams = teamsSnap.val() || {};
+      const order = Object.keys(teams);
       if (!order.length) return alert("Minst ett lag krävs.");
-      const sessSnap = await get(ref(db, `sessions/${sid}`)); const sess = sessSnap.val(); const deck = sess.deck || []; const shown = sess.shown || {};
-      const nextId = deck.find(id => !shown[id]); if (!nextId) return alert("Deck tomt.");
-      const updates = {}; updates[`sessions/${sid}/status`] = "playing"; updates[`sessions/${sid}/turn`] = { order, activeIndex: 0 }; updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false }; updates[`sessions/${sid}/shown/${nextId}`] = true;
+
+      const sessSnap = await get(ref(db, `sessions/${sid}`));
+      const sess = sessSnap.val();
+      const deck = sess.deck || [];
+      const shown = sess.shown || {};
+      const nextId = deck.find(id => !shown[id]);
+      if (!nextId) return alert("Deck tomt.");
+
+      const updates = {};
+      updates[`sessions/${sid}/status`] = "playing";
+      updates[`sessions/${sid}/turn`] = { order, activeIndex: 0 };
+      updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
+      updates[`sessions/${sid}/shown/${nextId}`] = true;
       await update(ref(db), updates);
     }
 
-    /* ===== Game UI (prototype-style) ===== */
+    /* ===========================
+       Game (prototype timeline kept)
+       =========================== */
     function yearsForTeam(session, tid){
-      const t = session.teams?.[tid]; const arr = (t?.timeline||[]).map(x => parseInt(x.year)||0).filter(Boolean);
+      const t = session.teams?.[tid];
+      const arr = (t?.timeline||[]).map(x => parseInt(x.year)||0).filter(Boolean);
       return arr.slice().sort((a,b)=>a-b);
     }
     function orderFor(session){ return (session.turn && session.turn.order) || Object.keys(session.teams||{}); }
@@ -413,17 +572,8 @@
       document.documentElement.style.setProperty('--card-w', bestBase + 'px');
       document.documentElement.style.setProperty('--gap', bestGap + 'px');
     }
-
-    function makeCard(year){
-      const d = document.createElement('div'); d.className = 'card';
-      const lab = document.createElement('div'); lab.className='year-vert'; lab.textContent = year; d.appendChild(lab);
-      return d;
-    }
-    function makeGap(i){
-      const g = document.createElement('div'); g.className='ghost-gap'; g.dataset.slotIndex=i;
-      if (i === currentHoverIndex) g.classList.add('active');
-      return g;
-    }
+    function makeCard(year){ const d=document.createElement('div'); d.className='card'; const lab=document.createElement('div'); lab.className='year-vert'; lab.textContent=year; d.appendChild(lab); return d; }
+    function makeGap(i){ const g=document.createElement('div'); g.className='ghost-gap'; g.dataset.slotIndex=i; if (i===currentHoverIndex) g.classList.add('active'); return g; }
 
     function renderTeamsHeader(session){
       const wrap = $("teams-header"); wrap.innerHTML="";
@@ -443,19 +593,17 @@
       const activeContainer = $("activeTimeline"), miniContainer = $("miniTimeline");
       computeCardLayout(activeContainer); computeCardLayout(miniContainer);
 
-      // Active
       activeContainer.innerHTML="";
       for (let i=0;i<=ys.length;i++){
         activeContainer.appendChild(makeGap(i));
         if (i<ys.length) activeContainer.appendChild(makeCard(String(ys[i])));
       }
 
-      // Mini = nästa lags timeline
       miniContainer.innerHTML="";
       const ord = orderFor(session); const nextIdx = (activeIdxFor(session)+1) % ord.length; const nextTid = ord[nextIdx];
       const ysNext = yearsForTeam(session, nextTid);
       for (let i=0;i<=ysNext.length;i++){
-        miniContainer.appendChild(makeGap(-1)); // passiv, ej interaktiv
+        miniContainer.appendChild(makeGap(-1));
         if (i<ysNext.length) miniContainer.appendChild(makeCard(String(ysNext[i])));
       }
     }
@@ -488,7 +636,6 @@
       btnLock.disabled = (selectedSlotIndex===null);
 
       if (isHost){
-        // Drag via pointer events
         function startDrag(e){
           dragging=true; activePointerId = e.pointerId;
           try { e.target.setPointerCapture && e.target.setPointerCapture(activePointerId); } catch(_){}
@@ -509,9 +656,7 @@
         activeContainer.onpointermove = (e)=>{ if (dragging) onMove(e); };
 
         btnLock.onclick = async ()=>{
-          // simply call confirmPlacement to commit slot against DB logic
           await confirmPlacementHandler();
-          // reset UI state
           selectedSlotIndex = null; currentHoverIndex = null; btnLock.disabled = true;
         };
         revealBtn.onclick = async ()=>{
@@ -529,7 +674,7 @@
       }
     }
 
-    /* Helpers used by confirmPlacementHandler */
+    /* Helpers + confirm handler (same as earlier fixed version) */
     function getActiveTeamInfo(session){
       const order = (session.turn && session.turn.order) || [];
       const idx = (session.turn && typeof session.turn.activeIndex === 'number') ? session.turn.activeIndex : 0;
@@ -590,7 +735,7 @@
 
     async function hostNextSong(){
       const sid = window.sessionId;
-      const sSnap = await get(ref(db, `sessions/${sid}`)); if (!snap) return;
+      const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
       const sess = sSnap.val();
       const deck = sess.deck || []; const shown = sess.shown || {};
       const nextId = deck.find(id => !shown[id]);
@@ -606,7 +751,8 @@
     /* Start-knapp */
     async function onStartGame(){
       if (!document.querySelectorAll("input[name='source']:checked").length){
-        const alla = document.getElementById("source-alla"); if (alla) alla.checked = true;
+        const alla = document.getElementById("source-alla");
+        if (alla) alla.checked = true;
       }
       window.updateYearSelection?.();
       if (!window.filterSongs()) return;
