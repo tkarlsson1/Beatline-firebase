@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM –0.609 (TEST)</title>
+  <title>NOTESTREAM –0.610 (TEST)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -958,62 +958,67 @@
       }
     }
 
-    async function confirmPlacementHandler(){
-      const sid = window.sessionId;
-      const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
-      const sess = sSnap.val();
+    
+async function confirmPlacementHandler(){
+  const sid = window.sessionId;
+  const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
+  const sess = sSnap.val();
 
-      const { activeTid, activeTeam } = getActiveTeamInfo(sess);
-      const cur = sess.current;
-      if (!cur || !cur.trackId) return alert("Ingen låt att placera.");
-      if (selectedSlotIndex == null) return alert("Välj en plats på tidslinjen först (släpp kortet i en markerad ruta).");
+  const { activeTid, activeTeam } = getActiveTeamInfo(sess);
+  const cur = sess.current;
+  if (!cur || !cur.trackId) return alert("Ingen låt att placera.");
+  if (selectedSlotIndex == null) return alert("Välj en plats på tidslinjen först (släpp kortet i en markerad ruta).");
 
-      const songMeta = sess.songMap?.[cur.trackId] || { year: "" };
-      const songYear = parseInt(songMeta.year)||0;
+  const songMeta = sess.songMap?.[cur.trackId] || { year: "" };
+  const songYear = parseInt(songMeta.year)||0;
 
-      const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
-      const gaps = buildDropSlots(sess, sortedTL);
-      const chosenGap = gaps.find(g => g.index === selectedSlotIndex);
-      if (!chosenGap) return alert("Ogiltig slot.");
+  const sortedTL = sortTimelineByYear(activeTeam?.timeline || []);
+  const gaps = buildDropSlots(sess, sortedTL);
+  const chosenGap = gaps.find(g => g.index === selectedSlotIndex);
+  if (!chosenGap) return alert("Ogiltig slot.");
 
-      const correct = isPlacementCorrect(chosenGap, songYear);
+  const correct = isPlacementCorrect(chosenGap, songYear);
 
-      const newTL = (activeTeam.timeline || []).slice();
-      newTL.push({ trackId: cur.trackId, year: songMeta.year });
+  const newTL = (activeTeam.timeline || []).slice();
+  newTL.push({ trackId: cur.trackId, year: songMeta.year });
 
-      const deck = sess.deck || []; const shown = sess.shown || {};
-      const nextId = deck.find(id => !shown[id] && id !== cur.trackId);
+  const deck = sess.deck || []; const shown = sess.shown || {};
+  const nextId = deck.find(id => !shown[id] && id !== cur.trackId);
 
-      const updates = {};
-      const teamPath = `sessions/${sid}/teams/${activeTid}`;
+  const updates = {};
+  const teamPath = `sessions/${sid}/teams/${activeTid}`;
 
-      if (correct) {
-        updates[`${teamPath}/score`] = (activeTeam.score || 0) + 1;
-      }
-      updates[`${teamPath}/timeline`] = newTL;
+  if (correct) {
+    updates[`${teamPath}/score`] = (activeTeam.score || 0) + 1;
+  }
+  updates[`${teamPath}/timeline`] = newTL;
+  updates[`sessions/${sid}/shown/${cur.trackId}`] = true;
 
-      updates[`sessions/${sid}/current/revealed`] = true;
-      updates[`sessions/${sid}/shown/${cur.trackId}`] = true;
+  const order = sess.turn.order || [];
+  const nextIdx = (sess.turn.activeIndex + 1) % (order.length || 1);
+  updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
 
-      const order = sess.turn.order || [];
-      const nextIdx = (sess.turn.activeIndex + 1) % (order.length || 1);
-      updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
+  if (nextId) {
+    // Move to the next card
+    updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
+    // Reveal the current one in a separate call FIRST to avoid ancestor/descendant conflict
+    await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+    await update(ref(db), updates);
+  } else {
+    // Last card: reveal it and finish
+    await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+    updates[`sessions/${sid}/status`] = "finished";
+    await update(ref(db), updates);
+  }
 
-      if (nextId) {
-        updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
-      } else {
-        updates[`sessions/${sid}/status`] = "finished";
-      }
+  selectedSlotIndex = null;
+  const feedback = document.getElementById("placement-feedback");
+  if (feedback) feedback.textContent = correct ? "✅ Rätt! Poäng till laget." : "❌ Fel placering.";
+}
 
-      await update(ref(db), updates);
-
-      selectedSlotIndex = null;
-      const feedback = document.getElementById("placement-feedback");
-      if (feedback) feedback.textContent = correct ? "✅ Rätt! Poäng till laget." : "❌ Fel placering.";
-    }
-
-    /* ===========================
+/* ===========================
        Starta spel (override)
+
        =========================== */
     async function onStartGame(){
       if (!document.querySelectorAll("input[name='source']:checked").length){
