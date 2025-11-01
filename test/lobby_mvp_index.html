@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.616 (TEST)</title>
+  <title>NOTESTREAM –0.617 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -248,9 +248,17 @@
     // ==== Spotify PKCE (host) – minimal ====
     const SPOTIFY_CLIENT_ID = '3033344ef55647b8b70ef1dccfa7e65f';
     const REDIRECT = (()=>{
-      // prefer /spotify/callback if present on this host; fallback to existing pathname + /callback
-      const base = location.origin;
-      return `${base}/spotify/callback`;
+      const host = location.host;
+      const path = location.pathname;
+      // Map known hosts to the exact Redirect URI you registered at Spotify
+      if (host === 'hitster-timmy.vercel.app') return 'https://hitster-timmy.vercel.app/callback';
+      if (host === 'localhost:5173') return 'http://localhost:5173/spotify/callback';
+      if (host === 'notestream.se') {
+        // support both root and /test subpath
+        return path.startsWith('/test') ? 'https://notestream.se/test/spotify/callback' : 'https://notestream.se/spotify/callback';
+      }
+      // Fallback: same origin + /spotify/callback (ensure this exact URI is whitelisted)
+      return `${location.origin}/spotify/callback`;
     })();
     const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state';
 
@@ -275,7 +283,10 @@
 
     // handle callback inline if we are on /spotify/callback
     (async function handleSpotifyCallback(){
-      if(location.pathname !== '/spotify/callback') return;
+      {
+      const p = location.pathname;
+      if(!(p.endsWith('/spotify/callback') || p.endsWith('/callback'))) return;
+    }
       const code = new URLSearchParams(location.search).get('code');
       const verifier = sessionStorage.getItem('sp_verifier');
       const spStatus = document.getElementById('spStatus');
