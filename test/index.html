@@ -990,7 +990,6 @@ function renderTimeline(session) {
 }
  
 async function confirmPlacementHandler(){
-(){
   const sid = window.sessionId;
   const sSnap = await get(ref(db, `sessions/${sid}`)); if (!sSnap.exists()) return;
   const sess = sSnap.val();
@@ -1013,7 +1012,8 @@ async function confirmPlacementHandler(){
   const newTL = (activeTeam.timeline || []).slice();
   newTL.push({ trackId: cur.trackId, year: songMeta.year });
 
-  const deck = sess.deck || []; const shown = sess.shown || {};
+  const deck = sess.deck || []; 
+  const shown = sess.shown || {};
   const nextId = deck.find(id => !shown[id] && id !== cur.trackId);
 
   const updates = {};
@@ -1030,13 +1030,12 @@ async function confirmPlacementHandler(){
   updates[`sessions/${sid}/turn/activeIndex`] = nextIdx;
 
   if (nextId) {
-    // Move to the next card
-    updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
-    // Reveal the current one in a separate call FIRST to avoid ancestor/descendant conflict
+    // 1) markera nuvarande som visad (undvik ancestor/descendant-krock)
     await update(ref(db, `sessions/${sid}/current`), { revealed: true });
+    // 2) gå vidare till nästa + övriga updates i en separat update()
+    updates[`sessions/${sid}/current`] = { trackId: nextId, revealed: false };
     await update(ref(db), updates);
   } else {
-    // Last card: reveal it and finish
     await update(ref(db, `sessions/${sid}/current`), { revealed: true });
     updates[`sessions/${sid}/status`] = "finished";
     await update(ref(db), updates);
