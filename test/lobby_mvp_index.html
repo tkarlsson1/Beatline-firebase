@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.620 (TEST)</title>
+  <title>NOTESTREAM –0.622 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -155,7 +155,7 @@
     }
     window.addEventListener("hashchange", route);
 
-    function showSection(id, on){ document.getElementById(id).style.display = on ? "block" : "none"; }
+    function showSection(id, on) { document.getElementById(id).style.display = on ? "block" : "none"; }
 
     // ==== Auth badge ====
     onAuthStateChanged(auth, (u) => {
@@ -231,7 +231,11 @@
         const isHost = auth.currentUser && v.hostId === auth.currentUser.uid;
         if (startBtn) {
           startBtn.disabled = !(isHost && teams.length >= 1);
-          startBtn.onclick = () => alert("Starta spel → (Cloud Function hostStart() kommer i nästa steg)");
+          startBtn.onclick = async () => {
+            const ok = await transferToSelectedDevice(false); // auto-transfer at game start
+            if (!ok) return;
+            alert("Starta spel → (Cloud Function hostStart() kommer i nästa steg)");
+          };
         }
       });
     }
@@ -256,7 +260,7 @@
 
     // ==== Spotify PKCE (host) – minimal ====
     const SPOTIFY_CLIENT_ID = "3033344ef55647b8b70ef1dccfa7e65f";
-    const REDIRECT = location.origin + location.pathname; // return to same page to avoid 404 on static hosting
+    const REDIRECT = location.origin + location.pathname; // return to same page (avoid 404 on static hosting)
     const SPOTIFY_SCOPES =
       "streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state";
 
@@ -393,6 +397,30 @@
       tok.expires_at = Date.now() + (j.expires_in * 1000 - 60000);
       localStorage.setItem("sp_token", JSON.stringify(tok));
       return tok.access_token;
+    }
+
+    // Transfer playback to the selected device (called at Starta spel)
+    async function transferToSelectedDevice(play = false) {
+      try {
+        const deviceId = localStorage.getItem("sp_device_id");
+        if (!deviceId) { alert("Välj en Connect-enhet först"); return false; }
+        const at = await withToken();
+        const res = await fetch("https://api.spotify.com/v1/me/player", {
+          method: "PUT",
+          headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" },
+          body: JSON.stringify({ device_ids: [deviceId], play })
+        });
+        if (!res.ok) {
+          const t = await res.text();
+          alert("Kunde inte ansluta till vald enhet.\n" + t);
+          return false;
+        }
+        return true;
+      } catch (e) {
+        console.error(e);
+        alert("Fel vid anslutning till enhet");
+        return false;
+      }
     }
 
     // ==== Boot ====
