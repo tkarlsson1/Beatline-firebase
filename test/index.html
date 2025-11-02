@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.636</title>
+  <title>NOTESTREAM v0.637</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1203,6 +1203,8 @@ select:focus, select:hover {
       const lobbyUrl = `${location.origin}/test/lobby_mvp_index.html#pre/${preId}`;
       location.href = lobbyUrl;
       window.createPreLobby = createPreLobby;
+      // Koppla knappen direkt här i modul-scope (viktig rad)
+document.getElementById('startLobbyBtn')?.addEventListener('click', createPreLobby);
     }
     // === /PRELOBBY ===
 
@@ -1526,10 +1528,7 @@ body, .screen, .app, .viewport { max-width: var(--no-gutter-max); }
         closeEditYearModal();
       });
 
-      // Koppla “Skapa lobby”
-      document.getElementById("startLobbyBtn")?.addEventListener("click", () => {
-  window.createPreLobby();
-});
+      
     });
   </script>
 
