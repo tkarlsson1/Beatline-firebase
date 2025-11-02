@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-// Peka på TEST-RTDB: notestreamfire (INTE live)
+// Peka på TEST-RTDB: notestreamfire (inte live)
 admin.initializeApp({
   databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app"
 });
@@ -11,7 +11,7 @@ const db = admin.database();
 /**
  * Callable: hostStart
  * data: { gameId: string }
- * auth: kräver inloggning (anonym auth räcker)
+ * auth: kräver inloggning (anon auth räcker)
  */
 exports.hostStart = functions.region("europe-west1").https.onCall(async (data, context) => {
   const uid = context.auth?.uid;
@@ -66,7 +66,7 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
 
   const pool = [];
 
-  // Standardlistor
+  // Standardlistor (om angivna)
   if (Array.isArray(settings.standardListIds)) {
     for (const listId of settings.standardListIds) {
       const items = await readTracksFromList(`standardLists/${listId}/tracks`);
@@ -74,11 +74,23 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     }
   }
 
-  // Egna listor (kräver ownerUid i settings)
+  // Egna listor (om angivna – kräver ownerUid)
   if (Array.isArray(settings.userPlaylistIds) && settings.ownerUid) {
     for (const listId of settings.userPlaylistIds) {
       const items = await readTracksFromList(`userPlaylists/${settings.ownerUid}/${listId}/tracks`);
       pool.push(...items);
+    }
+  }
+
+  // 📌 Fallback: om inga listor angavs → läs ALLA standardLists
+  if (pool.length === 0) {
+    const stdRoot = await db.ref(`standardLists`).get();
+    if (stdRoot.exists()) {
+      const lists = stdRoot.val() || {};
+      for (const listId of Object.keys(lists)) {
+        const items = await readTracksFromList(`standardLists/${listId}/tracks`);
+        pool.push(...items);
+      }
     }
   }
 
