@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.642 (TEST)</title>
+  <title>NOTESTREAM –0.643 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -146,15 +146,40 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
+    // ==== Helpers Spotify token ====
+    function getStoredToken(){
+      const raw = localStorage.getItem('sp_token');
+      if(!raw) return null;
+      try { return JSON.parse(raw); } catch { return null; }
+    }
+    function isTokenValid(tok){
+      return tok && typeof tok.expires_at === 'number' && Date.now() < tok.expires_at;
+    }
+
     // ==== Routing (hash) ====
     function showSection(id, on){ document.getElementById(id).style.display = on?"block":"none"; }
-    function route() {
+    async function route() {
       const hash = location.hash.replace(/^#/, "");
       const [path, id] = hash.split("/");
       const isPre = path === "pre";  // visa start även för #pre/<id>
-      showSection("screenStart", !path || isPre);
+      const showStart = (!path || isPre);
+      showSection("screenStart", showStart);
       showSection("screenLobby", path === "lobby");
       showSection("screenJoin", path === "join");
+
+      // Om vi är på startskärmen och redan har ett giltigt Spotify-token: uppdatera UI + visa enhetslista
+      if (showStart) {
+        const spStatus = document.getElementById('spStatus');
+        const pickBtn = document.getElementById('btnPickDevice');
+        const tok = getStoredToken();
+        if (isTokenValid(tok)) {
+          spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
+          pickBtn.disabled = false;
+          // rendera lista direkt
+          try { await renderDevicesList(); } catch {}
+        }
+      }
+
       if (!path) return;
       if (path === "lobby" && id) loadLobby(id);
       if (path === "join" && id) setupJoin(id);
@@ -328,11 +353,11 @@
         const stateHash = decodeURIComponent(params.get('state') || '') || sessionStorage.getItem('sp_hash') || '';
         if (stateHash) location.hash = stateHash;
 
+        // Uppdatera UI och lista
         if(spStatus) spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
         const pickBtn = document.getElementById('btnPickDevice');
         if(pickBtn) pickBtn.disabled = false;
 
-        // Visa enhetslistan direkt efter koppling (kvalitetsliv)
         renderDevicesList().catch(()=>{});
       }catch(e){
         if(spStatus) spStatus.innerHTML = '<span class="err">Spotify-koppling misslyckades</span>';
@@ -341,15 +366,16 @@
     })();
 
     async function withToken(){
-      const raw = localStorage.getItem('sp_token'); if(!raw) throw new Error('Ej inloggad mot Spotify');
-      const tok = JSON.parse(raw);
-      if(Date.now() < tok.expires_at) return tok.access_token;
+      const tok = getStoredToken();
+      if(tok && Date.now() < tok.expires_at) return tok.access_token;
+      if(!tok) throw new Error('Ej inloggad mot Spotify');
+      // refresh
       const res = await fetch('https://accounts.spotify.com/api/token',{
         method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:new URLSearchParams({ grant_type:'refresh_token', refresh_token:tok.refresh_token, client_id:SPOTIFY_CLIENT_ID })
       });
       const j = await res.json();
-      tok.access_token = j.access_token; tok.expires_at = Date.now() + (j.exires_in*1000 - 60000);
+      tok.access_token = j.access_token; tok.expires_at = Date.now() + (j.expires_in*1000 - 60000);
       localStorage.setItem('sp_token', JSON.stringify(tok));
       return tok.access_token;
     }
@@ -378,7 +404,7 @@
           try{
             localStorage.setItem('sp_device_id', d.id);
             document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
-            // Ingen tyst transfer här – vi gör det i spel-flödet när vi faktiskt ska spela
+            // Transfer gör vi i spel-flödet vid faktisk uppspelning
           }catch(e){ console.error(e); }
         });
         deviceArea.appendChild(b);
