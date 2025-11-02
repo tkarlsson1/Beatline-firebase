@@ -366,7 +366,8 @@
         const idToken = await u.getIdToken(true);
 
         // Skicka gameId både i query OCH i body för att täcka olika servermönster
-        const url = new URL('https://europe-west1-beatlinefirebase.cloudfunctions.net/hostStart');
+        const url = new URL('https://europe-west1-beatlinefirebase.cloudfunctions.net/hostStartHttp');
+
         url.searchParams.set('gameId', gameId);
 
         const res = await fetch(url.toString(), {
