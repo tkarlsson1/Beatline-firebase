@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.625 (TEST)</title>
+  <title>NOTESTREAM –0.629 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
     *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #111827;background:#0e152e;position:sticky;top:0;z-index:10}
     h1{font-size:18px;margin:0;font-weight:600}
-    main{max-width:900px;margin:0 auto;padding:16px}
+    main{max-width:980px;margin:0 auto;padding:16px}
     .card{background:#0e152e;border:1px solid #111827;border-radius:14px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.25)}
     .row{display:flex;gap:12px;flex-wrap:wrap}
     label{display:block;font-size:12px;color:var(--mut);margin-bottom:6px}
@@ -28,6 +28,8 @@
     .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
     a{color:#67e8f9;text-decoration:none}
     .ok{color:#10b981} .warn{color:#f59e0b} .err{color:#ef4444}
+    .lists{border:1px solid #1f2937;border-radius:12px;padding:8px;background:#0b1228}
+    .pill{display:inline-block;margin:2px 6px 2px 0;padding:4px 8px;border:1px solid #1f2937;border-radius:999px;font-size:12px;background:#0b1228}
   </style>
 </head>
 <body>
@@ -41,8 +43,17 @@
       <div class="card grid cols-2">
         <div>
           <h2 style="margin:0 0 8px 0">Skapa lobby</h2>
-          <p class="mut">Välj år och timers. Låtlistor kopplas på startsidan senare – detta är en lobby-MVP.</p>
-          <div class="grid cols-2">
+          <p class="mut">Den här vyn kan ta emot urval från startsidan (prelobby-token). Du kan justera år/timers här.</p>
+
+          <div>
+            <label>Listor från startsidan</label>
+            <div id="listsPreview" class="lists">
+              <span class="mut">Inga listor mottagna ännu (öppna via <span class="mono">#pre/&lt;id&gt;</span>).</span>
+            </div>
+            <p id="listsMsg" class="mut" style="margin:6px 0 0 0"></p>
+          </div>
+
+          <div class="grid cols-2" style="margin-top:10px">
             <div>
               <label>Från år</label>
               <input id="yearMin" type="number" min="1900" max="2099" value="1960" />
@@ -68,6 +79,7 @@
               <input id="tokensPerTeam" type="number" min="0" max="20" value="4" />
             </div>
           </div>
+
           <div style="margin-top:12px;display:flex;gap:8px">
             <button id="btnCreate" class="primary">Skapa lobby</button>
             <button id="btnGotoJoin" class="ghost">Gå till join-vy</button>
@@ -128,7 +140,7 @@
     // ==== Firebase (RTDB) init ====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getDatabase, ref, set, child, onValue, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+    import { getDatabase, ref, set, child, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
     import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-functions.js";
 
     const firebaseConfig = {
@@ -144,14 +156,60 @@
     const db = getDatabase(app);
     const functions = getFunctions(app, "europe-west1");
 
+    // ==== Prelobby (mottag från index.html) ====
+    let preSettings = null; // kommer från /prelobbies/<preId>/settings
+    let preId = null;
+
+    async function tryLoadPreFromHash() {
+      const hash = location.hash.replace(/^#/, "");
+      const [path, id] = hash.split("/");
+      if (path === "pre" && id) {
+        preId = id;
+        const s = await get(ref(db, `prelobbies/${id}/settings`));
+        if (s.exists()) {
+          preSettings = s.val();
+          applyPreToUI(preSettings);
+        } else {
+          document.getElementById("listsMsg").textContent = "Kunde inte läsa urval från startsidan.";
+        }
+      }
+    }
+
+    function applyPreToUI(p) {
+      // år
+      if (Number.isFinite(p.yearMin)) document.getElementById("yearMin").value = p.yearMin;
+      if (Number.isFinite(p.yearMax)) document.getElementById("yearMax").value = p.yearMax;
+      // timers
+      if (p.timers?.dragSec) document.getElementById("tDrag").value = p.timers.dragSec;
+      if (p.timers?.challengePromptSec) document.getElementById("tClaim").value = p.timers.challengePromptSec;
+      if (p.timers?.oppDragSec) document.getElementById("tOpp").value = p.timers.oppDragSec;
+      if (Number.isFinite(p.tokensPerTeam)) document.getElementById("tokensPerTeam").value = p.tokensPerTeam;
+
+      // visa listor (standardListIds) som piller
+      const box = document.getElementById("listsPreview");
+      box.innerHTML = "";
+      const ids = Array.isArray(p.standardListIds) ? p.standardListIds : [];
+      if (!ids.length) {
+        box.innerHTML = '<span class="mut">Inga listor mottagna.</span>';
+      } else {
+        ids.forEach(id => {
+          const span = document.createElement("span");
+          span.className = "pill";
+          span.textContent = id;
+          box.appendChild(span);
+        });
+        document.getElementById("listsMsg").textContent = `${ids.length} listor valda från startsidan.`;
+      }
+    }
+
     // ==== Routing (hash) ====
     function route() {
       const hash = location.hash.replace(/^#/, "");
       const [path, id] = hash.split("/");
-      showSection("screenStart", !path);
+      showSection("screenStart", !path || path === "pre");
       showSection("screenLobby", path === "lobby");
       showSection("screenJoin", path === "join");
-      if (!path) return;
+      if (!path || path === "pre") return;
       if (path === "lobby" && id) loadLobby(id);
       if (path === "join" && id) setupJoin(id);
     }
@@ -160,10 +218,15 @@
     function showSection(id, on){ document.getElementById(id).style.display = on ? "block" : "none"; }
 
     // ==== Auth badge ====
-    onAuthStateChanged(auth, (u)=>{
+    onAuthStateChanged(auth, async (u)=>{
       const el = document.getElementById("authBadge");
-      if (u) { el.innerHTML = `UID: <span class="kbd">${u.uid.slice(0,8)}…</span>`; route(); }
-      else el.textContent = "inte inloggad";
+      if (u) {
+        el.innerHTML = `UID: <span class="kbd">${u.uid.slice(0,8)}…</span>`;
+        await tryLoadPreFromHash();
+        route();
+      } else {
+        el.textContent = "inte inloggad";
+      }
     });
     signInAnonymously(auth).catch(console.error);
 
@@ -176,6 +239,7 @@
     if (btnCreate) {
       btnCreate.addEventListener("click", async ()=>{
         const u = auth.currentUser; if (!u) return alert("Inte inloggad");
+
         const yearMin = +document.getElementById("yearMin").value;
         const yearMax = +document.getElementById("yearMax").value;
         const tDrag = +document.getElementById("tDrag").value;
@@ -183,15 +247,34 @@
         const tOpp = +document.getElementById("tOpp").value;
         const tokensPerTeam = +document.getElementById("tokensPerTeam").value;
 
+        // Basinställningar
+        const settings = {
+          yearMin, yearMax,
+          timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp },
+          tokensPerTeam, winCards: 11, allowLateJoin: false, dedupeKey: "spotifyId"
+        };
+
+        // Om vi har preSettings från startsidan – inkludera dem
+        if (preSettings) {
+          if (Array.isArray(preSettings.standardListIds)) {
+            settings.standardListIds = preSettings.standardListIds.slice();
+          }
+          if (Array.isArray(preSettings.userPlaylistIds)) {
+            settings.userPlaylistIds = preSettings.userPlaylistIds.slice();
+          }
+          if (preSettings.ownerUid) settings.ownerUid = preSettings.ownerUid;
+        }
+
+        // Skapa game
         const gameId = (await push(ref(db, "games"))).key;
         const base = ref(db, `games/${gameId}`);
         await set(child(base, "phase"), "lobby");
         await set(child(base, "hostId"), u.uid);
-        await set(child(base, "settings"), {
-          yearMin, yearMax,
-          timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp },
-          tokensPerTeam, winCards: 11, allowLateJoin: false, dedupeKey: "spotifyId"
-        });
+        await set(child(base, "settings"), settings);
+
+        // valfritt: städa prelobby-noden (behövs ej)
+        // if (preId) await set(ref(db, `prelobbies/${preId}`), null);
+
         location.hash = `lobby/${gameId}`;
       });
     }
@@ -220,7 +303,6 @@
       const base = ref(db, `games/${gameId}`);
       lobbyUnsub = onValue(base, (snap)=>{
         const v = snap.val() || {};
-        // teams list
         const teamsEl = document.getElementById("teams");
         teamsEl.innerHTML = "";
         const teams = v.teams ? Object.entries(v.teams) : [];
@@ -234,17 +316,14 @@
         if (startBtn) {
           startBtn.disabled = !(isHost && teams.length >= 1);
           startBtn.onclick = async ()=>{
-            // 1) Auto-transfer till vald enhet
             const ok = await transferToSelectedDevice(false);
             if (!ok) return;
-            // 2) Anropa hostStart
             try {
               const hostStart = httpsCallable(functions, "hostStart");
               const res = await hostStart({ gameId });
               console.log("hostStart:", res?.data);
               alert("Spelet startat! (phase=playing, deck skapat)");
-              // TODO: när spelsidan finns:
-              // location.hash = `play/${gameId}`;
+              // TODO: location.hash = `play/${gameId}`;
             } catch (e) {
               console.error(e);
               alert("Kunde inte starta spel: " + (e.message || e));
@@ -411,7 +490,6 @@
       return tok.access_token;
     }
 
-    // Transfer playback to the selected device (called at Starta spel)
     async function transferToSelectedDevice(play = false){
       try{
         const deviceId = localStorage.getItem("sp_device_id");
@@ -436,7 +514,8 @@
     }
 
     // ==== Boot ====
-    route();
+    route();           // Visa rätt vy
+    tryLoadPreFromHash(); // Ladda ev. pre direkt om hash redan finns
   </script>
 </body>
 </html>
