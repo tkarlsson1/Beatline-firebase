@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.639 (TEST)</title>
+  <title>NOTESTREAM –0.640 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -142,16 +142,25 @@
     const db = getDatabase(app);
 
     // ==== Routing (hash) ====
-    function route() {
-      const hash = location.hash.replace(/^#/, "");
-      const [path, id] = hash.split("/");
-      showSection("screenStart", !path);
-      showSection("screenLobby", path === "lobby");
-      showSection("screenJoin", path === "join");
-      if (!path) return;
-      if (path === "lobby" && id) loadLobby(id);
-      if (path === "join" && id) setupJoin(id);
-    }
+   function route() {
+  const hash = location.hash.replace(/^#/, "");
+  const [path, id] = hash.split("/");
+
+  const isPre = path === "pre";        // <— NYTT
+
+  // Visa startsidan både utan hash och för #pre/<id>
+  showSection("screenStart", !path || isPre);    // <— ÄNDRAD
+  showSection("screenLobby", path === "lobby");
+  showSection("screenJoin", path === "join");
+
+  if (!path) return;
+
+  // (valfritt) här skulle vi kunna läsa in pre-info i UI om vi vill
+  // men själva skapandet läser redan prelobby-settings i btnCreate-handlern
+
+  if (path === "lobby" && id) loadLobby(id);
+  if (path === "join" && id) setupJoin(id);
+}
     window.addEventListener("hashchange", route);
     function showSection(id, on){ document.getElementById(id).style.display = on?"block":"none"; }
 
