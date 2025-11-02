@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.649 (TEST)</title>
+  <title>NOTESTREAM –0.650 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -386,9 +386,8 @@
           throw new Error(msg);
         }
 
-        const payload = await res.json().catch(()=> ({}));
-        const count = payload && typeof payload.deckCount === 'number' ? payload.deckCount : 'ok';
-        alert(`Spelet startades! Kort i lek: ${count}. Server sätter phase=playing.`);
+        // ★ NYTT: navigera direkt till game-sidan (ingen alert)
+        location.href = `/test/game_mvp.html#game/${gameId}`;
       }catch(e){
         console.error(e);
         alert('Kunde inte starta spel: ' + (e.message || e));
@@ -426,7 +425,7 @@
         startBtn.disabled = !(isHost && teams.length>=1);
         startBtn.onclick = ()=> startGame(gameId);
 
-        // === ÄNDRING: hoppa till spelsidan när phase blir playing ===
+        // Backup: om funktionen hann först
         if (v.phase === 'playing') {
           location.href = `/test/game_mvp.html#game/${gameId}`;
           return;

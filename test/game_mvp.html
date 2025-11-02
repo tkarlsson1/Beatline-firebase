@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.649 (TEST)</title>
+  <title>NOTESTREAM –0.650 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; --ok:#10b981; }
@@ -62,6 +62,7 @@
     <section class="card">
       <h3 style="margin:0 0 8px 0">Lag</h3>
       <div id="teamStrip" class="team-strip"></div>
+      <div id="teamEmpty" class="mut" style="display:none">Inga lag ännu – öppna lobby och lägg till minst ett.</div>
     </section>
 
     <section class="card grid">
@@ -106,39 +107,48 @@
     const db = getDatabase(app);
 
     // ==== Helpers ====
-    function $(id){ return document.getElementById(id); }
-    function parseHash(){
-      const [_, game, gid] = (location.hash || '').match(/^#game\/([^\/]+)$/) || [];
-      return gid || null;
-    }
+    const $ = (id)=>document.getElementById(id);
+    const parseHash = ()=>{
+      const m = (location.hash || '').match(/^#game\/([^\/]+)$/);
+      return m ? m[1] : null;
+    };
 
     // ==== Routing / load ====
     let gameId = parseHash();
     $('lblGameId').textContent = gameId || '–';
+    console.log('[Game] Loaded with hash:', location.hash, '→ gameId =', gameId);
 
     window.addEventListener('hashchange', ()=>{
       gameId = parseHash();
       $('lblGameId').textContent = gameId || '–';
+      console.log('[Game] hashchange →', gameId);
       if (gameId) bindGame(gameId);
     });
 
     onAuthStateChanged(auth, (u)=>{
       $('authBadge').textContent = u ? `UID: ${u.uid.slice(0,8)}…` : 'inte inloggad';
-      if (u && gameId) bindGame(gameId);
+      console.log('[Game] auth state:', u?.uid);
+      if (gameId) bindGame(gameId); // läs även anonymt (reglerna är öppna i test)
     });
     signInAnonymously(auth).catch(console.error);
 
     // ==== Bind game state ====
     let unsub = null;
     function bindGame(id){
-      if (unsub) unsub(); // detach previous
+      if (!id) return;
+      if (unsub) unsub();
       const gRef = ref(db, `games/${id}`);
+      console.log('[Game] binding to', `games/${id}`);
       unsub = onValue(gRef, snap=>{
-        if(!snap.exists()){ 
+        if(!snap.exists()){
+          console.warn('[Game] games/'+id+' not found');
           $('nowPlaying').textContent = 'Spelet hittades inte.';
+          $('teamStrip').innerHTML = '';
+          $('teamEmpty').style.display = 'block';
           return;
         }
         const v = snap.val() || {};
+        console.log('[Game] state:', v);
         renderGame(v, id);
       });
     }
@@ -153,6 +163,7 @@
       const strip = $('teamStrip');
       strip.innerHTML = '';
       const teams = g.teams ? Object.entries(g.teams) : [];
+      $('teamEmpty').style.display = teams.length ? 'none' : 'block';
       teams.forEach(([tid, t])=>{
         const div = document.createElement('div');
         div.className = 'team' + (g.turn === tid ? ' active' : '');
@@ -170,21 +181,22 @@
       // Now playing (spoilerfri)
       const di = g.drawIndex || 0;
       const deck = Array.isArray(g.deck) ? g.deck : [];
-      $('nowPlaying').textContent = `Spelar låt #${di + 1} av ${deck.length} (spoilerfri)`;
-      // Årtal visas inte före reveal – men vi kan visa intervall för guidance i framtiden.
+      $('nowPlaying').textContent = deck.length
+        ? `Spelar låt #${di + 1} av ${deck.length} (spoilerfri)`
+        : 'Ingen lek – skapa från lobbyn.';
       $('nowYear').textContent = (g.settings && g.settings.yearMin != null && g.settings.yearMax != null)
         ? `Årsintervall: ${g.settings.yearMin}–${g.settings.yearMax}` : '';
 
-      // Enable/disable knappar beroende på tur – placeholder nu
-      const amHostTurn = true; // TODO: när vi har user→team-koppling kan vi styra detta
+      // Knappar – placeholder tills vi kopplar state-maskin
+      const amHostTurn = true;
       $('btnLock').disabled = !amHostTurn;
       $('btnSkip').disabled = !amHostTurn;
     }
 
     // ==== Nav back ====
     $('btnBackLobby').addEventListener('click', ()=> history.back());
-    
-    // Boot: om gameId fanns i hash direkt, bind
+
+    // Boot
     if (gameId) bindGame(gameId);
   </script>
 </body>
