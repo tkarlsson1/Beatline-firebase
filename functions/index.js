@@ -19,7 +19,7 @@ function cors(req, res) {
 function rng(seed){ let x = seed>>>0; return ()=>{ x^=x<<13; x>>>=0; x^=x>>>17; x>>>=0; x^=x<<5; x>>>=0; return (x>>>0)/0x100000000; }; }
 function seededShuffle(arr, seedNum){ const a=arr.slice(); const R=rng(seedNum||123456); for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 
-exports.hostStart = functions.region('europe-west1').https.onRequest(async (req, res) => {
+exports.hostStartHttp = functions.region('europe-west1').https.onRequest(async (req, res) => {
   try {
     if (cors(req, res)) return;
     if (req.method !== 'POST') {
