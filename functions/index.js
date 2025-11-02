@@ -1,211 +1,238 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+/* eslint-disable no-console */
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-// Test-RTDB (NOTESTREAM): inte live
-admin.initializeApp({
-  databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app"
-});
+try {
+  admin.app();
+} catch {
+  admin.initializeApp({
+    databaseURL: 'https://notestreamfire.europe-west1.firebasedatabase.app',
+  });
+}
+
 const db = admin.database();
 
-/**
- * Callable: hostStart
- * data: { gameId: string }
- */
-exports.hostStart = functions.region("europe-west1").https.onCall(async (data, context) => {
-  const uid = context.auth?.uid;
-  const gameId = data?.gameId;
-  if (!uid || !gameId) {
-    throw new functions.https.HttpsError("failed-precondition", "auth/gameId required");
+function cors(req, res) {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return true;
   }
+  return false;
+}
 
-  const gameRef = db.ref(`games/${gameId}`);
-  const snap = await gameRef.get();
-  if (!snap.exists()) {
-    throw new functions.https.HttpsError("not-found", "game/not-found");
-  }
-  const game = snap.val();
-
-  if (game.hostId !== uid) {
-    throw new functions.https.HttpsError("permission-denied", "permission/only-host");
-  }
-  if (game.phase !== "lobby") {
-    throw new functions.https.HttpsError("failed-precondition", "state/not-lobby");
-  }
-
-  const teamsObj = game.teams || {};
-  const teamIds = Object.keys(teamsObj);
-  if (teamIds.length < 1) {
-    throw new functions.https.HttpsError("failed-precondition", "teams/empty");
-  }
-
-  const settings = game.settings || {};
-  const yearMin = Number.isFinite(settings.yearMin) ? settings.yearMin : 1900;
-  const yearMax = Number.isFinite(settings.yearMax) ? settings.yearMax : 2100;
-  const tokensPerTeam = Number.isFinite(settings.tokensPerTeam) ? settings.tokensPerTeam : 4;
-
-  // ---------- Helpers ----------
-  function coerceYear(y) {
-    if (y == null) return NaN;
-    if (typeof y === "number") return y;
-    if (typeof y === "string") {
-      const n = parseInt(y, 10);
-      return Number.isFinite(n) ? n : NaN;
-    }
-    return NaN;
-  }
-
-  // Försök extrahera spår från en list-nod som kan se ut:
-  //  - { songs: { <id>: {artist,title,year} } }
-  //  - { tracks: { <id>: {...} } }
-  //  - { <id>: {artist,title,year}, name: '...', ... }  (platt node)
-  function extractTracksFromNode(listNode) {
-    const container = listNode?.songs || listNode?.tracks || listNode;
-    const out = [];
-    for (const key of Object.keys(container || {})) {
-      const v = container[key];
-      if (!v || typeof v !== "object") continue;
-      // hoppa över uppenbara metadata-fält i en platt node
-      if ("name" in v && !("artist" in v) && !("title" in v)) continue;
-
-      const spotifyId = v.spotifyId || v.id || key;
-      const yearRaw = v.customYear != null ? v.customYear : v.year;
-      const year = coerceYear(yearRaw);
-      const title = v.title || v.name || "";
-      const artist =
-        v.artist ||
-        (Array.isArray(v.artists) && v.artists[0]?.name) ||
-        v.artistName ||
-        "";
-
-      // minst SpotifyID + år för att vara relevant
-      out.push({ spotifyId, title, artist, year });
-    }
-    return out;
-  }
-
-  async function readListAt(path) {
-    const s = await db.ref(path).get();
-    return s.exists() ? s.val() : null;
-  }
-
-  // ---------- Bygg pool ----------
-  const pool = [];
-
-  // A) Om list-ID:n är angivna i settings, lås till dem
-  if (Array.isArray(settings.standardListIds) && settings.standardListIds.length) {
-    functions.logger.info("Using provided standardListIds", settings.standardListIds);
-    for (const listId of settings.standardListIds) {
-      const node = await readListAt(`standardLists/${listId}`);
-      if (!node) continue;
-      const items = extractTracksFromNode(node);
-      functions.logger.info(`standardLists/${listId}: extracted`, items.length);
-      pool.push(...items);
-    }
-  }
-
-  if (Array.isArray(settings.userPlaylistIds) && settings.ownerUid) {
-    functions.logger.info("Using provided userPlaylistIds", settings.userPlaylistIds);
-    for (const listId of settings.userPlaylistIds) {
-      const node = await readListAt(`userPlaylists/${settings.ownerUid}/${listId}`);
-      if (!node) continue;
-      const items = extractTracksFromNode(node);
-      functions.logger.info(`userPlaylists/${settings.ownerUid}/${listId}: extracted`, items.length);
-      pool.push(...items);
-    }
-  }
-
-  // B) Fallback: läs ALLA standardLists om inget lades i poolen
-  if (pool.length === 0) {
-    const stdRootSnap = await db.ref("standardLists").get();
-    if (!stdRootSnap.exists()) {
-      functions.logger.warn("standardLists root missing");
-    } else {
-      const stdRoot = stdRootSnap.val() || {};
-      const listIds = Object.keys(stdRoot);
-      functions.logger.info("Fallback: scanning all standardLists", { count: listIds.length, listIds: listIds.slice(0, 10) });
-
-      for (const listId of listIds) {
-        const node = stdRoot[listId];
-        const items = extractTracksFromNode(node);
-        functions.logger.info(`fallback standardLists/${listId}: extracted`, items.length);
-        pool.push(...items);
-      }
-    }
-  }
-
-  functions.logger.info("Pool size before filter", pool.length);
-
-  // ---------- Filtrera + dedupe ----------
-  const inRange = pool.filter(
-    (t) => t && t.spotifyId && Number.isFinite(t.year) && t.year >= yearMin && t.year <= yearMax
-  );
-
-  const seen = new Set();
-  const deduped = [];
-  for (const t of inRange) {
-    if (seen.has(t.spotifyId)) continue;
-    seen.add(t.spotifyId);
-    deduped.push(t);
-  }
-
-  functions.logger.info("After filter/dedupe", { inRange: inRange.length, deduped: deduped.length, yearMin, yearMax });
-
-  if (deduped.length === 0) {
-    // Logga sampling av första 5 från pool för felsökning
-    functions.logger.warn("deck/empty — sample", pool.slice(0, 5));
-    throw new functions.https.HttpsError("failed-precondition", "deck/empty");
-  }
-
-  // ---------- Deterministisk shuffle ----------
-  let seed = 0;
-  for (const c of String(gameId)) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
-
-  const deck = deduped.slice();
-  for (let i = deck.length - 1; i > 0; i--) {
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    const j = seed % (i + 1);
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
-
-  // ---------- Startår per lag ----------
-  const startYears = {};
-  for (const tid of teamIds) {
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    const y = yearMin + (seed % (yearMax - yearMin + 1));
-    startYears[tid] = y;
-  }
-
-  // ---------- Init-state ----------
-  const firstTeam = teamIds[0];
-  const updates = {};
-
-  updates[`games/${gameId}/phase`] = "playing";
-  updates[`games/${gameId}/drawIndex`] = 0;
-  updates[`games/${gameId}/turn`] = firstTeam;
-  updates[`games/${gameId}/round`] = 1;
-
-  updates[`games/${gameId}/deck`] = deck.map((t) => ({
-    spotifyId: t.spotifyId,
-    year: t.year,
-    title: t.title,
-    artist: t.artist,
-  }));
-  updates[`games/${gameId}/current`] = null;
-  updates[`games/${gameId}/startYears`] = startYears;
-
-  // säkerställ tokens enligt settings om ej satta/annorlunda
-  for (const tid of teamIds) {
-    if (!teamsObj[tid]?.tokens || teamsObj[tid].tokens !== tokensPerTeam) {
-      updates[`games/${gameId}/teams/${tid}/tokens`] = tokensPerTeam;
-    }
-  }
-
-  await db.ref().update(updates);
-
-  return {
-    ok: true,
-    deckCount: deck.length,
-    firstTeam,
-    startYears,
+function rng(seed) {
+  // enkel deterministisk RNG (xorshift32)
+  let x = seed >>> 0;
+  return function () {
+    x ^= x << 13; x >>>= 0;
+    x ^= x >>> 17; x >>>= 0;
+    x ^= x << 5; x >>>= 0;
+    return (x >>> 0) / 0x100000000;
   };
-});
+}
+
+function seededShuffle(arr, seedNum) {
+  const a = arr.slice();
+  const R = rng(seedNum || 123456);
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(R() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+exports.hostStart = functions
+  .region('europe-west1')
+  .https.onRequest(async (req, res) => {
+    try {
+      if (cors(req, res)) return;
+      if (req.method !== 'POST') {
+        return res.status(405).json({ error: { status: 'METHOD_NOT_ALLOWED', message: 'Use POST' } });
+      }
+
+      // ---- Auth (Bearer) ----
+      const authHeader = req.get('Authorization') || '';
+      const m = authHeader.match(/^Bearer\s+(.+)$/i);
+      if (!m) {
+        return res.status(401).json({ error: { status: 'UNAUTHENTICATED', message: 'Missing Bearer token' } });
+      }
+      let decoded;
+      try {
+        decoded = await admin.auth().verifyIdToken(m[1]);
+      } catch (e) {
+        return res.status(401).json({ error: { status: 'UNAUTHENTICATED', message: 'Invalid ID token' } });
+      }
+      const callerUid = decoded.uid;
+
+      // ---- Input ----
+      const gameId =
+        (req.query && req.query.gameId) ||
+        (req.body && req.body.gameId);
+
+      if (!gameId || typeof gameId !== 'string') {
+        return res.status(400).json({ error: { status: 'INVALID_ARGUMENT', message: 'Missing gameId' } });
+      }
+
+      // ---- Read game ----
+      const gameSnap = await db.ref(`games/${gameId}`).get();
+      if (!gameSnap.exists()) {
+        return res.status(404).json({ error: { status: 'NOT_FOUND', message: 'game/not-found' } });
+      }
+      const game = gameSnap.val();
+
+      if (game.phase !== 'lobby') {
+        return res.status(400).json({ error: { status: 'INVALID_ARGUMENT', message: 'phase/invalid (must be lobby)' } });
+      }
+      if (!game.hostId || game.hostId !== callerUid) {
+        return res.status(403).json({ error: { status: 'PERMISSION_DENIED', message: 'host/forbidden' } });
+      }
+
+      const settings = game.settings || {};
+      const yearMin = Number(settings.yearMin ?? 1900);
+      const yearMax = Number(settings.yearMax ?? 3000);
+      const standardListIds = Array.isArray(settings.standardListIds) ? settings.standardListIds : [];
+      const userPlaylistIds = Array.isArray(settings.userPlaylistIds) ? settings.userPlaylistIds : [];
+
+      // ---- Teams ----
+      const teams = game.teams ? Object.entries(game.teams) : [];
+      if (teams.length === 0) {
+        return res.status(400).json({ error: { status: 'INVALID_ARGUMENT', message: 'teams/empty' } });
+      }
+
+      // välj första lag via tidigast joinedAt (fallback: key-ordning)
+      const sortedTeams = teams.sort((a, b) => {
+        const ta = (a[1] && a[1].joinedAt) || Number.MAX_SAFE_INTEGER;
+        const tb = (b[1] && b[1].joinedAt) || Number.MAX_SAFE_INTEGER;
+        if (ta !== tb) return ta - tb;
+        return a[0].localeCompare(b[0]);
+      });
+      const firstTeamId = sortedTeams[0][0];
+
+      // ---- Build deck ----
+      const dedupe = new Set();
+      const deck = [];
+
+      async function loadStandardList(listName) {
+        const path = `standardLists/${listName}/songs`;
+        const snap = await db.ref(path).get();
+        if (!snap.exists()) {
+          functions.logger.warn('standard list missing or empty', { listName });
+          return { added: 0, total: 0 };
+        }
+        const songs = snap.val();
+        let total = 0, added = 0;
+
+        for (const spotifyId of Object.keys(songs)) {
+          total++;
+          const s = songs[spotifyId] || {};
+          const yRaw = s.year;
+          const y = typeof yRaw === 'number' ? yRaw : Number(String(yRaw || '').replace(/[^\d]/g, ''));
+          if (!y || isNaN(y)) continue;
+          if (y < yearMin || y > yearMax) continue;
+          if (dedupe.has(spotifyId)) continue;
+          dedupe.add(spotifyId);
+          deck.push({
+            spotifyId,
+            title: s.title || '',
+            artist: s.artist || '',
+            year: y,
+            source: { type: 'standard', list: listName }
+          });
+          added++;
+        }
+        return { added, total };
+      }
+
+      async function loadUserPlaylist(uid, plId) {
+        // För framtiden: om du vill inkludera userPlaylists i leken
+        const path = `userPlaylists/${uid}/${plId}/songs`;
+        const snap = await db.ref(path).get();
+        if (!snap.exists()) return { added: 0, total: 0 };
+        const songs = snap.val();
+        let total = 0, added = 0;
+        for (const spotifyId of Object.keys(songs)) {
+          total++;
+          const s = songs[spotifyId] || {};
+          const yRaw = s.year;
+          const y = typeof yRaw === 'number' ? yRaw : Number(String(yRaw || '').replace(/[^\d]/g, ''));
+          if (!y || isNaN(y)) continue;
+          if (y < yearMin || y > yearMax) continue;
+          if (dedupe.has(spotifyId)) continue;
+          dedupe.add(spotifyId);
+          deck.push({
+            spotifyId,
+            title: s.title || '',
+            artist: s.artist || '',
+            year: y,
+            source: { type: 'user', playlist: plId, owner: uid }
+          });
+          added++;
+        }
+        return { added, total };
+      }
+
+      const stats = { standard: [], user: [] };
+
+      // ladda standardlistor
+      for (const name of standardListIds) {
+        const st = await loadStandardList(name);
+        stats.standard.push({ list: name, ...st });
+      }
+
+      // (valfritt) ladda userPlaylists om du redan vill stödja det
+      for (const pl of userPlaylistIds) {
+        const st = await loadUserPlaylist(settings.ownerUid || callerUid, pl);
+        stats.user.push({ playlist: pl, ...st });
+      }
+
+      functions.logger.info('hostStart deck build', {
+        gameId, counts: { total: deck.length, lists: stats }
+      });
+
+      if (deck.length === 0) {
+        return res.status(400).json({
+          error: {
+            status: 'INVALID_ARGUMENT',
+            message: 'deck/empty',
+            details: stats
+          }
+        });
+      }
+
+      // seedad blandning (seed = hash av gameId)
+      let seedNum = 0;
+      for (let i = 0; i < gameId.length; i++) seedNum = (seedNum * 31 + gameId.charCodeAt(i)) >>> 0;
+      const shuffled = seededShuffle(deck, seedNum);
+
+      // startYear per lag
+      const teamStartYears = {};
+      for (const [tid] of sortedTeams) {
+        const r = rng(seedNum ^ tid.length);
+        const yr = Math.floor(yearMin + r() * (yearMax - yearMin + 1));
+        teamStartYears[tid] = yr;
+      }
+
+      // skriv tillbaka
+      const updates = {};
+      updates[`games/${gameId}/phase`] = 'playing';
+      updates[`games/${gameId}/round`] = 1;
+      updates[`games/${gameId}/turn`] = firstTeamId;
+      updates[`games/${gameId}/drawIndex`] = 0;
+      updates[`games/${gameId}/startYears`] = teamStartYears;
+      updates[`games/${gameId}/deck`] = shuffled; // array av objekt
+
+      await db.ref().update(updates);
+
+      return res.status(200).json({
+        ok: true,
+        deckCount: shuffled.length,
+        firstTurn: firstTeamId
+      });
+    } catch (err) {
+      functions.logger.error('hostStart fatal', { err: String(err), stack: err && err.stack });
+      return res.status(500).json({ error: { status: 'INTERNAL', message: 'internal/error' } });
+    }
+  });
