@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.644</title>
+  <title>NOTESTREAM v0.645</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -444,10 +444,7 @@ select:focus, select:hover {
       createUserWithEmailAndPassword,
       onAuthStateChanged,
       signOut,
-      sendPasswordResetEmail,
-      // 🔒 Auth-persistence
-      setPersistence,
-      browserLocalPersistence
+      sendPasswordResetEmail
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     
     const firebaseConfig = {
@@ -476,10 +473,6 @@ select:focus, select:hover {
     window.firebaseUpdate = update;
     const auth = getAuth(app);
     window.auth = auth;
-
-    // 🔒 Auth-persistence: behåll session mellan sidladdningar
-    await setPersistence(auth, browserLocalPersistence);
-
     // Gör de globala variablerna tillgängliga
     window.currentPlaylistName = null;
     window.currentSpotifyID = null;
@@ -525,12 +518,8 @@ select:focus, select:hover {
     let shownSongs = [];
     let currentSong = null;
     
-    // ✅ Initiera dataläsning när auth är klar (kör en gång per inloggning)
-    let __dataInited = false;
+    // Funktion för att sätta fast databashanteringslyssnare – körs endast när en användare är inloggad.
     function initDataListeners() {
-      if (__dataInited) return;
-      __dataInited = true;
-
       // Läs standardspellistor (offentliga)
       onValue(ref(db, 'standardLists'), (snapshot) => {
         if (snapshot.exists()) {
@@ -601,9 +590,6 @@ select:focus, select:hover {
         } else {
           console.log("Ingen användare inloggad.");
           document.getElementById("loginModal").style.display = "flex";
-          // Om du vill auto-spara state här kan du lägga till logik,
-          // men vi signar inte in anonymt i denna vy.
-          __dataInited = false;
         }
       });
       
@@ -1134,7 +1120,6 @@ select:focus, select:hover {
             console.log("Utloggad!");
             document.getElementById("loginModal").style.display = "flex";
             dropdownMenu.style.display = "none";
-            __dataInited = false; // möjliggör ny init på nästa inloggning
           })
           .catch((error) => {
             console.error("Fel vid utloggning:", error);
