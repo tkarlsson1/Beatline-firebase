@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NOTESTREAM v0.627</title>
+  <title>NOTESTREAM v0.628</title>
   <!-- Ladda Manrope -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="favicon.png">
@@ -1194,6 +1194,89 @@ const logoutLink = document.createElement("a");
         }
       });
     });
+    // === PRELOBBY handoff till lobby_mvp_index ===
+// 1) Initiera en separat app mot TEST-RTDB (notestreamfire) för handoff
+import { initializeApp as initApp2 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getDatabase as getDB2, ref as ref2, push as push2, set as set2, get as get2 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+const prelobbyApp = initApp2({
+  apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+  authDomain: "beatlinefirebase.firebaseapp.com",
+  databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+  projectId: "beatlinefirebase",
+  appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+}, "prelobby");
+const prelobbyDb = getDB2(prelobbyApp);
+
+// 2) Hjälpare för att härleda valda standardlistor från befintliga UI:t
+function getSelectedStandardListIds() {
+  // Dina låtobjekt bär på source:[playlistName]. Vi vill mappa till nycklarna i standardLists.
+  // Vi läser root: standardLists -> tar listIds (t.ex. "1970-tal") och matchar mot de kryssade källorna.
+  // OBS: vi antar att dina "källor" i UI:t använder listnamn som motsvarar nycklarna.
+  const checked = Array.from(document.querySelectorAll('input[name="source"]:checked'))
+    .map(cb => cb.value);
+
+  return get2(ref2(prelobbyDb, "standardLists")).then(snap => {
+    const node = snap.exists() ? snap.val() : {};
+    const ids = Object.keys(node);
+    // Om "alla" är valt → returnera alla standardlistor
+    if (checked.includes("alla")) return ids;
+    // Filtrera: behåll de listor vars id/namn finns i checked
+    const setChecked = new Set(checked);
+    return ids.filter(id => setChecked.has(id));
+  });
+}
+
+// 3) Läs årsintervall från dina fält på sidan (justera om dina id:n heter något annat)
+function readYearRange() {
+  const startEl = document.getElementById("startYearInput") || document.getElementById("startYear"); // fallback om dina id:n skiljer sig
+  const endEl = document.getElementById("endYearInput") || document.getElementById("endYear");
+  // Om du har andra id:n, uppdatera ovan.
+  const min = startEl ? parseInt(startEl.value, 10) : 1900;
+  const max = endEl ? parseInt(endEl.value, 10) : 2100;
+  return { yearMin: isFinite(min) ? min : 1950, yearMax: isFinite(max) ? max : 2025 };
+}
+
+// 4) Klick-handler: skriv prelobby och gå till lobbyn
+const startLobbyBtn = document.getElementById("startLobbyBtn");
+if (startLobbyBtn) {
+  startLobbyBtn.addEventListener("click", async () => {
+    try {
+      const { yearMin, yearMax } = readYearRange();
+      const standardListIds = await getSelectedStandardListIds();
+
+      if (!standardListIds || standardListIds.length === 0) {
+        alert("Välj minst en standardlista innan du startar i lobby.");
+        return;
+      }
+
+      // userPlaylistIds/ownerUid kan kopplas på senare när din UI har det tydligt.
+      const preRef = ref2(prelobbyDb, "prelobbies");
+      const newRef = push2(preRef);
+      await set2(newRef, {
+        createdAt: Date.now(),
+        settings: {
+          yearMin, yearMax,
+          standardListIds,
+          // userPlaylistIds: [],
+          // ownerUid: null,
+          tokensPerTeam: 4, winCards: 11, allowLateJoin: false, dedupeKey: "spotifyId",
+          timers: { dragSec: 90, challengePromptSec: 10, oppDragSec: 20 }
+        }
+      });
+
+      // Skicka vidare till lobbyn med token
+      const preId = newRef.key;
+      // Justera prefixet om din lobby ligger på annan path än /test/
+      const lobbyUrl = `${location.origin}/test/lobby_mvp_index#pre/${preId}`;
+      location.href = lobbyUrl;
+    } catch (e) {
+      console.error(e);
+      alert("Kunde inte förbereda lobby-start: " + (e.message || e));
+    }
+  });
+}
+
   </script>
 
   <meta name="theme-color" content="#111111">
