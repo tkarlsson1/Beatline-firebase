@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.650 (TEST)</title>
+  <title>NOTESTREAM –0.651 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; --ok:#10b981; }
@@ -25,8 +25,18 @@
     button.primary{background:linear-gradient(180deg,#0891b2,#0284c7);border-color:#0369a1}
     button:disabled{opacity:.55}
     .spoiler{font-style:italic;color:#9aa3b5}
-    .timeline{min-height:220px;border:1px dashed #283146;border-radius:14px;background:#0b1228;display:grid;place-items:center}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a3553;background:#0b1228}
+
+    /* === Timeline / DnD === */
+    .timeline{min-height:240px;border:1px dashed #283146;border-radius:14px;background:#0b1228;position:relative;overflow:hidden;padding:14px}
+    .slots{position:absolute;left:14px;right:14px;top:50%;height:64px;transform:translateY(-50%);display:flex;gap:10px;align-items:stretch}
+    .slot{flex:1;border:1px dashed #2a3553;border-radius:10px;background:rgba(10,18,40,.35);position:relative;transition:border-color .15s, background .15s}
+    .slot.active{border-color:#3a4a78;background:rgba(10,18,40,.55)}
+    .marker{position:absolute;bottom:100%;height:14px;width:2px;background:#3a4a78;left:50%;transform:translateX(-50%)}
+    .marker-label{position:absolute;bottom:100%;transform:translate(-50%,-6px);left:50%;font-size:11px;color:#8aa0bf;white-space:nowrap}
+    .card-drag{position:absolute;top:16px;left:16px;width:120px;height:160px;border:1px solid #344160;border-radius:12px;background:#0b1228;display:grid;place-items:center;user-select:none;touch-action:none;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+    .card-drag.floating{pointer-events:none}
+    .card-face{font-size:48px;color:#c7d2fe}
+    .drop-hint{position:absolute;bottom:16px;left:16px;color:#9aa3b5;font-size:12px}
   </style>
 </head>
 <body>
@@ -74,16 +84,21 @@
       <div class="row">
         <button id="btnLock" class="primary" disabled>Lås gissning</button>
         <button id="btnSkip" disabled>Byt låt (−1 token)</button>
+        <span id="chosenSlotLbl" class="mut"></span>
       </div>
     </section>
 
     <section class="card">
-      <h3 style="margin-top:0">Tidslinje (placeholder)</h3>
+      <h3 style="margin-top:0">Tidslinje (DnD – första version)</h3>
       <div id="timeline" class="timeline">
-        DnD-tidslinje kommer här (nästa steg)
+        <div id="slots" class="slots"></div>
+        <div id="dragCard" class="card-drag" aria-grabbed="false">
+          <div class="card-face">?</div>
+        </div>
+        <div class="drop-hint">Dra ?-kortet till rätt plats i tidslinjen</div>
       </div>
       <p class="mut" style="margin-top:8px">
-        Den här vyn uppdateras i realtid från RTDB. Vi visar inte titel/artist innan “reveal”.
+        Den här vyn uppdateras i realtid från RTDB. Vi skriver ingenting än – “Lås gissning” visar bara vilket slot-index som skulle skickas.
       </p>
     </section>
   </main>
@@ -132,6 +147,11 @@
     });
     signInAnonymously(auth).catch(console.error);
 
+    // ==== State för DnD (klient-lokalt) ====
+    let currentGame = null;
+    let activeTeamId = null;
+    let chosenSlotIndex = null; // sätts när man släpper kortet
+
     // ==== Bind game state ====
     let unsub = null;
     function bindGame(id){
@@ -148,8 +168,9 @@
           return;
         }
         const v = snap.val() || {};
-        console.log('[Game] state:', v);
+        currentGame = v;
         renderGame(v, id);
+        renderTimeline(v);
       });
     }
 
@@ -158,6 +179,7 @@
       $('lblRound').textContent = g.round != null ? String(g.round) : '–';
       $('lblDraw').textContent  = g.drawIndex != null ? String(g.drawIndex) : '–';
       $('lblTurn').textContent  = g.turn || '–';
+      activeTeamId = g.turn || null;
 
       // Teams strip
       const strip = $('teamStrip');
@@ -188,10 +210,153 @@
         ? `Årsintervall: ${g.settings.yearMin}–${g.settings.yearMax}` : '';
 
       // Knappar – placeholder tills vi kopplar state-maskin
-      const amHostTurn = true;
-      $('btnLock').disabled = !amHostTurn;
-      $('btnSkip').disabled = !amHostTurn;
+      $('btnLock').disabled = (chosenSlotIndex == null);
+      $('btnSkip').disabled = true;
     }
+
+    // ==== Timeline render (slots + markers) ====
+    function renderTimeline(g){
+      const slotsEl = $('slots');
+      slotsEl.innerHTML = '';
+
+      // Hämta befintliga placerade kort för aktiva laget (om finns)
+      const placed = (g.timelines && activeTeamId && Array.isArray(g.timelines[activeTeamId]))
+        ? g.timelines[activeTeamId] : [];
+      const placedYears = placed.map(x=>x?.year).filter(y=>typeof y==='number');
+
+      // Antal slots = placerade + 1, minst 1
+      const slotCount = Math.max(1, placedYears.length + 1);
+
+      for(let i=0;i<slotCount;i++){
+        const s = document.createElement('div');
+        s.className = 'slot';
+        s.dataset.index = String(i);
+        slotsEl.appendChild(s);
+      }
+
+      // Rita ut markörer över slots som guidance (om vi har placerade år)
+      // Vi distribuerar dem mellan slotkanter för enkel visning
+      if (placedYears.length){
+        const rect = slotsEl.getBoundingClientRect();
+        const w = rect.width;
+        placedYears.forEach((year, idx)=>{
+          const x = (w / (slotCount)) * (idx+1); // ungefärlig placering
+          const marker = document.createElement('div');
+          marker.className = 'marker';
+          marker.style.left = `${(x / w) * 100}%`;
+          slotsEl.appendChild(marker);
+
+          const label = document.createElement('div');
+          label.className = 'marker-label';
+          label.style.left = `${(x / w) * 100}%`;
+          label.textContent = String(year);
+          slotsEl.appendChild(label);
+        });
+      }
+
+      // När state uppdateras rensar vi val
+      chosenSlotIndex = null;
+      $('chosenSlotLbl').textContent = '';
+      $('btnLock').disabled = true;
+    }
+
+    // ==== DnD-kort ====
+    const dragEl = $('dragCard');
+    const timeline = $('timeline');
+    const slotsEl = $('slots');
+
+    let dragging = false;
+    let startX = 0, startY = 0;
+    let cardX = 16, cardY = 16;
+
+    function setCardPos(x,y){
+      dragEl.style.transform = `translate(${x}px, ${y}px)`;
+    }
+    setCardPos(cardX, cardY);
+
+    function slotIndexFromPointer(clientX){
+      const r = slotsEl.getBoundingClientRect();
+      const x = Math.max(0, Math.min(clientX - r.left, r.width));
+      const children = Array.from(slotsEl.children).filter(c=>c.classList.contains('slot'));
+      if (!children.length) return 0;
+      const slotW = r.width / children.length;
+      let idx = Math.floor(x / slotW);
+      if (idx < 0) idx = 0;
+      if (idx >= children.length) idx = children.length - 1;
+      return idx;
+    }
+
+    function highlightSlot(idx){
+      const children = Array.from(slotsEl.children).filter(c=>c.classList.contains('slot'));
+      children.forEach((c,i)=> c.classList.toggle('active', i===idx));
+    }
+
+    function clearHighlight(){
+      const children = Array.from(slotsEl.children).filter(c=>c.classList.contains('slot'));
+      children.forEach((c)=> c.classList.remove('active'));
+    }
+
+    dragEl.addEventListener('pointerdown', (ev)=>{
+      dragging = true;
+      dragEl.setPointerCapture(ev.pointerId);
+      dragEl.classList.add('floating');
+      startX = ev.clientX - cardX;
+      startY = ev.clientY - cardY;
+      dragEl.setAttribute('aria-grabbed', 'true');
+    });
+
+    dragEl.addEventListener('pointermove', (ev)=>{
+      if(!dragging) return;
+      cardX = ev.clientX - startX;
+      cardY = ev.clientY - startY;
+      setCardPos(cardX, cardY);
+
+      // highlight när vi är över slots
+      const idx = slotIndexFromPointer(ev.clientX);
+      highlightSlot(idx);
+    });
+
+    function dropAtCurrent(ev){
+      const idx = slotIndexFromPointer(ev.clientX);
+      chosenSlotIndex = idx;
+      $('chosenSlotLbl').textContent = `Vald plats: slot ${idx}`;
+      $('btnLock').disabled = (chosenSlotIndex == null);
+      console.log('[DnD] Dropped at slot', idx);
+
+      // Snappa tillbaka kortet visuellt till toppen (vi låter highlight ligga kvar kort)
+      cardX = 16; cardY = 16;
+      setCardPos(cardX, cardY);
+      dragEl.classList.remove('floating');
+      dragEl.setAttribute('aria-grabbed', 'false');
+      clearHighlight();
+    }
+
+    dragEl.addEventListener('pointerup', (ev)=>{
+      if(!dragging) return;
+      dragging = false;
+      dropAtCurrent(ev);
+    });
+    dragEl.addEventListener('pointercancel', ()=>{
+      if(!dragging) return;
+      dragging = false;
+      // Avbrutet drag → reset
+      cardX = 16; cardY = 16; setCardPos(cardX, cardY);
+      dragEl.classList.remove('floating');
+      dragEl.setAttribute('aria-grabbed', 'false');
+      clearHighlight();
+    });
+
+    // “Lås gissning” – bara logga vad vi skulle skicka
+    $('btnLock').addEventListener('click', ()=>{
+      if (chosenSlotIndex == null) return;
+      console.log('[Lock] Would submit:', {
+        gameId,
+        teamId: activeTeamId,
+        drawIndex: currentGame?.drawIndex ?? 0,
+        slotIndex: chosenSlotIndex
+      });
+      alert(`(Demo) Lås gissning: slot ${chosenSlotIndex}\n(det här skriver ännu inte till DB)`);
+    });
 
     // ==== Nav back ====
     $('btnBackLobby').addEventListener('click', ()=> history.back());
