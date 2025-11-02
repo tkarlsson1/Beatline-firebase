@@ -3,8 +3,16 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-// Init Admin (idempotent)
-try { admin.app(); } catch { admin.initializeApp(); }
+// === Viktigt: peka Admin SDK på rätt RTDB-instans (notestreamfire) ===
+const RTDB_URL = 'https://notestreamfire.europe-west1.firebasedatabase.app';
+
+try {
+  admin.app();
+} catch {
+  admin.initializeApp({
+    databaseURL: RTDB_URL,
+  });
+}
 
 const db = admin.database();
 const REGION = 'europe-west1';
@@ -78,7 +86,7 @@ exports.hostStartHttp = functions
         const yearMax = Number(settings.yearMax ?? 2100);
 
         const standardIds = Array.isArray(settings.standardListIds) ? settings.standardListIds : [];
-        const userIds = Array.isArray(settings.userPlaylistIds) ? settings.userPlaylistIds : [];
+        const userIds     = Array.isArray(settings.userPlaylistIds) ? settings.userPlaylistIds : [];
 
         // Bygg deck med dedupe på spotifyId
         const deckMap = new Map(); // spotifyId -> track
@@ -167,13 +175,13 @@ exports.hostStartHttp = functions
     })
   );
 
- /* =========================== resolveRoundHttp ============================ */
- /** POST ?gameId=...  (endast host, phase=playing)
-  *  - hämtar lock för g.turn
-  *  - beräknar korrekt slot baserat på stigande år
-  *  - uppdaterar timelines/score vid träff
-  *  - bump: drawIndex och turn, rensar lock och skriver roundState/result
-  */
+/* =========================== resolveRoundHttp ============================ */
+/** POST ?gameId=...  (endast host, phase=playing)
+ *  - hämtar lock för g.turn
+ *  - beräknar korrekt slot baserat på stigande år
+ *  - uppdaterar timelines/score vid träff
+ *  - bump: drawIndex och turn, rensar lock och skriver roundState/result
+ */
 exports.resolveRoundHttp = functions
   .region(REGION)
   .https.onRequest(
