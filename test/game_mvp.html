@@ -3,25 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.651 (TEST)</title>
+  <title>NOTESTREAM –0.649 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; --ok:#10b981; }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    body{margin:0;background:#0b1020;color:#e5e7eb;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
     header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #111827;background:#0e152e;position:sticky;top:0;z-index:10}
     h1{font-size:18px;margin:0;font-weight:600}
     main{max-width:1100px;margin:0 auto;padding:16px}
     .card{background:#0e152e;border:1px solid #111827;border-radius:14px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.25)}
     .row{display:flex;gap:12px;flex-wrap:wrap}
-    .mut{color:var(--mut)}
+    .mut{color:#9ca3af}
     .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
     .team-strip{display:flex;gap:8px;flex-wrap:wrap}
     .team{border:1px solid #1f2937;background:#0b1228;border-radius:12px;padding:8px 10px}
     .team.active{outline:2px solid var(--acc)}
     .grid{display:grid;gap:12px}
     .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:#0b1228;border:1px solid #1f2937;border-radius:8px;padding:2px 6px}
-    button{border-radius:12px;border:1px solid #1f2937;background:#0b1228;color:var(--fg);padding:10px 12px;font-size:14px}
+    button{border-radius:12px;border:1px solid #1f2937;background:#0b1228;color:#e5e7eb;padding:10px 12px;font-size:14px}
     button.primary{background:linear-gradient(180deg,#0891b2,#0284c7);border-color:#0369a1}
     button:disabled{opacity:.55}
     .spoiler{font-style:italic;color:#9aa3b5}
@@ -37,6 +37,7 @@
     .card-drag.floating{pointer-events:none}
     .card-face{font-size:48px;color:#c7d2fe}
     .drop-hint{position:absolute;bottom:16px;left:16px;color:#9aa3b5;font-size:12px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a3553;background:#0b1228}
   </style>
 </head>
 <body>
@@ -80,6 +81,7 @@
         <div class="mut">Aktuellt kort</div>
         <div id="nowPlaying" class="spoiler">Spelar låt … (spoilerfri)</div>
         <div id="nowYear" class="mut" style="margin-top:4px"></div>
+        <div id="lockedInfo" class="mut" style="margin-top:6px"></div>
       </div>
       <div class="row">
         <button id="btnLock" class="primary" disabled>Lås gissning</button>
@@ -98,7 +100,7 @@
         <div class="drop-hint">Dra ?-kortet till rätt plats i tidslinjen</div>
       </div>
       <p class="mut" style="margin-top:8px">
-        Den här vyn uppdateras i realtid från RTDB. Vi skriver ingenting än – “Lås gissning” visar bara vilket slot-index som skulle skickas.
+        Den här vyn uppdateras i realtid från RTDB. Vi skriver <em>endast</em> en “locked guess” till <span class="mono">roundState/locks</span> i detta steg.
       </p>
     </section>
   </main>
@@ -107,7 +109,7 @@
     // ==== Firebase init ====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
@@ -123,10 +125,7 @@
 
     // ==== Helpers ====
     const $ = (id)=>document.getElementById(id);
-    const parseHash = ()=>{
-      const m = (location.hash || '').match(/^#game\/([^\/]+)$/);
-      return m ? m[1] : null;
-    };
+    const parseHash = ()=>((location.hash||'').match(/^#game\/([^\/]+)$/)||[])[1] || null;
 
     // ==== Routing / load ====
     let gameId = parseHash();
@@ -143,14 +142,14 @@
     onAuthStateChanged(auth, (u)=>{
       $('authBadge').textContent = u ? `UID: ${u.uid.slice(0,8)}…` : 'inte inloggad';
       console.log('[Game] auth state:', u?.uid);
-      if (gameId) bindGame(gameId); // läs även anonymt (reglerna är öppna i test)
+      if (gameId) bindGame(gameId);
     });
     signInAnonymously(auth).catch(console.error);
 
-    // ==== State för DnD (klient-lokalt) ====
+    // ==== State (klient-lokalt) ====
     let currentGame = null;
     let activeTeamId = null;
-    let chosenSlotIndex = null; // sätts när man släpper kortet
+    let chosenSlotIndex = null;
 
     // ==== Bind game state ====
     let unsub = null;
@@ -171,17 +170,16 @@
         currentGame = v;
         renderGame(v, id);
         renderTimeline(v);
+        renderLocked(v);
       });
     }
 
     function renderGame(g, id){
-      // Top labels
       $('lblRound').textContent = g.round != null ? String(g.round) : '–';
       $('lblDraw').textContent  = g.drawIndex != null ? String(g.drawIndex) : '–';
       $('lblTurn').textContent  = g.turn || '–';
       activeTeamId = g.turn || null;
 
-      // Teams strip
       const strip = $('teamStrip');
       strip.innerHTML = '';
       const teams = g.teams ? Object.entries(g.teams) : [];
@@ -200,7 +198,6 @@
         strip.appendChild(div);
       });
 
-      // Now playing (spoilerfri)
       const di = g.drawIndex || 0;
       const deck = Array.isArray(g.deck) ? g.deck : [];
       $('nowPlaying').textContent = deck.length
@@ -209,22 +206,27 @@
       $('nowYear').textContent = (g.settings && g.settings.yearMin != null && g.settings.yearMax != null)
         ? `Årsintervall: ${g.settings.yearMin}–${g.settings.yearMax}` : '';
 
-      // Knappar – placeholder tills vi kopplar state-maskin
       $('btnLock').disabled = (chosenSlotIndex == null);
       $('btnSkip').disabled = true;
     }
 
-    // ==== Timeline render (slots + markers) ====
+    function renderLocked(g){
+      const locks = g.roundState && g.roundState.locks ? g.roundState.locks : {};
+      const my = activeTeamId && locks[activeTeamId];
+      $('lockedInfo').innerHTML = my
+        ? `Din låsta gissning: <span class="pill mono">slot ${my.slotIndex}</span> (draw ${my.drawIndex})`
+        : '';
+    }
+
+    // ==== Timeline (slots + markers) ====
     function renderTimeline(g){
       const slotsEl = $('slots');
       slotsEl.innerHTML = '';
 
-      // Hämta befintliga placerade kort för aktiva laget (om finns)
       const placed = (g.timelines && activeTeamId && Array.isArray(g.timelines[activeTeamId]))
         ? g.timelines[activeTeamId] : [];
       const placedYears = placed.map(x=>x?.year).filter(y=>typeof y==='number');
 
-      // Antal slots = placerade + 1, minst 1
       const slotCount = Math.max(1, placedYears.length + 1);
 
       for(let i=0;i<slotCount;i++){
@@ -234,13 +236,11 @@
         slotsEl.appendChild(s);
       }
 
-      // Rita ut markörer över slots som guidance (om vi har placerade år)
-      // Vi distribuerar dem mellan slotkanter för enkel visning
       if (placedYears.length){
         const rect = slotsEl.getBoundingClientRect();
         const w = rect.width;
         placedYears.forEach((year, idx)=>{
-          const x = (w / (slotCount)) * (idx+1); // ungefärlig placering
+          const x = (w / (slotCount)) * (idx+1);
           const marker = document.createElement('div');
           marker.className = 'marker';
           marker.style.left = `${(x / w) * 100}%`;
@@ -254,7 +254,6 @@
         });
       }
 
-      // När state uppdateras rensar vi val
       chosenSlotIndex = null;
       $('chosenSlotLbl').textContent = '';
       $('btnLock').disabled = true;
@@ -269,9 +268,7 @@
     let startX = 0, startY = 0;
     let cardX = 16, cardY = 16;
 
-    function setCardPos(x,y){
-      dragEl.style.transform = `translate(${x}px, ${y}px)`;
-    }
+    function setCardPos(x,y){ dragEl.style.transform = `translate(${x}px, ${y}px)`; }
     setCardPos(cardX, cardY);
 
     function slotIndexFromPointer(clientX){
@@ -290,7 +287,6 @@
       const children = Array.from(slotsEl.children).filter(c=>c.classList.contains('slot'));
       children.forEach((c,i)=> c.classList.toggle('active', i===idx));
     }
-
     function clearHighlight(){
       const children = Array.from(slotsEl.children).filter(c=>c.classList.contains('slot'));
       children.forEach((c)=> c.classList.remove('active'));
@@ -310,8 +306,6 @@
       cardX = ev.clientX - startX;
       cardY = ev.clientY - startY;
       setCardPos(cardX, cardY);
-
-      // highlight när vi är över slots
       const idx = slotIndexFromPointer(ev.clientX);
       highlightSlot(idx);
     });
@@ -322,8 +316,6 @@
       $('chosenSlotLbl').textContent = `Vald plats: slot ${idx}`;
       $('btnLock').disabled = (chosenSlotIndex == null);
       console.log('[DnD] Dropped at slot', idx);
-
-      // Snappa tillbaka kortet visuellt till toppen (vi låter highlight ligga kvar kort)
       cardX = 16; cardY = 16;
       setCardPos(cardX, cardY);
       dragEl.classList.remove('floating');
@@ -339,23 +331,31 @@
     dragEl.addEventListener('pointercancel', ()=>{
       if(!dragging) return;
       dragging = false;
-      // Avbrutet drag → reset
       cardX = 16; cardY = 16; setCardPos(cardX, cardY);
       dragEl.classList.remove('floating');
       dragEl.setAttribute('aria-grabbed', 'false');
       clearHighlight();
     });
 
-    // “Lås gissning” – bara logga vad vi skulle skicka
-    $('btnLock').addEventListener('click', ()=>{
+    // ==== Lås gissning → skriv till RTDB ====
+    $('btnLock').addEventListener('click', async ()=>{
       if (chosenSlotIndex == null) return;
-      console.log('[Lock] Would submit:', {
-        gameId,
-        teamId: activeTeamId,
-        drawIndex: currentGame?.drawIndex ?? 0,
-        slotIndex: chosenSlotIndex
-      });
-      alert(`(Demo) Lås gissning: slot ${chosenSlotIndex}\n(det här skriver ännu inte till DB)`);
+      if (!gameId || !activeTeamId) return alert('Saknar game/lag.');
+
+      const u = auth.currentUser;
+      const by = u?.uid || 'anon';
+      const drawIndex = currentGame?.drawIndex ?? 0;
+
+      try{
+        const lockRef = ref(db, `games/${gameId}/roundState/locks/${activeTeamId}`);
+        const payload = { slotIndex: chosenSlotIndex, drawIndex, by, ts: Date.now() };
+        await set(lockRef, payload);
+        console.log('[Lock] Wrote', payload, '→', lockRef.toString());
+        alert(`Gissning låst: slot ${chosenSlotIndex} (endast demo – ingen server-resolve ännu)`);
+      }catch(e){
+        console.error(e);
+        alert('Kunde inte låsa gissning.');
+      }
     });
 
     // ==== Nav back ====
