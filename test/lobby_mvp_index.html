@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.640 (TEST)</title>
+  <title>NOTESTREAM –0.641 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -28,6 +28,13 @@
     .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
     a{color:#67e8f9;text-decoration:none}
     .ok{color:#10b981} .warn{color:#f59e0b} .err{color:#ef4444}
+
+    /* === Device picker modal === */
+    .device-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+    .device-card{background:#0e152e;border:1px solid #1f2937;border-radius:14px;padding:16px;max-width:460px;width:92%}
+    .device-list{display:grid;gap:8px;margin-top:8px}
+    .device-list button{width:100%;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid #2a3553;background:#0b1228}
+    .device-list button:hover{border-color:#3a4a78}
   </style>
 </head>
 <body>
@@ -123,6 +130,18 @@
     </section>
   </main>
 
+  <!-- Device picker modal -->
+  <div id="deviceModal" class="device-modal" aria-hidden="true">
+    <div class="device-card">
+      <h3 style="margin:0 0 6px 0">Välj enhet</h3>
+      <p class="mut" style="margin:0 0 8px 0">Tryck på enheten du vill använda för Spotify Connect.</p>
+      <div id="deviceList" class="device-list"></div>
+      <div style="text-align:right;margin-top:10px">
+        <button id="btnCloseDevice" class="ghost">Stäng</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     // ==== Firebase (RTDB) init ====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
@@ -142,27 +161,19 @@
     const db = getDatabase(app);
 
     // ==== Routing (hash) ====
-   function route() {
-  const hash = location.hash.replace(/^#/, "");
-  const [path, id] = hash.split("/");
-
-  const isPre = path === "pre";        // <— NYTT
-
-  // Visa startsidan både utan hash och för #pre/<id>
-  showSection("screenStart", !path || isPre);    // <— ÄNDRAD
-  showSection("screenLobby", path === "lobby");
-  showSection("screenJoin", path === "join");
-
-  if (!path) return;
-
-  // (valfritt) här skulle vi kunna läsa in pre-info i UI om vi vill
-  // men själva skapandet läser redan prelobby-settings i btnCreate-handlern
-
-  if (path === "lobby" && id) loadLobby(id);
-  if (path === "join" && id) setupJoin(id);
-}
-    window.addEventListener("hashchange", route);
     function showSection(id, on){ document.getElementById(id).style.display = on?"block":"none"; }
+    function route() {
+      const hash = location.hash.replace(/^#/, "");
+      const [path, id] = hash.split("/");
+      const isPre = path === "pre";  // visa start även för #pre/<id>
+      showSection("screenStart", !path || isPre);
+      showSection("screenLobby", path === "lobby");
+      showSection("screenJoin", path === "join");
+      if (!path) return;
+      if (path === "lobby" && id) loadLobby(id);
+      if (path === "join" && id) setupJoin(id);
+    }
+    window.addEventListener("hashchange", route);
 
     // ==== Auth badge ====
     onAuthStateChanged(auth, (u)=>{
@@ -202,7 +213,6 @@
       await set(child(base, 'hostId'), auth.currentUser.uid);
       await set(child(base, 'settings'), preSettings ? {
         ...preSettings,
-        // överskriv ev. lokala fält från UI om du vill
         yearMin, yearMax,
         tokensPerTeam,
         timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp }
@@ -214,7 +224,6 @@
         standardListIds: [], userPlaylistIds: []
       });
 
-      // navigera till lobby/<gameId>
       location.hash = `lobby/${gameId}`;
     });
 
@@ -285,7 +294,6 @@
       const challenge = b64url(await sha256(verifier));
       sessionStorage.setItem('sp_verifier', verifier);
 
-      // 🔒 Spara nuvarande hash och skicka med i state
       const currentHash = location.hash || '';
       sessionStorage.setItem('sp_hash', currentHash);
 
@@ -302,7 +310,6 @@
     });
 
     (async function handleSpotifyCallback(){
-      // På callback: ?code=…&state=…
       const params = new URLSearchParams(location.search);
       const code = params.get('code');
       if(!code) return;
@@ -330,7 +337,7 @@
         // Töm query
         history.replaceState({},'', location.origin + location.pathname);
 
-        // 🧭 Återställ hash från state eller sessionStorage
+        // Återställ hash från state eller sessionStorage
         const stateHash = decodeURIComponent(params.get('state') || '') || sessionStorage.getItem('sp_hash') || '';
         if (stateHash) location.hash = stateHash;
 
@@ -347,7 +354,6 @@
       const raw = localStorage.getItem('sp_token'); if(!raw) throw new Error('Ej inloggad mot Spotify');
       const tok = JSON.parse(raw);
       if(Date.now() < tok.expires_at) return tok.access_token;
-      // refresh
       const res = await fetch('https://accounts.spotify.com/api/token',{
         method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
         body:new URLSearchParams({ grant_type:'refresh_token', refresh_token:tok.refresh_token, client_id:SPOTIFY_CLIENT_ID })
@@ -358,18 +364,47 @@
       return tok.access_token;
     }
 
+    // === Device picker ===
+    const deviceModal = document.getElementById('deviceModal');
+    const deviceList  = document.getElementById('deviceList');
+    const btnCloseDevice = document.getElementById('btnCloseDevice');
+
+    function showDeviceModal(){ deviceModal.style.display = 'flex'; }
+    function hideDeviceModal(){ deviceModal.style.display = 'none'; }
+
+    btnCloseDevice.addEventListener('click', hideDeviceModal);
+    deviceModal.addEventListener('click', (e)=>{ if(e.target === deviceModal) hideDeviceModal(); });
+
     btnPickDevice.addEventListener('click', async ()=>{
       try{
         const at = await withToken();
         const r = await fetch('https://api.spotify.com/v1/me/player/devices',{ headers:{ Authorization: 'Bearer '+at }});
         const j = await r.json();
         if(!j.devices || !j.devices.length) return alert('Inga Connect-enheter hittades. Öppna Spotify på den enhet du vill använda och försök igen.');
-        // Klickbar lista
-        const names = j.devices.map((d,i)=>`${i+1}. ${d.name} (${d.type})${d.is_active?' ✓':''}`).join('\n');
-        const pick = prompt('Välj enhet (nummer):\n'+names);
-        const idx = (parseInt(pick,10)||0)-1; const d = j.devices[idx]; if(!d) return;
-        localStorage.setItem('sp_device_id', d.id);
-        document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
+
+        // Fyll listan med klickbara knappar
+        deviceList.innerHTML = '';
+        j.devices.forEach(d=>{
+          const b = document.createElement('button');
+          b.className = 'ghost';
+          b.innerHTML = `${d.name} <span class="mut">(${d.type})</span>${d.is_active?' <span class="ok">✓ aktiv</span>':''}`;
+          b.addEventListener('click', async ()=>{
+            try{
+              // Spara val
+              localStorage.setItem('sp_device_id', d.id);
+              document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
+              // Försök transfer playback tyst
+              await fetch('https://api.spotify.com/v1/me/player', {
+                method:'PUT',
+                headers:{ Authorization:'Bearer '+at, 'Content-Type':'application/json' },
+                body: JSON.stringify({ device_ids:[d.id], play:false })
+              });
+            }catch(_){} // ignorerar tysta fel
+            hideDeviceModal();
+          });
+          deviceList.appendChild(b);
+        });
+        showDeviceModal();
       }catch(e){ alert('Kunde inte hämta enheter'); console.error(e); }
     });
 
