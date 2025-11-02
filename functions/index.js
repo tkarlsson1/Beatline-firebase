@@ -46,20 +46,34 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
   const tokensPerTeam = Number.isFinite(settings.tokensPerTeam) ? settings.tokensPerTeam : 4;
 
   // ---- 1) Läs spellistor och bygg pool ----
-  async function readTracksFromList(refPath) {
-    const s = await db.ref(refPath).get();
-    const node = s.exists() ? s.val() : {};
-    const tracksNode = node.tracks || node; // stöd både /list/tracks och /list direkt
+  function coerceYear(y) {
+    if (y == null) return NaN;
+    if (typeof y === "number") return y;
+    if (typeof y === "string") {
+      const n = parseInt(y, 10);
+      return Number.isFinite(n) ? n : NaN;
+    }
+    return NaN;
+  }
+
+  async function readTracksFromListNode(refPathToListRoot) {
+    const s = await db.ref(refPathToListRoot).get();
+    if (!s.exists()) return [];
+    const node = s.val() || {};
+    // Stöd tre varianter: /list/songs, /list/tracks, eller direkt /list
+    const tracksNode = node.songs || node.tracks || node;
+
     const out = [];
     for (const k of Object.keys(tracksNode)) {
       const t = tracksNode[k];
-      if (!t) continue;
-      out.push({
-        spotifyId: t.spotifyId || t.id || k,
-        title: t.title,
-        artist: t.artist,
-        year: (t.customYear != null ? t.customYear : t.year)
-      });
+      if (!t || typeof t !== "object") continue;
+      const spotifyId = t.spotifyId || t.id || k;
+      const yearRaw = (t.customYear != null ? t.customYear : t.year);
+      const year = coerceYear(yearRaw);
+      const title = t.title || t.name || "";
+      const artist = t.artist || (Array.isArray(t.artists) && t.artists[0]?.name) || t.artistName || "";
+
+      out.push({ spotifyId, title, artist, year });
     }
     return out;
   }
@@ -69,7 +83,7 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
   // Standardlistor (om angivna)
   if (Array.isArray(settings.standardListIds)) {
     for (const listId of settings.standardListIds) {
-      const items = await readTracksFromList(`standardLists/${listId}/tracks`);
+      const items = await readTracksFromListNode(`standardLists/${listId}`);
       pool.push(...items);
     }
   }
@@ -77,18 +91,18 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
   // Egna listor (om angivna – kräver ownerUid)
   if (Array.isArray(settings.userPlaylistIds) && settings.ownerUid) {
     for (const listId of settings.userPlaylistIds) {
-      const items = await readTracksFromList(`userPlaylists/${settings.ownerUid}/${listId}/tracks`);
+      const items = await readTracksFromListNode(`userPlaylists/${settings.ownerUid}/${listId}`);
       pool.push(...items);
     }
   }
 
-  // 📌 Fallback: om inga listor angavs → läs ALLA standardLists
+  // 📌 Fallback: om inga listor angavs → läs ALLA standardLists/<listId>
   if (pool.length === 0) {
     const stdRoot = await db.ref(`standardLists`).get();
     if (stdRoot.exists()) {
       const lists = stdRoot.val() || {};
       for (const listId of Object.keys(lists)) {
-        const items = await readTracksFromList(`standardLists/${listId}/tracks`);
+        const items = await readTracksFromListNode(`standardLists/${listId}`);
         pool.push(...items);
       }
     }
@@ -96,7 +110,10 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
 
   // ---- 2) Filtrera + dedupe ----
   const inRange = pool.filter(t =>
-    t && t.spotifyId && Number.isFinite(t.year) && t.year >= yearMin && t.year <= yearMax
+    t &&
+    t.spotifyId &&
+    Number.isFinite(t.year) &&
+    t.year >= yearMin && t.year <= yearMax
   );
 
   const seen = new Set();
