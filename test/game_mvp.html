@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.649 (TEST)</title>
+  <title>NOTESTREAM –0.653 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; --ok:#10b981; }
@@ -25,8 +25,6 @@
     button.primary{background:linear-gradient(180deg,#0891b2,#0284c7);border-color:#0369a1}
     button:disabled{opacity:.55}
     .spoiler{font-style:italic;color:#9aa3b5}
-
-    /* === Timeline / DnD === */
     .timeline{min-height:240px;border:1px dashed #283146;border-radius:14px;background:#0b1228;position:relative;overflow:hidden;padding:14px}
     .slots{position:absolute;left:14px;right:14px;top:50%;height:64px;transform:translateY(-50%);display:flex;gap:10px;align-items:stretch}
     .slot{flex:1;border:1px dashed #2a3553;border-radius:10px;background:rgba(10,18,40,.35);position:relative;transition:border-color .15s, background .15s}
@@ -64,8 +62,9 @@
           <div class="mut">Tur</div>
           <div id="lblTurn" class="mono">–</div>
         </div>
-        <div>
+        <div class="row">
           <button id="btnBackLobby">⟵ Till lobby</button>
+          <button id="btnResolve" class="primary" style="display:none">Reveal / resolve (host)</button>
         </div>
       </div>
     </section>
@@ -82,6 +81,7 @@
         <div id="nowPlaying" class="spoiler">Spelar låt … (spoilerfri)</div>
         <div id="nowYear" class="mut" style="margin-top:4px"></div>
         <div id="lockedInfo" class="mut" style="margin-top:6px"></div>
+        <div id="lastResult" class="mut" style="margin-top:6px"></div>
       </div>
       <div class="row">
         <button id="btnLock" class="primary" disabled>Lås gissning</button>
@@ -100,13 +100,12 @@
         <div class="drop-hint">Dra ?-kortet till rätt plats i tidslinjen</div>
       </div>
       <p class="mut" style="margin-top:8px">
-        Den här vyn uppdateras i realtid från RTDB. Vi skriver <em>endast</em> en “locked guess” till <span class="mono">roundState/locks</span> i detta steg.
+        “Lås gissning” skriver till <span class="mono">roundState/locks</span>. Host trycker “Reveal / resolve” för att bedöma och gå till nästa kort.
       </p>
     </section>
   </main>
 
   <script type="module">
-    // ==== Firebase init ====
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
     import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
@@ -123,44 +122,35 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ==== Helpers ====
     const $ = (id)=>document.getElementById(id);
     const parseHash = ()=>((location.hash||'').match(/^#game\/([^\/]+)$/)||[])[1] || null;
 
-    // ==== Routing / load ====
     let gameId = parseHash();
     $('lblGameId').textContent = gameId || '–';
-    console.log('[Game] Loaded with hash:', location.hash, '→ gameId =', gameId);
 
     window.addEventListener('hashchange', ()=>{
       gameId = parseHash();
       $('lblGameId').textContent = gameId || '–';
-      console.log('[Game] hashchange →', gameId);
       if (gameId) bindGame(gameId);
     });
 
     onAuthStateChanged(auth, (u)=>{
       $('authBadge').textContent = u ? `UID: ${u.uid.slice(0,8)}…` : 'inte inloggad';
-      console.log('[Game] auth state:', u?.uid);
       if (gameId) bindGame(gameId);
     });
     signInAnonymously(auth).catch(console.error);
 
-    // ==== State (klient-lokalt) ====
     let currentGame = null;
     let activeTeamId = null;
+    let unsub = null;
     let chosenSlotIndex = null;
 
-    // ==== Bind game state ====
-    let unsub = null;
     function bindGame(id){
       if (!id) return;
       if (unsub) unsub();
       const gRef = ref(db, `games/${id}`);
-      console.log('[Game] binding to', `games/${id}`);
       unsub = onValue(gRef, snap=>{
         if(!snap.exists()){
-          console.warn('[Game] games/'+id+' not found');
           $('nowPlaying').textContent = 'Spelet hittades inte.';
           $('teamStrip').innerHTML = '';
           $('teamEmpty').style.display = 'block';
@@ -171,10 +161,11 @@
         renderGame(v, id);
         renderTimeline(v);
         renderLocked(v);
+        renderResult(v);
       });
     }
 
-    function renderGame(g, id){
+    function renderGame(g){
       $('lblRound').textContent = g.round != null ? String(g.round) : '–';
       $('lblDraw').textContent  = g.drawIndex != null ? String(g.drawIndex) : '–';
       $('lblTurn').textContent  = g.turn || '–';
@@ -208,6 +199,9 @@
 
       $('btnLock').disabled = (chosenSlotIndex == null);
       $('btnSkip').disabled = true;
+
+      // Visa "resolve" för host
+      $('btnResolve').style.display = (auth.currentUser && g.hostId === auth.currentUser.uid) ? 'inline-block' : 'none';
     }
 
     function renderLocked(g){
@@ -218,56 +212,20 @@
         : '';
     }
 
-    // ==== Timeline (slots + markers) ====
-    function renderTimeline(g){
-      const slotsEl = $('slots');
-      slotsEl.innerHTML = '';
-
-      const placed = (g.timelines && activeTeamId && Array.isArray(g.timelines[activeTeamId]))
-        ? g.timelines[activeTeamId] : [];
-      const placedYears = placed.map(x=>x?.year).filter(y=>typeof y==='number');
-
-      const slotCount = Math.max(1, placedYears.length + 1);
-
-      for(let i=0;i<slotCount;i++){
-        const s = document.createElement('div');
-        s.className = 'slot';
-        s.dataset.index = String(i);
-        slotsEl.appendChild(s);
-      }
-
-      if (placedYears.length){
-        const rect = slotsEl.getBoundingClientRect();
-        const w = rect.width;
-        placedYears.forEach((year, idx)=>{
-          const x = (w / (slotCount)) * (idx+1);
-          const marker = document.createElement('div');
-          marker.className = 'marker';
-          marker.style.left = `${(x / w) * 100}%`;
-          slotsEl.appendChild(marker);
-
-          const label = document.createElement('div');
-          label.className = 'marker-label';
-          label.style.left = `${(x / w) * 100}%`;
-          label.textContent = String(year);
-          slotsEl.appendChild(label);
-        });
-      }
-
-      chosenSlotIndex = null;
-      $('chosenSlotLbl').textContent = '';
-      $('btnLock').disabled = true;
+    function renderResult(g){
+      const r = g.roundState && g.roundState.result;
+      if (!r) { $('lastResult').textContent = ''; return; }
+      $('lastResult').innerHTML = `Senaste resultat: lag <span class="mono">${r.teamId?.slice(0,6)}…</span> ` +
+        (r.hit ? `<span style="color:var(--ok)">rätt</span>` : `<span style="color:var(--danger)">fel</span>`) +
+        ` • korrekt slot ${r.correctIndex}, gissade ${r.submittedIndex} • år ${r.year}`;
     }
 
-    // ==== DnD-kort ====
+    // === DnD (samma som tidigare) ===
     const dragEl = $('dragCard');
-    const timeline = $('timeline');
     const slotsEl = $('slots');
-
     let dragging = false;
     let startX = 0, startY = 0;
     let cardX = 16, cardY = 16;
-
     function setCardPos(x,y){ dragEl.style.transform = `translate(${x}px, ${y}px)`; }
     setCardPos(cardX, cardY);
 
@@ -282,7 +240,6 @@
       if (idx >= children.length) idx = children.length - 1;
       return idx;
     }
-
     function highlightSlot(idx){
       const children = Array.from(slotsEl.children).filter(c=>c.classList.contains('slot'));
       children.forEach((c,i)=> c.classList.toggle('active', i===idx));
@@ -300,7 +257,6 @@
       startY = ev.clientY - cardY;
       dragEl.setAttribute('aria-grabbed', 'true');
     });
-
     dragEl.addEventListener('pointermove', (ev)=>{
       if(!dragging) return;
       cardX = ev.clientX - startX;
@@ -309,59 +265,79 @@
       const idx = slotIndexFromPointer(ev.clientX);
       highlightSlot(idx);
     });
-
     function dropAtCurrent(ev){
       const idx = slotIndexFromPointer(ev.clientX);
       chosenSlotIndex = idx;
       $('chosenSlotLbl').textContent = `Vald plats: slot ${idx}`;
       $('btnLock').disabled = (chosenSlotIndex == null);
-      console.log('[DnD] Dropped at slot', idx);
-      cardX = 16; cardY = 16;
-      setCardPos(cardX, cardY);
-      dragEl.classList.remove('floating');
-      dragEl.setAttribute('aria-grabbed', 'false');
-      clearHighlight();
-    }
-
-    dragEl.addEventListener('pointerup', (ev)=>{
-      if(!dragging) return;
-      dragging = false;
-      dropAtCurrent(ev);
-    });
-    dragEl.addEventListener('pointercancel', ()=>{
-      if(!dragging) return;
-      dragging = false;
       cardX = 16; cardY = 16; setCardPos(cardX, cardY);
       dragEl.classList.remove('floating');
       dragEl.setAttribute('aria-grabbed', 'false');
       clearHighlight();
-    });
+    }
+    dragEl.addEventListener('pointerup', (ev)=>{ if(!dragging) return; dragging=false; dropAtCurrent(ev); });
+    dragEl.addEventListener('pointercancel', ()=>{ if(!dragging) return; dragging=false; cardX=16; cardY=16; setCardPos(cardX,cardY); dragEl.classList.remove('floating'); dragEl.setAttribute('aria-grabbed','false'); clearHighlight(); });
 
-    // ==== Lås gissning → skriv till RTDB ====
+    // ==== Lås gissning → RTDB ====
     $('btnLock').addEventListener('click', async ()=>{
       if (chosenSlotIndex == null) return;
       if (!gameId || !activeTeamId) return alert('Saknar game/lag.');
-
       const u = auth.currentUser;
       const by = u?.uid || 'anon';
       const drawIndex = currentGame?.drawIndex ?? 0;
-
       try{
         const lockRef = ref(db, `games/${gameId}/roundState/locks/${activeTeamId}`);
-        const payload = { slotIndex: chosenSlotIndex, drawIndex, by, ts: Date.now() };
-        await set(lockRef, payload);
-        console.log('[Lock] Wrote', payload, '→', lockRef.toString());
-        alert(`Gissning låst: slot ${chosenSlotIndex} (endast demo – ingen server-resolve ännu)`);
-      }catch(e){
-        console.error(e);
-        alert('Kunde inte låsa gissning.');
-      }
+        await set(lockRef, { slotIndex: chosenSlotIndex, drawIndex, by, ts: Date.now() });
+        alert(`Gissning låst: slot ${chosenSlotIndex}`);
+      }catch(e){ console.error(e); alert('Kunde inte låsa gissning.'); }
     });
 
-    // ==== Nav back ====
-    $('btnBackLobby').addEventListener('click', ()=> history.back());
+    // ==== Reveal/resolve (host) → Cloud Function ====
+    $('btnResolve').addEventListener('click', async ()=>{
+      try{
+        const u = auth.currentUser; if(!u) return alert('Ej inloggad');
+        const idToken = await u.getIdToken(true);
+        const url = new URL('https://europe-west1-beatlinefirebase.cloudfunctions.net/resolveRoundHttp');
+        url.searchParams.set('gameId', gameId);
+        const res = await fetch(url.toString(),{
+          method:'POST',
+          headers:{ 'Content-Type': 'application/json', 'Authorization': 'Bearer '+idToken },
+          body: JSON.stringify({ gameId })
+        });
+        const j = await res.json().catch(()=> ({}));
+        if(!res.ok) throw new Error(j?.error?.message || res.statusText);
+        console.log('[Resolve] result', j);
+      }catch(e){ console.error(e); alert('Kunde inte resolve:a rundan: '+(e.message||e)); }
+    });
 
-    // Boot
+    // === Render timeline (samma som innan, kortat något) ===
+    function renderTimeline(g){
+      const slotsEl = document.getElementById('slots');
+      slotsEl.innerHTML = '';
+      const placed = (g.timelines && activeTeamId && Array.isArray(g.timelines[activeTeamId]))
+        ? g.timelines[activeTeamId] : [];
+      const placedYears = placed.map(x=>x?.year).filter(y=>typeof y==='number');
+      const slotCount = Math.max(1, placedYears.length + 1);
+      for(let i=0;i<slotCount;i++){
+        const s = document.createElement('div');
+        s.className = 'slot';
+        s.dataset.index = String(i);
+        slotsEl.appendChild(s);
+      }
+      if (placedYears.length){
+        const rect = slotsEl.getBoundingClientRect(); const w = rect.width;
+        placedYears.forEach((year, idx)=>{
+          const x = (w / (slotCount)) * (idx+1);
+          const marker = document.createElement('div'); marker.className='marker'; marker.style.left=`${(x / w) * 100}%`; slotsEl.appendChild(marker);
+          const label  = document.createElement('div'); label.className='marker-label'; label.style.left=`${(x / w) * 100}%`; label.textContent=String(year); slotsEl.appendChild(label);
+        });
+      }
+      chosenSlotIndex = null; $('chosenSlotLbl').textContent=''; $('btnLock').disabled=true;
+    }
+
+    // Nav
+    document.getElementById('btnBackLobby').addEventListener('click', ()=> history.back());
+
     if (gameId) bindGame(gameId);
   </script>
 </body>
