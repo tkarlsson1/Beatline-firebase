@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOTESTREAM –0.649 (TEST)</title>
+  <meta name="theme-color" content="#111827" />
+  <style>
+    :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; --ok:#10b981; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #111827;background:#0e152e;position:sticky;top:0;z-index:10}
+    h1{font-size:18px;margin:0;font-weight:600}
+    main{max-width:1100px;margin:0 auto;padding:16px}
+    .card{background:#0e152e;border:1px solid #111827;border-radius:14px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.25)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .mut{color:var(--mut)}
+    .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+    .team-strip{display:flex;gap:8px;flex-wrap:wrap}
+    .team{border:1px solid #1f2937;background:#0b1228;border-radius:12px;padding:8px 10px}
+    .team.active{outline:2px solid var(--acc)}
+    .grid{display:grid;gap:12px}
+    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:#0b1228;border:1px solid #1f2937;border-radius:8px;padding:2px 6px}
+    button{border-radius:12px;border:1px solid #1f2937;background:#0b1228;color:var(--fg);padding:10px 12px;font-size:14px}
+    button.primary{background:linear-gradient(180deg,#0891b2,#0284c7);border-color:#0369a1}
+    button:disabled{opacity:.55}
+    .spoiler{font-style:italic;color:#9aa3b5}
+    .timeline{min-height:220px;border:1px dashed #283146;border-radius:14px;background:#0b1228;display:grid;place-items:center}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a3553;background:#0b1228}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎵 Beatline – Game (MVP)</h1>
+    <div id="authBadge" class="mut">…</div>
+  </header>
+  <main>
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <div class="mut">GameID</div>
+          <div id="lblGameId" class="mono"></div>
+        </div>
+        <div>
+          <div class="mut">Runda</div>
+          <div id="lblRound" class="mono">–</div>
+        </div>
+        <div>
+          <div class="mut">Dragindex</div>
+          <div id="lblDraw" class="mono">–</div>
+        </div>
+        <div>
+          <div class="mut">Tur</div>
+          <div id="lblTurn" class="mono">–</div>
+        </div>
+        <div>
+          <button id="btnBackLobby">⟵ Till lobby</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin:0 0 8px 0">Lag</h3>
+      <div id="teamStrip" class="team-strip"></div>
+    </section>
+
+    <section class="card grid">
+      <div>
+        <div class="mut">Aktuellt kort</div>
+        <div id="nowPlaying" class="spoiler">Spelar låt … (spoilerfri)</div>
+        <div id="nowYear" class="mut" style="margin-top:4px"></div>
+      </div>
+      <div class="row">
+        <button id="btnLock" class="primary" disabled>Lås gissning</button>
+        <button id="btnSkip" disabled>Byt låt (−1 token)</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">Tidslinje (placeholder)</h3>
+      <div id="timeline" class="timeline">
+        DnD-tidslinje kommer här (nästa steg)
+      </div>
+      <p class="mut" style="margin-top:8px">
+        Den här vyn uppdateras i realtid från RTDB. Vi visar inte titel/artist innan “reveal”.
+      </p>
+    </section>
+  </main>
+
+  <script type="module">
+    // ==== Firebase init ====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+      authDomain: "beatlinefirebase.firebaseapp.com",
+      databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
+      projectId: "beatlinefirebase",
+      appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // ==== Helpers ====
+    function $(id){ return document.getElementById(id); }
+    function parseHash(){
+      const [_, game, gid] = (location.hash || '').match(/^#game\/([^\/]+)$/) || [];
+      return gid || null;
+    }
+
+    // ==== Routing / load ====
+    let gameId = parseHash();
+    $('lblGameId').textContent = gameId || '–';
+
+    window.addEventListener('hashchange', ()=>{
+      gameId = parseHash();
+      $('lblGameId').textContent = gameId || '–';
+      if (gameId) bindGame(gameId);
+    });
+
+    onAuthStateChanged(auth, (u)=>{
+      $('authBadge').textContent = u ? `UID: ${u.uid.slice(0,8)}…` : 'inte inloggad';
+      if (u && gameId) bindGame(gameId);
+    });
+    signInAnonymously(auth).catch(console.error);
+
+    // ==== Bind game state ====
+    let unsub = null;
+    function bindGame(id){
+      if (unsub) unsub(); // detach previous
+      const gRef = ref(db, `games/${id}`);
+      unsub = onValue(gRef, snap=>{
+        if(!snap.exists()){ 
+          $('nowPlaying').textContent = 'Spelet hittades inte.';
+          return;
+        }
+        const v = snap.val() || {};
+        renderGame(v, id);
+      });
+    }
+
+    function renderGame(g, id){
+      // Top labels
+      $('lblRound').textContent = g.round != null ? String(g.round) : '–';
+      $('lblDraw').textContent  = g.drawIndex != null ? String(g.drawIndex) : '–';
+      $('lblTurn').textContent  = g.turn || '–';
+
+      // Teams strip
+      const strip = $('teamStrip');
+      strip.innerHTML = '';
+      const teams = g.teams ? Object.entries(g.teams) : [];
+      teams.forEach(([tid, t])=>{
+        const div = document.createElement('div');
+        div.className = 'team' + (g.turn === tid ? ' active' : '');
+        const tokens = (t && typeof t.tokens === 'number') ? t.tokens : '–';
+        const score  = (t && typeof t.score  === 'number') ? t.score  : 0;
+        const startY = (g.startYears && g.startYears[tid]) ? g.startYears[tid] : '–';
+        div.innerHTML = `
+          <div><strong>${t?.name || 'Lag'}</strong></div>
+          <div class="mut">Tokens: <span class="mono">${tokens}</span> • Poäng: <span class="mono">${score}</span></div>
+          <div class="mut">Startår: <span class="mono">${startY}</span></div>
+        `;
+        strip.appendChild(div);
+      });
+
+      // Now playing (spoilerfri)
+      const di = g.drawIndex || 0;
+      const deck = Array.isArray(g.deck) ? g.deck : [];
+      $('nowPlaying').textContent = `Spelar låt #${di + 1} av ${deck.length} (spoilerfri)`;
+      // Årtal visas inte före reveal – men vi kan visa intervall för guidance i framtiden.
+      $('nowYear').textContent = (g.settings && g.settings.yearMin != null && g.settings.yearMax != null)
+        ? `Årsintervall: ${g.settings.yearMin}–${g.settings.yearMax}` : '';
+
+      // Enable/disable knappar beroende på tur – placeholder nu
+      const amHostTurn = true; // TODO: när vi har user→team-koppling kan vi styra detta
+      $('btnLock').disabled = !amHostTurn;
+      $('btnSkip').disabled = !amHostTurn;
+    }
+
+    // ==== Nav back ====
+    $('btnBackLobby').addEventListener('click', ()=> history.back());
+    
+    // Boot: om gameId fanns i hash direkt, bind
+    if (gameId) bindGame(gameId);
+  </script>
+</body>
+</html>

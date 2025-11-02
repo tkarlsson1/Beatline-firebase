@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.648 (TEST)</title>
+  <title>NOTESTREAM –0.649 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -426,9 +426,9 @@
         startBtn.disabled = !(isHost && teams.length>=1);
         startBtn.onclick = ()=> startGame(gameId);
 
-        // NYTT: auto-navigera till “spelsidan” när phase blir playing
+        // === ÄNDRING: hoppa till spelsidan när phase blir playing ===
         if (v.phase === 'playing') {
-          location.hash = `game/${gameId}`;
+          location.href = `/test/game_mvp.html#game/${gameId}`;
           return;
         }
       });
