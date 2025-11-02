@@ -1,17 +1,15 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-// Peka på TEST-RTDB: notestreamfire (inte live)
+// Test-RTDB (NOTESTREAM): inte live
 admin.initializeApp({
   databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app"
 });
-
 const db = admin.database();
 
 /**
  * Callable: hostStart
  * data: { gameId: string }
- * auth: kräver inloggning (anon auth räcker)
  */
 exports.hostStart = functions.region("europe-west1").https.onCall(async (data, context) => {
   const uid = context.auth?.uid;
@@ -45,7 +43,7 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
   const yearMax = Number.isFinite(settings.yearMax) ? settings.yearMax : 2100;
   const tokensPerTeam = Number.isFinite(settings.tokensPerTeam) ? settings.tokensPerTeam : 4;
 
-  // ---- 1) Läs spellistor och bygg pool ----
+  // ---------- Helpers ----------
   function coerceYear(y) {
     if (y == null) return NaN;
     if (typeof y === "number") return y;
@@ -56,64 +54,90 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     return NaN;
   }
 
-  async function readTracksFromListNode(refPathToListRoot) {
-    const s = await db.ref(refPathToListRoot).get();
-    if (!s.exists()) return [];
-    const node = s.val() || {};
-    // Stöd tre varianter: /list/songs, /list/tracks, eller direkt /list
-    const tracksNode = node.songs || node.tracks || node;
-
+  // Försök extrahera spår från en list-nod som kan se ut:
+  //  - { songs: { <id>: {artist,title,year} } }
+  //  - { tracks: { <id>: {...} } }
+  //  - { <id>: {artist,title,year}, name: '...', ... }  (platt node)
+  function extractTracksFromNode(listNode) {
+    const container = listNode?.songs || listNode?.tracks || listNode;
     const out = [];
-    for (const k of Object.keys(tracksNode)) {
-      const t = tracksNode[k];
-      if (!t || typeof t !== "object") continue;
-      const spotifyId = t.spotifyId || t.id || k;
-      const yearRaw = (t.customYear != null ? t.customYear : t.year);
-      const year = coerceYear(yearRaw);
-      const title = t.title || t.name || "";
-      const artist = t.artist || (Array.isArray(t.artists) && t.artists[0]?.name) || t.artistName || "";
+    for (const key of Object.keys(container || {})) {
+      const v = container[key];
+      if (!v || typeof v !== "object") continue;
+      // hoppa över uppenbara metadata-fält i en platt node
+      if ("name" in v && !("artist" in v) && !("title" in v)) continue;
 
+      const spotifyId = v.spotifyId || v.id || key;
+      const yearRaw = v.customYear != null ? v.customYear : v.year;
+      const year = coerceYear(yearRaw);
+      const title = v.title || v.name || "";
+      const artist =
+        v.artist ||
+        (Array.isArray(v.artists) && v.artists[0]?.name) ||
+        v.artistName ||
+        "";
+
+      // minst SpotifyID + år för att vara relevant
       out.push({ spotifyId, title, artist, year });
     }
     return out;
   }
 
+  async function readListAt(path) {
+    const s = await db.ref(path).get();
+    return s.exists() ? s.val() : null;
+  }
+
+  // ---------- Bygg pool ----------
   const pool = [];
 
-  // Standardlistor (om angivna)
-  if (Array.isArray(settings.standardListIds)) {
+  // A) Om list-ID:n är angivna i settings, lås till dem
+  if (Array.isArray(settings.standardListIds) && settings.standardListIds.length) {
+    functions.logger.info("Using provided standardListIds", settings.standardListIds);
     for (const listId of settings.standardListIds) {
-      const items = await readTracksFromListNode(`standardLists/${listId}`);
+      const node = await readListAt(`standardLists/${listId}`);
+      if (!node) continue;
+      const items = extractTracksFromNode(node);
+      functions.logger.info(`standardLists/${listId}: extracted`, items.length);
       pool.push(...items);
     }
   }
 
-  // Egna listor (om angivna – kräver ownerUid)
   if (Array.isArray(settings.userPlaylistIds) && settings.ownerUid) {
+    functions.logger.info("Using provided userPlaylistIds", settings.userPlaylistIds);
     for (const listId of settings.userPlaylistIds) {
-      const items = await readTracksFromListNode(`userPlaylists/${settings.ownerUid}/${listId}`);
+      const node = await readListAt(`userPlaylists/${settings.ownerUid}/${listId}`);
+      if (!node) continue;
+      const items = extractTracksFromNode(node);
+      functions.logger.info(`userPlaylists/${settings.ownerUid}/${listId}: extracted`, items.length);
       pool.push(...items);
     }
   }
 
-  // 📌 Fallback: om inga listor angavs → läs ALLA standardLists/<listId>
+  // B) Fallback: läs ALLA standardLists om inget lades i poolen
   if (pool.length === 0) {
-    const stdRoot = await db.ref(`standardLists`).get();
-    if (stdRoot.exists()) {
-      const lists = stdRoot.val() || {};
-      for (const listId of Object.keys(lists)) {
-        const items = await readTracksFromListNode(`standardLists/${listId}`);
+    const stdRootSnap = await db.ref("standardLists").get();
+    if (!stdRootSnap.exists()) {
+      functions.logger.warn("standardLists root missing");
+    } else {
+      const stdRoot = stdRootSnap.val() || {};
+      const listIds = Object.keys(stdRoot);
+      functions.logger.info("Fallback: scanning all standardLists", { count: listIds.length, listIds: listIds.slice(0, 10) });
+
+      for (const listId of listIds) {
+        const node = stdRoot[listId];
+        const items = extractTracksFromNode(node);
+        functions.logger.info(`fallback standardLists/${listId}: extracted`, items.length);
         pool.push(...items);
       }
     }
   }
 
-  // ---- 2) Filtrera + dedupe ----
-  const inRange = pool.filter(t =>
-    t &&
-    t.spotifyId &&
-    Number.isFinite(t.year) &&
-    t.year >= yearMin && t.year <= yearMax
+  functions.logger.info("Pool size before filter", pool.length);
+
+  // ---------- Filtrera + dedupe ----------
+  const inRange = pool.filter(
+    (t) => t && t.spotifyId && Number.isFinite(t.year) && t.year >= yearMin && t.year <= yearMax
   );
 
   const seen = new Set();
@@ -124,11 +148,15 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     deduped.push(t);
   }
 
+  functions.logger.info("After filter/dedupe", { inRange: inRange.length, deduped: deduped.length, yearMin, yearMax });
+
   if (deduped.length === 0) {
+    // Logga sampling av första 5 från pool för felsökning
+    functions.logger.warn("deck/empty — sample", pool.slice(0, 5));
     throw new functions.https.HttpsError("failed-precondition", "deck/empty");
   }
 
-  // ---- 3) Deterministisk shuffle på gameId (Fisher–Yates) ----
+  // ---------- Deterministisk shuffle ----------
   let seed = 0;
   for (const c of String(gameId)) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
 
@@ -139,7 +167,7 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
 
-  // ---- 4) Startår per lag ----
+  // ---------- Startår per lag ----------
   const startYears = {};
   for (const tid of teamIds) {
     seed = (seed * 1664525 + 1013904223) >>> 0;
@@ -147,7 +175,7 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     startYears[tid] = y;
   }
 
-  // ---- 5) Init-state ----
+  // ---------- Init-state ----------
   const firstTeam = teamIds[0];
   const updates = {};
 
@@ -156,8 +184,11 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
   updates[`games/${gameId}/turn`] = firstTeam;
   updates[`games/${gameId}/round`] = 1;
 
-  updates[`games/${gameId}/deck`] = deck.map(t => ({
-    spotifyId: t.spotifyId, year: t.year, title: t.title, artist: t.artist
+  updates[`games/${gameId}/deck`] = deck.map((t) => ({
+    spotifyId: t.spotifyId,
+    year: t.year,
+    title: t.title,
+    artist: t.artist,
   }));
   updates[`games/${gameId}/current`] = null;
   updates[`games/${gameId}/startYears`] = startYears;
@@ -175,6 +206,6 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     ok: true,
     deckCount: deck.length,
     firstTeam,
-    startYears
+    startYears,
   };
 });
