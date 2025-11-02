@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.641 (TEST)</title>
+  <title>NOTESTREAM –0.642 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -28,10 +28,7 @@
     .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
     a{color:#67e8f9;text-decoration:none}
     .ok{color:#10b981} .warn{color:#f59e0b} .err{color:#ef4444}
-
-    /* === Device picker modal === */
-    .device-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
-    .device-card{background:#0e152e;border:1px solid #1f2937;border-radius:14px;padding:16px;max-width:460px;width:92%}
+    /* Enhetslista under Spotify-sektionen */
     .device-list{display:grid;gap:8px;margin-top:8px}
     .device-list button{width:100%;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid #2a3553;background:#0b1228}
     .device-list button:hover{border-color:#3a4a78}
@@ -88,6 +85,7 @@
             <button id="btnSpotify" class="ghost">Koppla Spotify</button>
             <button id="btnPickDevice" class="ghost" disabled>Välj enhet</button>
           </div>
+          <div id="deviceArea" class="device-list"></div>
           <p class="mut" style="margin-top:8px">Scopes: streaming, read email/private, modify/read playback</p>
         </div>
       </div>
@@ -129,18 +127,6 @@
       </div>
     </section>
   </main>
-
-  <!-- Device picker modal -->
-  <div id="deviceModal" class="device-modal" aria-hidden="true">
-    <div class="device-card">
-      <h3 style="margin:0 0 6px 0">Välj enhet</h3>
-      <p class="mut" style="margin:0 0 8px 0">Tryck på enheten du vill använda för Spotify Connect.</p>
-      <div id="deviceList" class="device-list"></div>
-      <div style="text-align:right;margin-top:10px">
-        <button id="btnCloseDevice" class="ghost">Stäng</button>
-      </div>
-    </div>
-  </div>
 
   <script type="module">
     // ==== Firebase (RTDB) init ====
@@ -188,6 +174,7 @@
     const btnGotoJoin = document.getElementById('btnGotoJoin');
     const btnSpotify = document.getElementById('btnSpotify');
     const btnPickDevice = document.getElementById('btnPickDevice');
+    const deviceArea = document.getElementById('deviceArea');
 
     btnCreate.addEventListener('click', async ()=>{
       const u = auth.currentUser; if(!u) return alert('Inte inloggad');
@@ -344,6 +331,9 @@
         if(spStatus) spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
         const pickBtn = document.getElementById('btnPickDevice');
         if(pickBtn) pickBtn.disabled = false;
+
+        // Visa enhetslistan direkt efter koppling (kvalitetsliv)
+        renderDevicesList().catch(()=>{});
       }catch(e){
         if(spStatus) spStatus.innerHTML = '<span class="err">Spotify-koppling misslyckades</span>';
         console.error(e);
@@ -359,54 +349,43 @@
         body:new URLSearchParams({ grant_type:'refresh_token', refresh_token:tok.refresh_token, client_id:SPOTIFY_CLIENT_ID })
       });
       const j = await res.json();
-      tok.access_token = j.access_token; tok.expires_at = Date.now() + (j.expires_in*1000 - 60000);
+      tok.access_token = j.access_token; tok.expires_at = Date.now() + (j.exires_in*1000 - 60000);
       localStorage.setItem('sp_token', JSON.stringify(tok));
       return tok.access_token;
     }
 
-    // === Device picker ===
-    const deviceModal = document.getElementById('deviceModal');
-    const deviceList  = document.getElementById('deviceList');
-    const btnCloseDevice = document.getElementById('btnCloseDevice');
-
-    function showDeviceModal(){ deviceModal.style.display = 'flex'; }
-    function hideDeviceModal(){ deviceModal.style.display = 'none'; }
-
-    btnCloseDevice.addEventListener('click', hideDeviceModal);
-    deviceModal.addEventListener('click', (e)=>{ if(e.target === deviceModal) hideDeviceModal(); });
-
-    btnPickDevice.addEventListener('click', async ()=>{
+    // === Enhetslista (inline) ===
+    async function renderDevicesList(){
+      deviceArea.innerHTML = '';
+      let j;
       try{
         const at = await withToken();
         const r = await fetch('https://api.spotify.com/v1/me/player/devices',{ headers:{ Authorization: 'Bearer '+at }});
-        const j = await r.json();
-        if(!j.devices || !j.devices.length) return alert('Inga Connect-enheter hittades. Öppna Spotify på den enhet du vill använda och försök igen.');
-
-        // Fyll listan med klickbara knappar
-        deviceList.innerHTML = '';
-        j.devices.forEach(d=>{
-          const b = document.createElement('button');
-          b.className = 'ghost';
-          b.innerHTML = `${d.name} <span class="mut">(${d.type})</span>${d.is_active?' <span class="ok">✓ aktiv</span>':''}`;
-          b.addEventListener('click', async ()=>{
-            try{
-              // Spara val
-              localStorage.setItem('sp_device_id', d.id);
-              document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
-              // Försök transfer playback tyst
-              await fetch('https://api.spotify.com/v1/me/player', {
-                method:'PUT',
-                headers:{ Authorization:'Bearer '+at, 'Content-Type':'application/json' },
-                body: JSON.stringify({ device_ids:[d.id], play:false })
-              });
-            }catch(_){} // ignorerar tysta fel
-            hideDeviceModal();
-          });
-          deviceList.appendChild(b);
+        j = await r.json();
+      }catch(e){
+        deviceArea.innerHTML = '<div class="mut">Kunde inte hämta enheter.</div>';
+        console.error(e); return;
+      }
+      if(!j.devices || !j.devices.length){
+        deviceArea.innerHTML = '<div class="mut">Inga Connect-enheter hittades. Öppna Spotify på en enhet och försök igen.</div>';
+        return;
+      }
+      j.devices.forEach(d=>{
+        const b = document.createElement('button');
+        b.className = 'ghost';
+        b.innerHTML = `${d.name} <span class="mut">(${d.type})</span>${d.is_active?' <span class="ok">✓ aktiv</span>':''}`;
+        b.addEventListener('click', async ()=>{
+          try{
+            localStorage.setItem('sp_device_id', d.id);
+            document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
+            // Ingen tyst transfer här – vi gör det i spel-flödet när vi faktiskt ska spela
+          }catch(e){ console.error(e); }
         });
-        showDeviceModal();
-      }catch(e){ alert('Kunde inte hämta enheter'); console.error(e); }
-    });
+        deviceArea.appendChild(b);
+      });
+    }
+
+    btnPickDevice.addEventListener('click', ()=>{ renderDevicesList(); });
 
     // ==== Boot ====
     route();
