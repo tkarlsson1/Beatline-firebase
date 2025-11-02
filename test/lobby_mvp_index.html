@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.653 (TEST)</title>
+  <title>NOTESTREAM –0.654 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
-    :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
+    :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; --panel:#0e152e; --border:#111827; }
     *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #111827;background:#0e152e;position:sticky;top:0;z-index:10}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--panel);position:sticky;top:0;z-index:10}
     h1{font-size:18px;margin:0;font-weight:600}
-    main{max-width:900px;margin:0 auto;padding:16px}
-    .card{background:#0e152e;border:1px solid #111827;border-radius:14px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.25)}
+    main{max-width:960px;margin:0 auto;padding:16px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 16px rgba(0,0,0,.25)}
     .row{display:flex;gap:12px;flex-wrap:wrap}
     label{display:block;font-size:12px;color:var(--mut);margin-bottom:6px}
     input,select,button{border-radius:12px;border:1px solid #1f2937;background:#0b1228;color:var(--fg);padding:10px 12px;font-size:14px}
-    input:disabled,button:disabled{opacity:.55}
     button.primary{background:linear-gradient(180deg,#0891b2,#0284c7);border-color:#0369a1}
     button.ghost{background:transparent;border-color:#283146}
+    button:disabled{opacity:.6}
     .mut{color:var(--mut)}
     .grid{display:grid;gap:12px}
     .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -28,9 +28,12 @@
     .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
     a{color:#67e8f9;text-decoration:none}
     .ok{color:#10b981} .warn{color:#f59e0b} .err{color:#ef4444}
+    /* Device modal */
+    .device-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+    .device-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;max-width:520px;width:90%;padding:16px}
     .device-list{display:grid;gap:8px;margin-top:8px}
-    .device-list button{width:100%;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid #2a3553;background:#0b1228}
-    .device-list button:hover{border-color:#3a4a78}
+    .device-item{display:flex;justify-content:space-between;align-items:center;border:1px solid #1f2937;border-radius:12px;padding:10px 12px;background:#0b1228;cursor:pointer}
+    .device-item:hover{background:#0d1733}
   </style>
 </head>
 <body>
@@ -39,99 +42,57 @@
     <div id="authBadge" class="mut">…</div>
   </header>
   <main>
-    <!-- START / screen -->
-    <section id="screenStart" class="grid" style="display:none">
-      <div class="card grid cols-2">
-        <div>
-          <h2 style="margin:0 0 8px 0">Skapa lobby</h2>
-          <p class="mut">Låtlistor kommer via pre-lobby-token från startsidan.</p>
-
-          <div id="preSummary" class="card" style="margin:12px 0; display:none;">
-            <h3 style="margin:0 0 6px 0">Val från startsidan</h3>
-            <div id="preSummaryBody" class="mut">Laddar…</div>
-          </div>
-
-          <div class="grid cols-2">
-            <div>
-              <label>Från år</label>
-              <input id="yearMin" type="number" min="1900" max="2099" value="1960" />
-            </div>
-            <div>
-              <label>Till år</label>
-              <input id="yearMax" type="number" min="1900" max="2099" value="2025" />
-            </div>
-            <div>
-              <label>Drag-tid (sek)</label>
-              <input id="tDrag" type="number" min="15" max="300" value="90" />
-            </div>
-            <div>
-              <label>Utmaningsfönster (sek)</label>
-              <input id="tClaim" type="number" min="5" max="60" value="10" />
-            </div>
-            <div>
-              <label>Opp-drag (sek)</label>
-              <input id="tOpp" type="number" min="5" max="120" value="20" />
-            </div>
-            <div>
-              <label>Tokens / lag</label>
-              <input id="tokensPerTeam" type="number" min="0" max="20" value="4" />
-            </div>
-          </div>
-          <div style="margin-top:12px;display:flex;gap:8px">
-            <button id="btnCreate" class="primary">Skapa lobby</button>
-            <button id="btnGotoJoin" class="ghost">Gå till join-vy</button>
-          </div>
-          <p class="mut" style="margin-top:8px">Max 8 lag • Vinst: 11 kort • Sen ankomst: ej tillåten</p>
-        </div>
-        <div>
-          <h3 style="margin:0 0 8px 0">Spotify (host)</h3>
-          <p id="spStatus" class="mut">Inte kopplad</p>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="btnSpotify" class="ghost">Koppla Spotify</button>
-            <button id="btnPickDevice" class="ghost" disabled>Välj enhet</button>
-          </div>
-          <div id="deviceArea" class="device-list"></div>
-          <p class="mut" style="margin-top:8px">Scopes: streaming, read email/private, modify/read playback</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- LOBBY / screen -->
     <section id="screenLobby" class="grid" style="display:none">
       <div class="card">
-        <h2 style="margin:0 0 8px 0">Lobby <span class="mut mono" id="lblGameId"></span></h2>
+        <h2 style="margin:0 0 8px 0">Lobby <span class="mut mono" id="lblId"></span></h2>
+
         <div class="row">
-          <div style="flex:1">
+          <div style="flex:1;min-width:280px">
             <label>Join-länk</label>
             <div class="mono" id="joinUrl" style="word-break:break-all"></div>
             <div class="qr" style="margin-top:8px"><img id="qrImg" alt="QR"/></div>
+
+            <div style="margin-top:16px">
+              <label>Val (förhandsvy)</label>
+              <div id="settingsPreview" class="mut" style="white-space:pre-line"></div>
+            </div>
           </div>
-          <div style="flex:1">
+
+          <div style="flex:1;min-width:280px">
             <label>Lag</label>
-            <div id="teams" class="teams"></div>
-            <div style="margin-top:12px;display:flex;gap:8px">
+            <div id="teams" class="teams" style="min-height:42px"></div>
+
+            <div style="margin-top:16px">
+              <h3 style="margin:0 0 6px 0">Spotify</h3>
+              <p id="spStatus" class="mut" style="margin:0 0 8px 0">Inte kopplad</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button id="btnSpotify" class="ghost">Koppla Spotify</button>
+                <button id="btnPickDevice" class="ghost" disabled>Välj enhet</button>
+              </div>
+              <div id="deviceChosen" class="mut" style="margin-top:6px"></div>
+            </div>
+
+            <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
               <button id="btnStart" class="primary" disabled>Starta spel</button>
               <button id="btnLeave" class="ghost">Lämna lobby</button>
             </div>
-            <p id="lobbyHint" class="mut">Koppla Spotify och välj enhet innan start för uppspelning via Connect. QR-fallback finns.</p>
+            <p id="lobbyHint" class="mut" style="margin-top:8px">Koppla Spotify och välj enhet innan start. QR-fallback finns.</p>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- JOIN / screen -->
-    <section id="screenJoin" class="grid" style="display:none">
-      <div class="card">
-        <h2 style="margin:0 0 8px 0">Gå med i spel</h2>
-        <p class="mut">Skriv lagnamn för att gå med i <span id="joinGameId" class="mono"></span></p>
-        <div class="row">
-          <input id="inpTeamName" placeholder="Lagnamn" maxlength="24" style="flex:1" />
-          <button id="btnJoin" class="primary">Gå med</button>
-        </div>
-        <p id="joinMsg" class="mut"></p>
-      </div>
-    </section>
   </main>
+
+  <!-- Device modal -->
+  <div id="deviceModal" class="device-modal" aria-hidden="true">
+    <div class="device-card" role="dialog" aria-modal="true" aria-labelledby="deviceTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="deviceTitle" style="margin:0">Välj Connect-enhet</h3>
+        <button id="btnCloseDevice" class="ghost" aria-label="Stäng">Stäng</button>
+      </div>
+      <div id="deviceList" class="device-list"></div>
+    </div>
+  </div>
 
   <script type="module">
     // ==== Firebase (RTDB) init ====
@@ -151,16 +112,181 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // ==== Spotify helpers ====
-    function getStoredToken(){
-      const raw = localStorage.getItem('sp_token');
-      if(!raw) return null;
-      try { return JSON.parse(raw); } catch { return null; }
+    // ==== UI helpers ====
+    const $ = (id)=>document.getElementById(id);
+    const screenLobby = $('screenLobby');
+    const lblId = $('lblId');
+    const joinUrlEl = $('joinUrl');
+    const qrImg = $('qrImg');
+    const teamsEl = $('teams');
+    const btnStart = $('btnStart');
+    const btnLeave = $('btnLeave');
+    const spStatus = $('spStatus');
+    const btnSpotify = $('btnSpotify');
+    const btnPickDevice = $('btnPickDevice');
+    const settingsPreview = $('settingsPreview');
+    const deviceModal = $('deviceModal');
+    const deviceList = $('deviceList');
+    const btnCloseDevice = $('btnCloseDevice');
+    const deviceChosen = $('deviceChosen');
+
+    function showSection(el, on){ el.style.display = on? 'block':'none'; }
+    function setAuthBadge(u){
+      const el = document.getElementById('authBadge');
+      if(u){ el.innerHTML = `UID: <span class="kbd">${u.uid.slice(0,8)}…</span>`; }
+      else el.textContent = 'inte inloggad';
     }
-    function isTokenValid(tok){
-      return tok && typeof tok.expires_at === 'number' && Date.now() < tok.expires_at;
+
+    // ==== Routing (#pre/<id> eller #lobby/<id>) ====
+    let currentMode = null; // 'pre' | 'lobby'
+    let currentId = null;
+    function parseHash(){
+      const [p, id] = (location.hash.replace(/^#/, '')||'').split('/');
+      currentMode = p || null;
+      currentId = id || null;
     }
-    async function withToken(){
+    function route(){
+      parseHash();
+      showSection(screenLobby, !!currentMode);
+      if(currentMode === 'pre' && currentId) bindPre(currentId);
+      if(currentMode === 'lobby' && currentId) bindLobby(currentId);
+    }
+    window.addEventListener('hashchange', route);
+
+    // ==== Auth ====
+    onAuthStateChanged(auth, (u)=>{
+      setAuthBadge(u);
+      if(u) route();
+    });
+    signInAnonymously(auth).catch(console.error);
+
+    // ==== Bind pre-lobby ====
+    let unsubPre = null;
+    async function bindPre(preId){
+      lblId.textContent = `#pre/${preId}`;
+      const deepLink = `${location.origin}${location.pathname}#join/${preId}`; // vi använder join via preId i MVP
+      joinUrlEl.textContent = deepLink;
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(deepLink)}`;
+
+      // Läs och visa settings
+      const stSnap = await get(ref(db, `prelobbies/${preId}/settings`));
+      const st = stSnap.val() || {};
+      const std = Array.isArray(st.standardListIds) ? st.standardListIds : [];
+      const yr = `År: ${st.yearMin ?? '?'}–${st.yearMax ?? '?'}`;
+      const tok = `Tokens/lag: ${st.tokensPerTeam ?? 4}, Vinst: ${st.winCards ?? 11}`;
+      settingsPreview.textContent = `Standardlistor (${std.length}): ${std.join(', ') || '—'}\n${yr}\n${tok}`;
+
+      // Start-knapp aktiv direkt (host krävs för start, men vi låser upp UI)
+      btnStart.disabled = false;
+
+      // “Lämna” bara back
+      btnLeave.onclick = ()=> history.back();
+
+      // Teams – i MVP listar vi inte per pre, utan först när det blivit game
+      teamsEl.innerHTML = '<span class="mut">Lag visas efter start (i games/*).</span>';
+    }
+
+    // ==== Promote pre → game och starta ====
+    async function promotePreToGame(preId){
+      const u = auth.currentUser; if(!u) throw new Error('Inte inloggad');
+      const preSnap = await get(ref(db, `prelobbies/${preId}/settings`));
+      if(!preSnap.exists()) throw new Error('prelobby saknas');
+      const settings = preSnap.val() || {};
+
+      const newRef = push(ref(db, 'games'));
+      const gameId = newRef.key;
+      await set(newRef, {
+        phase: 'lobby',
+        hostId: u.uid,
+        settings,
+        teams: {}
+      });
+
+      // Byt URL till #lobby/<gameId> och bind nya lobbyn
+      location.hash = `lobby/${gameId}`;
+      return gameId;
+    }
+
+    // ==== Bind lobby ====
+    let unsubLobby = null;
+    async function bindLobby(gameId){
+      lblId.textContent = `#lobby/${gameId}`;
+      const deepLink = `${location.origin}${location.pathname}#join/${gameId}`;
+      joinUrlEl.textContent = deepLink;
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(deepLink)}`;
+
+      if(unsubLobby) unsubLobby();
+      const base = ref(db, `games/${gameId}`);
+      unsubLobby = onValue(base, snap=>{
+        const g = snap.val() || {};
+        // teams
+        teamsEl.innerHTML = '';
+        const teams = g.teams ? Object.entries(g.teams) : [];
+        for(const [tid,t] of teams){
+          const div = document.createElement('div');
+          div.className = 'chip';
+          div.textContent = `${t.name || '??'}${t.tokens!=null?' • '+t.tokens+' tok':''}`;
+          teamsEl.appendChild(div);
+        }
+        // settings preview
+        const st = g.settings || {};
+        const std = Array.isArray(st.standardListIds) ? st.standardListIds : [];
+        const yr = `År: ${st.yearMin ?? '?'}–${st.yearMax ?? '?'}`;
+        const tok = `Tokens/lag: ${st.tokensPerTeam ?? 4}, Vinst: ${st.winCards ?? 11}`;
+        settingsPreview.textContent = `Standardlistor (${std.length}): ${std.join(', ') || '—'}\n${yr}\n${tok}`;
+
+        // host kan starta om minst 1 lag (valfritt krav i MVP)
+        const isHost = auth.currentUser && g.hostId === auth.currentUser.uid;
+        btnStart.disabled = !isHost;
+      });
+
+      btnLeave.onclick = ()=> history.back();
+    }
+
+    // ==== Starta spel (hanterar både #pre och #lobby) ====
+    async function startGame(){
+      const u = auth.currentUser; if(!u) throw new Error('Inte inloggad');
+      const token = await u.getIdToken();
+
+      parseHash();
+      let gameId = currentId;
+
+      if(currentMode === 'pre'){
+        // 1) Skapa games/<id> från prelobby
+        gameId = await promotePreToGame(currentId);
+        // route() triggas automatiskt via hash-ändring, men vi fortsätter direkt
+      }
+
+      // 2) ropa hostStartHttp
+      const url = `https://europe-west1-beatlinefirebase.cloudfunctions.net/hostStartHttp?gameId=${encodeURIComponent(gameId)}`;
+      const resp = await fetch(url, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+        body: '{}'
+      });
+      const j = await resp.json();
+      if(!resp.ok) throw new Error(JSON.stringify(j));
+
+      alert(`Spelet startades! Kort i lek: ${j.deckCount}. Server sätter phase=playing.`);
+      // Navigera till game-sidan
+      location.href = `${location.origin}/test/game_mvp.html#game/${gameId}`;
+    }
+
+    btnStart.addEventListener('click', ()=> startGame().catch(e=>{
+      console.error(e);
+      alert('Kunde inte starta spel: ' + (e.message || e));
+    }));
+
+    // ==== Spotify PKCE + enhetsval ====
+    const SPOTIFY_CLIENT_ID = '3033344ef55647b8b70ef1dccfa7e65f';
+    const REDIRECT = location.origin + location.pathname; // åter till samma sida
+    const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state';
+
+    function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+    async function sha256(txt){const data=new TextEncoder().encode(txt);return await crypto.subtle.digest('SHA-256',data)}
+    function randStr(len){const arr=new Uint8Array(len);crypto.getRandomValues(arr);return Array.from(arr).map(b=>('0'+(b%36).toString(36)).slice(-1)).join('');}
+
+    async function withSpToken(){
       const raw = localStorage.getItem('sp_token'); if(!raw) throw new Error('Ej inloggad mot Spotify');
       const tok = JSON.parse(raw);
       if(Date.now() < tok.expires_at) return tok.access_token;
@@ -174,298 +300,11 @@
       return tok.access_token;
     }
 
-    async function listDevices(){
-      try{
-        const at = await withToken();
-        const r = await fetch('https://api.spotify.com/v1/me/player/devices',{ headers:{ Authorization: 'Bearer '+at }});
-        const j = await r.json();
-        const area = document.getElementById('deviceArea');
-        area.innerHTML = '';
-        if(!j.devices || !j.devices.length){
-          area.innerHTML = '<div class="mut">Inga Connect-enheter hittades. Öppna Spotify på en enhet och försök igen.</div>';
-          return;
-        }
-        j.devices.forEach(d=>{
-          const btn = document.createElement('button');
-          btn.textContent = `${d.name} (${d.type})${d.is_active?' ✓':''}`;
-          btn.onclick = async ()=>{
-            try{
-              const at2 = await withToken();
-              const res = await fetch('https://api.spotify.com/v1/me/player',{
-                method:'PUT',
-                headers:{'Content-Type':'application/json', Authorization:'Bearer '+at2},
-                body: JSON.stringify({ device_ids:[d.id] })
-              });
-              if(res.status!==204) {
-                const t = await res.text();
-                alert('Kunde inte välja enhet: '+(t||res.status));
-              } else {
-                document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
-              }
-            }catch(e){ alert('Fel vid val av enhet'); console.error(e); }
-          };
-          area.appendChild(btn);
-        });
-      }catch(e){
-        console.error(e);
-        document.getElementById('deviceArea').innerHTML = '<div class="err">Kunde inte hämta enheter.</div>';
-      }
-    }
-
-    // ==== Pre-lobby state ====
-    let preId = null;
-    let preSettings = null;
-
-    async function loadPreSettings(id) {
-      preId = id;
-      preSettings = null;
-
-      const box = document.getElementById('preSummary');
-      const body = document.getElementById('preSummaryBody');
-      if (box && body) { box.style.display = 'block'; body.textContent = 'Laddar…'; }
-
-      try {
-        const snap = await get(ref(db, `prelobbies/${id}/settings`));
-        if (!snap.exists()) {
-          if (body) body.innerHTML = '<span class="err">Kunde inte hitta pre-lobby-inställningar.</span>';
-          return;
-        }
-        preSettings = snap.val() || {};
-        const lists = []
-          .concat(preSettings.standardListIds || [])
-          .concat(preSettings.userPlaylistIds || []);
-        const yearMin = preSettings.yearMin ?? '–';
-        const yearMax = preSettings.yearMax ?? '–';
-        const tokens = preSettings.tokensPerTeam ?? '–';
-        const win = preSettings.winCards ?? '–';
-        if (body) {
-          body.innerHTML = `
-            <div>Listor: <span class="mono">${lists.length ? lists.join(', ') : '–'}</span></div>
-            <div>Årtal: <span class="mono">${yearMin}–${yearMax}</span></div>
-            <div>Tokens/lag: <span class="mono">${tokens}</span> • Vinst vid: <span class="mono">${win}</span></div>
-            <div class="mut" style="margin-top:4px">Ägare (UID): <span class="mono">${preSettings.ownerUid || '–'}</span></div>
-          `;
-        }
-      } catch (e) {
-        console.error('prelobby load error', e);
-        const body = document.getElementById('preSummaryBody');
-        if (body) body.innerHTML = '<span class="err">Fel vid hämtning av pre-lobby.</span>';
-      }
-    }
-
-    // ==== Routing (hash) ====
-    function showSection(id, on){ document.getElementById(id).style.display = on?"block":"none"; }
-
-    async function route() {
-      const hash = location.hash.replace(/^#/, "");
-      const [path, id] = hash.split("/");
-      const isPre = path === "pre";
-      const showStart = (!path || isPre);
-
-      showSection("screenStart", showStart);
-      showSection("screenLobby", path === "lobby");
-      showSection("screenJoin", path === "join");
-
-      // Spotify: status + lista enheter om token redan finns
-      if (showStart) {
-        const spStatus = document.getElementById('spStatus');
-        const pickBtn = document.getElementById('btnPickDevice');
-        const tok = getStoredToken();
-        if (isTokenValid(tok)) {
-          spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
-          pickBtn.disabled = false;
-          listDevices();
-        }
-      }
-
-      if (isPre && id) {
-        await loadPreSettings(id);
-      } else {
-        const box = document.getElementById('preSummary');
-        if (box) box.style.display = 'none';
-      }
-
-      if (!path) return;
-      if (path === "lobby" && id) loadLobby(id);
-      if (path === "join" && id) setupJoin(id);
-    }
-    window.addEventListener("hashchange", route);
-
-    // ==== Auth badge ====
-    onAuthStateChanged(auth, (u)=>{
-      const el = document.getElementById('authBadge');
-      if(u){ el.innerHTML = `UID: <span class="kbd">${u.uid.slice(0,8)}…</span>`; route(); }
-      else el.textContent = 'inte inloggad';
-    });
-    signInAnonymously(auth).catch(console.error);
-
-    // ==== Create Lobby ====
-    const btnCreate = document.getElementById('btnCreate');
-    const btnGotoJoin = document.getElementById('btnGotoJoin');
-    const btnSpotify = document.getElementById('btnSpotify');
-    const btnPickDevice = document.getElementById('btnPickDevice');
-
-    btnCreate.addEventListener('click', async ()=>{
-      try{
-        const u = auth.currentUser;
-        if(!u) return alert('Inte inloggad');
-
-        if(!preSettings){
-          return alert('Hittar inte val från startsidan (pre-lobby saknas). Gå tillbaka och skapa lobby från startsidan.');
-        }
-
-        const yearMin = +document.getElementById('yearMin').value;
-        const yearMax = +document.getElementById('yearMax').value;
-        const tDrag = +document.getElementById('tDrag').value;
-        const tClaim = +document.getElementById('tClaim').value;
-        const tOpp = +document.getElementById('tOpp').value;
-        const tokensPerTeam = +document.getElementById('tokensPerTeam').value;
-
-        const mergedSettings = {
-          allowLateJoin: preSettings.allowLateJoin ?? false,
-          dedupeKey: preSettings.dedupeKey ?? 'spotifyId',
-          winCards: preSettings.winCards ?? 11,
-          standardListIds: preSettings.standardListIds || [],
-          userPlaylistIds: preSettings.userPlaylistIds || [],
-          ownerUid: preSettings.ownerUid || u.uid,
-          yearMin, yearMax,
-          tokensPerTeam,
-          timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp }
-        };
-
-        const gameId = (await push(ref(db, 'games'))).key;
-        const base = ref(db, `games/${gameId}`);
-
-        await set(child(base, 'phase'), 'lobby');
-        await set(child(base, 'hostId'), u.uid);
-        await set(child(base, 'settings'), mergedSettings);
-
-        location.hash = `lobby/${gameId}`;
-      }catch(e){
-        console.error(e);
-        alert('Kunde inte skapa lobby. Se console för detaljer.');
-      }
-    });
-
-    btnGotoJoin.addEventListener('click', ()=>{
-      const gid = prompt('Ange gameId att joina:');
-      if(gid) location.hash = `join/${gid}`;
-    });
-
-    // ==== Starta spel → Cloud Function hostStartHttp ====
-    async function startGame(gameId){
-      try{
-        const u = auth.currentUser;
-        if(!u) throw new Error('Inte inloggad');
-
-        const idToken = await u.getIdToken(true);
-
-        const url = new URL('https://europe-west1-beatlinefirebase.cloudfunctions.net/hostStartHttp');
-        url.searchParams.set('gameId', gameId);
-
-        const res = await fetch(url.toString(), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-          },
-          body: JSON.stringify({ gameId })
-        });
-
-        if(!res.ok){
-          let msg = 'HTTP '+res.status;
-          try{
-            const j = await res.json();
-            if(j && j.error && (j.error.message || j.error.status)){
-              msg = JSON.stringify(j);
-            }
-          }catch{
-            const t = await res.text().catch(()=> '');
-            if(t) msg = t;
-          }
-          throw new Error(msg);
-        }
-
-        // ★ NYTT: navigera direkt till game-sidan (ingen alert)
-        location.href = `/test/game_mvp.html#game/${gameId}`;
-      }catch(e){
-        console.error(e);
-        alert('Kunde inte starta spel: ' + (e.message || e));
-      }
-    }
-
-    // ==== Lobby view ====
-    let lobbyUnsub = null;
-    async function loadLobby(gameId){
-      document.getElementById('lblGameId').textContent = gameId;
-      const joinUrl = `${location.origin}${location.pathname}#join/${gameId}`;
-      document.getElementById('joinUrl').textContent = joinUrl;
-      document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(joinUrl)}`;
-
-      const startBtn = document.getElementById('btnStart');
-      const leaveBtn = document.getElementById('btnLeave');
-      leaveBtn.onclick = ()=> history.back();
-
-      if(lobbyUnsub) lobbyUnsub();
-      const base = ref(db, `games/${gameId}`);
-      lobbyUnsub = onValue(base, snap=>{
-        const v = snap.val()||{};
-
-        const teamsEl = document.getElementById('teams');
-        teamsEl.innerHTML = '';
-        const teams = v.teams? Object.entries(v.teams):[];
-        for(const [tid,t] of teams){
-          const div = document.createElement('div');
-          div.className = 'chip';
-          div.textContent = `${t.name || '??'}${t.tokens!=null?' • '+t.tokens+' tok':''}`;
-          teamsEl.appendChild(div);
-        }
-
-        const isHost = auth.currentUser && v.hostId === auth.currentUser.uid;
-        startBtn.disabled = !(isHost && teams.length>=1);
-        startBtn.onclick = ()=> startGame(gameId);
-
-        // Backup: om funktionen hann först
-        if (v.phase === 'playing') {
-          location.href = `/test/game_mvp.html#game/${gameId}`;
-          return;
-        }
-      });
-    }
-
-    // ==== Join view ====
-    async function setupJoin(gameId){
-      document.getElementById('joinGameId').textContent = gameId;
-      const joinBtn = document.getElementById('btnJoin');
-      const nameInp = document.getElementById('inpTeamName');
-      const msg = document.getElementById('joinMsg');
-      joinBtn.onclick = async ()=>{
-        const u = auth.currentUser; if(!u) return alert('Inte inloggad');
-        const name = (nameInp.value||'').trim();
-        if(!name) { msg.textContent = 'Ange lagnamn'; return; }
-        const tRef = ref(db, `games/${gameId}/teams/${u.uid}`);
-        await set(tRef, { name, tokens: 4, score: 0, joinedAt: Date.now() });
-        msg.innerHTML = `Klart! Du är med som <span class="mono">${name}</span>.`;
-      };
-    }
-
-    // ==== Spotify PKCE (bevarar hash via state) ====
-    const SPOTIFY_CLIENT_ID = '3033344ef55647b8b70ef1dccfa7e65f';
-    const REDIRECT = location.origin + location.pathname;
-    const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state';
-
-    function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
-    async function sha256(txt){const data=new TextEncoder().encode(txt);return await crypto.subtle.digest('SHA-256',data)}
-    function randStr(len){const arr=new Uint8Array(len);crypto.getRandomValues(arr);return Array.from(arr).map(b=>('0'+(b%36).toString(36)).slice(-1)).join('');}
-
+    // Koppla Spotify
     btnSpotify.addEventListener('click', async ()=>{
       const verifier = randStr(64);
       const challenge = b64url(await sha256(verifier));
       sessionStorage.setItem('sp_verifier', verifier);
-
-      const currentHash = location.hash || '';
-      sessionStorage.setItem('sp_hash', currentHash);
-
       const url = new URL('https://accounts.spotify.com/authorize');
       url.searchParams.set('client_id', SPOTIFY_CLIENT_ID);
       url.searchParams.set('response_type', 'code');
@@ -474,49 +313,92 @@
       url.searchParams.set('code_challenge', challenge);
       url.searchParams.set('scope', SPOTIFY_SCOPES);
       url.searchParams.set('show_dialog', 'true');
-      url.searchParams.set('state', encodeURIComponent(currentHash));
       location.href = url.toString();
     });
 
+    // Hantera callback (om ?code=…)
     (async function handleSpotifyCallback(){
-      const params = new URLSearchParams(location.search);
-      const code = params.get('code');
-      if(!code) return;
-
-      const spStatus = document.getElementById('spStatus');
+      const code = new URLSearchParams(location.search).get('code');
+      if(!code) {
+        // Om token redan finns – visa status och försök enhetslista direkt
+        if(localStorage.getItem('sp_token')){
+          spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
+          btnPickDevice.disabled = false;
+          try { await openDeviceModal(true); } catch(_) {}
+        }
+        return;
+      }
       const verifier = sessionStorage.getItem('sp_verifier');
-      if(!verifier){ if(spStatus) spStatus.textContent = 'Spotify: saknar verifier'; return; }
-
+      if(!verifier){ spStatus.textContent = 'Spotify: saknar verifier'; return; }
       try{
         const tokenRes = await fetch('https://accounts.spotify.com/api/token',{
           method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
-          body: new URLSearchParams({
-            grant_type:'authorization_code', code,
-            client_id: SPOTIFY_CLIENT_ID, redirect_uri: REDIRECT, code_verifier: verifier
-          })
+          body: new URLSearchParams({ grant_type:'authorization_code', code, client_id: SPOTIFY_CLIENT_ID, redirect_uri: REDIRECT, code_verifier: verifier })
         });
         const token = await tokenRes.json();
         if(!token.access_token) throw new Error(JSON.stringify(token));
-        localStorage.setItem('sp_token', JSON.stringify({
-          access_token: token.access_token,
-          refresh_token: token.refresh_token,
-          expires_at: Date.now() + (token.expires_in*1000 - 60000)
-        }));
-        history.replaceState({},'', location.origin + location.pathname);
-        const stateHash = decodeURIComponent(params.get('state') || '') || sessionStorage.getItem('sp_hash') || '';
-        if (stateHash) location.hash = stateHash;
-
-        if(spStatus) spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
-        const pickBtn = document.getElementById('btnPickDevice');
-        if(pickBtn) pickBtn.disabled = false;
-        listDevices();
-      }catch(e){
-        if(spStatus) spStatus.innerHTML = '<span class="err">Spotify-koppling misslyckades</span>';
-        console.error(e);
-      }
+        localStorage.setItem('sp_token', JSON.stringify({ access_token: token.access_token, refresh_token: token.refresh_token, expires_at: Date.now() + (token.expires_in*1000 - 60000) }));
+        history.replaceState({},'', location.origin + location.pathname + location.hash); // ta bort ?code men behåll hash
+        spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
+        btnPickDevice.disabled = false;
+        await openDeviceModal(true);
+      }catch(e){ spStatus.innerHTML = '<span class="err">Spotify-koppling misslyckades</span>'; console.error(e); }
     })();
 
+    // Enhetsval (modal + klick)
+    btnPickDevice.addEventListener('click', ()=> openDeviceModal());
+
+    async function openDeviceModal(autoOpen=false){
+      try{
+        const at = await withSpToken();
+        const r = await fetch('https://api.spotify.com/v1/me/player/devices',{ headers:{ Authorization: 'Bearer '+at }});
+        const j = await r.json();
+        deviceList.innerHTML = '';
+        if(!j.devices || !j.devices.length){
+          deviceList.innerHTML = '<div class="mut">Inga Connect-enheter hittades. Öppna Spotify på en enhet och försök igen.</div>';
+        }else{
+          for(const d of j.devices){
+            const row = document.createElement('div');
+            row.className = 'device-item';
+            row.innerHTML = `<div>${d.name} <span class="mut">(${d.type})${d.is_active?' • aktiv':''}</span></div><div class="kbd">${d.id.slice(0,6)}…</div>`;
+            row.addEventListener('click', async ()=>{
+              try{
+                // transfer playback
+                const put = await fetch('https://api.spotify.com/v1/me/player',{
+                  method:'PUT',
+                  headers:{ Authorization: 'Bearer '+at, 'Content-Type':'application/json' },
+                  body: JSON.stringify({ device_ids:[d.id], play:false })
+                });
+                if(put.status===204){
+                  localStorage.setItem('sp_device_id', d.id);
+                  deviceChosen.innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
+                  closeDeviceModal();
+                }else{
+                  alert('Kunde inte välja enhet ('+put.status+')');
+                }
+              }catch(err){ console.error(err); alert('Fel vid val av enhet'); }
+            });
+            deviceList.appendChild(row);
+          }
+        }
+        deviceModal.style.display = 'flex';
+        deviceModal.setAttribute('aria-hidden','false');
+        if(!autoOpen) btnCloseDevice.focus();
+      }catch(e){
+        console.error(e);
+        alert('Kunde inte hämta enheter');
+      }
+    }
+    function closeDeviceModal(){
+      deviceModal.style.display = 'none';
+      deviceModal.setAttribute('aria-hidden','true');
+    }
+    btnCloseDevice.addEventListener('click', closeDeviceModal);
+    deviceModal.addEventListener('click', (e)=>{ if(e.target===deviceModal) closeDeviceModal(); });
+
     // ==== Boot ====
+    // Visa lobbyvy direkt om hash finns
+    showSection(screenLobby, true);
     route();
   </script>
 </body>
