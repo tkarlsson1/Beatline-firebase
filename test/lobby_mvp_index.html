@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NOTESTREAM –0.646 (TEST)</title>
+  <title>NOTESTREAM –0.647 (TEST)</title>
   <meta name="theme-color" content="#111827" />
   <style>
     :root { --bg:#0b1020; --fg:#e5e7eb; --mut:#9ca3af; --acc:#06b6d4; --danger:#ef4444; }
@@ -161,6 +161,59 @@
     function isTokenValid(tok){
       return tok && typeof tok.expires_at === 'number' && Date.now() < tok.expires_at;
     }
+    async function withToken(){
+      const raw = localStorage.getItem('sp_token'); if(!raw) throw new Error('Ej inloggad mot Spotify');
+      const tok = JSON.parse(raw);
+      if(Date.now() < tok.expires_at) return tok.access_token;
+      // refresh
+      const res = await fetch('https://accounts.spotify.com/api/token',{
+        method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams({ grant_type:'refresh_token', refresh_token:tok.refresh_token, client_id:SPOTIFY_CLIENT_ID })
+      });
+      const j = await res.json();
+      tok.access_token = j.access_token; tok.expires_at = Date.now() + (j.expires_in*1000 - 60000);
+      localStorage.setItem('sp_token', JSON.stringify(tok));
+      return tok.access_token;
+    }
+
+    async function listDevices(){
+      try{
+        const at = await withToken();
+        const r = await fetch('https://api.spotify.com/v1/me/player/devices',{ headers:{ Authorization: 'Bearer '+at }});
+        const j = await r.json();
+        const area = document.getElementById('deviceArea');
+        area.innerHTML = '';
+        if(!j.devices || !j.devices.length){
+          area.innerHTML = '<div class="mut">Inga Connect-enheter hittades. Öppna Spotify på en enhet och försök igen.</div>';
+          return;
+        }
+        j.devices.forEach(d=>{
+          const btn = document.createElement('button');
+          btn.textContent = `${d.name} (${d.type})${d.is_active?' ✓':''}`;
+          btn.onclick = async ()=>{
+            try{
+              const at2 = await withToken();
+              // transfer playback till vald enhet
+              const res = await fetch('https://api.spotify.com/v1/me/player',{
+                method:'PUT',
+                headers:{'Content-Type':'application/json', Authorization:'Bearer '+at2},
+                body: JSON.stringify({ device_ids:[d.id] })
+              });
+              if(res.status!==204) {
+                const t = await res.text();
+                alert('Kunde inte välja enhet: '+(t||res.status));
+              } else {
+                document.getElementById('spStatus').innerHTML = `Enhet vald: <span class="kbd">${d.name}</span>`;
+              }
+            }catch(e){ alert('Fel vid val av enhet'); console.error(e); }
+          };
+          area.appendChild(btn);
+        });
+      }catch(e){
+        console.error(e);
+        document.getElementById('deviceArea').innerHTML = '<div class="err">Kunde inte hämta enheter.</div>';
+      }
+    }
 
     // ==== Pre-lobby state ====
     let preId = null;
@@ -216,15 +269,18 @@
       showSection("screenLobby", path === "lobby");
       showSection("screenJoin", path === "join");
 
-      // Visa Spotify-kopplad status om token redan finns
+      // Spotify: status + lista enheter om token redan finns
       if (showStart) {
         const spStatus = document.getElementById('spStatus');
         const pickBtn = document.getElementById('btnPickDevice');
         const tok = getStoredToken();
-        if (isTokenValid(tok)) { spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>'; pickBtn.disabled = false; }
+        if (isTokenValid(tok)) {
+          spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
+          pickBtn.disabled = false;
+          listDevices(); // NY: rendera klickbar lista
+        }
       }
 
-      // Om vi är i pre-lobby-läge, ladda sammanfattning
       if (isPre && id) {
         await loadPreSettings(id);
       } else {
@@ -258,12 +314,11 @@
         const u = auth.currentUser;
         if(!u) return alert('Inte inloggad');
 
-        // Vi kräver preSettings (kommit hit via #pre/<id>)
         if(!preSettings){
           return alert('Hittar inte val från startsidan (pre-lobby saknas). Gå tillbaka och skapa lobby från startsidan.');
         }
 
-        // Hämta lokala UI-värden (år & timers kan justeras här i lobbyn före skap)
+        // År/timers kan justeras här
         const yearMin = +document.getElementById('yearMin').value;
         const yearMax = +document.getElementById('yearMax').value;
         const tDrag = +document.getElementById('tDrag').value;
@@ -272,15 +327,12 @@
         const tokensPerTeam = +document.getElementById('tokensPerTeam').value;
 
         const mergedSettings = {
-          // Val från pre-lobby
           allowLateJoin: preSettings.allowLateJoin ?? false,
           dedupeKey: preSettings.dedupeKey ?? 'spotifyId',
           winCards: preSettings.winCards ?? 11,
           standardListIds: preSettings.standardListIds || [],
           userPlaylistIds: preSettings.userPlaylistIds || [],
           ownerUid: preSettings.ownerUid || u.uid,
-
-          // Justeringar från UI i denna vy
           yearMin, yearMax,
           tokensPerTeam,
           timers: { dragSec: tDrag, challengePromptSec: tClaim, oppDragSec: tOpp }
@@ -293,7 +345,6 @@
         await set(child(base, 'hostId'), u.uid);
         await set(child(base, 'settings'), mergedSettings);
 
-        // Hoppa till lobby/<gameId>
         location.hash = `lobby/${gameId}`;
       }catch(e){
         console.error(e);
@@ -312,8 +363,13 @@
         const u = auth.currentUser;
         if(!u) throw new Error('Inte inloggad');
 
-        const idToken = await u.getIdToken(/* forceRefresh */ true);
-        const res = await fetch('https://europe-west1-beatlinefirebase.cloudfunctions.net/hostStart', {
+        const idToken = await u.getIdToken(true);
+
+        // Skicka gameId både i query OCH i body för att täcka olika servermönster
+        const url = new URL('https://europe-west1-beatlinefirebase.cloudfunctions.net/hostStart');
+        url.searchParams.set('gameId', gameId);
+
+        const res = await fetch(url.toString(), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -323,18 +379,24 @@
         });
 
         if(!res.ok){
-          const t = await res.text().catch(()=> '');
-          throw new Error(t || ('HTTP '+res.status));
+          // försök läsa json-fel
+          let msg = 'HTTP '+res.status;
+          try{
+            const j = await res.json();
+            if(j && j.error && (j.error.message || j.error.status)){
+              msg = JSON.stringify(j);
+            }
+          }catch{
+            const t = await res.text().catch(()=> '');
+            if(t) msg = t;
+          }
+          throw new Error(msg);
         }
 
-        // Vid lyckad start förväntas servern sätta phase="playing".
-        // Klienten stannar kvar i lobbyn; UI kan lyssna på phase och navigera senare.
-        alert('Spelet startades! (phase sätts till playing när deck är byggt)');
+        alert('Spelet startades! (servern sätter phase=playing när deck är klart)');
       }catch(e){
         console.error(e);
-        // Visa serverfel snyggt om det kommer en kod som t.ex. "deck/empty"
-        const msg = (''+e.message || '').trim();
-        alert('Kunde inte starta spel: ' + msg);
+        alert('Kunde inte starta spel: ' + (e.message || e));
       }
     }
 
@@ -355,7 +417,6 @@
       lobbyUnsub = onValue(base, snap=>{
         const v = snap.val()||{};
 
-        // visa lag
         const teamsEl = document.getElementById('teams');
         teamsEl.innerHTML = '';
         const teams = v.teams? Object.entries(v.teams):[];
@@ -368,14 +429,12 @@
 
         const isHost = auth.currentUser && v.hostId === auth.currentUser.uid;
         startBtn.disabled = !(isHost && teams.length>=1);
-
-        // Om server redan har startat (phase=playing), kan vi senare auto-navigera till spelsidan
-        // (lämnar navigation för ett senare steg)
-        if (v.phase === 'playing') {
-          // t.ex.: location.hash = `game/${gameId}`;
-        }
-
         startBtn.onclick = ()=> startGame(gameId);
+
+        if (v.phase === 'playing') {
+          // TODO: navigera till spelsidan när den finns
+          // location.hash = `game/${gameId}`;
+        }
       });
     }
 
@@ -455,6 +514,7 @@
         if(spStatus) spStatus.innerHTML = '<span class="ok">Spotify kopplad</span>';
         const pickBtn = document.getElementById('btnPickDevice');
         if(pickBtn) pickBtn.disabled = false;
+        listDevices(); // NY: visa lista direkt efter koppling
       }catch(e){
         if(spStatus) spStatus.innerHTML = '<span class="err">Spotify-koppling misslyckades</span>';
         console.error(e);
