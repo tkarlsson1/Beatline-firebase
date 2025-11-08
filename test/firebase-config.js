@@ -408,15 +408,103 @@ window.restart = function() {
   document.getElementById("song-display").innerHTML = "";
 };
 
-function displaySong(song) {
+async function displaySong(song) {
   const displayYear = song.customYear ? song.customYear : song.year;
-  
+
   const standardListNames = (typeof standardSongs !== "undefined" && standardSongs.length)
     ? Array.from(new Set(standardSongs.map(s => s.source[0])))
     : [];
-  
+
   const isUserSong = !song.source.some(src => standardListNames.includes(src));
-  
+
+  // Check if Spotify Web Playback is available
+  const hasSpotifyPlayer = window.spotifyPlayer && window.spotifyPlayer.getDeviceId();
+
+  console.log('🎵 displaySong() called');
+  console.log('  Song ID:', song.qr);
+  console.log('  Spotify Player available:', !!window.spotifyPlayer);
+  console.log('  Device ID:', hasSpotifyPlayer || 'not available');
+
+  const songDisplay = document.getElementById("song-display");
+
+  if (hasSpotifyPlayer) {
+    // USE SPOTIFY WEB PLAYBACK
+    console.log('✅ Using Spotify Web Playback');
+
+    songDisplay.innerHTML = `
+      <div id="now-playing-indicator" style="
+        background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+        animation: pulse 2s ease-in-out infinite;
+      ">
+        <div style="font-size: 2.5rem; margin-bottom: 10px;">♪</div>
+        <div style="font-size: 1.2rem; font-weight: bold;">Nu spelar...</div>
+        <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px;">Lyssna på Spotify</div>
+      </div>
+      <style>
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.02); opacity: 0.95; }
+        }
+      </style>
+      <button class="answer-button" onclick="revealDetails()">Visa svar</button>
+      <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+        <div class="year-container" style="text-align: center; width: 100%;">
+          <span style="display: inline-block; position: relative;">
+            <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+              ${displayYear}
+            </span>
+            ${
+              isUserSong
+                ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
+                     onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
+                : ``
+            }
+          </span>
+        </div>
+        <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
+          ${song.artist}<br>${song.title}
+        </div>
+      </div>
+    `;
+
+    // Play the track via Spotify Web Playback SDK
+    try {
+      console.log('  Calling spotifyPlayer.play()...');
+      const success = await window.spotifyPlayer.play(song.qr);
+
+      if (success) {
+        console.log('  ✅ Playback started successfully');
+      } else {
+        console.error('  ❌ Playback failed, falling back to QR code');
+        // Fallback to QR code if playback fails
+        showQRCodeFallback(song, displayYear, isUserSong);
+      }
+    } catch (error) {
+      console.error('  ❌ Error playing track:', error);
+      // Fallback to QR code on error
+      showQRCodeFallback(song, displayYear, isUserSong);
+    }
+
+  } else {
+    // FALLBACK TO QR CODE
+    console.log('ℹ️ Using QR code fallback (Spotify player not available)');
+    showQRCodeFallback(song, displayYear, isUserSong);
+  }
+
+  let playlistInfoElement = document.getElementById("playlist-info");
+  if (playlistInfoElement) {
+    playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
+  }
+}
+
+// Helper function to show QR code fallback
+function showQRCodeFallback(song, displayYear, isUserSong) {
   const songDisplay = document.getElementById("song-display");
   songDisplay.innerHTML = `
     <div id="qrcode-${song.qr}" class="qrcode"></div>
@@ -428,7 +516,7 @@ function displaySong(song) {
             ${displayYear}
           </span>
           ${
-            isUserSong 
+            isUserSong
               ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
                    onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
               : ``
@@ -441,11 +529,7 @@ function displaySong(song) {
     </div>
   `;
   generateQRCode(song.qr);
-  
-  let playlistInfoElement = document.getElementById("playlist-info");
-  if (playlistInfoElement) {
-    playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
-  }
+  console.log('  QR code generated for track:', song.qr);
 }
 
 window.generateQRCode = function(qr) {
