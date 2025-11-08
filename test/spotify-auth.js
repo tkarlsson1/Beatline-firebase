@@ -66,9 +66,28 @@ async function authorizeSpotify() {
   const codeChallenge = base64encode(hashed);
   debugLog('Code challenge generated (first 20 chars):', codeChallenge.substring(0, 20) + '...');
 
-  // Store code verifier for later use
-  localStorage.setItem('spotify_code_verifier', codeVerifier);
-  debugLog('Code verifier stored in localStorage');
+  // Store code verifier for later use with verification
+  try {
+    localStorage.setItem('spotify_code_verifier', codeVerifier);
+    debugLog('  → localStorage.setItem("spotify_code_verifier") called');
+
+    const verifyCodeVerifier = localStorage.getItem('spotify_code_verifier');
+    if (verifyCodeVerifier === codeVerifier) {
+      debugLog('  ✅ VERIFIED: Code verifier stored correctly (first 20 chars):', verifyCodeVerifier.substring(0, 20) + '...');
+    } else {
+      console.error('  ❌ CRITICAL ERROR: Code verifier verification FAILED!');
+      console.error('    Expected:', codeVerifier.substring(0, 20) + '...');
+      console.error('    Got:', verifyCodeVerifier ? verifyCodeVerifier.substring(0, 20) + '...' : 'null');
+      alert('Critical error: Failed to store OAuth state. Please try again.');
+      return;
+    }
+  } catch (error) {
+    console.error('❌ CRITICAL: Failed to store code verifier in localStorage!');
+    console.error('  Error:', error);
+    console.error('  This may indicate localStorage is disabled or full');
+    alert('Error: Cannot store OAuth state. Please check browser settings and try again.');
+    return;
+  }
 
   const authUrl = new URL('https://accounts.spotify.com/authorize');
   const params = {
@@ -191,21 +210,91 @@ async function getAccessToken(code) {
       const expiryTime = Date.now() + (data.expires_in * 1000);
       const expiryDate = new Date(expiryTime);
 
-      localStorage.setItem('spotify_access_token', data.access_token);
-      localStorage.setItem('spotify_token_expiry', expiryTime.toString());
+      debugLog('Attempting to store tokens in localStorage...');
 
-      if (data.refresh_token) {
-        localStorage.setItem('spotify_refresh_token', data.refresh_token);
-        debugLog('Refresh token stored (first 20 chars):', data.refresh_token.substring(0, 20) + '...');
+      // CRITICAL: Store access token with verification
+      try {
+        localStorage.setItem('spotify_access_token', data.access_token);
+        debugLog('  → localStorage.setItem("spotify_access_token") called');
+
+        // VERIFY immediately after setting
+        const verifyToken = localStorage.getItem('spotify_access_token');
+        if (verifyToken === data.access_token) {
+          debugLog('  ✅ VERIFIED: Access token stored correctly (first 20 chars):', verifyToken.substring(0, 20) + '...');
+        } else {
+          console.error('  ❌ CRITICAL ERROR: Token verification FAILED!');
+          console.error('    Expected:', data.access_token.substring(0, 20) + '...');
+          console.error('    Got:', verifyToken ? verifyToken.substring(0, 20) + '...' : 'null');
+        }
+      } catch (error) {
+        console.error('❌ CRITICAL: Failed to store access token in localStorage!');
+        console.error('  Error:', error);
+        console.error('  Error name:', error.name);
+        console.error('  Error message:', error.message);
+        return null;
       }
 
-      debugLog('✅ Access token stored successfully (first 20 chars):', data.access_token.substring(0, 20) + '...');
+      // Store expiry time with verification
+      try {
+        localStorage.setItem('spotify_token_expiry', expiryTime.toString());
+        debugLog('  → localStorage.setItem("spotify_token_expiry") called');
+
+        const verifyExpiry = localStorage.getItem('spotify_token_expiry');
+        if (verifyExpiry === expiryTime.toString()) {
+          debugLog('  ✅ VERIFIED: Token expiry stored correctly:', new Date(parseInt(verifyExpiry)).toLocaleString());
+        } else {
+          console.error('  ❌ ERROR: Expiry verification FAILED!');
+          console.error('    Expected:', expiryTime.toString());
+          console.error('    Got:', verifyExpiry);
+        }
+      } catch (error) {
+        console.error('❌ ERROR: Failed to store token expiry!');
+        console.error('  Error:', error);
+      }
+
+      // Store refresh token if provided
+      if (data.refresh_token) {
+        try {
+          localStorage.setItem('spotify_refresh_token', data.refresh_token);
+          debugLog('  → localStorage.setItem("spotify_refresh_token") called');
+
+          const verifyRefresh = localStorage.getItem('spotify_refresh_token');
+          if (verifyRefresh === data.refresh_token) {
+            debugLog('  ✅ VERIFIED: Refresh token stored correctly (first 20 chars):', verifyRefresh.substring(0, 20) + '...');
+          } else {
+            console.error('  ❌ ERROR: Refresh token verification FAILED!');
+          }
+        } catch (error) {
+          console.error('❌ ERROR: Failed to store refresh token!');
+          console.error('  Error:', error);
+        }
+      }
+
+      debugLog('\n📦 Final localStorage check after storage:');
+      debugLog('  spotify_access_token:', localStorage.getItem('spotify_access_token') ? 'EXISTS (length: ' + localStorage.getItem('spotify_access_token').length + ')' : 'MISSING!');
+      debugLog('  spotify_token_expiry:', localStorage.getItem('spotify_token_expiry') || 'MISSING!');
+      debugLog('  spotify_refresh_token:', localStorage.getItem('spotify_refresh_token') ? 'EXISTS' : 'MISSING');
+
+      debugLog('✅ Token storage complete');
       debugLog('Token expires at:', expiryDate.toLocaleString());
       debugLog('Token expires in:', data.expires_in, 'seconds');
 
       // Clean up code verifier
-      localStorage.removeItem('spotify_code_verifier');
-      debugLog('Code verifier removed from localStorage');
+      try {
+        localStorage.removeItem('spotify_code_verifier');
+        debugLog('Code verifier removed from localStorage');
+
+        // Verify removal
+        const verifyRemoved = localStorage.getItem('spotify_code_verifier');
+        if (verifyRemoved === null) {
+          debugLog('  ✅ VERIFIED: Code verifier removed successfully');
+        } else {
+          console.warn('  ⚠️ WARNING: Code verifier still exists after removal!');
+        }
+      } catch (error) {
+        console.error('❌ ERROR: Failed to remove code verifier!');
+        console.error('  Error:', error);
+      }
 
       return data.access_token;
     } else {
@@ -266,17 +355,68 @@ async function refreshAccessToken() {
       const expiryTime = Date.now() + (data.expires_in * 1000);
       const expiryDate = new Date(expiryTime);
 
-      localStorage.setItem('spotify_access_token', data.access_token);
-      localStorage.setItem('spotify_token_expiry', expiryTime.toString());
+      debugLog('Attempting to store refreshed tokens in localStorage...');
 
-      debugLog('✅ Access token refreshed successfully (first 20 chars):', data.access_token.substring(0, 20) + '...');
+      // Store refreshed access token with verification
+      try {
+        localStorage.setItem('spotify_access_token', data.access_token);
+        debugLog('  → localStorage.setItem("spotify_access_token") called');
+
+        const verifyToken = localStorage.getItem('spotify_access_token');
+        if (verifyToken === data.access_token) {
+          debugLog('  ✅ VERIFIED: Refreshed access token stored correctly (first 20 chars):', verifyToken.substring(0, 20) + '...');
+        } else {
+          console.error('  ❌ ERROR: Refreshed token verification FAILED!');
+          console.error('    Expected:', data.access_token.substring(0, 20) + '...');
+          console.error('    Got:', verifyToken ? verifyToken.substring(0, 20) + '...' : 'null');
+        }
+      } catch (error) {
+        console.error('❌ CRITICAL: Failed to store refreshed access token!');
+        console.error('  Error:', error);
+        return null;
+      }
+
+      // Store refreshed expiry with verification
+      try {
+        localStorage.setItem('spotify_token_expiry', expiryTime.toString());
+        debugLog('  → localStorage.setItem("spotify_token_expiry") called');
+
+        const verifyExpiry = localStorage.getItem('spotify_token_expiry');
+        if (verifyExpiry === expiryTime.toString()) {
+          debugLog('  ✅ VERIFIED: Token expiry updated correctly:', new Date(parseInt(verifyExpiry)).toLocaleString());
+        } else {
+          console.error('  ❌ ERROR: Expiry verification FAILED!');
+        }
+      } catch (error) {
+        console.error('❌ ERROR: Failed to store refreshed token expiry!');
+        console.error('  Error:', error);
+      }
+
+      debugLog('✅ Access token refreshed successfully');
       debugLog('New token expires at:', expiryDate.toLocaleString());
 
       // Update refresh token if provided
       if (data.refresh_token) {
-        localStorage.setItem('spotify_refresh_token', data.refresh_token);
-        debugLog('Refresh token updated (first 20 chars):', data.refresh_token.substring(0, 20) + '...');
+        try {
+          localStorage.setItem('spotify_refresh_token', data.refresh_token);
+          debugLog('  → localStorage.setItem("spotify_refresh_token") called');
+
+          const verifyRefresh = localStorage.getItem('spotify_refresh_token');
+          if (verifyRefresh === data.refresh_token) {
+            debugLog('  ✅ VERIFIED: Refresh token updated (first 20 chars):', verifyRefresh.substring(0, 20) + '...');
+          } else {
+            console.error('  ❌ ERROR: Refresh token update verification FAILED!');
+          }
+        } catch (error) {
+          console.error('❌ ERROR: Failed to update refresh token!');
+          console.error('  Error:', error);
+        }
       }
+
+      debugLog('\n📦 Final localStorage check after refresh:');
+      debugLog('  spotify_access_token:', localStorage.getItem('spotify_access_token') ? 'EXISTS (length: ' + localStorage.getItem('spotify_access_token').length + ')' : 'MISSING!');
+      debugLog('  spotify_token_expiry:', localStorage.getItem('spotify_token_expiry') || 'MISSING!');
+      debugLog('  spotify_refresh_token:', localStorage.getItem('spotify_refresh_token') ? 'EXISTS' : 'MISSING');
 
       return data.access_token;
     } else {
@@ -371,10 +511,54 @@ function isSpotifyAuthenticated() {
 function logoutSpotify() {
   debugLog('Logging out - clearing all Spotify tokens...');
 
-  localStorage.removeItem('spotify_access_token');
-  localStorage.removeItem('spotify_token_expiry');
-  localStorage.removeItem('spotify_refresh_token');
-  localStorage.removeItem('spotify_code_verifier');
+  // Remove all tokens with verification
+  try {
+    localStorage.removeItem('spotify_access_token');
+    const verifyAccess = localStorage.getItem('spotify_access_token');
+    if (verifyAccess === null) {
+      debugLog('  ✅ VERIFIED: Access token removed');
+    } else {
+      console.warn('  ⚠️ WARNING: Access token still exists after removal!');
+    }
+  } catch (error) {
+    console.error('❌ ERROR: Failed to remove access token!', error);
+  }
+
+  try {
+    localStorage.removeItem('spotify_token_expiry');
+    const verifyExpiry = localStorage.getItem('spotify_token_expiry');
+    if (verifyExpiry === null) {
+      debugLog('  ✅ VERIFIED: Token expiry removed');
+    } else {
+      console.warn('  ⚠️ WARNING: Token expiry still exists after removal!');
+    }
+  } catch (error) {
+    console.error('❌ ERROR: Failed to remove token expiry!', error);
+  }
+
+  try {
+    localStorage.removeItem('spotify_refresh_token');
+    const verifyRefresh = localStorage.getItem('spotify_refresh_token');
+    if (verifyRefresh === null) {
+      debugLog('  ✅ VERIFIED: Refresh token removed');
+    } else {
+      console.warn('  ⚠️ WARNING: Refresh token still exists after removal!');
+    }
+  } catch (error) {
+    console.error('❌ ERROR: Failed to remove refresh token!', error);
+  }
+
+  try {
+    localStorage.removeItem('spotify_code_verifier');
+    const verifyVerifier = localStorage.getItem('spotify_code_verifier');
+    if (verifyVerifier === null) {
+      debugLog('  ✅ VERIFIED: Code verifier removed');
+    } else {
+      console.warn('  ⚠️ WARNING: Code verifier still exists after removal!');
+    }
+  } catch (error) {
+    console.error('❌ ERROR: Failed to remove code verifier!', error);
+  }
 
   debugLog('✅ All tokens cleared from localStorage');
 }
@@ -532,6 +716,88 @@ function getTokenDebugInfo() {
   };
 }
 
+// ============================================
+// TEST LOCALSTORAGE FUNCTIONALITY
+// ============================================
+function testLocalStorage() {
+  console.log('=== TESTING LOCALSTORAGE FUNCTIONALITY ===');
+
+  const testKey = 'spotify_test_key';
+  const testValue = 'test_value_' + Date.now();
+
+  try {
+    // Test write
+    console.log('Test 1: Writing to localStorage...');
+    localStorage.setItem(testKey, testValue);
+    console.log('  → localStorage.setItem() called');
+
+    // Test read
+    console.log('Test 2: Reading from localStorage...');
+    const readValue = localStorage.getItem(testKey);
+    console.log('  → localStorage.getItem() returned:', readValue);
+
+    // Verify
+    if (readValue === testValue) {
+      console.log('  ✅ SUCCESS: Value matches!');
+    } else {
+      console.error('  ❌ FAIL: Value mismatch!');
+      console.error('    Expected:', testValue);
+      console.error('    Got:', readValue);
+      return false;
+    }
+
+    // Test delete
+    console.log('Test 3: Deleting from localStorage...');
+    localStorage.removeItem(testKey);
+    console.log('  → localStorage.removeItem() called');
+
+    // Verify deletion
+    const deletedValue = localStorage.getItem(testKey);
+    if (deletedValue === null) {
+      console.log('  ✅ SUCCESS: Value deleted!');
+    } else {
+      console.error('  ❌ FAIL: Value still exists after deletion!');
+      console.error('    Got:', deletedValue);
+      return false;
+    }
+
+    // Test quota
+    console.log('Test 4: Checking localStorage quota...');
+    try {
+      const largeString = 'x'.repeat(1000000); // 1MB
+      localStorage.setItem('spotify_quota_test', largeString);
+      localStorage.removeItem('spotify_quota_test');
+      console.log('  ✅ SUCCESS: Can write large values (1MB+)');
+    } catch (quotaError) {
+      console.warn('  ⚠️ WARNING: Limited localStorage quota');
+      console.warn('    Error:', quotaError.message);
+    }
+
+    console.log('\n✅ ALL LOCALSTORAGE TESTS PASSED!');
+    console.log('localStorage is working correctly.');
+    return true;
+
+  } catch (error) {
+    console.error('❌ LOCALSTORAGE TEST FAILED!');
+    console.error('  Error:', error);
+    console.error('  Error name:', error.name);
+    console.error('  Error message:', error.message);
+
+    if (error.name === 'SecurityError') {
+      console.error('\n  This usually means:');
+      console.error('    - Running in private/incognito mode');
+      console.error('    - localStorage is disabled in browser settings');
+      console.error('    - Third-party cookies are blocked');
+    } else if (error.name === 'QuotaExceededError') {
+      console.error('\n  This means:');
+      console.error('    - localStorage is full');
+      console.error('    - Try clearing browser data');
+    }
+
+    return false;
+  }
+}
+
 // Export functions and config for global use
 window.SPOTIFY_CONFIG = SPOTIFY_CONFIG;
 
@@ -543,5 +809,12 @@ window.spotifyAuth = {
   checkPremium: checkPremiumAccount,
   handleCallback: handleSpotifyCallback,
   getDebugInfo: getTokenDebugInfo,
+  testLocalStorage: testLocalStorage,
   config: SPOTIFY_CONFIG
 };
+
+// Auto-run localStorage test on script load (in debug mode)
+if (DEBUG) {
+  console.log('\n[Spotify Auth] Running automatic localStorage test...');
+  testLocalStorage();
+}
