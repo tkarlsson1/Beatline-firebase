@@ -8,6 +8,7 @@ const SPOTIFY_CONFIG = {
   scopes: [
     'streaming',
     'user-read-email',
+    'user-read-private',
     'user-modify-playback-state',
     'user-read-playback-state'
   ]
