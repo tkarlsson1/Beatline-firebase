@@ -433,18 +433,19 @@ async function displaySong(song) {
 
     songDisplay.innerHTML = `
       <div id="now-playing-indicator" style="
-        background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+        background: rgba(29, 185, 84, 0.1);
+        width: 60%;
         color: white;
         padding: 20px;
         border-radius: 12px;
         text-align: center;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+        margin: 0 auto 1.5rem auto;
+        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
         animation: pulse 2s ease-in-out infinite;
       ">
         <div style="font-size: 2.5rem; margin-bottom: 10px;">♪</div>
-        <div style="font-size: 1.2rem; font-weight: bold;">Nu spelar...</div>
-        <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px;">Lyssna på Spotify</div>
+        <div style="font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,0,0,0.8);">Nu spelar...</div>
+        <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; text-shadow: 0 0 8px rgba(0,0,0,0.8);">Lyssna på Spotify</div>
       </div>
       <style>
         @keyframes pulse {
