@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify Web Playback Test</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #191414;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1DB954;
+    }
+
+    .status-box {
+      background: #282828;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    .status-item {
+      margin: 10px 0;
+      padding: 10px;
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .status-label {
+      font-weight: bold;
+      color: #1DB954;
+    }
+
+    button {
+      background: #1DB954;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #1ed760;
+    }
+
+    button:disabled {
+      background: #535353;
+      cursor: not-allowed;
+    }
+
+    .controls {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .now-playing {
+      background: #1DB954;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+
+    .error {
+      background: #E22134;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: none;
+    }
+
+    .success {
+      background: #1DB954;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎵 Spotify Web Playback Test</h1>
+
+  <!-- Connection Status -->
+  <div class="status-box">
+    <h2>Connection Status</h2>
+    <div class="status-item">
+      <span class="status-label">Authentication:</span>
+      <span id="authStatus">Not Connected</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Player:</span>
+      <span id="playerStatus">Not Ready</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Device ID:</span>
+      <span id="deviceId">-</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Premium Account:</span>
+      <span id="premiumStatus">Unknown</span>
+    </div>
+  </div>
+
+  <!-- Now Playing Indicator -->
+  <div id="nowPlaying" class="now-playing">
+    ♪ Now Playing...
+  </div>
+
+  <!-- Messages -->
+  <div id="errorMessage" class="error"></div>
+  <div id="successMessage" class="success"></div>
+
+  <!-- Playback State -->
+  <div class="status-box">
+    <h2>Playback State</h2>
+    <div class="status-item">
+      <span class="status-label">Playing:</span>
+      <span id="isPlaying">No</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Position:</span>
+      <span id="position">0:00</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Duration:</span>
+      <span id="duration">0:00</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <h2>Controls</h2>
+    <button id="connectBtn" onclick="connectSpotify()">Connect Spotify</button>
+    <br>
+    <button id="playTestBtn" onclick="playTestTrack()" disabled>Play Test Track</button>
+    <button id="pauseBtn" onclick="pausePlayback()" disabled>Pause</button>
+    <button id="resumeBtn" onclick="resumePlayback()" disabled>Resume</button>
+    <button id="nextBtn" onclick="skipTrack()" disabled>Next</button>
+  </div>
+
+  <!-- Spotify Web Playback SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+  <!-- Spotify Auth and Player Scripts -->
+  <script src="spotify-auth.js"></script>
+  <script src="spotify-player.js"></script>
+
+  <script>
+    // Test track ID: "Mr. Brightside" by The Killers
+    const TEST_TRACK_ID = '3n3Ppam7vgaVa1iaRUc9Lp';
+
+    // ============================================
+    // UPDATE UI STATUS
+    // ============================================
+    function updateStatus() {
+      // Check authentication
+      const isAuth = window.spotifyAuth && window.spotifyAuth.isAuthenticated();
+      document.getElementById('authStatus').textContent = isAuth ? 'Connected ✓' : 'Not Connected';
+      document.getElementById('authStatus').style.color = isAuth ? '#1DB954' : '#E22134';
+
+      // Check player
+      const deviceId = window.spotifyPlayer && window.spotifyPlayer.getDeviceId();
+      document.getElementById('playerStatus').textContent = deviceId ? 'Ready ✓' : 'Not Ready';
+      document.getElementById('playerStatus').style.color = deviceId ? '#1DB954' : '#E22134';
+      document.getElementById('deviceId').textContent = deviceId || '-';
+
+      // Update buttons
+      const playerReady = isAuth && deviceId;
+      document.getElementById('playTestBtn').disabled = !playerReady;
+      document.getElementById('pauseBtn').disabled = !playerReady;
+      document.getElementById('resumeBtn').disabled = !playerReady;
+      document.getElementById('nextBtn').disabled = !playerReady;
+
+      // Update connect button
+      if (isAuth) {
+        document.getElementById('connectBtn').textContent = 'Disconnect Spotify';
+        document.getElementById('connectBtn').style.background = '#E22134';
+      } else {
+        document.getElementById('connectBtn').textContent = 'Connect Spotify';
+        document.getElementById('connectBtn').style.background = '#1DB954';
+      }
+    }
+
+    // ============================================
+    // CONNECT/DISCONNECT SPOTIFY
+    // ============================================
+    async function connectSpotify() {
+      const isAuth = window.spotifyAuth && window.spotifyAuth.isAuthenticated();
+
+      if (isAuth) {
+        // Disconnect
+        if (confirm('Are you sure you want to disconnect?')) {
+          window.spotifyAuth.logout();
+          if (window.spotifyPlayer) {
+            window.spotifyPlayer.disconnect();
+          }
+          showSuccess('Disconnected from Spotify');
+          updateStatus();
+        }
+      } else {
+        // Connect
+        if (window.spotifyAuth) {
+          // Set flag so callback knows to return to test page
+          sessionStorage.setItem('spotifyTestMode', 'true');
+          window.spotifyAuth.authorize();
+        } else {
+          showError('Spotify auth not available');
+        }
+      }
+    }
+
+    // ============================================
+    // PLAYBACK CONTROLS
+    // ============================================
+    async function playTestTrack() {
+      showSuccess('Starting test track...');
+      const success = await window.spotifyPlayer.play(TEST_TRACK_ID);
+      if (success) {
+        document.getElementById('nowPlaying').style.display = 'block';
+        showSuccess('Playing test track!');
+      } else {
+        showError('Failed to play track');
+      }
+    }
+
+    async function pausePlayback() {
+      const success = await window.spotifyPlayer.pause();
+      if (success) {
+        document.getElementById('nowPlaying').style.display = 'none';
+        showSuccess('Playback paused');
+      } else {
+        showError('Failed to pause');
+      }
+    }
+
+    async function resumePlayback() {
+      const success = await window.spotifyPlayer.resume();
+      if (success) {
+        document.getElementById('nowPlaying').style.display = 'block';
+        showSuccess('Playback resumed');
+      } else {
+        showError('Failed to resume');
+      }
+    }
+
+    async function skipTrack() {
+      const success = await window.spotifyPlayer.next();
+      if (success) {
+        showSuccess('Skipped to next track');
+      } else {
+        showError('Failed to skip');
+      }
+    }
+
+    // ============================================
+    // MESSAGE HELPERS
+    // ============================================
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 3000);
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      setTimeout(() => {
+        successDiv.style.display = 'none';
+      }, 3000);
+    }
+
+    // ============================================
+    // FORMAT TIME
+    // ============================================
+    function formatTime(ms) {
+      const seconds = Math.floor(ms / 1000);
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+
+    // Listen for player ready
+    window.addEventListener('spotifyPlayerReady', (e) => {
+      console.log('Player ready event received');
+      updateStatus();
+      showSuccess('Spotify Player is ready!');
+    });
+
+    // Listen for state changes
+    window.addEventListener('spotifyStateChanged', (e) => {
+      const state = e.detail;
+
+      document.getElementById('isPlaying').textContent = state.paused ? 'No' : 'Yes';
+      document.getElementById('isPlaying').style.color = state.paused ? '#E22134' : '#1DB954';
+
+      document.getElementById('position').textContent = formatTime(state.position);
+      document.getElementById('duration').textContent = formatTime(state.duration);
+
+      // Update now playing indicator
+      if (!state.paused) {
+        document.getElementById('nowPlaying').style.display = 'block';
+      } else {
+        document.getElementById('nowPlaying').style.display = 'none';
+      }
+    });
+
+    // ============================================
+    // HANDLE CALLBACK
+    // ============================================
+    async function handleCallback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+
+      if (code) {
+        showSuccess('Authorization code received, exchanging for token...');
+        const success = await window.spotifyAuth.handleCallback();
+
+        if (success) {
+          showSuccess('Successfully connected to Spotify!');
+
+          // Check premium status
+          const isPremium = await window.spotifyAuth.checkPremium();
+          document.getElementById('premiumStatus').textContent = isPremium ? 'Yes ✓' : 'No';
+          document.getElementById('premiumStatus').style.color = isPremium ? '#1DB954' : '#E22134';
+
+          // Clean URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+
+          // Wait for player to initialize
+          setTimeout(() => {
+            updateStatus();
+          }, 2000);
+        } else {
+          showError('Failed to complete authentication');
+        }
+      }
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      updateStatus();
+      await handleCallback();
+
+      // If already authenticated, check premium status
+      if (window.spotifyAuth && window.spotifyAuth.isAuthenticated()) {
+        const isPremium = await window.spotifyAuth.checkPremium();
+        document.getElementById('premiumStatus').textContent = isPremium ? 'Yes ✓' : 'No';
+        document.getElementById('premiumStatus').style.color = isPremium ? '#1DB954' : '#E22134';
+      }
+
+      // Update status periodically
+      setInterval(updateStatus, 1000);
+    });
+  </script>
+</body>
+</html>

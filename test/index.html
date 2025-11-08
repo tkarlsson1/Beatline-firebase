@@ -168,10 +168,16 @@
   
   <!-- Utils -->
   <script src="utils.js"></script>
-  
-  <!-- Spotify Integration -->
+
+  <!-- Spotify OAuth Authentication -->
+  <script src="spotify-auth.js"></script>
+
+  <!-- Spotify Web Playback SDK Player -->
+  <script src="spotify-player.js"></script>
+
+  <!-- Spotify Integration (Playlist Import) -->
   <script src="spotify.js"></script>
-  
+
   <!-- UI Event Handlers -->
   <script src="ui-events.js"></script>
   
@@ -183,6 +189,21 @@
   
   <!-- Initialization (Accessibility, Viewport, Service Worker) -->
   <script src="init.js"></script>
+
+  <!-- Spotify Web Playback SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+  <!-- Handle Spotify Connection Status -->
+  <script>
+    // Check if user just connected Spotify
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('spotify') === 'connected') {
+      // Show a subtle notification or update UI
+      console.log('Spotify connected successfully');
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  </script>
 
 </body>
 </html>

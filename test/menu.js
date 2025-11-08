@@ -65,6 +65,17 @@ document.addEventListener("DOMContentLoaded", function() {
   });
   dropdownMenu.appendChild(darkModeLink);
 
+  const spotifyLink = document.createElement("a");
+  spotifyLink.href = "#";
+  spotifyLink.id = "spotifyConnectionLink";
+  spotifyLink.textContent = "Connect Spotify";
+  spotifyLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    handleSpotifyConnection();
+    dropdownMenu.style.display = "none";
+  });
+  dropdownMenu.appendChild(spotifyLink);
+
   const managePlaylistsLink = document.createElement("a");
   managePlaylistsLink.href = "#";
   managePlaylistsLink.textContent = "Hantera spellistor";
@@ -111,6 +122,14 @@ document.addEventListener("DOMContentLoaded", function() {
     document.body.classList.add("dark-mode");
     darkModeLink.textContent = "Ljust läge";
   }
+
+  // Update Spotify connection status
+  updateSpotifyConnectionStatus();
+
+  // Listen for Spotify player ready event
+  window.addEventListener('spotifyPlayerReady', () => {
+    updateSpotifyConnectionStatus();
+  });
 });
 
 // ============================================
@@ -123,5 +142,50 @@ function toggleDarkMode() {
   const darkModeToggle = document.getElementById("darkModeToggle");
   if (darkModeToggle) {
     darkModeToggle.textContent = isDarkMode ? "Ljust läge" : "Mörkt läge";
+  }
+}
+
+// ============================================
+// SPOTIFY CONNECTION
+// ============================================
+function handleSpotifyConnection() {
+  if (window.spotifyAuth && window.spotifyAuth.isAuthenticated()) {
+    // Already connected - show status or offer to disconnect
+    const shouldDisconnect = confirm('Spotify is already connected. Do you want to disconnect?');
+    if (shouldDisconnect) {
+      window.spotifyAuth.logout();
+      if (window.spotifyPlayer) {
+        window.spotifyPlayer.disconnect();
+      }
+      updateSpotifyConnectionStatus();
+      alert('Disconnected from Spotify');
+    }
+  } else {
+    // Not connected - start OAuth flow
+    if (window.spotifyAuth) {
+      window.spotifyAuth.authorize();
+    } else {
+      alert('Spotify authentication not available. Please reload the page.');
+    }
+  }
+}
+
+function updateSpotifyConnectionStatus() {
+  const spotifyLink = document.getElementById("spotifyConnectionLink");
+  if (!spotifyLink) return;
+
+  if (window.spotifyAuth && window.spotifyAuth.isAuthenticated()) {
+    // Check if player is also ready
+    const playerReady = window.spotifyPlayer && window.spotifyPlayer.getDeviceId();
+    if (playerReady) {
+      spotifyLink.textContent = "Spotify Connected ✓";
+      spotifyLink.style.color = "#1DB954"; // Spotify green
+    } else {
+      spotifyLink.textContent = "Spotify Connecting...";
+      spotifyLink.style.color = "#FFA500"; // Orange
+    }
+  } else {
+    spotifyLink.textContent = "Connect Spotify";
+    spotifyLink.style.color = ""; // Reset to default
   }
 }
