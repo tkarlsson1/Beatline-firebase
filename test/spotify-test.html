@@ -118,6 +118,40 @@
     </div>
   </div>
 
+  <!-- Token Debug Info -->
+  <div class="status-box">
+    <h2>🔍 Token Debug Info</h2>
+    <div class="status-item">
+      <span class="status-label">Token Status:</span>
+      <span id="tokenStatus">-</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Token Preview:</span>
+      <span id="tokenPreview" style="font-family: monospace; font-size: 0.85rem;">-</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Refresh Token:</span>
+      <span id="refreshTokenPreview" style="font-family: monospace; font-size: 0.85rem;">-</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Expires At:</span>
+      <span id="tokenExpiry">-</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Time Until Expiry:</span>
+      <span id="timeUntilExpiry">-</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Current Time:</span>
+      <span id="currentTime">-</span>
+    </div>
+    <div style="text-align: center; margin-top: 15px;">
+      <button onclick="refreshDebugInfo()" style="background: #4285F4;">Refresh Debug Info</button>
+      <button onclick="clearTokens()" style="background: #E22134;">Clear All Tokens</button>
+      <button onclick="viewFullDebug()" style="background: #9C27B0;">View Full Debug (Console)</button>
+    </div>
+  </div>
+
   <!-- Now Playing Indicator -->
   <div id="nowPlaying" class="now-playing">
     ♪ Now Playing...
@@ -301,6 +335,118 @@
     }
 
     // ============================================
+    // DEBUG FUNCTIONS
+    // ============================================
+    function refreshDebugInfo() {
+      console.log('=== REFRESHING DEBUG INFO ===');
+
+      if (!window.spotifyAuth || !window.spotifyAuth.getDebugInfo) {
+        console.error('Spotify auth not available');
+        showError('Spotify auth not available');
+        return;
+      }
+
+      const debugInfo = window.spotifyAuth.getDebugInfo();
+      console.log('Token Debug Info:', debugInfo);
+
+      // Update UI
+      const statusEl = document.getElementById('tokenStatus');
+      statusEl.textContent = debugInfo.status.toUpperCase();
+
+      if (debugInfo.status === 'valid') {
+        statusEl.style.color = '#1DB954';
+      } else if (debugInfo.status === 'expired') {
+        statusEl.style.color = '#FFA500';
+      } else {
+        statusEl.style.color = '#E22134';
+      }
+
+      document.getElementById('tokenPreview').textContent = debugInfo.token_preview || 'No token';
+      document.getElementById('refreshTokenPreview').textContent = debugInfo.refresh_preview || 'No refresh token';
+      document.getElementById('tokenExpiry').textContent = debugInfo.expiry_date || '-';
+
+      if (debugInfo.minutes_until_expiry !== null) {
+        const mins = debugInfo.minutes_until_expiry;
+        let expiryText = '';
+
+        if (mins < 0) {
+          expiryText = `Expired ${Math.abs(mins)} minutes ago`;
+        } else if (mins < 5) {
+          expiryText = `⚠️ Expires in ${mins} minutes (refresh soon!)`;
+        } else {
+          expiryText = `${mins} minutes`;
+        }
+
+        document.getElementById('timeUntilExpiry').textContent = expiryText;
+        document.getElementById('timeUntilExpiry').style.color = mins < 5 ? '#FFA500' : '#fff';
+      } else {
+        document.getElementById('timeUntilExpiry').textContent = '-';
+      }
+
+      document.getElementById('currentTime').textContent = debugInfo.current_time || new Date().toLocaleString();
+
+      showSuccess('Debug info refreshed');
+    }
+
+    function clearTokens() {
+      if (confirm('Are you sure you want to clear all tokens? You will need to re-authenticate.')) {
+        console.log('=== CLEARING ALL TOKENS ===');
+
+        if (window.spotifyAuth) {
+          window.spotifyAuth.logout();
+        }
+
+        if (window.spotifyPlayer) {
+          window.spotifyPlayer.disconnect();
+        }
+
+        refreshDebugInfo();
+        updateStatus();
+
+        showSuccess('All tokens cleared');
+        console.log('✅ All tokens cleared');
+      }
+    }
+
+    function viewFullDebug() {
+      console.log('=== FULL DEBUG INFORMATION ===');
+
+      if (!window.spotifyAuth) {
+        console.error('Spotify auth not available');
+        return;
+      }
+
+      const debugInfo = window.spotifyAuth.getDebugInfo();
+      console.log('Token Debug Info:', debugInfo);
+
+      console.log('\nLocalStorage Contents:');
+      console.log('- spotify_access_token:', localStorage.getItem('spotify_access_token')?.substring(0, 20) + '...');
+      console.log('- spotify_token_expiry:', localStorage.getItem('spotify_token_expiry'));
+      console.log('- spotify_refresh_token:', localStorage.getItem('spotify_refresh_token')?.substring(0, 20) + '...');
+      console.log('- spotify_code_verifier:', localStorage.getItem('spotify_code_verifier')?.substring(0, 20) + '...');
+
+      console.log('\nAuthentication Status:');
+      console.log('- Is Authenticated:', window.spotifyAuth.isAuthenticated());
+
+      console.log('\nPlayer Status:');
+      console.log('- Device ID:', window.spotifyPlayer?.getDeviceId());
+      console.log('- Is Playing:', window.spotifyPlayer?.isPlaying());
+
+      const state = window.spotifyPlayer?.getState();
+      if (state) {
+        console.log('- Player State:', {
+          paused: state.paused,
+          position: formatTime(state.position),
+          duration: formatTime(state.duration)
+        });
+      }
+
+      console.log('\n=== END DEBUG INFO ===');
+
+      showSuccess('Full debug info printed to console');
+    }
+
+    // ============================================
     // EVENT LISTENERS
     // ============================================
 
@@ -365,7 +511,10 @@
     // INITIALIZATION
     // ============================================
     document.addEventListener('DOMContentLoaded', async () => {
+      console.log('=== SPOTIFY TEST PAGE INITIALIZED ===');
+
       updateStatus();
+      refreshDebugInfo();
       await handleCallback();
 
       // If already authenticated, check premium status
@@ -376,7 +525,12 @@
       }
 
       // Update status periodically
-      setInterval(updateStatus, 1000);
+      setInterval(() => {
+        updateStatus();
+        refreshDebugInfo();
+      }, 2000);
+
+      console.log('✅ Initialization complete');
     });
   </script>
 </body>
