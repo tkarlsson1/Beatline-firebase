@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lobby.js Test Page</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4285F4;
+      margin-bottom: 30px;
+    }
+
+    .test-section {
+      background: #282828;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4285F4;
+    }
+
+    .test-section h2 {
+      margin-top: 0;
+      color: #4285F4;
+      font-size: 1.2rem;
+    }
+
+    button {
+      background: #4285F4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #5a95f5;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 200px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background: #333;
+      color: #fff;
+      font-size: 1rem;
+      margin: 5px;
+    }
+
+    .output {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      min-height: 40px;
+      border: 1px solid #444;
+    }
+
+    .output.success {
+      border-left: 4px solid #34A853;
+    }
+
+    .output.error {
+      border-left: 4px solid #EA4335;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .color-box {
+      padding: 15px;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 0 3px rgba(0,0,0,0.5);
+    }
+
+    .team-list {
+      margin-top: 10px;
+    }
+
+    .team-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      background: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .color-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .qr-container {
+      text-align: center;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stat-box {
+      background: #333;
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #4285F4;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+  </style>
+
+  <!-- QRCode library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- Load lobby.js -->
+  <script src="lobby.js"></script>
+</head>
+<body>
+  <h1>🎮 Lobby.js Test Page</h1>
+
+  <!-- Constants Display -->
+  <div class="test-section">
+    <h2>📊 Constants</h2>
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Max Teams</div>
+        <div class="stat-value" id="maxTeams">-</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Max Name Length</div>
+        <div class="stat-value" id="maxNameLength">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate IDs -->
+  <div class="test-section">
+    <h2>🎲 Generate IDs</h2>
+    <button onclick="testGenerateGameId()">Generate Game ID</button>
+    <button onclick="testGeneratePIN()">Generate PIN</button>
+    <button onclick="testGenerateTeamId()">Generate Team ID</button>
+    <div class="output" id="idOutput">Click buttons to generate IDs...</div>
+  </div>
+
+  <!-- Team Colors -->
+  <div class="test-section">
+    <h2>🎨 Team Colors</h2>
+    <div class="color-grid" id="colorGrid"></div>
+  </div>
+
+  <!-- Team Name Validation -->
+  <div class="test-section">
+    <h2>✅ Validate Team Name</h2>
+    <input type="text" id="teamNameInput" placeholder="Enter team name..." maxlength="25">
+    <button onclick="testValidateTeamName()">Validate</button>
+    <button onclick="testValidateWithExisting()">Validate (with existing teams)</button>
+    <div class="output" id="nameValidationOutput">Enter a team name and click validate...</div>
+  </div>
+
+  <!-- Timer Validation -->
+  <div class="test-section">
+    <h2>⏱️ Validate Timers</h2>
+    <div style="margin-bottom: 10px;">
+      <label>Guess Timer (30-360s):</label>
+      <input type="number" id="guessTimer" value="90">
+      <button onclick="testValidateTimer('guess')">Validate</button>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <label>Challenge Timer (5-30s):</label>
+      <input type="number" id="challengeTimer" value="10">
+      <button onclick="testValidateTimer('challenge')">Validate</button>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <label>Place Challenge (10-60s):</label>
+      <input type="number" id="placeChallengeTimer" value="20">
+      <button onclick="testValidateTimer('placeChallenge')">Validate</button>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <label>Pause Timer (5-60s):</label>
+      <input type="number" id="pauseTimer" value="10">
+      <button onclick="testValidateTimer('pauseBetweenSongs')">Validate</button>
+    </div>
+    <div class="output" id="timerValidationOutput">Adjust timers and click validate...</div>
+  </div>
+
+  <!-- Color Assignment -->
+  <div class="test-section">
+    <h2>🎨 Test Color Assignment</h2>
+    <button onclick="addMockTeam()">Add Mock Team</button>
+    <button onclick="clearMockTeams()">Clear All Teams</button>
+    <button onclick="testIsLobbyFull()">Check if Full</button>
+    <div id="mockTeamsList" class="team-list"></div>
+    <div class="output" id="colorOutput">Click "Add Mock Team" to test color assignment...</div>
+  </div>
+
+  <!-- QR Code Generation -->
+  <div class="test-section">
+    <h2>📱 QR Code Generation</h2>
+    <button onclick="testGenerateQRCode()">Generate QR Code</button>
+    <div style="text-align: center; margin-top: 10px;">
+      <div id="qrCodeContainer"></div>
+    </div>
+    <div class="output" id="qrOutput">Click button to generate QR code...</div>
+  </div>
+
+  <!-- Clipboard Test -->
+  <div class="test-section">
+    <h2>📋 Clipboard Test</h2>
+    <button onclick="testCopyGameId()">Copy Game ID</button>
+    <button onclick="testCopyPIN()">Copy PIN</button>
+    <div class="output" id="clipboardOutput">Click buttons to test clipboard...</div>
+  </div>
+
+  <!-- Notification Test -->
+  <div class="test-section">
+    <h2>🔔 Notification Test</h2>
+    <button onclick="testNotification('success')">Success Notification</button>
+    <button onclick="testNotification('error')">Error Notification</button>
+    <button onclick="testNotification('info')">Info Notification</button>
+  </div>
+
+  <script>
+    // Mock teams for testing
+    let mockTeams = {};
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('Test page loaded');
+      
+      // Display constants
+      document.getElementById('maxTeams').textContent = MAX_TEAMS;
+      document.getElementById('maxNameLength').textContent = MAX_TEAM_NAME_LENGTH;
+      
+      // Display colors
+      displayColors();
+    });
+
+    // ============================================
+    // TEST FUNCTIONS
+    // ============================================
+
+    function testGenerateGameId() {
+      const gameId = generateGameId();
+      document.getElementById('idOutput').innerHTML = `
+        <strong>Game ID:</strong> ${gameId}<br>
+        <small>Format: 6 uppercase letters/numbers</small>
+      `;
+      document.getElementById('idOutput').className = 'output success';
+    }
+
+    function testGeneratePIN() {
+      const pin = generatePIN();
+      document.getElementById('idOutput').innerHTML = `
+        <strong>PIN:</strong> ${pin}<br>
+        <small>Format: 6 digits</small>
+      `;
+      document.getElementById('idOutput').className = 'output success';
+    }
+
+    function testGenerateTeamId() {
+      const teamId = generateTeamId();
+      document.getElementById('idOutput').innerHTML = `
+        <strong>Team ID:</strong> ${teamId}<br>
+        <small>Format: team_timestamp_random</small>
+      `;
+      document.getElementById('idOutput').className = 'output success';
+    }
+
+    function displayColors() {
+      const grid = document.getElementById('colorGrid');
+      grid.innerHTML = '';
+      
+      TEAM_COLORS.forEach(color => {
+        const box = document.createElement('div');
+        box.className = 'color-box';
+        box.style.backgroundColor = color.hex;
+        box.textContent = color.label;
+        grid.appendChild(box);
+      });
+    }
+
+    function testValidateTeamName() {
+      const name = document.getElementById('teamNameInput').value;
+      const result = validateTeamName(name, null);
+      
+      const output = document.getElementById('nameValidationOutput');
+      
+      if (result.valid) {
+        output.innerHTML = `✅ <strong>Valid!</strong><br>Team name: "${name}"`;
+        output.className = 'output success';
+      } else {
+        output.innerHTML = `❌ <strong>Invalid:</strong> ${result.error}`;
+        output.className = 'output error';
+      }
+    }
+
+    function testValidateWithExisting() {
+      const name = document.getElementById('teamNameInput').value;
+      
+      // Create mock existing teams
+      const existingTeams = {
+        team1: { name: 'Test Team' },
+        team2: { name: 'Winners' }
+      };
+      
+      const result = validateTeamName(name, existingTeams);
+      
+      const output = document.getElementById('nameValidationOutput');
+      
+      if (result.valid) {
+        output.innerHTML = `✅ <strong>Valid!</strong><br>Name not taken. Existing: Test Team, Winners`;
+        output.className = 'output success';
+      } else {
+        output.innerHTML = `❌ <strong>Invalid:</strong> ${result.error}<br>Existing teams: Test Team, Winners`;
+        output.className = 'output error';
+      }
+    }
+
+    function testValidateTimer(timerType) {
+      const inputMap = {
+        guess: 'guessTimer',
+        challenge: 'challengeTimer',
+        placeChallenge: 'placeChallengeTimer',
+        pauseBetweenSongs: 'pauseTimer'
+      };
+      
+      const value = document.getElementById(inputMap[timerType]).value;
+      const result = validateTimer(timerType, value);
+      
+      const output = document.getElementById('timerValidationOutput');
+      const limits = TIMER_LIMITS[timerType];
+      
+      if (result.valid) {
+        output.innerHTML = `✅ <strong>Valid ${timerType}:</strong> ${result.value}s<br>
+          <small>Range: ${limits.min}-${limits.max}s, Default: ${limits.default}s</small>`;
+        output.className = 'output success';
+      } else {
+        output.innerHTML = `❌ <strong>Invalid ${timerType}:</strong> ${result.error}<br>
+          <small>Range: ${limits.min}-${limits.max}s</small>`;
+        output.className = 'output error';
+      }
+    }
+
+    function addMockTeam() {
+      const teamId = generateTeamId();
+      const color = getNextAvailableColor(mockTeams);
+      
+      if (!color) {
+        const output = document.getElementById('colorOutput');
+        output.innerHTML = '❌ <strong>Lobby full!</strong> Max 8 teams reached.';
+        output.className = 'output error';
+        return;
+      }
+      
+      const teamName = `Team ${Object.keys(mockTeams).length + 1}`;
+      
+      mockTeams[teamId] = {
+        name: teamName,
+        color: color.name,
+        tokens: 4,
+        score: 0
+      };
+      
+      updateMockTeamsList();
+      
+      const output = document.getElementById('colorOutput');
+      output.innerHTML = `✅ Added <strong>${teamName}</strong> with color <strong>${color.label}</strong><br>
+        <small>Teams: ${Object.keys(mockTeams).length}/${MAX_TEAMS}</small>`;
+      output.className = 'output success';
+    }
+
+    function clearMockTeams() {
+      mockTeams = {};
+      updateMockTeamsList();
+      
+      const output = document.getElementById('colorOutput');
+      output.innerHTML = '🗑️ All teams cleared';
+      output.className = 'output';
+    }
+
+    function updateMockTeamsList() {
+      const list = document.getElementById('mockTeamsList');
+      list.innerHTML = '';
+      
+      if (Object.keys(mockTeams).length === 0) {
+        list.innerHTML = '<p style="opacity: 0.5;">No teams yet...</p>';
+        return;
+      }
+      
+      Object.entries(mockTeams).forEach(([teamId, team]) => {
+        const colorObj = TEAM_COLORS.find(c => c.name === team.color);
+        
+        const item = document.createElement('div');
+        item.className = 'team-item';
+        item.innerHTML = `
+          <span class="color-dot" style="background: ${colorObj.hex}"></span>
+          <strong>${team.name}</strong>
+          <span style="opacity: 0.7;">(${colorObj.label})</span>
+          <span style="margin-left: auto;">🪙 ${team.tokens}</span>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function testIsLobbyFull() {
+      const isFull = isLobbyFull(mockTeams);
+      const count = Object.keys(mockTeams).length;
+      
+      const output = document.getElementById('colorOutput');
+      
+      if (isFull) {
+        output.innerHTML = `🚫 <strong>Lobby is FULL</strong><br>
+          <small>${count}/${MAX_TEAMS} teams</small>`;
+        output.className = 'output error';
+      } else {
+        output.innerHTML = `✅ <strong>Lobby has space</strong><br>
+          <small>${count}/${MAX_TEAMS} teams (${MAX_TEAMS - count} spots left)</small>`;
+        output.className = 'output success';
+      }
+    }
+
+    function testGenerateQRCode() {
+      const gameId = generateGameId();
+      const container = document.getElementById('qrCodeContainer');
+      container.innerHTML = '<div class="qr-container"><div id="qrCode"></div></div>';
+      
+      generateLobbyQRCode(gameId, 'qrCode');
+      
+      const output = document.getElementById('qrOutput');
+      output.innerHTML = `✅ QR Code generated for game: <strong>${gameId}</strong><br>
+        <small>URL: https://www.notestream.se/join?game=${gameId}</small>`;
+      output.className = 'output success';
+    }
+
+    function testCopyGameId() {
+      const gameId = generateGameId();
+      copyToClipboard(gameId, 'Game ID');
+      
+      const output = document.getElementById('clipboardOutput');
+      output.innerHTML = `📋 Copied to clipboard: <strong>${gameId}</strong>`;
+      output.className = 'output success';
+    }
+
+    function testCopyPIN() {
+      const pin = generatePIN();
+      copyToClipboard(pin, 'PIN');
+      
+      const output = document.getElementById('clipboardOutput');
+      output.innerHTML = `📋 Copied to clipboard: <strong>${pin}</strong>`;
+      output.className = 'output success';
+    }
+
+    function testNotification(type) {
+      const messages = {
+        success: 'Detta är en success-notis! ✓',
+        error: 'Detta är en error-notis! ✗',
+        info: 'Detta är en info-notis ℹ️'
+      };
+      
+      showNotification(messages[type], type);
+    }
+  </script>
+</body>
+</html>
