@@ -103,18 +103,6 @@
     </div>
     
     <!-- ============================================ -->
-    <!-- FEEDBACK MODAL -->
-    <!-- ============================================ -->
-    <div id="feedbackModal">
-      <div>
-        <span id="closeFeedback">&times;</span>
-        <h2>Lämna feedback</h2>
-        <textarea id="feedbackText" placeholder="Skriv din feedback här..."></textarea>
-        <button id="submitFeedback">Skicka feedback</button>
-      </div>
-    </div>
-    
-    <!-- ============================================ -->
     <!-- README MODAL -->
     <!-- ============================================ -->
     <div id="readmeModal" class="modal" role="dialog" aria-modal="true">
@@ -167,9 +155,7 @@
       <span id="closeManagePlaylists" class="closeBtn" aria-label="Stäng">&times;</span>
       <h2>Hantera spellistor</h2>
       <p id="managePlaylistsInfo" style="opacity:.9; margin-top:.5rem;"></p>
-      <div id="managePlaylistsList" style="margin-top: 1rem;">
-        <!-- Dynamic content -->
-      </div>
+      <div id="managePlaylistsList" style="margin-top: 1rem;"></div>
     </div>
   </div>
 
@@ -182,7 +168,6 @@
   <!-- SPOTIFY INTEGRATION -->
   <!-- ============================================ -->
   <script>
-    // ========== SPOTIFY TOKEN AND PLAYLIST FETCHING ==========
     async function getBackendSpotifyToken() {
       console.log("getBackendSpotifyToken: Kontrollerar om cachat token finns...");
       const cachedToken = localStorage.getItem('spotifyToken');
@@ -312,50 +297,15 @@
         }
       });
       
-      // Feedback Modal
-      document.getElementById("feedbackButton")?.addEventListener("click", function() {
-        document.getElementById("feedbackModal").style.display = "block";
-      });
-      document.getElementById("closeFeedback")?.addEventListener("click", function() {
-        document.getElementById("feedbackModal").style.display = "none";
-      });
-      window.addEventListener("click", function(event) {
-        if (event.target == document.getElementById("feedbackModal")) {
-          document.getElementById("feedbackModal").style.display = "none";
-        }
-      });
-      document.getElementById("submitFeedback")?.addEventListener("click", function() {
-        const feedbackText = document.getElementById("feedbackText").value.trim();
-        if (feedbackText.length === 0) {
-          alert("Feedback kan inte vara tom!");
-          return;
-        }
-        
-        const feedbackRef = window.firebaseRef(window.firebaseDb, 'feedback');
-        window.firebasePush(feedbackRef, { text: feedbackText, timestamp: Date.now() })
-          .then(() => {
-            alert("Tack för din feedback!");
-            document.getElementById("feedbackText").value = "";
-            document.getElementById("feedbackModal").style.display = "none";
-          })
-          .catch((error) => {
-            console.error("Fel vid lagring av feedback:", error);
-            alert("Något gick fel. Försök igen senare.");
-          });
-      });
-      
       // Edit Year Modal handlers
       document.getElementById("saveYearButton").addEventListener("click", function() {
         const newYear = document.getElementById("newYearInput").value.trim();
-        console.log("Save-knappen klickad, nytt år:", newYear);
         if (!/^\d{4}$/.test(newYear)) {
           alert("Ange ett giltigt årtal med 4 siffror.");
           return;
         }
-        console.log("Uppdaterar customYear för playlist:", currentPlaylistName, "spotifyID:", currentSpotifyID);
-        updateCustomYear(currentPlaylistName, currentSpotifyID, newYear)
+        updateCustomYear(window.currentPlaylistName, window.currentSpotifyID, newYear)
           .then(() => {
-            console.log("Uppdatering lyckades, stänger modal.");
             closeEditYearModal();
           })
           .catch((error) => {
@@ -364,7 +314,6 @@
       });
       
       document.getElementById("closeModal").addEventListener("click", function() {
-        console.log("Stänger modal via stäng-knappen.");
         closeEditYearModal();
       });
     });
@@ -406,7 +355,6 @@
       dropdownMenu.style.zIndex = "9999";
       dropdownMenu.style.width = "max-content";
       
-      // Menu items
       const lasForstLink = document.createElement("a");
       lasForstLink.href = "#";
       lasForstLink.textContent = "Läs först";
