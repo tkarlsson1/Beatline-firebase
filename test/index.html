@@ -12,7 +12,7 @@
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
   <meta name="twitter:card" content="summary_large_image">
   
-  <title>NOTESTREAM v0.657</title>
+  <title>NOTESTREAM v0.658</title>
   
   <!-- Favicon and manifest -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -855,6 +855,7 @@
     window.firebaseSet = set;
     window.firebaseUpdate = update;
     window.auth = auth;
+    window.firebaseSignOut = signOut;
     
     // Global variables for playlist management
     window.currentPlaylistName = null;
@@ -1647,8 +1648,8 @@
       logoutLink.textContent = "Logga ut";
       logoutLink.addEventListener("click", (e) => {
         e.preventDefault();
-        window.auth && window.auth.constructor.name === 'Auth' && 
-          window.auth.signOut().then(() => {
+        window.firebaseSignOut(window.auth)
+          .then(() => {
             console.log("Utloggad!");
             document.getElementById("loginModal").style.display = "flex";
             dropdownMenu.style.display = "none";
