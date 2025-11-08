@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify OAuth Configuration Verification</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #1DB954;
+      border-bottom: 2px solid #1DB954;
+      padding-bottom: 10px;
+    }
+
+    .section {
+      background: #282828;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #1DB954;
+    }
+
+    .config-item {
+      margin: 15px 0;
+      padding: 10px;
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .label {
+      color: #1DB954;
+      font-weight: bold;
+      display: inline-block;
+      width: 200px;
+    }
+
+    .value {
+      color: #fff;
+      background: #1a1a1a;
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-family: monospace;
+      display: inline-block;
+      word-break: break-all;
+    }
+
+    .warning {
+      background: #FFA500;
+      color: #000;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    .error {
+      background: #E22134;
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #1DB954;
+      color: #000;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist li {
+      padding: 10px;
+      margin: 5px 0;
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .checklist li:before {
+      content: "☐ ";
+      color: #1DB954;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    code {
+      background: #1a1a1a;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #1DB954;
+    }
+
+    .copy-btn {
+      background: #1DB954;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .copy-btn:hover {
+      background: #1ed760;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Spotify OAuth Configuration Verification</h1>
+
+  <div class="section">
+    <h2>Current Configuration</h2>
+    <div class="config-item">
+      <span class="label">Client ID:</span>
+      <span class="value" id="clientId">-</span>
+      <button class="copy-btn" onclick="copy('clientId')">Copy</button>
+    </div>
+    <div class="config-item">
+      <span class="label">Redirect URI:</span>
+      <span class="value" id="redirectUri">-</span>
+      <button class="copy-btn" onclick="copy('redirectUri')">Copy</button>
+    </div>
+    <div class="config-item">
+      <span class="label">Scopes:</span>
+      <span class="value" id="scopes">-</span>
+    </div>
+    <div class="config-item">
+      <span class="label">Current Page URL:</span>
+      <span class="value" id="currentUrl">-</span>
+    </div>
+    <div class="config-item">
+      <span class="label">Callback URL (Expected):</span>
+      <span class="value" id="callbackUrl">-</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Redirect URI Validation</h2>
+    <div id="uriValidation"></div>
+  </div>
+
+  <div class="section">
+    <h2>✓ Spotify Dashboard Setup Checklist</h2>
+    <ul class="checklist">
+      <li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank" style="color: #1DB954;">Spotify Developer Dashboard</a></li>
+      <li>Select your app (or create one if needed)</li>
+      <li>Click "Settings" button</li>
+      <li>Find "Redirect URIs" section</li>
+      <li>Add EXACTLY: <code id="uriToCopy">https://www.notestream.se/test/callback</code> <button class="copy-btn" onclick="copyUri()">Copy URI</button></li>
+      <li>Click "Add" button</li>
+      <li>Scroll down and click "Save" button</li>
+      <li>Verify the URI appears in the list (no trailing slashes!)</li>
+    </ul>
+  </div>
+
+  <div class="warning">
+    ⚠️ <strong>Important:</strong> The redirect URI in Spotify Dashboard must match EXACTLY (including https://, path, no trailing slash). Case-sensitive!
+  </div>
+
+  <div class="section">
+    <h2>Common Issues & Solutions</h2>
+    <div style="line-height: 1.8;">
+      <strong>Issue:</strong> "redirect_uri_mismatch" error<br>
+      <strong>Solution:</strong> URI in code doesn't match Dashboard. Check for:<br>
+      &nbsp;&nbsp;• Trailing slashes (https://example.com/callback vs https://example.com/callback/)<br>
+      &nbsp;&nbsp;• HTTP vs HTTPS<br>
+      &nbsp;&nbsp;• Different subdomain (www. vs no www.)<br>
+      &nbsp;&nbsp;• Port numbers<br><br>
+
+      <strong>Issue:</strong> "invalid_client" error<br>
+      <strong>Solution:</strong> Wrong Client ID or Client Secret (we're using PKCE, so no secret needed)<br><br>
+
+      <strong>Issue:</strong> "invalid_grant" error<br>
+      <strong>Solution:</strong><br>
+      &nbsp;&nbsp;• Authorization code already used (can only use once)<br>
+      &nbsp;&nbsp;• Code expired (10 minutes max)<br>
+      &nbsp;&nbsp;• Code verifier mismatch (PKCE issue)<br><br>
+
+      <strong>Issue:</strong> No authorization code in callback URL<br>
+      <strong>Solution:</strong><br>
+      &nbsp;&nbsp;• User denied authorization<br>
+      &nbsp;&nbsp;• Redirect URI mismatch<br>
+      &nbsp;&nbsp;• Invalid OAuth flow setup
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Test OAuth Flow</h2>
+    <button onclick="testAuth()" style="background: #1DB954; color: #000; border: none; padding: 12px 24px; border-radius: 24px; font-size: 16px; font-weight: bold; cursor: pointer;">
+      Test OAuth Authorization
+    </button>
+    <p style="margin-top: 10px; color: #aaa; font-size: 0.9em;">This will start the OAuth flow and redirect you to Spotify for authorization.</p>
+  </div>
+
+  <script src="spotify-auth.js"></script>
+  <script>
+    const EXPECTED_REDIRECT_URI = 'https://www.notestream.se/test/callback';
+
+    function loadConfig() {
+      if (!window.SPOTIFY_CONFIG) {
+        document.getElementById('clientId').textContent = 'Config not loaded!';
+        return;
+      }
+
+      const config = window.SPOTIFY_CONFIG;
+      document.getElementById('clientId').textContent = config.clientId;
+      document.getElementById('redirectUri').textContent = config.redirectUri;
+      document.getElementById('scopes').textContent = config.scopes.join(', ');
+      document.getElementById('currentUrl').textContent = window.location.href;
+      document.getElementById('callbackUrl').textContent = EXPECTED_REDIRECT_URI;
+
+      // Validate URI
+      const validation = document.getElementById('uriValidation');
+      if (config.redirectUri === EXPECTED_REDIRECT_URI) {
+        validation.innerHTML = '<div class="success">✅ Redirect URI matches expected value!</div>';
+      } else {
+        validation.innerHTML = `
+          <div class="error">
+            ❌ Redirect URI MISMATCH!<br><br>
+            <strong>In Code:</strong> ${config.redirectUri}<br>
+            <strong>Expected:</strong> ${EXPECTED_REDIRECT_URI}<br><br>
+            This will cause OAuth to fail. Update spotify-auth.js to use the correct URI.
+          </div>
+        `;
+      }
+    }
+
+    function copy(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard: ' + text);
+      });
+    }
+
+    function copyUri() {
+      const uri = EXPECTED_REDIRECT_URI;
+      navigator.clipboard.writeText(uri).then(() => {
+        alert('Redirect URI copied to clipboard!\n\nNow paste it into Spotify Dashboard → Settings → Redirect URIs');
+      });
+    }
+
+    function testAuth() {
+      if (confirm('This will start the OAuth flow and redirect you to Spotify.\n\nMake sure the redirect URI is added to your Spotify Dashboard first!\n\nContinue?')) {
+        console.log('Starting test OAuth flow...');
+        sessionStorage.setItem('spotifyTestMode', 'true');
+        window.spotifyAuth.authorize();
+      }
+    }
+
+    // Load config on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      // Wait a bit for spotify-auth.js to load
+      setTimeout(loadConfig, 100);
+    });
+  </script>
+</body>
+</html>

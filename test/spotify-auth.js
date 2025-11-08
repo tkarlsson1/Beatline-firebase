@@ -101,32 +101,90 @@ async function getAccessToken(code) {
 
   debugLog('Code verifier retrieved (first 20 chars):', codeVerifier.substring(0, 20) + '...');
 
+  const requestBody = {
+    client_id: SPOTIFY_CONFIG.clientId,
+    grant_type: 'authorization_code',
+    code: code,
+    redirect_uri: SPOTIFY_CONFIG.redirectUri,
+    code_verifier: codeVerifier,
+  };
+
+  debugLog('Token exchange request details:', {
+    url: 'https://accounts.spotify.com/api/token',
+    method: 'POST',
+    client_id: SPOTIFY_CONFIG.clientId,
+    grant_type: 'authorization_code',
+    redirect_uri: SPOTIFY_CONFIG.redirectUri,
+    code_length: code.length,
+    code_verifier_length: codeVerifier.length
+  });
+
   const payload = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: new URLSearchParams({
-      client_id: SPOTIFY_CONFIG.clientId,
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: SPOTIFY_CONFIG.redirectUri,
-      code_verifier: codeVerifier,
-    }),
+    body: new URLSearchParams(requestBody),
   };
 
   try {
     debugLog('Sending token request to Spotify...');
     const response = await fetch('https://accounts.spotify.com/api/token', payload);
-    const data = await response.json();
 
-    debugLog('Token response status:', response.status);
-    debugLog('Token response data:', {
+    debugLog('Token response received:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+      headers: {
+        'content-type': response.headers.get('content-type')
+      }
+    });
+
+    // Get response text first to handle both success and error cases
+    const responseText = await response.text();
+    debugLog('Response body length:', responseText.length);
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('[Spotify Auth] ❌ Failed to parse response as JSON:', parseError);
+      console.error('[Spotify Auth] Response text:', responseText.substring(0, 200));
+      return null;
+    }
+
+    debugLog('Parsed response data:', {
       has_access_token: !!data.access_token,
       has_refresh_token: !!data.refresh_token,
       expires_in: data.expires_in,
-      error: data.error
+      token_type: data.token_type,
+      scope: data.scope,
+      error: data.error,
+      error_description: data.error_description
     });
+
+    // Check for errors in response
+    if (data.error) {
+      console.error('[Spotify Auth] ❌ Spotify API returned an error:');
+      console.error('  Error:', data.error);
+      console.error('  Description:', data.error_description);
+
+      if (data.error === 'invalid_grant') {
+        console.error('  Common causes:');
+        console.error('    - Authorization code already used');
+        console.error('    - Authorization code expired');
+        console.error('    - Code verifier mismatch');
+        console.error('    - Redirect URI mismatch');
+      }
+
+      return null;
+    }
+
+    if (!response.ok) {
+      console.error('[Spotify Auth] ❌ HTTP error response:', response.status, response.statusText);
+      console.error('  Response data:', data);
+      return null;
+    }
 
     if (data.access_token) {
       // Store token with expiry time
@@ -474,7 +532,9 @@ function getTokenDebugInfo() {
   };
 }
 
-// Export functions for global use
+// Export functions and config for global use
+window.SPOTIFY_CONFIG = SPOTIFY_CONFIG;
+
 window.spotifyAuth = {
   authorize: authorizeSpotify,
   getToken: getValidAccessToken,
@@ -482,5 +542,6 @@ window.spotifyAuth = {
   logout: logoutSpotify,
   checkPremium: checkPremiumAccount,
   handleCallback: handleSpotifyCallback,
-  getDebugInfo: getTokenDebugInfo
+  getDebugInfo: getTokenDebugInfo,
+  config: SPOTIFY_CONFIG
 };

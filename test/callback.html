@@ -67,22 +67,49 @@
 
   <script>
     async function handleCallback() {
+      // ============================================
+      // LOG FULL CALLBACK URL FOR DEBUGGING
+      // ============================================
+      console.log('=== SPOTIFY CALLBACK PAGE LOADED ===');
+      console.log('Full URL:', window.location.href);
+      console.log('Pathname:', window.location.pathname);
+      console.log('Search params:', window.location.search);
+      console.log('Hash:', window.location.hash);
+
       const messageEl = document.getElementById('message');
       const urlParams = new URLSearchParams(window.location.search);
+
+      // Log all URL parameters
+      console.log('\nAll URL Parameters:');
+      for (let [key, value] of urlParams.entries()) {
+        if (key === 'code') {
+          console.log(`  ${key}: ${value.substring(0, 20)}... (truncated)`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
+
       const code = urlParams.get('code');
       const error = urlParams.get('error');
       const state = urlParams.get('state');
 
+      console.log('\nExtracted Values:');
+      console.log('  code:', code ? code.substring(0, 20) + '... (truncated)' : 'NOT FOUND');
+      console.log('  error:', error || 'none');
+      console.log('  state:', state || 'none');
+
       // Check if coming from test page
       const returnToTest = sessionStorage.getItem('spotifyTestMode') === 'true';
+      console.log('  returnToTest:', returnToTest);
 
       if (error) {
+        console.error('\n❌ SPOTIFY AUTHORIZATION ERROR:', error);
         messageEl.textContent = 'Authorization failed: ' + error;
         messageEl.className = 'error';
-        console.error('Spotify authorization error:', error);
 
         // Redirect back after delay
         setTimeout(() => {
+          console.log('Redirecting after error...');
           if (returnToTest) {
             window.location.href = 'spotify-test.html';
           } else {
@@ -92,50 +119,83 @@
         return;
       }
 
-      if (code) {
-        try {
-          messageEl.textContent = 'Exchanging code for access token...';
+      if (!code) {
+        console.error('\n❌ NO AUTHORIZATION CODE FOUND IN URL!');
+        console.log('This usually means:');
+        console.log('  1. User denied authorization');
+        console.log('  2. Redirect URI mismatch');
+        console.log('  3. Invalid OAuth flow');
+        messageEl.textContent = 'No authorization code found. Redirecting...';
+        messageEl.className = 'error';
 
-          const success = await window.spotifyAuth.handleCallback();
-
-          if (success) {
-            messageEl.textContent = 'Successfully connected to Spotify! Redirecting...';
-            messageEl.className = 'success';
-
-            // Check premium status
-            const isPremium = await window.spotifyAuth.checkPremium();
-
-            if (!isPremium) {
-              messageEl.textContent = 'Warning: Spotify Premium required for Web Playback. Redirecting...';
-              messageEl.className = 'error';
-            }
-
-            // Redirect back to app or test page
-            setTimeout(() => {
-              if (returnToTest) {
-                window.location.href = 'spotify-test.html?authorized=true';
-              } else {
-                window.location.href = 'index.html?spotify=connected';
-              }
-            }, 2000);
+        setTimeout(() => {
+          console.log('Redirecting after missing code...');
+          if (returnToTest) {
+            window.location.href = 'spotify-test.html';
           } else {
-            messageEl.textContent = 'Failed to exchange authorization code. Redirecting...';
-            messageEl.className = 'error';
-
-            setTimeout(() => {
-              if (returnToTest) {
-                window.location.href = 'spotify-test.html';
-              } else {
-                window.location.href = 'index.html';
-              }
-            }, 3000);
+            window.location.href = 'index.html';
           }
-        } catch (err) {
-          console.error('Error handling callback:', err);
-          messageEl.textContent = 'An error occurred. Redirecting...';
+        }, 3000);
+        return;
+      }
+
+      // We have a code - proceed with exchange
+      console.log('\n✅ Authorization code found!');
+      console.log('Starting token exchange process...');
+
+      try {
+        messageEl.textContent = 'Exchanging code for access token...';
+
+        console.log('Calling window.spotifyAuth.handleCallback()...');
+        const success = await window.spotifyAuth.handleCallback();
+
+        console.log('handleCallback() returned:', success);
+
+        if (success) {
+          console.log('✅ Token exchange successful!');
+
+          // Verify token was actually stored
+          const storedToken = localStorage.getItem('spotify_access_token');
+          const storedExpiry = localStorage.getItem('spotify_token_expiry');
+          const storedRefresh = localStorage.getItem('spotify_refresh_token');
+
+          console.log('\nToken Storage Check:');
+          console.log('  Access token stored:', !!storedToken, storedToken ? `(${storedToken.substring(0, 20)}...)` : '');
+          console.log('  Token expiry stored:', !!storedExpiry, storedExpiry ? new Date(parseInt(storedExpiry)).toLocaleString() : '');
+          console.log('  Refresh token stored:', !!storedRefresh, storedRefresh ? `(${storedRefresh.substring(0, 20)}...)` : '');
+
+          messageEl.textContent = 'Successfully connected to Spotify! Redirecting...';
+          messageEl.className = 'success';
+
+          // Check premium status
+          console.log('\nChecking premium status...');
+          const isPremium = await window.spotifyAuth.checkPremium();
+          console.log('Premium status:', isPremium);
+
+          if (!isPremium) {
+            console.warn('⚠️ User does not have Spotify Premium');
+            messageEl.textContent = 'Warning: Spotify Premium required for Web Playback. Redirecting...';
+            messageEl.className = 'error';
+          }
+
+          // Redirect back to app or test page
+          setTimeout(() => {
+            console.log('Redirecting to', returnToTest ? 'test page' : 'main app');
+            if (returnToTest) {
+              window.location.href = 'spotify-test.html?authorized=true';
+            } else {
+              window.location.href = 'index.html?spotify=connected';
+            }
+          }, 2000);
+        } else {
+          console.error('❌ Token exchange FAILED - handleCallback() returned false');
+          console.log('Check the logs above for details about why the exchange failed');
+
+          messageEl.textContent = 'Failed to exchange authorization code. Check console for details.';
           messageEl.className = 'error';
 
           setTimeout(() => {
+            console.log('Redirecting after failed exchange...');
             if (returnToTest) {
               window.location.href = 'spotify-test.html';
             } else {
@@ -143,11 +203,15 @@
             }
           }, 3000);
         }
-      } else {
-        messageEl.textContent = 'No authorization code found. Redirecting...';
+      } catch (err) {
+        console.error('❌ EXCEPTION during callback handling:', err);
+        console.error('Error stack:', err.stack);
+
+        messageEl.textContent = 'An error occurred: ' + err.message;
         messageEl.className = 'error';
 
         setTimeout(() => {
+          console.log('Redirecting after exception...');
           if (returnToTest) {
             window.location.href = 'spotify-test.html';
           } else {
