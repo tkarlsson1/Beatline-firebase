@@ -4,6 +4,38 @@
   outline-offset: 2px;
 }
 
+/* ========== DARK MODE VARIABLES ========== */
+:root {
+  --bg-color: transparent;
+  --text-color: #fff;
+  --primary-bg: #032934;
+  --primary-hover: #032934;
+  --accent-color: #0b939c;
+  --accent-hover: #0a7c85;
+  --modal-bg: #111;
+  --modal-border: rgba(255,255,255,.15);
+  --checkbox-active: #0b939c;
+  --input-bg: #032934;
+  --input-text: #fff;
+  --menu-bg: #032934;
+}
+
+body.dark-mode {
+  --bg-color: #0a0a0a;
+  --text-color: #e0e0e0;
+  --primary-bg: #1a1a1a;
+  --primary-hover: #2a2a2a;
+  --accent-color: #4db8c4;
+  --accent-hover: #3a9aa5;
+  --modal-bg: #1a1a1a;
+  --modal-border: rgba(255,255,255,.2);
+  --checkbox-active: #4db8c4;
+  --input-bg: #2a2a2a;
+  --input-text: #e0e0e0;
+  --menu-bg: #1a1a1a;
+  background: var(--bg-color) !important;
+}
+
 /* ========== BASIC LAYOUT ========== */
 html, body {
   overflow-x: hidden;
@@ -69,8 +101,8 @@ select, button {
   padding: 0.5rem;
   font-size: 1rem;
   margin-bottom: 1rem;
-  background: #032934;
-  color: #fff;
+  background: var(--primary-bg);
+  color: var(--text-color);
   border: none;
   border-radius: 4px;
   font-family: 'Manrope', sans-serif;
@@ -79,7 +111,7 @@ select, button {
 button:hover,
 button:active,
 button:focus {
-  background: #032934;
+  background: var(--primary-hover);
 }
 
 #startYear, #endYear {
@@ -87,14 +119,14 @@ button:focus {
 }
 
 select {
-  background-color: #032934;
-  color: #fff;
+  background-color: var(--primary-bg);
+  color: var(--text-color);
   border: none;
 }
 
 select:focus, select:hover {
-  background-color: #032934 !important;
-  color: #fff;
+  background-color: var(--primary-hover) !important;
+  color: var(--text-color);
 }
 
 /* ========== START BUTTON ========== */
@@ -165,24 +197,24 @@ select:focus, select:hover {
 .checkbox-pill label {
   cursor: pointer;
   padding: 0.5rem 0.5rem;
-  border: 3px solid #032934;
+  border: 3px solid var(--primary-bg);
   border-radius: 8px;
-  background-color: #032934;
+  background-color: var(--primary-bg);
   transition: background 0.3s, color 0.3s, border-color 0.3s;
-  color: #fff;
+  color: var(--text-color);
   font-size: 1rem;
   user-select: none;
   font-family: 'Manrope', sans-serif;
 }
 
 .checkbox-pill input[type="checkbox"]:checked + label {
-  background-color: #0b939c;
-  color: #fff;
-  border-color: #0b939c;
+  background-color: var(--checkbox-active);
+  color: var(--text-color);
+  border-color: var(--checkbox-active);
 }
 
 #filter-page label {
-  color: #fff;
+  color: var(--text-color);
 }
 
 /* ========== SPOTIFY IMPORT ========== */
@@ -191,15 +223,15 @@ select:focus, select:hover {
   text-align: center;
   padding: 1rem;
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-color);
 }
 
 #spotify-import input, #playlistTypeInput {
   width: 40%;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
-  background: #032934;
-  color: #fff;
+  background: var(--input-bg);
+  color: var(--input-text);
   border: none;
   border-radius: 4px;
   font-family: 'Manrope', sans-serif;
@@ -223,7 +255,7 @@ select:focus, select:hover {
   background: none;
   border: none;
   font-size: 2rem;
-  color: #fff;
+  color: var(--text-color);
   cursor: pointer;
 }
 
@@ -238,21 +270,21 @@ select:focus, select:hover {
   position: absolute;
   right: 0;
   top: 2.5rem;
-  background: #032934;
-  border: 1px solid #fff;
+  background: var(--menu-bg);
+  border: 1px solid var(--text-color);
   border-radius: 4px;
 }
 
 #dropdownMenu a {
   display: block;
   padding: 0.5rem 1rem;
-  color: #fff;
+  color: var(--text-color);
   text-decoration: none;
   font-size: 1rem;
 }
 
 #dropdownMenu a:hover {
-  background: #0b939c;
+  background: var(--accent-color);
 }
 
 /* ========== DIVIDERS AND HEADINGS ========== */
@@ -291,11 +323,11 @@ h2 + hr, h3 + hr {
   cursor: pointer;
   margin-left: 0.5rem;
   font-size: 0.8em;
-  color: #0b939c;
+  color: var(--accent-color);
 }
 
 .edit-icon:hover {
-  color: #0a7c85;
+  color: var(--accent-hover);
 }
 
 /* ========== MODALS - GENERAL ========== */
@@ -348,8 +380,8 @@ body.modal-open {
 
 #saveYearButton {
   padding: 0.5rem 1rem;
-  background-color: #0b939c;
-  color: #fff;
+  background-color: var(--accent-color);
+  color: var(--text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -357,7 +389,7 @@ body.modal-open {
 }
 
 #saveYearButton:hover {
-  background-color: #0a7c85;
+  background-color: var(--accent-hover);
 }
 
 /* ========== README MODAL ========== */
@@ -384,9 +416,9 @@ body.modal-open {
   border-radius: 8px;
   position: relative;
   font-family: 'Manrope', sans-serif;
-  background: #111 !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
+  background: var(--modal-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--modal-border) !important;
   border-radius: 12px !important;
   width: min(92vw, 600px) !important;
   max-width: 600px !important;
@@ -397,11 +429,11 @@ body.modal-open {
   overflow: auto !important;
 }
 
-#readmeModal > div, 
+#readmeModal > div,
 #readmeModal .modal-content {
-  background: #111 !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,.15) !important;
+  background: var(--modal-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--modal-border) !important;
   border-radius: 12px !important;
   width: min(92vw, 600px) !important;
   max-width: 600px !important;
@@ -478,8 +510,8 @@ body.modal-open {
 #loginBox button, #registerBox button {
   padding: 0.4rem 0.8rem;
   font-size: 1rem;
-  background-color: #0b939c;
-  color: #fff;
+  background-color: var(--accent-color);
+  color: var(--text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -487,11 +519,11 @@ body.modal-open {
 }
 
 #loginModal > div, #authModal > div, #signinModal > div {
-  background: #111;
-  color: #fff;
+  background: var(--modal-bg);
+  color: var(--text-color);
   margin: 6vh auto;
   padding: 20px;
-  border: 1px solid rgba(255,255,255,.15);
+  border: 1px solid var(--modal-border);
   border-radius: 12px;
   position: relative;
   width: min(92vw, 600px);
@@ -528,8 +560,8 @@ body.modal-open {
   display: block;
   margin: 0 auto;
   width: 128px;
-  background: #032934;
-  color: #fff;
+  background: var(--primary-bg);
+  color: var(--text-color);
   border: none;
   border-radius: 4px;
   font-size: 1rem;
@@ -542,7 +574,7 @@ body.modal-open {
 }
 
 .answer-button:hover, .answer-button:active, .answer-button:focus {
-  background: #032934;
+  background: var(--primary-hover);
 }
 
 /* ========== MANAGE PLAYLISTS MODAL ========== */

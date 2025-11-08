@@ -53,7 +53,18 @@ document.addEventListener("DOMContentLoaded", function() {
     dropdownMenu.style.display = "none";
   });
   dropdownMenu.appendChild(startpageLink);
-  
+
+  const darkModeLink = document.createElement("a");
+  darkModeLink.href = "#";
+  darkModeLink.id = "darkModeToggle";
+  darkModeLink.textContent = "Mörkt läge";
+  darkModeLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleDarkMode();
+    dropdownMenu.style.display = "none";
+  });
+  dropdownMenu.appendChild(darkModeLink);
+
   const managePlaylistsLink = document.createElement("a");
   managePlaylistsLink.href = "#";
   managePlaylistsLink.textContent = "Hantera spellistor";
@@ -93,4 +104,24 @@ document.addEventListener("DOMContentLoaded", function() {
       dropdownMenu.style.display = "none";
     }
   });
+
+  // Initialize dark mode from localStorage
+  const isDarkMode = localStorage.getItem("darkMode") === "true";
+  if (isDarkMode) {
+    document.body.classList.add("dark-mode");
+    darkModeLink.textContent = "Ljust läge";
+  }
 });
+
+// ============================================
+// DARK MODE TOGGLE
+// ============================================
+function toggleDarkMode() {
+  const isDarkMode = document.body.classList.toggle("dark-mode");
+  localStorage.setItem("darkMode", isDarkMode);
+
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  if (darkModeToggle) {
+    darkModeToggle.textContent = isDarkMode ? "Ljust läge" : "Mörkt läge";
+  }
+}
