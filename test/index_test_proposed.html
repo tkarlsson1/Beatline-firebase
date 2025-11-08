@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NOTESTREAM v0.610_test</title>
+<style>
+  :root {
+    --bg: #0b0f12;
+    --txt: #fff;
+    --card-w: 96px;      /* computed base */
+    --card-scale: 0.56;  /* size factor */
+    --gap: 10px;         /* spacing via ghost-gap */
+    --team1: #ffcc00;
+    --team2: #00a0ff;
+    --team3: #ff4d5a;
+  }
+  html,body { margin:0; height:100%; background: var(--bg); color: var(--txt); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  #app { padding: 14px; display:flex; flex-direction:column; gap:12px; }
+  .topbar { display:flex; justify-content:center; align-items:center; }
+  .badge { background: rgba(255,255,255,.06); padding:.45rem .7rem; border:1px solid rgba(255,255,255,.2); border-radius:999px; }
+
+  /* Centered team lineup with tokens */
+  .teams-strip { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; align-items:center; }
+  .chip { display:flex; align-items:center; gap:6px; padding:.25rem .6rem; border:1px solid rgba(255,255,255,.2); border-radius:999px; background:rgba(255,255,255,.05); }
+  .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
+  .t1 { background: var(--team1); } .t2 { background: var(--team2); } .t3 { background: var(--team3); }
+
+  .controls { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; align-items:center; }
+  .controls button { padding:.55rem .9rem; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:#fff; cursor:pointer; }
+  .controls button:hover { background: rgba(255,255,255,.12); }
+
+  .stage { display:flex; flex-direction:column; gap:10px; }
+  .panel { background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:12px; }
+
+  .row { display:flex; justify-content:center; align-items:center; margin-bottom:8px; gap:8px; flex-wrap:wrap; }
+
+  .timeline-wrap { overflow:auto; }
+  .timeline { display:flex; align-items:center; gap: 0; padding: 8px; justify-content: center; } /* spacing via ghost-gap only */
+  .card { width: calc(var(--card-w)*var(--card-scale)); height: calc(var(--card-w)*var(--card-scale)*1.5); background:#111; border:1px solid rgba(255,255,255,.15); border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(0,0,0,.25); position: relative; }
+  .card .year-vert { transform: rotate(90deg); transform-origin:center; font-weight:600; letter-spacing:.35px; font-size: calc(var(--card-w)*var(--card-scale) * 0.58); line-height: 1; white-space: nowrap; }
+
+  /* Tentative per-team colors */
+  .tentative.t1 { background: #2d2200; border-color: var(--team1); }
+  .tentative.t2 { background: #001f33; border-color: var(--team2); }
+  .tentative.t3 { background: #2a0a0e; border-color: var(--team3); }
+  .tentative { cursor: grab; }
+  .tentative.dragging { cursor: grabbing; }
+
+  /* Gaps: base spacing via width; active gap expands to card width */
+  .ghost-gap { width: var(--gap); height: calc(var(--card-w)*var(--card-scale)*1.5); display:flex; align-items:center; justify-content:center; position:relative; transition: width .12s ease; flex: 0 0 auto; }
+  .ghost-gap.active { width: calc(var(--card-w)*var(--card-scale)); }
+
+  .mini .timeline { transform: scale(.3); transform-origin: center top; justify-content: center; }
+  .mini { height: calc((var(--card-w)*var(--card-scale)*1.5) * .3 + 24px); overflow:hidden; }
+
+  .name-row { display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; }
+  .name-row .active-name { font-weight:700; }
+
+  /* Instant drag on mobile */
+  .draggable { touch-action: none; user-select: none; -webkit-user-select: none; }
+  .no-select { user-select: none; -webkit-user-select: none; }
+</style>
+</head>
+<body>
+<div id="app" class="no-select">
+  <div class="topbar">
+    <div class="badge"><strong>PROTOTYP v0.610</strong></div>
+  </div>
+
+  <!-- Centered team list with tokens -->
+  <div id="teamsStrip" class="teams-strip"></div>
+
+  <!-- Active team name centered; host-only "Byt låt" sits here -->
+  <div class="name-row">
+    <span id="activeTeamName" class="active-name">Lag 1 (4)</span>
+    <button id="btnReroll" title="Byt låt (−1 token)">Byt låt (−1)</button>
+  </div>
+
+  <div class="stage">
+    <!-- Host-only controls (placed centered) -->
+    <div class="controls" id="hostControls">
+      <button id="btnNext">Nästa låt</button>
+      <button id="btnReveal" disabled>Reveal</button>
+      <button id="btnNextTurn" disabled>Nästa tur</button>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div id="oppPrompt" style="display:none; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span>Opponera?</span>
+          <div id="oppButtons" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+          <button id="btnOppNo">Ingen</button>
+          <span id="promptTimer" style="font-variant-numeric: tabular-nums;"></span>
+        </div>
+        <div id="oppDnD" style="display:none; gap:8px; align-items:center; flex-wrap:wrap;">
+          <span>Opposition DnD</span>
+          <button id="btnOppLock">Lås opponering</button>
+          <span id="oppTimer" style="font-variant-numeric: tabular-nums;"></span>
+        </div>
+      </div>
+
+      <!-- Centered, prominent Lock button above timeline -->
+      <div class="controls">
+        <button id="btnLock" disabled style="min-width: 160px;">Lås in</button>
+      </div>
+
+      <div class="timeline-wrap">
+        <div class="timeline" id="activeTimeline"></div>
+      </div>
+
+      <!-- Drag handle (token) -->
+      <div class="controls">
+        <div id="songCard" class="chip draggable" aria-label="Dra för att lägga kort">
+          <span>🎵 Dra för att lägga kort</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel mini">
+      <div class="row"><strong>Min tidslinje (nästa lag)</strong></div>
+      <div class="timeline-wrap">
+        <div class="timeline" id="miniTimeline"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const hostMode = true; // toggle to false to simulate player view
+
+  const $ = (id) => document.getElementById(id);
+  const MOCK_MIN_YEAR = 1955, MOCK_MAX_YEAR = 2023;
+  const randInt = (a,b)=> a + Math.floor(Math.random()*(b-a+1));
+
+  const teams = [
+    { id:1, name:'Lag 1', color:'var(--team1)', tokens:4, years:[] },
+    { id:2, name:'Lag 2', color:'var(--team2)', tokens:4, years:[] },
+    { id:3, name:'Lag 3', color:'var(--team3)', tokens:4, years:[] },
+  ];
+  let activeIdx = 0, startYear = null, gameOver = false;
+  let phase = 'idle'; // listening|locked|prompt|opposition|reveal|resolve|gameover
+  let placedSlotIndex = null, opponentTeamIdx = null, opponentSlotIndex = null;
+  let dragging = false, currentHoverIndex = null, currentTrackYear = null;
+  let dragSource = null; // 'palette' | 'activeTent' | 'oppTent'
+  let activePointerId = null;
+
+  const activeTimeline = $('activeTimeline'), miniTimeline = $('miniTimeline');
+  const songCard = $('songCard'), oppPrompt = $('oppPrompt'), oppDnD = $('oppDnD');
+  const promptTimerEl = $('promptTimer'), oppTimerEl = $('oppTimer');
+  const oppButtons = $('oppButtons'), activeTeamName = $('activeTeamName');
+  const btnNext = $('btnNext'), btnReroll = $('btnReroll'), btnLock = $('btnLock');
+  const btnReveal = $('btnReveal'), btnNextTurn = $('btnNextTurn');
+  const btnOppNo = $('btnOppNo'), btnOppLock = $('btnOppLock');
+  const teamsStrip = $('teamsStrip');
+  const otherIdxs = ()=> teams.map((_,i)=>i).filter(i => i!==activeIdx);
+  const yearsFor = (idx)=> teams[idx].years.slice().sort((a,b)=>a-b);
+  const nextIdx = (i)=> (i+1) % teams.length;
+  const teamColorClass = (idx)=> idx===0?'t1': idx===1?'t2':'t3';
+
+  // Host-only visibility
+  $('hostControls').style.display = hostMode ? 'flex' : 'none';
+  btnReroll.style.display = hostMode ? 'inline-flex' : 'none';
+  btnReveal.style.display = hostMode ? 'inline-flex' : 'none';
+  btnNextTurn.style.display = hostMode ? 'inline-flex' : 'none';
+
+  function renderTeamsStrip(){
+    teamsStrip.innerHTML='';
+    teams.forEach((t, i)=>{
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const dot = document.createElement('span');
+      dot.className = 'dot ' + (i===0?'t1':i===1?'t2':'t3');
+      const label = document.createElement('span');
+      label.textContent = `${t.name} (${t.tokens})`;
+      chip.appendChild(dot); chip.appendChild(label);
+      teamsStrip.appendChild(chip);
+    });
+  }
+
+  function makeCard(val, classes=''){
+    const d = document.createElement('div');
+    d.className = 'card ' + classes;
+    const lab = document.createElement('div');
+    lab.className = 'year-vert';
+    lab.textContent = val;
+    d.appendChild(lab);
+    return d;
+  }
+
+  function makeTentativeCard(teamIdx, who){
+    const c = makeCard('?', 'tentative ' + teamColorClass(teamIdx) + ' draggable');
+    c.addEventListener('pointerdown', (e)=>{
+      if (gameOver) return;
+      if (who==='active' && phase!=='listening') return;
+      if (who==='opponent' && phase!=='opposition') return;
+      startPointerDrag(e, (who==='active') ? 'activeTent' : 'oppTent');
+      c.classList.add('dragging');
+    });
+    return c;
+  }
+
+  function makeGap(i, showActive, showOpp, hoverIdx){
+    const g = document.createElement('div');
+    g.className = 'ghost-gap';
+    g.dataset.slotIndex = i;
+    if (i === hoverIdx || i === showActive || i === showOpp) g.classList.add('active');
+
+    if (showActive !== null && i === showActive){
+      g.appendChild(makeTentativeCard(activeIdx, 'active'));
+    }
+    if (showOpp !== null && i === showOpp){
+      const c = makeTentativeCard(opponentTeamIdx, 'opponent');
+      if (showActive === showOpp){ c.style.position = 'absolute'; c.style.transform = 'translateY(8px)'; g.style.position = 'relative'; }
+      g.appendChild(c);
+    }
+    return g;
+  }
+
+  function insertSorted(arr, x){
+    const out = arr.slice();
+    let pos = out.findIndex(v => x <= v);
+    if (pos === -1) out.push(x); else out.splice(pos, 0, x);
+    return out;
+  }
+
+  function renderTimeline(container, years, inOpposition){
+    container.innerHTML = '';
+    const ys = years.slice().sort((a,b)=>a-b);
+    const ordered = insertSorted(ys, startYear);
+    for (let i=0;i<=ordered.length;i++){
+      const g = makeGap(i, placedSlotIndex, inOpposition ? opponentSlotIndex : null, dragging ? currentHoverIndex : null);
+      container.appendChild(g);
+      if (i < ordered.length) container.appendChild(makeCard(String(ordered[i])));
+    }
+  }
+
+  function computeCardLayout(){
+    const wrap = activeTimeline.closest('.timeline-wrap');
+    if (!wrap) return;
+    const w = wrap.clientWidth || window.innerWidth;
+    const padding = 24;
+    const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-scale')) || 0.56;
+    const maxBase = 140, minBase = 56;
+    let bestBase = 96, bestGap = 10;
+    for (let base = maxBase; base >= minBase; base -= 1) {
+      const cw = base * scale;
+      const gap = Math.max(6, Math.round(cw * 0.12));
+      const total = 10*cw + 11*gap;
+      if (total <= (w - padding)) { bestBase = base; bestGap = gap; break; }
+    }
+    document.documentElement.style.setProperty('--card-w', bestBase + 'px');
+    document.documentElement.style.setProperty('--gap', bestGap + 'px');
+  }
+
+  function renderAll(){
+    computeCardLayout();
+    renderTeamsStrip();
+    renderTimeline(activeTimeline, yearsFor(activeIdx), phase==='opposition');
+    renderTimeline(miniTimeline, yearsFor(nextIdx(activeIdx)), false);
+    const t = teams[activeIdx];
+    activeTeamName.textContent = `${t.name} (${t.tokens})`;
+    updateControls();
+  }
+
+  function updateControls(){
+    $('btnLock').disabled    = (placedSlotIndex===null || phase!=='listening' || gameOver);
+    if (hostMode){
+      $('btnReveal').disabled  = !(['prompt','opposition','locked'].includes(phase)) || gameOver;
+      $('btnNextTurn').disabled= (phase!=='resolve') || gameOver;
+      $('btnReroll').disabled  = (phase!=='listening' || teams[activeIdx].tokens<=0 || gameOver);
+      $('btnNext').disabled    = gameOver;
+    }
+  }
+
+  // Flow
+  function startRound(){
+    if (gameOver) return;
+    if (startYear === null){ startYear = randInt(MOCK_MIN_YEAR, MOCK_MAX_YEAR); }
+    phase='listening'; placedSlotIndex=null; opponentTeamIdx=null; opponentSlotIndex=null;
+    currentHoverIndex=null; currentTrackYear = mockRandomYear();
+    oppPrompt.style.display='none'; oppDnD.style.display='none';
+    renderAll();
+  }
+
+  function doReroll(){
+    const t = teams[activeIdx]; if (t.tokens<=0 || gameOver) return;
+    t.tokens--; currentTrackYear = mockRandomYear(); renderAll();
+  }
+
+  function lockPlacement(){
+    if (placedSlotIndex===null || gameOver) return;
+    phase='locked'; renderAll(); startPromptCountdown();
+  }
+
+  let promptTimer=null, promptRemaining=0;
+  function startPromptCountdown(){
+    promptRemaining=10; // 10s window
+    oppPrompt.style.display='flex'; promptTimerEl.textContent=` ${promptRemaining}s`;
+    clearInterval(promptTimer);
+    promptTimer = setInterval(()=>{
+      promptRemaining--; promptTimerEl.textContent=` ${promptRemaining}s`;
+      if (promptRemaining<=0){ clearInterval(promptTimer); beginOpposition(null); }
+    },1000);
+    oppButtons.innerHTML='';
+    otherIdxs().forEach(i => {
+      const b = document.createElement('button');
+      b.textContent = `${teams[i].name} (−1)`;
+      if (!hostMode) b.style.display='none'; // demo for host
+      b.onclick = ()=> beginOpposition(i);
+      if (teams[i].tokens <= 0) { b.disabled = true; b.style.opacity = .5; }
+      oppButtons.appendChild(b);
+    });
+  }
+
+  function beginOpposition(yesTeamIdx){
+    oppPrompt.style.display='none'; clearInterval(promptTimer);
+    if (yesTeamIdx===null){ phase='prompt'; doReveal(); return; }
+    if (teams[yesTeamIdx].tokens <= 0){ phase='prompt'; doReveal(); return; }
+    teams[yesTeamIdx].tokens--;
+    opponentTeamIdx = yesTeamIdx;
+    opponentSlotIndex = null;
+    phase='opposition';
+    startOppCountdown();
+    oppDnD.style.display='flex';
+    renderAll();
+  }
+
+  let oppTimer=null, oppRemaining=0;
+  function startOppCountdown(){
+    oppRemaining=30; oppTimerEl.textContent=` ${oppRemaining}s`;
+    clearInterval(oppTimer);
+    oppTimer = setInterval(()=>{
+      oppRemaining--; oppTimerEl.textContent=` ${oppRemaining}s`;
+      if (oppRemaining<=0){ clearInterval(oppTimer); doReveal(); }
+    },1000);
+  }
+
+  function doReveal(){
+    if (gameOver) return;
+    phase='reveal'; oppDnD.style.display='none';
+
+    const ordered = insertSorted(yearsFor(activeIdx), startYear);
+    const actOK = isCorrectSlotAgainstOrdered(ordered, placedSlotIndex, currentTrackYear);
+    const oppOK = (opponentTeamIdx!==null) ? isCorrectSlotAgainstOrdered(ordered, opponentSlotIndex, currentTrackYear) : false;
+
+    if (actOK){
+      commitToTimeline(activeIdx, currentTrackYear);
+    } else if (opponentTeamIdx!==null && oppOK){
+      commitToTimeline(opponentTeamIdx, currentTrackYear);
+    }
+
+    placedSlotIndex = null; opponentSlotIndex = null; opponentTeamIdx = null;
+
+    if (teams[activeIdx].years.length >= 11){
+      phase='gameover'; gameOver=true; alert(`${teams[activeIdx].name} når 11!`);
+    } else {
+      const win = teams.find(t => t.years.length >= 11);
+      if (win){ phase='gameover'; gameOver=true; alert(`${win.name} når 11!`); }
+      else { phase='resolve'; }
+    }
+    renderAll();
+  }
+
+  function nextTurn(){
+    if (gameOver) return;
+    if (teams.some(t => t.years.length >= 11)){ phase='gameover'; gameOver=true; renderAll(); return; }
+    activeIdx = (activeIdx + 1) % teams.length; startRound();
+  }
+
+  function commitToTimeline(teamIdx, year){
+    const t = teams[teamIdx];
+    if (t.years.length >= 11) return;
+    t.years.push(year); t.years.sort((a,b)=>a-b);
+  }
+
+  // ---------- Pointer-based DnD ----------
+  songCard.addEventListener('pointerdown', (e)=>{
+    if (!(phase==='listening' || phase==='opposition') || gameOver) return;
+    if (phase==='listening' && placedSlotIndex!==null) return;
+    if (phase==='opposition' && opponentSlotIndex!==null) return;
+    startPointerDrag(e, 'palette');
+  });
+
+  function startPointerDrag(e, source){
+    dragging = true;
+    dragSource = source;
+    activePointerId = e.pointerId;
+    try { e.target.setPointerCapture && e.target.setPointerCapture(activePointerId); } catch(_){}
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp, { once: true });
+    window.addEventListener('pointercancel', onPointerCancel, { once: true });
+    onPointerMove(e); // compute initial hover
+  }
+
+  function onPointerMove(e){
+    if (!dragging || e.pointerId !== activePointerId) return;
+    const x = e.clientX;
+    const idx = nearestIndexByMidpoint(x);
+    if (idx!==null){ currentHoverIndex = idx; renderAll(); }
+  }
+
+  function onPointerUp(e){
+    if (!dragging || e.pointerId !== activePointerId) return;
+    finishPointerDrag();
+  }
+
+  function onPointerCancel(_e){
+    if (!dragging) return;
+    finishPointerDrag(true);
+  }
+
+  function finishPointerDrag(cancelled=false){
+    if (!cancelled){
+      if (dragSource==='palette'){
+        if (phase==='listening') placedSlotIndex = currentHoverIndex;
+        else if (phase==='opposition') opponentSlotIndex = currentHoverIndex;
+      } else if (dragSource==='activeTent'){
+        placedSlotIndex = currentHoverIndex;
+      } else if (dragSource==='oppTent'){
+        opponentSlotIndex = currentHoverIndex;
+      }
+    }
+    dragging=false; dragSource=null; activePointerId=null;
+    renderAll();
+    window.removeEventListener('pointermove', onPointerMove);
+  }
+
+  // Make tentative "?" draggable
+  function enableTentativeDrag(){
+    // Handled inside makeTentativeCard via pointerdown
+  }
+
+  activeTimeline.addEventListener('pointermove', (e)=>{
+    if (!dragging) return;
+    onPointerMove(e);
+  });
+
+  function nearestIndexByMidpoint(x){
+    const gaps = activeTimeline.querySelectorAll('.ghost-gap');
+    let bestIdx=null, bestDist=Infinity;
+    gaps.forEach((g, i)=>{
+      const r = g.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+      const d = Math.abs(x - cx);
+      if (d < bestDist){ bestDist = d; bestIdx = i; }
+    });
+    return bestIdx;
+  }
+
+  // Wire buttons
+  btnNext.addEventListener('click', startRound);
+  btnReroll.addEventListener('click', doReroll);
+  btnLock.addEventListener('click', lockPlacement);
+  btnReveal.addEventListener('click', doReveal);
+  btnNextTurn.addEventListener('click', nextTurn);
+  btnOppNo.addEventListener('click', ()=> beginOpposition(null));
+  btnOppLock.addEventListener('click', ()=> {
+    if (phase==='opposition' && opponentTeamIdx!==null && opponentSlotIndex!==null) doReveal();
+  });
+
+  // Helpers
+  function isCorrectSlotAgainstOrdered(ordered, slotIndex, Y){
+    if (slotIndex===null || slotIndex===undefined) return false;
+    if (ordered.length===0) return true;
+    if (slotIndex===0) return Y <= ordered[0];
+    if (slotIndex===ordered.length) return Y >= ordered[ordered.length-1];
+    const L = ordered[slotIndex-1], R = ordered[slotIndex];
+    return (L <= Y && Y <= R);
+  }
+  function mockRandomYear(){ return randInt(1955, 2023); }
+
+  // Init
+  window.addEventListener('resize', computeCardLayout);
+  window.addEventListener('orientationchange', computeCardLayout);
+  computeCardLayout();
+  startRound();
+})();
+</script>
+</body>
+</html>
