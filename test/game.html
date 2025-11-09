@@ -843,31 +843,22 @@
         placementPosition = position;
       }
       
-      // Insert at correct position
+      // Insert at correct position based on index
+      // Position from Firebase should correspond to index in DOM
       if (position === 0 || cards.length === 0) {
         container.insertBefore(previewCard, container.firstChild);
       } else if (position >= cards.length) {
         container.appendChild(previewCard);
       } else {
-        // Find card at placementPosition and insert before it
-        let insertBeforeCard = null;
-        cards.forEach(card => {
-          const pos = parseInt(card.dataset.position);
-          if (pos >= position && !insertBeforeCard) {
-            insertBeforeCard = card;
-          }
-        });
-        
-        if (insertBeforeCard) {
-          container.insertBefore(previewCard, insertBeforeCard);
-        } else {
-          container.appendChild(previewCard);
-        }
+        // Insert before the card at this index
+        const insertBeforeCard = cards[position];
+        container.insertBefore(previewCard, insertBeforeCard);
       }
     }
     
     function getDropPositionFromCoords(x, y) {
       // Find which position in timeline based on x coordinate
+      // Position is based on actual index in DOM, not dataset.position
       const timeline = document.getElementById('timeline');
       const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
       
@@ -882,34 +873,32 @@
         return 0;
       }
       
-      // Check between cards and after last card
-      for (let i = 0; i < cards.length; i++) {
-        const card = cards[i];
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const cardPos = parseInt(card.dataset.position);
+      // Check if after last card
+      const lastCard = cards[cards.length - 1];
+      const lastRect = lastCard.getBoundingClientRect();
+      if (x > lastRect.right - lastRect.width / 2) {
+        return cards.length;
+      }
+      
+      // Check between cards
+      for (let i = 0; i < cards.length - 1; i++) {
+        const currentCard = cards[i];
+        const nextCard = cards[i + 1];
         
-        if (i === cards.length - 1) {
-          // Last card - check if after it
-          if (x > rect.right - rect.width / 2) {
-            return cardPos + 1;
-          }
-        } else {
-          // Check if before next card
-          const nextCard = cards[i + 1];
-          const nextRect = nextCard.getBoundingClientRect();
-          const nextCenter = nextRect.left + nextRect.width / 2;
-          
-          if (x >= cardCenter && x < nextCenter) {
-            return cardPos + 1;
-          }
+        const currentRect = currentCard.getBoundingClientRect();
+        const nextRect = nextCard.getBoundingClientRect();
+        
+        const currentCenter = currentRect.left + currentRect.width / 2;
+        const nextCenter = nextRect.left + nextRect.width / 2;
+        
+        // If x is between current card center and next card center
+        if (x >= currentCenter && x < nextCenter) {
+          return i + 1;
         }
       }
       
       // Default to after last card
-      const lastCard = cards[cards.length - 1];
-      const lastPos = parseInt(lastCard.dataset.position);
-      return lastPos + 1;
+      return cards.length;
     }
     
     function showDynamicDropIndicator(x, y) {
@@ -942,25 +931,17 @@
       `;
       indicator.textContent = '↓';
       
-      // Insert at position
+      // Insert at position based on actual index
       if (position === 0 || cards.length === 0) {
+        // Insert before first card
         timeline.insertBefore(indicator, timeline.firstChild);
       } else if (position >= cards.length) {
+        // Insert after last card
         timeline.appendChild(indicator);
       } else {
-        let insertBeforeCard = null;
-        cards.forEach(card => {
-          const pos = parseInt(card.dataset.position);
-          if (pos >= position && !insertBeforeCard) {
-            insertBeforeCard = card;
-          }
-        });
-        
-        if (insertBeforeCard) {
-          timeline.insertBefore(indicator, insertBeforeCard);
-        } else {
-          timeline.appendChild(indicator);
-        }
+        // Insert before the card at this index
+        const insertBeforeCard = cards[position];
+        timeline.insertBefore(indicator, insertBeforeCard);
       }
       
       return position;
