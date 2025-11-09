@@ -917,10 +917,23 @@
             console.log('[Lobby] Starting team:', startingTeamId);
             
             // Get timer settings from settings or use defaults
-            const guessingTime = (settings.timers && settings.timers.guess) || 90;
-            const betweenSongsTime = (settings.timers && settings.timers.pauseBetweenSongs) || 10;
+            console.log('[Lobby] Full settings object:', settings);
+            console.log('[Lobby] settings.timers:', settings ? settings.timers : 'settings is null/undefined');
             
-            console.log('[Lobby] Timer settings:', { guessingTime, betweenSongsTime });
+            const guessingTime = (settings && settings.timers && settings.timers.guess) 
+              ? parseInt(settings.timers.guess) 
+              : 90;
+            const betweenSongsTime = (settings && settings.timers && settings.timers.pauseBetweenSongs) 
+              ? parseInt(settings.timers.pauseBetweenSongs) 
+              : 10;
+            
+            console.log('[Lobby] Timer settings extracted:', { 
+              guessingTime, 
+              betweenSongsTime,
+              fromSettings: !!(settings && settings.timers),
+              rawGuess: settings && settings.timers ? settings.timers.guess : 'N/A',
+              rawPause: settings && settings.timers ? settings.timers.pauseBetweenSongs : 'N/A'
+            });
             
             // Update game data
             const updates = {
