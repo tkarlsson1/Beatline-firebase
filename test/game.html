@@ -1377,14 +1377,9 @@
     }
     
     // ============================================
-    // DEBUG FUNCTIONS (HOST ONLY)
+    // GAME CONTROL FUNCTIONS
     // ============================================
     function nextTeam() {
-      if (!isHost) {
-        console.error('[Game] Only host can control game');
-        return;
-      }
-      
       console.log('[Game] Switching to next team...');
       
       // Get list of team IDs
