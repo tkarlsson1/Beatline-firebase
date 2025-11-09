@@ -53,6 +53,126 @@ let currentFilteredSongs = [];
 let shownSongs = [];
 let currentSong = null;
 
+// ============================================
+// CREATE LOBBY FUNCTION
+// ============================================
+window.createLobby = async function(teamName) {
+  console.log('[Firebase] Creating lobby with team name:', teamName);
+  
+  try {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      console.error('[Firebase] User not authenticated');
+      alert('Du måste vara inloggad för att skapa en lobby');
+      return;
+    }
+    
+    // Generate game ID and PIN
+    const gameId = generateGameId();
+    const pin = generatePIN();
+    
+    console.log('[Firebase] Generated game ID:', gameId);
+    console.log('[Firebase] Generated PIN:', pin);
+    
+    // Get selected playlists
+    const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
+    const selectedPlaylists = Array.from(checkedBoxes).map(cb => cb.value);
+    
+    // Filter out "alla" if present
+    const playlists = selectedPlaylists.filter(p => p !== 'alla');
+    
+    console.log('[Firebase] Selected playlists:', playlists);
+    
+    // Get year range
+    const startYear = parseInt(document.getElementById('startYear').value);
+    const endYear = parseInt(document.getElementById('endYear').value);
+    
+    console.log('[Firebase] Year range:', startYear, '-', endYear);
+    
+    // Validate
+    if (playlists.length === 0) {
+      alert('Välj minst en spellista!');
+      return;
+    }
+    
+    if (!startYear || !endYear || startYear > endYear) {
+      alert('Ogiltigt årsintervall!');
+      return;
+    }
+    
+    // Generate team ID for host
+    const hostTeamId = generateTeamId();
+    
+    // Get first available color (host gets first color)
+    const hostColor = TEAM_COLORS[0];
+    
+    console.log('[Firebase] Host team ID:', hostTeamId);
+    console.log('[Firebase] Host color:', hostColor.name);
+    
+    // Create game object
+    const gameData = {
+      host: auth.currentUser.uid,
+      status: 'lobby',
+      createdAt: Date.now(),
+      pin: pin,
+      
+      settings: {
+        playlists: playlists,
+        yearRange: {
+          min: startYear,
+          max: endYear
+        },
+        timers: {
+          guess: 90,
+          challenge: 10,
+          placeChallenge: 20,
+          pauseBetweenSongs: 10
+        }
+      },
+      
+      teams: {
+        [hostTeamId]: {
+          name: teamName,
+          host: true,
+          userId: auth.currentUser.uid,
+          tokens: 4,
+          score: 0,
+          timeline: {},
+          color: hostColor.name,
+          joinedAt: Date.now()
+        }
+      },
+      
+      // Songs will be shuffled when game starts (not now)
+      songs: null,
+      currentSong: null,
+      currentTeam: null,
+      currentRound: 0
+    };
+    
+    console.log('[Firebase] Creating game in database...');
+    
+    // Save to Firebase
+    const gameRef = ref(db, `games/${gameId}`);
+    await set(gameRef, gameData);
+    
+    console.log('[Firebase] ✅ Game created successfully!');
+    console.log('[Firebase] Game ID:', gameId);
+    console.log('[Firebase] PIN:', pin);
+    console.log('[Firebase] Host team:', teamName);
+    
+    // Redirect to lobby
+    const lobbyUrl = `lobby.html?gameId=${gameId}&host=true`;
+    console.log('[Firebase] Redirecting to:', lobbyUrl);
+    
+    window.location.href = lobbyUrl;
+    
+  } catch (error) {
+    console.error('[Firebase] Error creating lobby:', error);
+    alert('Något gick fel vid skapande av lobby: ' + error.message);
+  }
+};
+
 // ========== EDIT YEAR MODAL FUNCTIONS ==========
 function openEditYearModal(playlistName, spotifyID, currentYear) {
   window.currentPlaylistName = playlistName;
@@ -410,103 +530,77 @@ window.restart = function() {
 
 async function displaySong(song) {
   const displayYear = song.customYear ? song.customYear : song.year;
-
+  
   const standardListNames = (typeof standardSongs !== "undefined" && standardSongs.length)
     ? Array.from(new Set(standardSongs.map(s => s.source[0])))
     : [];
-
+  
   const isUserSong = !song.source.some(src => standardListNames.includes(src));
-
-  // Check if Spotify Web Playback is available
-  const hasSpotifyPlayer = window.spotifyPlayer && window.spotifyPlayer.getDeviceId();
-
-  console.log('🎵 displaySong() called');
-  console.log('  Song ID:', song.qr);
-  console.log('  Spotify Player available:', !!window.spotifyPlayer);
-  console.log('  Device ID:', hasSpotifyPlayer || 'not available');
-
+  
   const songDisplay = document.getElementById("song-display");
-
+  
+  // Check if Spotify player is available and ready
+  const hasSpotifyPlayer = window.spotifyPlayer && window.spotifyPlayer.getDeviceId();
+  
   if (hasSpotifyPlayer) {
-    // USE SPOTIFY WEB PLAYBACK
-    console.log('✅ Using Spotify Web Playback');
-
-    songDisplay.innerHTML = `
-      <div id="now-playing-indicator" style="
-        background: rgba(29, 185, 84, 0.1);
-        width: 60%;
-        color: white;
-        padding: 20px;
-        border-radius: 12px;
-        text-align: center;
-        margin: 0 auto 1.5rem auto;
-        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.2);
-        animation: pulse 2s ease-in-out infinite;
-      ">
-        <div style="font-size: 2.5rem; margin-bottom: 10px;">♪</div>
-        <div style="font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 10px rgba(0,0,0,0.8);">Nu spelar...</div>
-        <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; text-shadow: 0 0 8px rgba(0,0,0,0.8);">Lyssna på Spotify</div>
-      </div>
-      <style>
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.02); opacity: 0.95; }
-        }
-      </style>
-      <button class="answer-button" onclick="revealDetails()">Visa svar</button>
-      <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
-        <div class="year-container" style="text-align: center; width: 100%;">
-          <span style="display: inline-block; position: relative;">
-            <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
-              ${displayYear}
-            </span>
-            ${
-              isUserSong
-                ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
-                     onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
-                : ``
-            }
-          </span>
-        </div>
-        <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
-          ${song.artist}<br>${song.title}
-        </div>
-      </div>
-    `;
-
-    // Play the track via Spotify Web Playback SDK
+    // Try to play via Spotify
+    console.log('[Display] Attempting to play via Spotify:', song.qr);
+    
     try {
-      console.log('  Calling spotifyPlayer.play()...');
-      const success = await window.spotifyPlayer.play(song.qr);
-
-      if (success) {
-        console.log('  ✅ Playback started successfully');
+      const playSuccess = await window.spotifyPlayer.play(song.qr);
+      
+      if (playSuccess) {
+        // Successfully playing via Spotify
+        console.log('[Display] Playing via Spotify');
+        
+        songDisplay.innerHTML = `
+          <div style="background: rgba(27, 215, 96, 0.1); padding: 15px; border-radius: 8px; margin: 0 auto 1rem auto; width: 60%; text-align: center;">
+            <span style="color: #1DB954; font-size: 1.2rem;">♪ Nu spelar...</span>
+          </div>
+          <button class="answer-button" onclick="revealDetails()">Visa svar</button>
+          <div id="song-details" style="display: none; margin-top: 1rem; font-weight: bold;">
+            <div class="year-container" style="text-align: center; width: 100%;">
+              <span style="display: inline-block; position: relative;">
+                <span class="year-text" style="font-size: 4em; color: #fff; text-shadow: 0 0 8px #000;">
+                  ${displayYear}
+                </span>
+                ${
+                  isUserSong 
+                    ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
+                         onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
+                    : ``
+                }
+              </span>
+            </div>
+            <div class="info" style="font-size: 1.4em; color: #fff; text-shadow: 0 0 8px #000;">
+              ${song.artist}<br>${song.title}
+            </div>
+          </div>
+        `;
       } else {
-        console.error('  ❌ Playback failed, falling back to QR code');
-        // Fallback to QR code if playback fails
-        showQRCodeFallback(song, displayYear, isUserSong);
+        // Playback failed, show QR code
+        console.log('[Display] Spotify playback failed, showing QR code');
+        displaySongWithQR(song, displayYear, isUserSong);
       }
     } catch (error) {
-      console.error('  ❌ Error playing track:', error);
-      // Fallback to QR code on error
-      showQRCodeFallback(song, displayYear, isUserSong);
+      console.log('[Display] Error playing via Spotify, showing QR code:', error);
+      displaySongWithQR(song, displayYear, isUserSong);
     }
-
   } else {
-    // FALLBACK TO QR CODE
-    console.log('ℹ️ Using QR code fallback (Spotify player not available)');
-    showQRCodeFallback(song, displayYear, isUserSong);
+    // No Spotify player, show QR code
+    console.log('[Display] No Spotify player available, showing QR code');
+    displaySongWithQR(song, displayYear, isUserSong);
   }
-
+  
   let playlistInfoElement = document.getElementById("playlist-info");
   if (playlistInfoElement) {
     playlistInfoElement.innerText = "Spellistor: " + song.source.join(", ");
   }
 }
 
-// Helper function to show QR code fallback
-function showQRCodeFallback(song, displayYear, isUserSong) {
+function displaySongWithQR(song, displayYear, isUserSong) {
   const songDisplay = document.getElementById("song-display");
+  
   songDisplay.innerHTML = `
     <div id="qrcode-${song.qr}" class="qrcode"></div>
     <button class="answer-button" onclick="revealDetails()">Visa svar</button>
@@ -517,7 +611,7 @@ function showQRCodeFallback(song, displayYear, isUserSong) {
             ${displayYear}
           </span>
           ${
-            isUserSong
+            isUserSong 
               ? `<i class="edit-icon" style="position: absolute; right: -2em; top: 50%; transform: translateY(-50%) scale(1.5) scaleX(-1); color: #0a6e73; cursor: pointer;"
                    onclick="openEditYearModal('${song.source[0]}', '${song.qr}', '${displayYear}')">✎</i>`
               : ``
@@ -530,7 +624,6 @@ function showQRCodeFallback(song, displayYear, isUserSong) {
     </div>
   `;
   generateQRCode(song.qr);
-  console.log('  QR code generated for track:', song.qr);
 }
 
 window.generateQRCode = function(qr) {

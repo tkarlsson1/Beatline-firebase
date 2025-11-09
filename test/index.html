@@ -12,7 +12,7 @@
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
   <meta name="twitter:card" content="summary_large_image">
   
-  <title>NOTESTREAM v0.673</title>
+  <title>NOTESTREAM v0.676</title>
   
   <!-- Favicon and manifest -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -90,7 +90,7 @@
       </div>
       
       <p id="selectedSongCount" style="text-align:center; color:#fff; margin-top:0.5rem;">Valda låtar: 0</p>
-      <button id="startButton" onclick="applyFilter()" class="start-button">Starta spel</button>
+      <button id="createLobbyButton" class="start-button">Skapa lobby</button>
     </div>
     
     <!-- ============================================ -->
@@ -160,8 +160,36 @@
   </div>
 
   <!-- ============================================ -->
+  <!-- CREATE LOBBY MODAL -->
+  <!-- ============================================ -->
+  <div id="createLobbyModal" class="modal" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-content" style="background:#fff; padding:2rem; border-radius:8px; text-align:center; max-width:400px; width:90%;">
+      <span id="closeLobbyModal" class="close" style="color:#333;">&times;</span>
+      <h2 style="color:#333; margin-top:0;">Skapa lobby</h2>
+      <p style="color:#666; margin-bottom:1.5rem;">Välj ditt lagnamn för att skapa lobbyn</p>
+      <input 
+        type="text" 
+        id="hostTeamNameInput" 
+        placeholder="Skriv ditt lagnamn..." 
+        maxlength="20"
+        style="width:100%; padding:0.8rem; border:1px solid #ccc; border-radius:4px; font-size:1rem; margin-bottom:1rem; box-sizing:border-box;"
+      />
+      <p id="lobbyNameError" class="error" style="display:none; color:#EA4335; font-size:0.9rem; margin-bottom:1rem;">Lagnamn kan inte vara tomt</p>
+      <button 
+        id="confirmCreateLobby" 
+        style="width:100%; padding:0.8rem; background:#4285F4; color:white; border:none; border-radius:4px; font-size:1rem; font-weight:bold; cursor:pointer;"
+      >
+        Skapa lobby
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
   <!-- JAVASCRIPT FILES -->
   <!-- ============================================ -->
+  
+  <!-- Lobby Helper Functions -->
+  <script src="lobby.js"></script>
   
   <!-- Firebase (module) -->
   <script type="module" src="firebase-config.js"></script>
@@ -203,6 +231,106 @@
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
+  </script>
+
+  <!-- ============================================ -->
+  <!-- CREATE LOBBY BUTTON HANDLER -->
+  <!-- ============================================ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const createLobbyButton = document.getElementById('createLobbyButton');
+      const createLobbyModal = document.getElementById('createLobbyModal');
+      const closeLobbyModal = document.getElementById('closeLobbyModal');
+      const hostTeamNameInput = document.getElementById('hostTeamNameInput');
+      const confirmCreateLobby = document.getElementById('confirmCreateLobby');
+      const lobbyNameError = document.getElementById('lobbyNameError');
+
+      // Open modal when "Skapa lobby" button is clicked
+      createLobbyButton.addEventListener('click', () => {
+        console.log('[Index] Create lobby button clicked');
+        
+        // Validate that at least one playlist is selected (same validation as before)
+        const checkedBoxes = document.querySelectorAll('input[name="source"]:checked');
+        
+        if (checkedBoxes.length === 0) {
+          alert('Välj minst en spellista!');
+          return;
+        }
+        
+        // Validate that there are songs available
+        if (currentFilteredSongs.length === 0) {
+          alert('Inga låtar hittades i den valda perioden.');
+          return;
+        }
+        
+        // Open modal
+        createLobbyModal.style.display = 'flex';
+        hostTeamNameInput.value = '';
+        lobbyNameError.style.display = 'none';
+        hostTeamNameInput.focus();
+        
+        // Dispatch modal open event for accessibility
+        createLobbyModal.dispatchEvent(new CustomEvent('modal:open', {bubbles: true}));
+      });
+
+      // Close modal when X is clicked
+      closeLobbyModal.addEventListener('click', () => {
+        console.log('[Index] Closing lobby modal');
+        createLobbyModal.style.display = 'none';
+        createLobbyModal.dispatchEvent(new CustomEvent('modal:close', {bubbles: true}));
+      });
+
+      // Close modal when clicking outside
+      createLobbyModal.addEventListener('click', (e) => {
+        if (e.target === createLobbyModal) {
+          console.log('[Index] Closing lobby modal (clicked outside)');
+          createLobbyModal.style.display = 'none';
+          createLobbyModal.dispatchEvent(new CustomEvent('modal:close', {bubbles: true}));
+        }
+      });
+
+      // Handle Enter key in input
+      hostTeamNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          confirmCreateLobby.click();
+        }
+      });
+
+      // Confirm and create lobby
+      confirmCreateLobby.addEventListener('click', () => {
+        const teamName = hostTeamNameInput.value.trim();
+        
+        console.log('[Index] Confirm create lobby clicked, team name:', teamName);
+        
+        // Validate team name
+        if (!teamName || teamName.length === 0) {
+          lobbyNameError.textContent = 'Lagnamn kan inte vara tomt';
+          lobbyNameError.style.display = 'block';
+          return;
+        }
+        
+        if (teamName.length > 20) {
+          lobbyNameError.textContent = 'Lagnamn max 20 tecken';
+          lobbyNameError.style.display = 'block';
+          return;
+        }
+        
+        // Hide error
+        lobbyNameError.style.display = 'none';
+        
+        // Close modal
+        createLobbyModal.style.display = 'none';
+        
+        // Call createLobby function (will be defined in firebase-config.js)
+        if (typeof window.createLobby === 'function') {
+          console.log('[Index] Calling createLobby with team name:', teamName);
+          window.createLobby(teamName);
+        } else {
+          console.error('[Index] createLobby function not found!');
+          alert('Något gick fel. Ladda om sidan och försök igen.');
+        }
+      });
+    });
   </script>
 
 </body>
