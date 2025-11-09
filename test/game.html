@@ -599,6 +599,7 @@
     let timerInterval = null;
     let lastVibrateSecond = null;
     let hasStartedInitialTimer = false; // Track if Timer 4 has started at game start
+    let hasInitializedScores = false; // Track if scores have been initialized based on revealed cards
     
     // ============================================
     // INITIALIZATION
@@ -742,6 +743,42 @@
       
       // Update round counter
       document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
+      
+      // Initialize scores based on revealed cards (only once at game start)
+      if (!hasInitializedScores && currentGameData.status === 'playing' && isHost) {
+        hasInitializedScores = true;
+        console.log('[Game] Initializing scores based on revealed cards');
+        
+        // Update each team's score based on their revealed cards
+        const scoreUpdates = {};
+        Object.entries(currentTeams).forEach(([teamKey, team]) => {
+          if (team.timeline) {
+            let revealedCount = 0;
+            Object.values(team.timeline).forEach(card => {
+              if (card && card.revealed) {
+                revealedCount++;
+              }
+            });
+            
+            // Only update if score is not set or is 0 but should be higher
+            if (revealedCount > 0 && (!team.score || team.score === 0)) {
+              scoreUpdates[`games/${gameId}/teams/${teamKey}/score`] = revealedCount;
+              console.log('[Game] Setting initial score for', team.name, 'to', revealedCount);
+            }
+          }
+        });
+        
+        // Apply score updates if any
+        if (Object.keys(scoreUpdates).length > 0) {
+          window.firebaseUpdate(window.firebaseRef(window.firebaseDb), scoreUpdates)
+            .then(() => {
+              console.log('[Game] Initial scores set');
+            })
+            .catch((error) => {
+              console.error('[Game] Error setting initial scores:', error);
+            });
+        }
+      }
       
       // Update pause/resume button visibility (host only)
       if (isHost) {
@@ -1533,10 +1570,20 @@
       console.log('[Game] ========== VALIDATION START ==========');
       console.log('[Game] Validating card:', cardKey, card);
       
-      // Stop timer (only host updates Firebase)
-      if (isHost) {
-        stopTimer();
-      }
+      // Stop timer immediately by clearing Firebase (anyone can do this during validation)
+      const timerUpdates = {};
+      timerUpdates[`games/${gameId}/timerState`] = null;
+      timerUpdates[`games/${gameId}/timerStartTime`] = null;
+      timerUpdates[`games/${gameId}/timerDuration`] = null;
+      timerUpdates[`games/${gameId}/nextTeam`] = null;
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), timerUpdates)
+        .then(() => {
+          console.log('[Game] Timer stopped for validation');
+        })
+        .catch((error) => {
+          console.error('[Game] Error stopping timer:', error);
+        });
       
       // Get fresh data from Firebase using get() instead of onValue
       const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${teamId}`);
