@@ -209,3 +209,52 @@ exports.hostStart = functions.region("europe-west1").https.onCall(async (data, c
     startYears,
   };
 });
+
+/**
+ * Scheduled: cleanupOldGames
+ * Runs every 6 hours to delete games older than 6 hours
+ */
+exports.cleanupOldGames = functions.region("europe-west1").pubsub
+  .schedule('every 6 hours')
+  .timeZone('Europe/Stockholm')
+  .onRun(async (context) => {
+    functions.logger.info('[Cleanup] Starting cleanup of old games...');
+    
+    const gamesRef = db.ref('games');
+    
+    // Hämta alla spel
+    const snapshot = await gamesRef.once('value');
+    const games = snapshot.val();
+    
+    if (!games) {
+      functions.logger.info('[Cleanup] No games found');
+      return null;
+    }
+    
+    // Hitta spel äldre än 6 timmar
+    const sixHoursAgo = Date.now() - (6 * 60 * 60 * 1000);
+    const updates = {};
+    let count = 0;
+    
+    Object.keys(games).forEach(gameId => {
+      const game = games[gameId];
+      
+      // Kolla om spelet har createdAt och är äldre än 6h
+      if (game.createdAt && game.createdAt < sixHoursAgo) {
+        updates[`games/${gameId}`] = null;
+        count++;
+        const ageHours = Math.round((Date.now() - game.createdAt) / 3600000);
+        functions.logger.info(`[Cleanup] Marking game ${gameId} for deletion (age: ${ageHours}h)`);
+      }
+    });
+    
+    // Radera gamla spel
+    if (count > 0) {
+      await db.ref().update(updates);
+      functions.logger.info(`[Cleanup] Successfully deleted ${count} old games`);
+    } else {
+      functions.logger.info('[Cleanup] No old games to delete');
+    }
+    
+    return null;
+  });
