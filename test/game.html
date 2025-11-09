@@ -768,9 +768,9 @@
         container.appendChild(cardElement);
       });
       
-      // Add preview card if placement position is set
-      if (placementPosition !== null && currentTeamId === teamId) {
-        addPreviewCard();
+      // Add preview card if team has pending card in Firebase
+      if (displayTeam.pendingCard) {
+        addPreviewCardFromFirebase(displayTeam.pendingCard, currentTeamId === teamId);
       }
     }
     
@@ -800,8 +800,8 @@
       return cardDiv;
     }
     
-    function addPreviewCard() {
-      // Add preview of placed card at the placement position
+    function addPreviewCardFromFirebase(pendingCard, isMyCard) {
+      // Add preview of placed card at the placement position from Firebase
       const container = document.getElementById('timeline');
       const cards = container.querySelectorAll('.card:not(.preview-card)');
       
@@ -811,34 +811,44 @@
         existingPreview.remove();
       }
       
+      const position = pendingCard.position;
+      
       // Create preview card
       const previewCard = document.createElement('div');
       previewCard.className = 'card blank-card preview-card';
-      previewCard.draggable = true;
       previewCard.innerHTML = `
         <div class="card-blank-text">?</div>
-        <div class="card-info">Ditt kort<br>(Dra för att flytta)</div>
+        <div class="card-info">${isMyCard ? 'Ditt kort<br>(Dra för att flytta)' : 'Väntar...'}</div>
       `;
       previewCard.style.border = '3px solid #4CAF50';
       
-      // Make preview draggable
-      previewCard.addEventListener('dragstart', handlePreviewDragStart);
-      previewCard.addEventListener('dragend', handleDragEnd);
-      previewCard.addEventListener('touchstart', handlePreviewTouchStart);
-      previewCard.addEventListener('touchmove', handleTouchMove);
-      previewCard.addEventListener('touchend', handleTouchEnd);
+      // Make preview draggable only if it's my card
+      if (isMyCard) {
+        previewCard.draggable = true;
+        previewCard.addEventListener('dragstart', handlePreviewDragStart);
+        previewCard.addEventListener('dragend', handleDragEnd);
+        previewCard.addEventListener('touchstart', handlePreviewTouchStart);
+        previewCard.addEventListener('touchmove', handleTouchMove);
+        previewCard.addEventListener('touchend', handleTouchEnd);
+        previewCard.style.cursor = 'move';
+      }
+      
+      // Update local placementPosition to match Firebase (for lock in button)
+      if (isMyCard) {
+        placementPosition = position;
+      }
       
       // Insert at correct position
-      if (placementPosition === 0 || cards.length === 0) {
+      if (position === 0 || cards.length === 0) {
         container.insertBefore(previewCard, container.firstChild);
-      } else if (placementPosition >= cards.length) {
+      } else if (position >= cards.length) {
         container.appendChild(previewCard);
       } else {
         // Find card at placementPosition and insert before it
         let insertBeforeCard = null;
         cards.forEach(card => {
           const pos = parseInt(card.dataset.position);
-          if (pos >= placementPosition && !insertBeforeCard) {
+          if (pos >= position && !insertBeforeCard) {
             insertBeforeCard = card;
           }
         });
@@ -1092,7 +1102,9 @@
       
       placementPosition = position;
       clearDynamicDropIndicator();
-      updateGameView(); // Re-render to show preview card
+      
+      // Save preview card to Firebase so all players can see it
+      savePendingCard(position);
       
       showNotification(`Kort placerat vid position ${position}`, 'success');
     }
@@ -1140,8 +1152,8 @@
       isDragging = true;
       draggedCard = e.currentTarget;
       
-      // Store current placement position before clearing
-      const previousPlacement = placementPosition;
+      // Clear pending card from Firebase when starting to drag
+      clearPendingCard();
       placementPosition = null;
       
       const touch = e.touches[0];
@@ -1224,10 +1236,54 @@
       
       isDragging = false;
       
-      updateGameView(); // Re-render to show preview card at new position
+      // Save preview card to Firebase so all players can see it
+      savePendingCard(position);
+      
       showNotification(`Kort placerat vid position ${position}`, 'success');
       
       e.preventDefault();
+    }
+    
+    // ============================================
+    // PENDING CARD (PREVIEW) MANAGEMENT
+    // ============================================
+    function savePendingCard(position) {
+      console.log('[Game] Saving pending card to Firebase at position:', position);
+      
+      const pendingCardRef = window.firebaseRef(
+        window.firebaseDb, 
+        `games/${gameId}/teams/${teamId}/pendingCard`
+      );
+      
+      const pendingCard = {
+        position: position,
+        timestamp: Date.now()
+      };
+      
+      window.firebaseSet(pendingCardRef, pendingCard)
+        .then(() => {
+          console.log('[Game] Pending card saved');
+        })
+        .catch((error) => {
+          console.error('[Game] Error saving pending card:', error);
+        });
+    }
+    
+    function clearPendingCard() {
+      console.log('[Game] Clearing pending card from Firebase');
+      
+      const pendingCardRef = window.firebaseRef(
+        window.firebaseDb, 
+        `games/${gameId}/teams/${teamId}/pendingCard`
+      );
+      
+      window.firebaseSet(pendingCardRef, null)
+        .then(() => {
+          console.log('[Game] Pending card cleared');
+        })
+        .catch((error) => {
+          console.error('[Game] Error clearing pending card:', error);
+        });
     }
     
     // ============================================
@@ -1298,6 +1354,9 @@
       // Add new card
       updates[`games/${gameId}/teams/${teamId}/timeline/${newCardKey}`] = newCard;
       
+      // Clear pending card from Firebase
+      updates[`games/${gameId}/teams/${teamId}/pendingCard`] = null;
+      
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
         .then(() => {
           console.log('[Game] Card locked in to timeline');
@@ -1305,12 +1364,10 @@
           placementPosition = null;
           
           // TODO: Trigger next phase (challenge window, scoring, etc.)
-          // For now, just move to next team
-          if (isHost) {
-            setTimeout(() => {
-              nextTeam();
-            }, 2000);
-          }
+          // For now, just move to next team (everyone can trigger this)
+          setTimeout(() => {
+            nextTeam();
+          }, 2000);
         })
         .catch((error) => {
           console.error('[Game] Error adding card:', error);
