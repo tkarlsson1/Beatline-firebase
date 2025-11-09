@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#032934">
+  
+  <title>Notestream - Lobby</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  
+  <style>
+    /* Lobby-specific styles */
+    .lobby-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      color: var(--text-color);
+    }
+    
+    .lobby-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .lobby-header h1 {
+      margin: 0 0 1rem 0;
+      font-size: 2rem;
+    }
+    
+    .game-info {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .info-item {
+      text-align: center;
+    }
+    
+    .info-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 0.3rem;
+    }
+    
+    .info-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    
+    .copy-btn {
+      background: var(--accent-color);
+      border: none;
+      color: white;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+    
+    .copy-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .qr-section {
+      text-align: center;
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    
+    #qrCodeElement {
+      display: inline-block;
+      margin: 1rem auto;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+    }
+    
+    .join-url {
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      word-break: break-all;
+    }
+    
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      margin: 2rem 0;
+    }
+    
+    .teams-section h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .team-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .team-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid;
+    }
+    
+    .team-item.own-team {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    
+    .team-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+    
+    .team-color-indicator {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .team-details {
+      flex: 1;
+    }
+    
+    .team-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    
+    .team-tokens {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .kick-btn {
+      background: #EA4335;
+      border: none;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+    
+    .kick-btn:hover {
+      background: #d33828;
+    }
+    
+    .settings-section {
+      margin-top: 2rem;
+    }
+    
+    .settings-section h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .timer-settings {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .timer-input-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .timer-input-group label {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+      opacity: 0.9;
+    }
+    
+    .timer-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .timer-input-wrapper input {
+      width: 70px;
+      padding: 0.5rem;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    
+    .timer-input-wrapper span {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    .timer-error {
+      color: #EA4335;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+      min-height: 1rem;
+    }
+    
+    .start-game-btn {
+      background: linear-gradient(to right, #fb1820, #ff6310);
+      border: none;
+      border-radius: 8px;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      display: block;
+      margin: 2rem auto 0 auto;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .start-game-btn:hover {
+      background: linear-gradient(to right, #e52e71, #ff8a00);
+      transform: scale(1.05);
+    }
+    
+    .start-game-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .waiting-message {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      text-align: center;
+      padding: 2rem;
+      color: #EA4335;
+      font-size: 1.1rem;
+    }
+    
+    @media (max-width: 600px) {
+      .lobby-container {
+        padding: 1rem;
+      }
+      
+      .timer-settings {
+        grid-template-columns: 1fr;
+      }
+      
+      .game-info {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="lobby-container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Laddar lobby...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div id="errorState" class="error-message" style="display: none;">
+      <p id="errorMessage"></p>
+      <button onclick="window.location.href='/test/'" class="start-button">Tillbaka till start</button>
+    </div>
+    
+    <!-- Host View -->
+    <div id="hostView" style="display: none;">
+      <div class="lobby-header">
+        <h1>🎮 NOTESTREAM LOBBY</h1>
+      </div>
+      
+      <div class="game-info">
+        <div class="info-item">
+          <div class="info-label">Game ID</div>
+          <div class="info-value">
+            <span id="gameIdDisplay"></span>
+            <button class="copy-btn" onclick="copyGameId()">📋</button>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">PIN</div>
+          <div class="info-value">
+            <span id="pinDisplay"></span>
+            <button class="copy-btn" onclick="copyPIN()">📋</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="qr-section">
+        <div id="qrCodeElement"></div>
+        <p>📱 Scanna QR-koden eller gå till:</p>
+        <div class="join-url" id="joinUrl"></div>
+      </div>
+      
+      <hr class="section-divider">
+      
+      <div class="teams-section">
+        <h2>👥 LAG I LOBBYN (<span id="teamCountHost">0</span>)</h2>
+        <div id="teamListHost" class="team-list"></div>
+      </div>
+      
+      <hr class="section-divider">
+      
+      <div class="settings-section">
+        <h2>⚙️ INSTÄLLNINGAR</h2>
+        <div class="timer-settings">
+          <div class="timer-input-group">
+            <label>Gissning:</label>
+            <div class="timer-input-wrapper">
+              <input type="number" id="timerGuess" min="30" max="360" value="90">
+              <span>sek</span>
+            </div>
+            <div class="timer-error" id="timerGuessError"></div>
+          </div>
+          
+          <div class="timer-input-group">
+            <label>Utmaning:</label>
+            <div class="timer-input-wrapper">
+              <input type="number" id="timerChallenge" min="5" max="30" value="10">
+              <span>sek</span>
+            </div>
+            <div class="timer-error" id="timerChallengeError"></div>
+          </div>
+          
+          <div class="timer-input-group">
+            <label>Placera utmaning:</label>
+            <div class="timer-input-wrapper">
+              <input type="number" id="timerPlace" min="10" max="60" value="20">
+              <span>sek</span>
+            </div>
+            <div class="timer-error" id="timerPlaceError"></div>
+          </div>
+          
+          <div class="timer-input-group">
+            <label>Paus mellan låtar:</label>
+            <div class="timer-input-wrapper">
+              <input type="number" id="timerPause" min="5" max="60" value="10">
+              <span>sek</span>
+            </div>
+            <div class="timer-error" id="timerPauseError"></div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="start-game-btn" id="startGameBtn" onclick="startGame()">
+        STARTA SPEL
+      </button>
+    </div>
+    
+    <!-- Player View -->
+    <div id="playerView" style="display: none;">
+      <div class="lobby-header">
+        <h1>🎮 VÄNTAR PÅ START...</h1>
+      </div>
+      
+      <div class="game-info">
+        <div class="info-item">
+          <div class="info-label">Game ID</div>
+          <div class="info-value">
+            <span id="gameIdDisplayPlayer"></span>
+          </div>
+        </div>
+      </div>
+      
+      <hr class="section-divider">
+      
+      <div class="teams-section">
+        <h2>👥 LAG I LOBBYN (<span id="teamCountPlayer">0</span>)</h2>
+        <div id="teamListPlayer" class="team-list"></div>
+      </div>
+      
+      <div class="waiting-message">
+        Väntar på att host startar spelet...
+      </div>
+    </div>
+  </div>
+  
+  <!-- Load lobby.js helper functions -->
+  <script src="lobby.js"></script>
+  
+  <script>
+    // ============================================
+    // GLOBAL VARIABLES
+    // ============================================
+    let gameId = null;
+    let isHost = false;
+    let teamId = null;
+    let currentTeams = {};
+    let currentGameData = null;
+    let listeners = [];
+    
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[Lobby] Page loaded');
+      
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      gameId = urlParams.get('gameId');
+      isHost = urlParams.get('host') === 'true';
+      teamId = urlParams.get('teamId');
+      
+      console.log('[Lobby] URL params:', { gameId, isHost, teamId });
+      
+      // Validate parameters
+      if (!gameId) {
+        showError('Inget game ID angivet');
+        return;
+      }
+      
+      if (!isHost && !teamId) {
+        showError('Inget team ID angivet');
+        return;
+      }
+      
+      // Check if Firebase is available
+      if (!window.firebaseDb || !window.firebaseRef || !window.firebaseOnValue) {
+        showError('Firebase inte initialiserat. Gå tillbaka till startsidan.');
+        return;
+      }
+      
+      // Initialize lobby
+      initializeLobby();
+    });
+    
+    // ============================================
+    // LOBBY INITIALIZATION
+    // ============================================
+    function initializeLobby() {
+      console.log('[Lobby] Initializing lobby...');
+      
+      // Validate game exists
+      const gameRef = window.firebaseRef(window.firebaseDb, `games/${gameId}`);
+      
+      window.firebaseOnValue(gameRef, (snapshot) => {
+        if (!snapshot.exists()) {
+          showError('Game ID finns inte');
+          return;
+        }
+        
+        const gameData = snapshot.val();
+        currentGameData = gameData;
+        
+        console.log('[Lobby] Game data loaded:', gameData);
+        
+        // Check if game is already started
+        if (gameData.status !== 'lobby') {
+          console.log('[Lobby] Game already started, redirecting...');
+          window.location.href = `game.html?gameId=${gameId}&teamId=${teamId}`;
+          return;
+        }
+        
+        // Check if host left (for players)
+        if (!isHost && !gameData.host) {
+          showError('Host har lämnat lobbyn');
+          return;
+        }
+        
+        // Hide loading, show appropriate view
+        document.getElementById('loadingState').style.display = 'none';
+        
+        if (isHost) {
+          showHostView(gameData);
+        } else {
+          showPlayerView(gameData);
+        }
+        
+        // Setup listeners
+        setupListeners();
+        
+      }, { onlyOnce: true });
+    }
+    
+    // ============================================
+    // VIEW RENDERING
+    // ============================================
+    function showHostView(gameData) {
+      console.log('[Lobby] Showing host view');
+      
+      const hostView = document.getElementById('hostView');
+      hostView.style.display = 'block';
+      
+      // Display game info
+      document.getElementById('gameIdDisplay').textContent = gameId;
+      document.getElementById('pinDisplay').textContent = gameData.pin;
+      
+      // Generate QR code
+      const joinUrl = `https://www.notestream.se/join?game=${gameId}`;
+      document.getElementById('joinUrl').textContent = joinUrl;
+      generateLobbyQRCode(gameId, 'qrCodeElement');
+      
+      // Set timer values from settings
+      if (gameData.settings && gameData.settings.timers) {
+        const timers = gameData.settings.timers;
+        document.getElementById('timerGuess').value = timers.guess || 90;
+        document.getElementById('timerChallenge').value = timers.challenge || 10;
+        document.getElementById('timerPlace').value = timers.placeChallenge || 20;
+        document.getElementById('timerPause').value = timers.pauseBetweenSongs || 10;
+      }
+      
+      // Setup timer input listeners
+      setupTimerInputs();
+    }
+    
+    function showPlayerView(gameData) {
+      console.log('[Lobby] Showing player view');
+      
+      const playerView = document.getElementById('playerView');
+      playerView.style.display = 'block';
+      
+      // Display game info
+      document.getElementById('gameIdDisplayPlayer').textContent = gameId;
+    }
+    
+    // ============================================
+    // FIREBASE LISTENERS
+    // ============================================
+    function setupListeners() {
+      console.log('[Lobby] Setting up Firebase listeners');
+      
+      // Listen to teams
+      const teamsRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams`);
+      const teamsListener = window.firebaseOnValue(teamsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          currentTeams = snapshot.val();
+          console.log('[Lobby] Teams updated:', currentTeams);
+          updateTeamList();
+        } else {
+          currentTeams = {};
+          updateTeamList();
+        }
+      });
+      listeners.push(teamsListener);
+      
+      // Listen to game status (for redirect to game)
+      const statusRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/status`);
+      const statusListener = window.firebaseOnValue(statusRef, (snapshot) => {
+        const status = snapshot.val();
+        console.log('[Lobby] Status updated:', status);
+        
+        if (status === 'playing') {
+          console.log('[Lobby] Game started, redirecting...');
+          // Get current user's team ID
+          const userTeamId = isHost ? getHostTeamId() : teamId;
+          window.location.href = `game.html?gameId=${gameId}&teamId=${userTeamId}`;
+        }
+      });
+      listeners.push(statusListener);
+      
+      // Host-specific listeners
+      if (isHost) {
+        // Listen to timer changes (in case of external updates)
+        const timersRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/settings/timers`);
+        const timersListener = window.firebaseOnValue(timersRef, (snapshot) => {
+          if (snapshot.exists()) {
+            const timers = snapshot.val();
+            console.log('[Lobby] Timers updated externally:', timers);
+            // Update input fields if they differ
+            updateTimerInputsFromFirebase(timers);
+          }
+        });
+        listeners.push(timersListener);
+      }
+    }
+    
+    // ============================================
+    // TEAM LIST RENDERING
+    // ============================================
+    function updateTeamList() {
+      console.log('[Lobby] Updating team list');
+      
+      const teamCount = Object.keys(currentTeams).length;
+      
+      if (isHost) {
+        document.getElementById('teamCountHost').textContent = teamCount;
+        renderTeamListHost();
+      } else {
+        document.getElementById('teamCountPlayer').textContent = teamCount;
+        renderTeamListPlayer();
+      }
+    }
+    
+    function renderTeamListHost() {
+      const container = document.getElementById('teamListHost');
+      container.innerHTML = '';
+      
+      if (Object.keys(currentTeams).length === 0) {
+        container.innerHTML = '<p style="text-align: center; opacity: 0.6;">Inga lag än...</p>';
+        return;
+      }
+      
+      Object.entries(currentTeams).forEach(([teamIdKey, team]) => {
+        const teamDiv = document.createElement('div');
+        teamDiv.className = 'team-item';
+        if (team.host) {
+          teamDiv.classList.add('own-team');
+        }
+        
+        const colorObj = TEAM_COLORS.find(c => c.name === team.color);
+        const colorHex = colorObj ? colorObj.hex : '#FFFFFF';
+        teamDiv.style.borderLeftColor = colorHex;
+        
+        teamDiv.innerHTML = `
+          <div class="team-info">
+            <div class="team-color-indicator" style="background: ${colorHex};"></div>
+            <div class="team-details">
+              <div class="team-name">${escapeHtml(team.name)} ${team.host ? '(Du)' : ''}</div>
+              <div class="team-tokens">${team.tokens} tokens</div>
+            </div>
+          </div>
+          ${!team.host ? `<button class="kick-btn" onclick="kickTeam('${teamIdKey}')">❌ Kicka</button>` : ''}
+        `;
+        
+        container.appendChild(teamDiv);
+      });
+      
+      // Update start button state
+      updateStartButton();
+    }
+    
+    function renderTeamListPlayer() {
+      const container = document.getElementById('teamListPlayer');
+      container.innerHTML = '';
+      
+      if (Object.keys(currentTeams).length === 0) {
+        container.innerHTML = '<p style="text-align: center; opacity: 0.6;">Inga lag än...</p>';
+        return;
+      }
+      
+      Object.entries(currentTeams).forEach(([teamIdKey, team]) => {
+        const teamDiv = document.createElement('div');
+        teamDiv.className = 'team-item';
+        if (teamIdKey === teamId) {
+          teamDiv.classList.add('own-team');
+        }
+        
+        const colorObj = TEAM_COLORS.find(c => c.name === team.color);
+        const colorHex = colorObj ? colorObj.hex : '#FFFFFF';
+        teamDiv.style.borderLeftColor = colorHex;
+        
+        teamDiv.innerHTML = `
+          <div class="team-info">
+            <div class="team-color-indicator" style="background: ${colorHex};"></div>
+            <div class="team-details">
+              <div class="team-name">${escapeHtml(team.name)} ${teamIdKey === teamId ? '(Du)' : ''}</div>
+              <div class="team-tokens">${team.tokens} tokens</div>
+            </div>
+          </div>
+        `;
+        
+        container.appendChild(teamDiv);
+      });
+    }
+    
+    // ============================================
+    // HOST ACTIONS
+    // ============================================
+    function copyGameId() {
+      copyToClipboard(gameId, 'Game ID');
+    }
+    
+    function copyPIN() {
+      const pin = currentGameData ? currentGameData.pin : '';
+      copyToClipboard(pin, 'PIN');
+    }
+    
+    function kickTeam(kickTeamId) {
+      console.log('[Lobby] Kicking team:', kickTeamId);
+      
+      const team = currentTeams[kickTeamId];
+      if (!team) {
+        console.error('[Lobby] Team not found:', kickTeamId);
+        return;
+      }
+      
+      if (!confirm(`Är du säker på att du vill kicka "${team.name}"?`)) {
+        return;
+      }
+      
+      const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${kickTeamId}`);
+      
+      window.firebaseSet(teamRef, null)
+        .then(() => {
+          console.log('[Lobby] Team kicked successfully');
+          showNotification('Lag borttaget', 'success');
+        })
+        .catch((error) => {
+          console.error('[Lobby] Error kicking team:', error);
+          showNotification('Kunde inte ta bort lag', 'error');
+        });
+    }
+    
+    function setupTimerInputs() {
+      const timerInputs = [
+        { id: 'timerGuess', type: 'guess' },
+        { id: 'timerChallenge', type: 'challenge' },
+        { id: 'timerPlace', type: 'placeChallenge' },
+        { id: 'timerPause', type: 'pauseBetweenSongs' }
+      ];
+      
+      timerInputs.forEach(({ id, type }) => {
+        const input = document.getElementById(id);
+        
+        // Update Firebase on change
+        input.addEventListener('change', () => {
+          updateTimer(type, input.value, id);
+        });
+        
+        // Also update on blur
+        input.addEventListener('blur', () => {
+          updateTimer(type, input.value, id);
+        });
+      });
+    }
+    
+    function updateTimer(timerType, value, inputId) {
+      console.log(`[Lobby] Updating timer ${timerType}:`, value);
+      
+      const validation = validateTimer(timerType, value);
+      const errorId = inputId + 'Error';
+      const errorElement = document.getElementById(errorId);
+      
+      if (!validation.valid) {
+        console.log('[Lobby] Timer validation failed:', validation.error);
+        errorElement.textContent = validation.error;
+        return;
+      }
+      
+      // Clear error
+      errorElement.textContent = '';
+      
+      // Update Firebase
+      const timerRef = window.firebaseRef(
+        window.firebaseDb, 
+        `games/${gameId}/settings/timers/${timerType}`
+      );
+      
+      window.firebaseSet(timerRef, validation.value)
+        .then(() => {
+          console.log(`[Lobby] Timer ${timerType} updated to ${validation.value}`);
+        })
+        .catch((error) => {
+          console.error(`[Lobby] Error updating timer ${timerType}:`, error);
+          showNotification('Kunde inte uppdatera timer', 'error');
+        });
+    }
+    
+    function updateTimerInputsFromFirebase(timers) {
+      if (timers.guess) document.getElementById('timerGuess').value = timers.guess;
+      if (timers.challenge) document.getElementById('timerChallenge').value = timers.challenge;
+      if (timers.placeChallenge) document.getElementById('timerPlace').value = timers.placeChallenge;
+      if (timers.pauseBetweenSongs) document.getElementById('timerPause').value = timers.pauseBetweenSongs;
+    }
+    
+    function updateStartButton() {
+      const startBtn = document.getElementById('startGameBtn');
+      const teamCount = Object.keys(currentTeams).length;
+      
+      if (teamCount < 2) {
+        startBtn.disabled = true;
+        startBtn.textContent = 'BEHÖVER MINST 2 LAG';
+      } else {
+        startBtn.disabled = false;
+        startBtn.textContent = 'STARTA SPEL';
+      }
+    }
+    
+    function startGame() {
+      console.log('[Lobby] Starting game...');
+      
+      const teamCount = Object.keys(currentTeams).length;
+      
+      if (teamCount < 2) {
+        showNotification('Behöver minst 2 lag för att starta', 'error');
+        return;
+      }
+      
+      if (!confirm(`Starta spelet med ${teamCount} lag?`)) {
+        return;
+      }
+      
+      // Disable start button
+      const startBtn = document.getElementById('startGameBtn');
+      startBtn.disabled = true;
+      startBtn.textContent = 'STARTAR...';
+      
+      // Get songs from settings
+      const gameRef = window.firebaseRef(window.firebaseDb, `games/${gameId}`);
+      
+      window.firebaseOnValue(gameRef, (snapshot) => {
+        if (!snapshot.exists()) {
+          showNotification('Kunde inte hitta game data', 'error');
+          startBtn.disabled = false;
+          startBtn.textContent = 'STARTA SPEL';
+          return;
+        }
+        
+        const gameData = snapshot.val();
+        
+        // TODO: Shuffle songs from settings.playlists and settings.yearRange
+        // For now, just create empty songs array
+        const songs = [];
+        
+        // Pick random starting team
+        const teamIds = Object.keys(currentTeams);
+        const startingTeamId = teamIds[Math.floor(Math.random() * teamIds.length)];
+        
+        console.log('[Lobby] Starting team:', startingTeamId);
+        
+        // Update game data
+        const updates = {
+          [`games/${gameId}/status`]: 'playing',
+          [`games/${gameId}/songs`]: songs,
+          [`games/${gameId}/currentRound`]: 0,
+          [`games/${gameId}/currentTeam`]: startingTeamId,
+          [`games/${gameId}/startingTeam`]: startingTeamId,
+          [`games/${gameId}/currentSong`]: null
+        };
+        
+        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+          .then(() => {
+            console.log('[Lobby] Game started successfully');
+            // The status listener will redirect automatically
+          })
+          .catch((error) => {
+            console.error('[Lobby] Error starting game:', error);
+            showNotification('Kunde inte starta spelet', 'error');
+            startBtn.disabled = false;
+            startBtn.textContent = 'STARTA SPEL';
+          });
+        
+      }, { onlyOnce: true });
+    }
+    
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    function getHostTeamId() {
+      for (const [teamIdKey, team] of Object.entries(currentTeams)) {
+        if (team.host) {
+          return teamIdKey;
+        }
+      }
+      return null;
+    }
+    
+    function showError(message) {
+      console.error('[Lobby] Error:', message);
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').style.display = 'block';
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // ============================================
+    // CLEANUP
+    // ============================================
+    window.addEventListener('beforeunload', () => {
+      console.log('[Lobby] Cleaning up listeners');
+      // Listeners will be automatically cleaned up by Firebase
+    });
+    
+    console.log('[Lobby] Script loaded successfully');
+  </script>
+</body>
+</html>
