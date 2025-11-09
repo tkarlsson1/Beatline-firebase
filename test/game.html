@@ -2118,10 +2118,11 @@
         }
       }
       
-      // Check if timer expired (only host should handle this)
-      if (remaining <= 0 && isHost) {
+      // Check if timer expired - let all clients handle it
+      // (each will check if it's their turn to lock in or if they're host to skip)
+      if (remaining <= 0) {
         console.log('[Timer] Timer expired!');
-        // Only call once per expiry
+        // Only call once per expiry - check if timer state still exists
         if (currentGameData.timerState) {
           onTimerExpired();
         }
@@ -2194,11 +2195,27 @@
     
     function onTimerExpired() {
       console.log('[Timer] onTimerExpired called, state:', currentGameData.timerState);
+      console.log('[Timer] Called by:', isHost ? 'HOST' : 'NON-HOST', 'teamId:', teamId);
       
       const timerState = currentGameData.timerState;
       
-      // Stop timer FIRST before handling expiry
-      stopTimer();
+      // Stop timer FIRST by clearing Firebase - anyone can do this
+      const timerUpdates = {};
+      timerUpdates[`games/${gameId}/timerState`] = null;
+      timerUpdates[`games/${gameId}/timerStartTime`] = null;
+      timerUpdates[`games/${gameId}/timerDuration`] = null;
+      timerUpdates[`games/${gameId}/nextTeam`] = null;
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), timerUpdates)
+        .then(() => {
+          console.log('[Timer] Timer stopped in Firebase by', isHost ? 'host' : 'non-host');
+        })
+        .catch((error) => {
+          console.error('[Timer] Error stopping timer:', error);
+        });
+      
+      // Reset vibrate tracking
+      lastVibrateSecond = null;
       
       if (timerState === 'guessing') {
         // Timer 1 expired - guessing time is up
