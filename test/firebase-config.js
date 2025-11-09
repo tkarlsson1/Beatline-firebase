@@ -100,6 +100,18 @@ window.createLobby = async function(teamName) {
       return;
     }
     
+    // Filter songs based on selected playlists and year range
+    const availableSongs = sourceFilteredSongs.filter(song =>
+      parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
+    );
+    
+    console.log('[Firebase] Available songs:', availableSongs.length);
+    
+    if (availableSongs.length === 0) {
+      alert('Inga låtar hittades i den valda perioden. Justera ditt val av spellistor eller årtal.');
+      return;
+    }
+    
     // Generate team ID for host
     const hostTeamId = generateTeamId();
     
