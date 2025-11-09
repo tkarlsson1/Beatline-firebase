@@ -683,6 +683,14 @@
       
       // Setup real-time listeners
       setupListeners();
+      
+      // Setup global timer interval that runs every second
+      console.log('[Game] Setting up timer interval');
+      timerInterval = setInterval(() => {
+        if (currentGameData && currentGameData.timerState) {
+          updateTimer();
+        }
+      }, 1000);
     }
     
     // ============================================
@@ -704,16 +712,6 @@
           updateGameView();
         }
       });
-      
-      // Setup timer interval to update every second
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
-      timerInterval = setInterval(() => {
-        if (currentGameData && currentGameData.timerState) {
-          updateTimer();
-        }
-      }, 1000);
     }
     
     // ============================================
@@ -837,13 +835,13 @@
         
         if (nextTeam) {
           contentDiv.innerHTML = `
-            <h1>⏸️ PAUS</h1>
-            <p class="turn-info">Nästa låt kommer snart...</p>
+            <h1>🎵 Nästa låt kommer snart</h1>
+            <p class="turn-info"></p>
           `;
         } else {
           contentDiv.innerHTML = `
-            <h1>⏸️ PAUS</h1>
-            <p class="turn-info">Mellan låtar</p>
+            <h1>🎵 Nästa låt kommer snart</h1>
+            <p class="turn-info"></p>
           `;
         }
       } else {
@@ -1429,10 +1427,8 @@
         return;
       }
       
-      // Stop timer during validation
-      if (isHost) {
-        stopTimer();
-      }
+      // Stop timer (only host updates Firebase, but all see it stop)
+      stopTimer();
       
       // Remove preview card
       const previewCard = document.querySelector('.preview-card');
@@ -1801,6 +1797,14 @@
     // TIMER FUNCTIONS
     // ============================================
     function startTimer(type, duration, nextTeamId = null) {
+      console.log('[Timer] startTimer called by', isHost ? 'HOST' : 'NON-HOST', '- type:', type);
+      
+      // Only host should start timers
+      if (!isHost) {
+        console.log('[Timer] Not host, skipping timer start');
+        return;
+      }
+      
       console.log('[Timer] Starting timer:', type, 'duration:', duration, 'nextTeam:', nextTeamId);
       
       const updates = {};
@@ -1824,13 +1828,16 @@
     function stopTimer() {
       console.log('[Timer] Stopping timer');
       
-      // Clear local interval
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+      // Reset vibrate tracking
+      lastVibrateSecond = null;
+      
+      // Only host should update Firebase
+      if (!isHost) {
+        console.log('[Timer] Not host, skipping Firebase update');
+        return;
       }
       
-      // Clear Firebase timer state
+      // Clear Firebase timer state (only host does this)
       const updates = {};
       updates[`games/${gameId}/timerState`] = null;
       updates[`games/${gameId}/timerStartTime`] = null;
@@ -1838,21 +1845,23 @@
       updates[`games/${gameId}/nextTeam`] = null;
       
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Timer] Timer stopped in Firebase');
+        })
         .catch((error) => {
           console.error('[Timer] Error stopping timer:', error);
         });
-      
-      // Reset vibrate tracking
-      lastVibrateSecond = null;
     }
     
     function updateTimer() {
-      if (!currentGameData.timerState || !currentGameData.timerStartTime || !currentGameData.timerDuration) {
+      if (!currentGameData || !currentGameData.timerState || !currentGameData.timerStartTime || !currentGameData.timerDuration) {
         // No active timer - clear any existing timer display
         const container = document.getElementById('turnIndicator');
-        const timerContainer = container.querySelector('.timer-container');
-        if (timerContainer) {
-          timerContainer.remove();
+        if (container) {
+          const timerContainer = container.querySelector('.timer-container');
+          if (timerContainer) {
+            timerContainer.remove();
+          }
         }
         return;
       }
@@ -1860,6 +1869,11 @@
       const elapsed = Date.now() - currentGameData.timerStartTime;
       const remaining = Math.max(0, currentGameData.timerDuration - elapsed);
       const remainingSeconds = Math.ceil(remaining / 1000);
+      
+      // Log every 5 seconds to avoid spam
+      if (remainingSeconds % 5 === 0) {
+        console.log('[Timer] Update:', remainingSeconds, 'seconds remaining, state:', currentGameData.timerState);
+      }
       
       // Render timer UI
       renderTimer(remainingSeconds, currentGameData.timerDuration);
