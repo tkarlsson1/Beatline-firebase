@@ -1407,23 +1407,44 @@
           const timeline = team.timeline || {};
           
           console.log('[Game] Timeline for validation:', timeline);
+          console.log('[Game] Timeline type:', Array.isArray(timeline) ? 'array' : 'object');
           
-          // Get all cards sorted by position
-          const sortedCards = Object.entries(timeline)
-            .map(([key, c]) => ({ key, ...c }))
-            .sort((a, b) => a.position - b.position);
+          // Convert to array of cards with original keys preserved
+          let cardsArray;
+          if (Array.isArray(timeline)) {
+            // Timeline is already an array (Firebase converted it)
+            cardsArray = timeline
+              .map((c, idx) => c ? { key: idx.toString(), ...c } : null)
+              .filter(c => c !== null);
+          } else {
+            // Timeline is an object
+            cardsArray = Object.entries(timeline)
+              .map(([key, c]) => ({ key, ...c }));
+          }
           
-          console.log('[Game] Sorted cards:', sortedCards.map(c => `${c.year} (pos ${c.position})`));
+          // Sort by position
+          const sortedCards = cardsArray.sort((a, b) => a.position - b.position);
           
-          // Find the card we just placed
-          const cardIndex = sortedCards.findIndex(c => c.key === cardKey);
+          console.log('[Game] Sorted cards:', sortedCards.map(c => `${c.year} (pos ${c.position}, key ${c.key})`));
+          console.log('[Game] Looking for card with key:', cardKey, 'and position:', card.position);
+          
+          // Find the card we just placed by POSITION and YEAR (more reliable than key)
+          const cardIndex = sortedCards.findIndex(c => 
+            c.position === card.position && 
+            c.year === card.year &&
+            c.spotifyId === card.spotifyId
+          );
           
           if (cardIndex === -1) {
             console.error('[Game] Card not found in timeline for validation');
+            console.error('[Game] Searched for:', card);
+            console.error('[Game] Available cards:', sortedCards);
             // Move to next team anyway
             setTimeout(() => nextTeam(), 1000);
             return;
           }
+          
+          console.log('[Game] Found card at index:', cardIndex);
           
           const placedCard = sortedCards[cardIndex];
           const leftCard = cardIndex > 0 ? sortedCards[cardIndex - 1] : null;
@@ -1465,9 +1486,13 @@
           // Update Firebase based on result
           const validationUpdates = {};
           
+          // Use the actual key from the found card in sorted array
+          const actualCardKey = placedCard.key;
+          console.log('[Game] Using card key for updates:', actualCardKey);
+          
           if (isCorrect) {
             // Reveal the card
-            validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}/revealed`] = true;
+            validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${actualCardKey}/revealed`] = true;
             
             // Increment score
             const newScore = (team.score || 0) + 1;
@@ -1484,7 +1509,7 @@
             }
           } else {
             // Remove the card from timeline
-            validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}`] = null;
+            validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${actualCardKey}`] = null;
             
             console.log('[Game] Removing incorrect card');
             showNotification(`✗ FEL! ${reason}`, 'error');
