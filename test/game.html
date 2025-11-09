@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#032934">
+  
+  <title>Notestream - Spel</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Firebase SDK (Compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Firebase Wrapper -->
+  <script src="firebase-wrapper.js"></script>
+  
+  <style>
+    /* Force landscape mode */
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    
+    /* Rotate message for portrait mode */
+    #rotateMessage {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: white;
+      z-index: 10000;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    
+    #rotateMessage svg {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 2rem;
+      animation: rotate 2s infinite;
+    }
+    
+    @keyframes rotate {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+    
+    #rotateMessage h2 {
+      font-size: 1.5rem;
+      margin: 0 0 1rem 0;
+    }
+    
+    #rotateMessage p {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    
+    /* Show rotate message in portrait mode */
+    @media (orientation: portrait) {
+      #rotateMessage {
+        display: flex;
+      }
+      
+      #gameContainer {
+        display: none;
+      }
+    }
+    
+    /* Game container - landscape only */
+    #gameContainer {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Team header */
+    .team-header {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+    
+    .team-list {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    
+    .team-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.5rem 0.8rem;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .team-badge.active {
+      border-color: #FBBC04;
+      background: rgba(251, 188, 4, 0.2);
+      box-shadow: 0 0 15px rgba(251, 188, 4, 0.5);
+    }
+    
+    .team-badge.own-team {
+      border-color: var(--accent-color);
+      background: rgba(11, 147, 156, 0.2);
+    }
+    
+    .team-color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    
+    .team-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    
+    .team-stats {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    .team-score {
+      color: #4CAF50;
+    }
+    
+    .team-tokens {
+      color: #FFC107;
+    }
+    
+    /* Game area */
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+    }
+    
+    /* Turn indicator */
+    .turn-indicator {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .turn-indicator h1 {
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    
+    .turn-indicator.your-turn h1 {
+      color: #4CAF50;
+      animation: pulse 2s infinite;
+    }
+    
+    .turn-indicator.waiting h1 {
+      color: #FFC107;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .turn-info {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+    
+    /* Debug controls (host only) */
+    .debug-controls {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .debug-controls h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    
+    .debug-btn {
+      background: var(--accent-color);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-family: 'Manrope', sans-serif;
+      transition: background 0.3s;
+    }
+    
+    .debug-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 2rem;
+      color: #EA4335;
+      font-size: 1.1rem;
+    }
+    
+    /* Round counter */
+    .round-counter {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Rotate message (shown in portrait) -->
+  <div id="rotateMessage">
+    <svg viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="2">
+      <rect x="20" y="35" width="40" height="60" rx="5"/>
+      <circle cx="40" cy="90" r="3" fill="white"/>
+      <path d="M 70 50 L 85 50 L 85 35 L 70 35" stroke-dasharray="3,3"/>
+      <text x="78" y="42" fill="white" font-size="8">↻</text>
+    </svg>
+    <h2>🔄 Vänd din telefon</h2>
+    <p>Spelet kräver liggande läge (landscape mode)</p>
+  </div>
+  
+  <!-- Game container (shown in landscape) -->
+  <div id="gameContainer">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Laddar spel...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <p id="errorMessage"></p>
+      <button onclick="window.location.href='/test/'" class="start-button">
+        Tillbaka till start
+      </button>
+    </div>
+    
+    <!-- Game View -->
+    <div id="gameView" style="display: none;">
+      <!-- Round counter -->
+      <div class="round-counter">
+        Runda <span id="roundDisplay">1</span>
+      </div>
+      
+      <!-- Team header -->
+      <div class="team-header">
+        <div class="team-list" id="teamList">
+          <!-- Teams will be rendered here -->
+        </div>
+      </div>
+      
+      <!-- Game area -->
+      <div class="game-area">
+        <div class="turn-indicator" id="turnIndicator">
+          <!-- Turn info will be rendered here -->
+        </div>
+      </div>
+      
+      <!-- Debug controls (host only) -->
+      <div class="debug-controls" id="debugControls" style="display: none;">
+        <h3>🔧 HOST KONTROLLER</h3>
+        <button class="debug-btn" onclick="nextTeam()">Nästa lag →</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Load lobby.js helper functions -->
+  <script src="lobby.js"></script>
+  
+  <script>
+    // ============================================
+    // GLOBAL VARIABLES
+    // ============================================
+    let gameId = null;
+    let teamId = null;
+    let isHost = false;
+    let currentGameData = null;
+    let currentTeams = {};
+    let myTeam = null;
+    let listeners = [];
+    
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[Game] Page loaded');
+      
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      gameId = urlParams.get('gameId');
+      teamId = urlParams.get('teamId');
+      
+      console.log('[Game] URL params:', { gameId, teamId });
+      
+      // Validate parameters
+      if (!gameId || !teamId) {
+        showError('Saknar gameId eller teamId i URL');
+        return;
+      }
+      
+      // Check if Firebase is available
+      if (!window.firebaseDb || !window.firebaseRef) {
+        showError('Firebase inte initialiserat');
+        return;
+      }
+      
+      // Initialize game
+      initializeGame();
+    });
+    
+    // ============================================
+    // GAME INITIALIZATION
+    // ============================================
+    function initializeGame() {
+      console.log('[Game] Initializing game...');
+      
+      // Load game data
+      const gameRef = window.firebaseRef(window.firebaseDb, `games/${gameId}`);
+      
+      window.firebaseOnValue(gameRef, (snapshot) => {
+        if (!snapshot.exists()) {
+          showError('Spel finns inte');
+          return;
+        }
+        
+        const gameData = snapshot.val();
+        currentGameData = gameData;
+        currentTeams = gameData.teams || {};
+        
+        console.log('[Game] Game data loaded:', gameData);
+        
+        // Check if game is in playing status
+        if (gameData.status !== 'playing') {
+          showError('Spelet har inte startat eller är avslutat');
+          return;
+        }
+        
+        // Find my team
+        myTeam = currentTeams[teamId];
+        if (!myTeam) {
+          showError('Ditt lag finns inte i spelet');
+          return;
+        }
+        
+        // Check if host
+        isHost = myTeam.host === true;
+        
+        console.log('[Game] My team:', myTeam);
+        console.log('[Game] Is host:', isHost);
+        
+        // Hide loading, show game
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('gameView').style.display = 'block';
+        
+        // Show debug controls for host
+        if (isHost) {
+          document.getElementById('debugControls').style.display = 'block';
+        }
+        
+        // Initial render
+        updateGameView();
+        
+      }, { onlyOnce: true });
+      
+      // Setup real-time listeners
+      setupListeners();
+    }
+    
+    // ============================================
+    // FIREBASE LISTENERS
+    // ============================================
+    function setupListeners() {
+      console.log('[Game] Setting up Firebase listeners');
+      
+      // Listen to entire game state for simplicity (optimize later if needed)
+      const gameRef = window.firebaseRef(window.firebaseDb, `games/${gameId}`);
+      
+      window.firebaseOnValue(gameRef, (snapshot) => {
+        if (snapshot.exists()) {
+          currentGameData = snapshot.val();
+          currentTeams = currentGameData.teams || {};
+          myTeam = currentTeams[teamId];
+          
+          console.log('[Game] Game state updated');
+          updateGameView();
+        }
+      });
+    }
+    
+    // ============================================
+    // RENDER GAME VIEW
+    // ============================================
+    function updateGameView() {
+      console.log('[Game] Updating game view');
+      
+      // Update team header
+      renderTeamHeader();
+      
+      // Update turn indicator
+      renderTurnIndicator();
+      
+      // Update round counter
+      document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
+    }
+    
+    function renderTeamHeader() {
+      const container = document.getElementById('teamList');
+      container.innerHTML = '';
+      
+      const currentTeamId = currentGameData.currentTeam;
+      
+      Object.entries(currentTeams).forEach(([teamIdKey, team]) => {
+        const badge = document.createElement('div');
+        badge.className = 'team-badge';
+        
+        // Highlight active team
+        if (teamIdKey === currentTeamId) {
+          badge.classList.add('active');
+        }
+        
+        // Highlight own team
+        if (teamIdKey === teamId) {
+          badge.classList.add('own-team');
+        }
+        
+        // Get team color
+        const colorObj = TEAM_COLORS.find(c => c.name === team.color);
+        const colorHex = colorObj ? colorObj.hex : '#FFFFFF';
+        
+        badge.innerHTML = `
+          <div class="team-color-dot" style="background: ${colorHex};"></div>
+          <div class="team-name">${escapeHtml(team.name)}</div>
+          <div class="team-stats">
+            <span class="team-score">🎵 ${team.score || 0}</span>
+            <span class="team-tokens">🎫 ${team.tokens || 0}</span>
+          </div>
+        `;
+        
+        container.appendChild(badge);
+      });
+    }
+    
+    function renderTurnIndicator() {
+      const container = document.getElementById('turnIndicator');
+      const currentTeamId = currentGameData.currentTeam;
+      
+      if (!currentTeamId) {
+        container.innerHTML = `
+          <h1>⏳ Väntar på start...</h1>
+          <p class="turn-info">Spelet initialiseras</p>
+        `;
+        return;
+      }
+      
+      const currentTeam = currentTeams[currentTeamId];
+      
+      if (!currentTeam) {
+        container.innerHTML = `
+          <h1>⚠️ Fel</h1>
+          <p class="turn-info">Aktivt lag finns inte</p>
+        `;
+        return;
+      }
+      
+      // Is it my turn?
+      if (currentTeamId === teamId) {
+        container.className = 'turn-indicator your-turn';
+        container.innerHTML = `
+          <h1>🎮 DIN TUR!</h1>
+          <p class="turn-info">Det är dags att gissa!</p>
+        `;
+      } else {
+        container.className = 'turn-indicator waiting';
+        container.innerHTML = `
+          <h1>⏳ ${escapeHtml(currentTeam.name)}s tur</h1>
+          <p class="turn-info">Väntar på att de ska gissa...</p>
+        `;
+      }
+    }
+    
+    // ============================================
+    // DEBUG FUNCTIONS (HOST ONLY)
+    // ============================================
+    function nextTeam() {
+      if (!isHost) {
+        console.error('[Game] Only host can control game');
+        return;
+      }
+      
+      console.log('[Game] Switching to next team...');
+      
+      // Get list of team IDs
+      const teamIds = Object.keys(currentTeams);
+      
+      if (teamIds.length === 0) {
+        console.error('[Game] No teams in game');
+        return;
+      }
+      
+      // Find current team index
+      const currentTeamId = currentGameData.currentTeam;
+      const currentIndex = teamIds.indexOf(currentTeamId);
+      
+      // Get next team (wrap around)
+      const nextIndex = (currentIndex + 1) % teamIds.length;
+      const nextTeamId = teamIds[nextIndex];
+      
+      console.log('[Game] Next team:', nextTeamId);
+      
+      // Update Firebase
+      const updates = {};
+      updates[`games/${gameId}/currentTeam`] = nextTeamId;
+      
+      // Increment round if we wrapped around
+      if (nextIndex === 0) {
+        const newRound = (currentGameData.currentRound || 0) + 1;
+        updates[`games/${gameId}/currentRound`] = newRound;
+        console.log('[Game] New round:', newRound);
+      }
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Game] Team switched successfully');
+        })
+        .catch((error) => {
+          console.error('[Game] Error switching team:', error);
+        });
+    }
+    
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    function showError(message) {
+      console.error('[Game] Error:', message);
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').style.display = 'block';
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    console.log('[Game] Script loaded successfully');
+  </script>
+</body>
+</html>
