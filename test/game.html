@@ -1450,9 +1450,6 @@
         return;
       }
       
-      // Stop timer (only host updates Firebase, but all see it stop)
-      stopTimer();
-      
       // Remove preview card
       const previewCard = document.querySelector('.preview-card');
       if (previewCard) {
@@ -1535,6 +1532,11 @@
     function validateAndScoreCard(cardKey, card) {
       console.log('[Game] ========== VALIDATION START ==========');
       console.log('[Game] Validating card:', cardKey, card);
+      
+      // Stop timer (only host updates Firebase)
+      if (isHost) {
+        stopTimer();
+      }
       
       // Get fresh data from Firebase using get() instead of onValue
       const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${teamId}`);
@@ -1639,11 +1641,20 @@
             // Reveal the card
             validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${actualCardKey}/revealed`] = true;
             
-            // Increment score
-            const newScore = (team.score || 0) + 1;
+            // Calculate score as total number of revealed cards
+            // Count revealed cards in timeline (after this card is revealed)
+            let revealedCount = 0;
+            Object.values(timeline).forEach(c => {
+              if (c && c.revealed) {
+                revealedCount++;
+              }
+            });
+            // Add 1 for the card we just revealed
+            const newScore = revealedCount + 1;
+            
             validationUpdates[`games/${gameId}/teams/${teamId}/score`] = newScore;
             
-            console.log('[Game] Updating score from', team.score, 'to', newScore);
+            console.log('[Game] Updating score to', newScore, '(revealed cards)');
             
             // Check for winner (11 cards)
             if (newScore >= 11) {
