@@ -26,75 +26,25 @@
   <script src="firebase-wrapper.js"></script>
   
   <style>
-    /* Force landscape mode */
+    /* Game container - allow scrolling for testing */
     body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
       background: #000;
     }
     
-    /* Rotate message for portrait mode */
-    #rotateMessage {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      color: white;
-      z-index: 10000;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 2rem;
-      box-sizing: border-box;
-    }
-    
-    #rotateMessage svg {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 2rem;
-      animation: rotate 2s infinite;
-    }
-    
-    @keyframes rotate {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(90deg); }
-    }
-    
-    #rotateMessage h2 {
-      font-size: 1.5rem;
-      margin: 0 0 1rem 0;
-    }
-    
-    #rotateMessage p {
-      font-size: 1rem;
-      opacity: 0.8;
-    }
-    
-    /* Show rotate message in portrait mode */
-    @media (orientation: portrait) {
-      #rotateMessage {
-        display: flex;
-      }
-      
-      #gameContainer {
-        display: none;
-      }
-    }
-    
-    /* Game container - landscape only */
     #gameContainer {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
       background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
       color: var(--text-color);
       display: flex;
       flex-direction: column;
+      padding-bottom: 2rem;
+    }
+    
+    /* Hide rotate message for now (landscape enforcement disabled) */
+    #rotateMessage {
+      display: none !important;
     }
     
     /* Team header */
@@ -169,21 +119,20 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
+      padding: 2rem 1rem;
       position: relative;
+      overflow-y: auto;
     }
     
     /* Turn indicator */
     .turn-indicator {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     
     .turn-indicator h1 {
-      font-size: 3rem;
-      margin: 0 0 1rem 0;
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
       text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
     
