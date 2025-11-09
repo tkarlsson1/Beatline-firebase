@@ -160,6 +160,65 @@
       opacity: 0.8;
     }
     
+    /* Timer display */
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .timer-circle {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+    
+    .timer-circle svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    
+    .timer-circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 8;
+    }
+    
+    .timer-circle-progress {
+      fill: none;
+      stroke: #4CAF50;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s linear, stroke 0.3s;
+    }
+    
+    .timer-circle-progress.warning {
+      stroke: #FFC107;
+    }
+    
+    .timer-circle-progress.danger {
+      stroke: #EA4335;
+    }
+    
+    .timer-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .timer-label {
+      font-size: 1rem;
+      opacity: 0.8;
+      text-align: center;
+    }
+    
     /* Debug controls (host only) */
     .debug-controls {
       position: fixed;
@@ -534,6 +593,11 @@
     let placementPosition = null; // Where the card will be placed
     let currentCardElement = null;
     
+    // Timer state
+    let timerInterval = null;
+    let lastVibrateSecond = null;
+    let hasStartedInitialTimer = false; // Track if Timer 4 has started at game start
+    
     // ============================================
     // INITIALIZATION
     // ============================================
@@ -640,6 +704,16 @@
           updateGameView();
         }
       });
+      
+      // Setup timer interval to update every second
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      timerInterval = setInterval(() => {
+        if (currentGameData && currentGameData.timerState) {
+          updateTimer();
+        }
+      }, 1000);
     }
     
     // ============================================
@@ -654,6 +728,9 @@
       // Update turn indicator
       renderTurnIndicator();
       
+      // Update timer
+      updateTimer();
+      
       // Update timeline
       renderTimeline();
       
@@ -665,6 +742,20 @@
       
       // Update round counter
       document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
+      
+      // Start initial timer (Timer 4) when game first starts
+      if (!hasStartedInitialTimer && currentGameData.status === 'playing' && isHost) {
+        hasStartedInitialTimer = true;
+        console.log('[Game] Starting initial pause timer (Timer 4)');
+        
+        // Find the starting team (should already be set in currentTeam)
+        const firstTeamId = currentGameData.currentTeam;
+        
+        // Start Timer 4 (10s pause) showing the first team
+        setTimeout(() => {
+          startTimer('pause', 10000, firstTeamId);
+        }, 500); // Small delay to ensure everything is loaded
+      }
     }
     
     function renderTeamHeader() {
@@ -708,8 +799,19 @@
       const container = document.getElementById('turnIndicator');
       const currentTeamId = currentGameData.currentTeam;
       
+      // Check if we need to show timer
+      const timerState = currentGameData.timerState;
+      
+      // Find or create content container (separate from timer)
+      let contentDiv = container.querySelector('.turn-content');
+      if (!contentDiv) {
+        contentDiv = document.createElement('div');
+        contentDiv.className = 'turn-content';
+        container.insertBefore(contentDiv, container.firstChild);
+      }
+      
       if (!currentTeamId) {
-        container.innerHTML = `
+        contentDiv.innerHTML = `
           <h1>⏳ Väntar på start...</h1>
           <p class="turn-info">Spelet initialiseras</p>
         `;
@@ -719,26 +821,47 @@
       const currentTeam = currentTeams[currentTeamId];
       
       if (!currentTeam) {
-        container.innerHTML = `
+        contentDiv.innerHTML = `
           <h1>⚠️ Fel</h1>
           <p class="turn-info">Aktivt lag finns inte</p>
         `;
         return;
       }
       
-      // Is it my turn?
-      if (currentTeamId === teamId) {
-        container.className = 'turn-indicator your-turn';
-        container.innerHTML = `
-          <h1>🎮 DIN TUR!</h1>
-          <p class="turn-info">Det är dags att gissa!</p>
-        `;
-      } else {
+      // Determine what to show based on timer state
+      if (timerState === 'pause') {
+        // During pause, show next team info
         container.className = 'turn-indicator waiting';
-        container.innerHTML = `
-          <h1>⏳ ${escapeHtml(currentTeam.name)}s tur</h1>
-          <p class="turn-info">Väntar på att de ska gissa...</p>
-        `;
+        const nextTeamId = currentGameData.nextTeam;
+        const nextTeam = currentTeams[nextTeamId];
+        
+        if (nextTeam) {
+          contentDiv.innerHTML = `
+            <h1>⏸️ PAUS</h1>
+            <p class="turn-info">Nästa låt kommer snart...</p>
+          `;
+        } else {
+          contentDiv.innerHTML = `
+            <h1>⏸️ PAUS</h1>
+            <p class="turn-info">Mellan låtar</p>
+          `;
+        }
+      } else {
+        // During guessing or no timer
+        // Is it my turn?
+        if (currentTeamId === teamId) {
+          container.className = 'turn-indicator your-turn';
+          contentDiv.innerHTML = `
+            <h1>🎮 DIN TUR!</h1>
+            <p class="turn-info">Det är dags att gissa!</p>
+          `;
+        } else {
+          container.className = 'turn-indicator waiting';
+          contentDiv.innerHTML = `
+            <h1>⏳ ${escapeHtml(currentTeam.name)}s tur</h1>
+            <p class="turn-info">Väntar på att de ska gissa...</p>
+          `;
+        }
       }
     }
     
@@ -1358,10 +1481,26 @@
           console.error('[Game] Error adding card:', error);
           showNotification('Kunde inte placera kort', 'error');
           
-          // Still move to next team even on error
-          setTimeout(() => {
-            nextTeam();
-          }, 2000);
+          // Start pause timer even on error - only host
+          if (isHost) {
+            setTimeout(() => {
+              const teamIds = Object.keys(currentTeams);
+              const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+              const nextIndex = (currentIndex + 1) % teamIds.length;
+              const nextTeamId = teamIds[nextIndex];
+              
+              // Update to next team
+              const updates = {};
+              updates[`games/${gameId}/currentTeam`] = nextTeamId;
+              
+              window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+                .then(() => {
+                  const afterNextIndex = (nextIndex + 1) % teamIds.length;
+                  const afterNextTeamId = teamIds[afterNextIndex];
+                  startTimer('pause', 10000, afterNextTeamId);
+                });
+            }, 2000);
+          }
         });
     }
     
@@ -1505,18 +1644,73 @@
           console.log('[Game] Validation complete, updates applied');
           console.log('[Game] ========== VALIDATION END ==========');
           
-          // Always move to next team after validation
-          setTimeout(() => {
-            nextTeam();
-          }, 2000);
+          // Start Timer 4 (pause) after validation - only host should do this
+          if (isHost) {
+            setTimeout(() => {
+              console.log('[Game] Starting pause timer after validation');
+              
+              // Calculate next team
+              const teamIds = Object.keys(currentTeams);
+              const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+              const nextIndex = (currentIndex + 1) % teamIds.length;
+              const nextTeamId = teamIds[nextIndex];
+              
+              // Update current team and song in Firebase
+              const currentSongIndex = currentGameData.currentSongIndex || 0;
+              const nextSongIndex = currentSongIndex + 1;
+              const songs = currentGameData.songs || [];
+              
+              if (nextSongIndex >= songs.length) {
+                console.warn('[Game] No more songs in deck!');
+                return;
+              }
+              
+              const nextSong = songs[nextSongIndex];
+              
+              const updates = {};
+              updates[`games/${gameId}/currentTeam`] = nextTeamId;
+              updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+              updates[`games/${gameId}/currentSong`] = nextSong;
+              
+              // Increment round if we wrapped around
+              if (nextIndex === 0) {
+                const newRound = (currentGameData.currentRound || 0) + 1;
+                updates[`games/${gameId}/currentRound`] = newRound;
+              }
+              
+              window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+                .then(() => {
+                  // Start pause timer showing the next team
+                  const afterNextIndex = (nextIndex + 1) % teamIds.length;
+                  const afterNextTeamId = teamIds[afterNextIndex];
+                  startTimer('pause', 10000, afterNextTeamId);
+                });
+            }, 2000);
+          }
         })
         .catch((error) => {
           console.error('[Game] Error in validation:', error);
           
-          // Move to next team even on error
-          setTimeout(() => {
-            nextTeam();
-          }, 1000);
+          // Start pause timer even on error - only host
+          if (isHost) {
+            setTimeout(() => {
+              const teamIds = Object.keys(currentTeams);
+              const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+              const nextIndex = (currentIndex + 1) % teamIds.length;
+              const nextTeamId = teamIds[nextIndex];
+              
+              // Update to next team
+              const updates = {};
+              updates[`games/${gameId}/currentTeam`] = nextTeamId;
+              
+              window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+                .then(() => {
+                  const afterNextIndex = (nextIndex + 1) % teamIds.length;
+                  const afterNextTeamId = teamIds[afterNextIndex];
+                  startTimer('pause', 10000, afterNextTeamId);
+                });
+            }, 1000);
+          }
         });
     }
     
@@ -1594,6 +1788,254 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
+    }
+    
+    // ============================================
+    // TIMER FUNCTIONS
+    // ============================================
+    function startTimer(type, duration, nextTeamId = null) {
+      console.log('[Timer] Starting timer:', type, 'duration:', duration, 'nextTeam:', nextTeamId);
+      
+      const updates = {};
+      updates[`games/${gameId}/timerState`] = type;
+      updates[`games/${gameId}/timerStartTime`] = Date.now();
+      updates[`games/${gameId}/timerDuration`] = duration;
+      
+      if (nextTeamId) {
+        updates[`games/${gameId}/nextTeam`] = nextTeamId;
+      }
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Timer] Timer started in Firebase');
+        })
+        .catch((error) => {
+          console.error('[Timer] Error starting timer:', error);
+        });
+    }
+    
+    function stopTimer() {
+      console.log('[Timer] Stopping timer');
+      
+      // Clear local interval
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
+      // Clear Firebase timer state
+      const updates = {};
+      updates[`games/${gameId}/timerState`] = null;
+      updates[`games/${gameId}/timerStartTime`] = null;
+      updates[`games/${gameId}/timerDuration`] = null;
+      updates[`games/${gameId}/nextTeam`] = null;
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .catch((error) => {
+          console.error('[Timer] Error stopping timer:', error);
+        });
+      
+      // Reset vibrate tracking
+      lastVibrateSecond = null;
+    }
+    
+    function updateTimer() {
+      if (!currentGameData.timerState || !currentGameData.timerStartTime || !currentGameData.timerDuration) {
+        // No active timer
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        return;
+      }
+      
+      const elapsed = Date.now() - currentGameData.timerStartTime;
+      const remaining = Math.max(0, currentGameData.timerDuration - elapsed);
+      const remainingSeconds = Math.ceil(remaining / 1000);
+      
+      // Render timer UI
+      renderTimer(remainingSeconds, currentGameData.timerDuration);
+      
+      // Vibrate warnings (only for active team during guessing timer)
+      if (currentGameData.timerState === 'guessing' && currentGameData.currentTeam === teamId) {
+        if (remainingSeconds <= 10 && remainingSeconds > 0 && remainingSeconds !== lastVibrateSecond) {
+          vibrate([100]);
+          lastVibrateSecond = remainingSeconds;
+          console.log('[Timer] Vibrate at', remainingSeconds, 'seconds');
+        }
+      }
+      
+      // Check if timer expired
+      if (remaining <= 0) {
+        console.log('[Timer] Timer expired!');
+        onTimerExpired();
+      }
+    }
+    
+    function renderTimer(remainingSeconds, totalDuration) {
+      const container = document.getElementById('turnIndicator');
+      const timerState = currentGameData.timerState;
+      
+      if (!timerState) {
+        // No timer active - don't render timer UI
+        return;
+      }
+      
+      // Create timer HTML if it doesn't exist
+      let timerContainer = container.querySelector('.timer-container');
+      if (!timerContainer) {
+        timerContainer = document.createElement('div');
+        timerContainer.className = 'timer-container';
+        container.appendChild(timerContainer);
+      }
+      
+      // Calculate progress
+      const progress = remainingSeconds / (totalDuration / 1000);
+      const circumference = 2 * Math.PI * 52; // radius = 52
+      const offset = circumference * (1 - progress);
+      
+      // Determine color based on remaining time
+      let colorClass = '';
+      const percentage = (remainingSeconds / (totalDuration / 1000)) * 100;
+      if (percentage <= 20) {
+        colorClass = 'danger';
+      } else if (percentage <= 40) {
+        colorClass = 'warning';
+      }
+      
+      // Timer label text
+      let labelText = '';
+      if (timerState === 'guessing') {
+        labelText = 'Tid att gissa';
+      } else if (timerState === 'pause') {
+        const nextTeamId = currentGameData.nextTeam;
+        const nextTeam = currentTeams[nextTeamId];
+        if (nextTeam) {
+          labelText = `NÄSTA TUR: ${escapeHtml(nextTeam.name)}`;
+        } else {
+          labelText = 'Paus mellan låtar';
+        }
+      }
+      
+      // Render timer UI
+      timerContainer.innerHTML = `
+        <div class="timer-circle">
+          <svg viewBox="0 0 120 120">
+            <circle class="timer-circle-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="timer-circle-progress ${colorClass}" 
+                    cx="60" cy="60" r="52"
+                    stroke-dasharray="${circumference}"
+                    stroke-dashoffset="${offset}">
+            </circle>
+          </svg>
+          <div class="timer-text">${remainingSeconds}</div>
+        </div>
+        <div class="timer-label">${labelText}</div>
+      `;
+    }
+    
+    function onTimerExpired() {
+      console.log('[Timer] onTimerExpired called, state:', currentGameData.timerState);
+      
+      const timerState = currentGameData.timerState;
+      
+      if (timerState === 'guessing') {
+        // Timer 1 expired - guessing time is up
+        console.log('[Timer] Guessing timer expired');
+        
+        // Check if current team has placed a card
+        const currentTeam = currentTeams[currentGameData.currentTeam];
+        
+        if (currentTeam && currentTeam.pendingCard) {
+          // Has pending card - lock it in automatically
+          console.log('[Timer] Auto-locking pending card');
+          if (currentGameData.currentTeam === teamId) {
+            // Only the current team should lock in
+            lockInPlacement();
+          }
+        } else {
+          // No pending card - skip this team's turn
+          console.log('[Timer] No pending card - skipping turn');
+          if (isHost) {
+            // Only host should call skipTurn to avoid race conditions
+            skipTurn();
+          }
+        }
+      } else if (timerState === 'pause') {
+        // Timer 4 expired - pause between songs is over
+        console.log('[Timer] Pause timer expired');
+        
+        if (isHost) {
+          // Only host should transition to next turn
+          transitionToNextTurn();
+        }
+      }
+      
+      // Stop timer
+      stopTimer();
+    }
+    
+    function skipTurn() {
+      console.log('[Timer] Skipping turn for team:', currentGameData.currentTeam);
+      
+      showNotification('⏱️ Tiden är ute! Turen hoppar över', 'info');
+      
+      // Move to next team immediately, but start with Timer 4 (pause)
+      const teamIds = Object.keys(currentTeams);
+      const currentTeamId = currentGameData.currentTeam;
+      const currentIndex = teamIds.indexOf(currentTeamId);
+      const nextIndex = (currentIndex + 1) % teamIds.length;
+      const nextTeamId = teamIds[nextIndex];
+      
+      // Get next song
+      const currentSongIndex = currentGameData.currentSongIndex || 0;
+      const nextSongIndex = currentSongIndex + 1;
+      const songs = currentGameData.songs || [];
+      
+      if (nextSongIndex >= songs.length) {
+        console.warn('[Timer] No more songs in deck!');
+        return;
+      }
+      
+      const nextSong = songs[nextSongIndex];
+      
+      // Update Firebase
+      const updates = {};
+      updates[`games/${gameId}/currentTeam`] = nextTeamId;
+      updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+      updates[`games/${gameId}/currentSong`] = nextSong;
+      
+      // Increment round if we wrapped around
+      if (nextIndex === 0) {
+        const newRound = (currentGameData.currentRound || 0) + 1;
+        updates[`games/${gameId}/currentRound`] = newRound;
+      }
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Timer] Turn skipped, starting pause timer');
+          
+          // Start Timer 4 (pause) - show who's next
+          const afterNextIndex = (nextIndex + 1) % teamIds.length;
+          const afterNextTeamId = teamIds[afterNextIndex];
+          startTimer('pause', 10000, afterNextTeamId);
+        })
+        .catch((error) => {
+          console.error('[Timer] Error skipping turn:', error);
+        });
+    }
+    
+    function transitionToNextTurn() {
+      console.log('[Timer] Transitioning to next turn');
+      
+      // Just start Timer 1 for the current team
+      startTimer('guessing', 90000);
+    }
+    
+    function vibrate(pattern) {
+      if ('vibrate' in navigator) {
+        navigator.vibrate(pattern);
+      }
     }
     
     console.log('[Game] Script loaded successfully');
