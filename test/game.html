@@ -2118,13 +2118,33 @@
         }
       }
       
-      // Check if timer expired - let all clients handle it
-      // (each will check if it's their turn to lock in or if they're host to skip)
+      // Check if timer expired - but only let appropriate clients handle it to avoid race conditions
       if (remaining <= 0) {
         console.log('[Timer] Timer expired!');
-        // Only call once per expiry - check if timer state still exists
+        
+        // Only call if timer state still exists
         if (currentGameData.timerState) {
-          onTimerExpired();
+          const timerState = currentGameData.timerState;
+          
+          // For guessing timer: only current team (or host as backup) should handle
+          if (timerState === 'guessing') {
+            const isCurrentTeam = currentGameData.currentTeam === teamId;
+            if (isCurrentTeam || isHost) {
+              console.log('[Timer] Handling guessing timer expiry as', isCurrentTeam ? 'current team' : 'host backup');
+              onTimerExpired();
+            } else {
+              console.log('[Timer] Not current team or host, ignoring guessing timer expiry');
+            }
+          }
+          // For between_songs timer: only host should handle
+          else if (timerState === 'between_songs') {
+            if (isHost) {
+              console.log('[Timer] Handling between_songs timer expiry as host');
+              onTimerExpired();
+            } else {
+              console.log('[Timer] Not host, ignoring between_songs timer expiry');
+            }
+          }
         }
       }
     }
@@ -2196,10 +2216,28 @@
     function onTimerExpired() {
       console.log('[Timer] onTimerExpired called, state:', currentGameData.timerState);
       console.log('[Timer] Called by:', isHost ? 'HOST' : 'NON-HOST', 'teamId:', teamId);
+      console.log('[Timer] Current team:', currentGameData.currentTeam);
       
       const timerState = currentGameData.timerState;
       
-      // Stop timer FIRST by clearing Firebase - anyone can do this
+      // Determine if THIS client should handle the timer stop
+      let shouldStopTimer = false;
+      
+      if (timerState === 'guessing') {
+        // For guessing: current team or host can stop
+        shouldStopTimer = (currentGameData.currentTeam === teamId) || isHost;
+      } else if (timerState === 'between_songs') {
+        // For between_songs: only host can stop
+        shouldStopTimer = isHost;
+      }
+      
+      if (!shouldStopTimer) {
+        console.log('[Timer] Not authorized to stop this timer, skipping');
+        return;
+      }
+      
+      // Stop timer by clearing Firebase
+      console.log('[Timer] Stopping timer in Firebase');
       const timerUpdates = {};
       timerUpdates[`games/${gameId}/timerState`] = null;
       timerUpdates[`games/${gameId}/timerStartTime`] = null;
@@ -2208,7 +2246,7 @@
       
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), timerUpdates)
         .then(() => {
-          console.log('[Timer] Timer stopped in Firebase by', isHost ? 'host' : 'non-host');
+          console.log('[Timer] Timer stopped in Firebase');
         })
         .catch((error) => {
           console.error('[Timer] Error stopping timer:', error);
