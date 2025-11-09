@@ -825,6 +825,8 @@
       previewCard.addEventListener('dragstart', handlePreviewDragStart);
       previewCard.addEventListener('dragend', handleDragEnd);
       previewCard.addEventListener('touchstart', handlePreviewTouchStart);
+      previewCard.addEventListener('touchmove', handleTouchMove);
+      previewCard.addEventListener('touchend', handleTouchEnd);
       
       // Insert at correct position
       if (placementPosition === 0 || cards.length === 0) {
@@ -1127,10 +1129,19 @@
     
     function handlePreviewTouchStart(e) {
       console.log('[Game] Touch start (preview card)');
+      
+      // Clean up any existing ghost card first
+      if (ghostCard) {
+        console.log('[Game] Removing existing ghost card');
+        document.body.removeChild(ghostCard);
+        ghostCard = null;
+      }
+      
       isDragging = true;
       draggedCard = e.currentTarget;
       
-      // Clear current placement so we can set a new one
+      // Store current placement position before clearing
+      const previousPlacement = placementPosition;
       placementPosition = null;
       
       const touch = e.touches[0];
@@ -1149,14 +1160,25 @@
       ghostCard.style.top = touch.clientY - 80 + 'px';
       document.body.appendChild(ghostCard);
       
+      console.log('[Game] Ghost card created');
+      
       draggedCard.classList.add('dragging');
       e.preventDefault();
     }
     
     function handleTouchMove(e) {
-      if (!isDragging || !ghostCard) return;
+      if (!isDragging) {
+        return;
+      }
+      
+      if (!ghostCard) {
+        console.warn('[Game] Touch move but no ghost card!');
+        return;
+      }
       
       const touch = e.touches[0];
+      
+      // Update ghost card position
       ghostCard.style.left = touch.clientX - 60 + 'px';
       ghostCard.style.top = touch.clientY - 80 + 'px';
       
@@ -1167,7 +1189,12 @@
     }
     
     function handleTouchEnd(e) {
-      if (!isDragging) return;
+      console.log('[Game] Touch end, isDragging:', isDragging);
+      
+      if (!isDragging) {
+        console.log('[Game] Not dragging, ignoring touch end');
+        return;
+      }
       
       const touch = e.changedTouches[0];
       const position = getDropPositionFromCoords(touch.clientX, touch.clientY);
@@ -1177,19 +1204,27 @@
       placementPosition = position;
       clearDynamicDropIndicator();
       
-      // Cleanup
+      // Cleanup ghost card
+      console.log('[Game] Cleaning up ghost card:', ghostCard ? 'exists' : 'null');
       if (ghostCard) {
-        document.body.removeChild(ghostCard);
+        try {
+          document.body.removeChild(ghostCard);
+          console.log('[Game] Ghost card removed');
+        } catch (err) {
+          console.error('[Game] Error removing ghost card:', err);
+        }
         ghostCard = null;
       }
       
+      // Cleanup dragged card styling
       if (draggedCard) {
         draggedCard.classList.remove('dragging');
+        draggedCard = null;
       }
       
       isDragging = false;
       
-      updateGameView(); // Re-render to show preview card
+      updateGameView(); // Re-render to show preview card at new position
       showNotification(`Kort placerat vid position ${position}`, 'success');
       
       e.preventDefault();
