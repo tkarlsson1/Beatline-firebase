@@ -209,7 +209,7 @@ function isLobbyFull(existingTeams) {
 function generateLobbyQRCode(gameId, elementId) {
   console.log('[Lobby] Generating QR code for game:', gameId);
   
-  const joinUrl = `https://www.notestream.se/join?game=${gameId}`;
+  const joinUrl = `https://www.notestream.se/test/join.html?game=${gameId}`;
   const qrElement = document.getElementById(elementId);
   
   if (!qrElement) {

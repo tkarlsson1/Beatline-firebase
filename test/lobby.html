@@ -554,7 +554,7 @@
       document.getElementById('pinDisplay').textContent = gameData.pin;
       
       // Generate QR code
-      const joinUrl = `https://www.notestream.se/join?game=${gameId}`;
+      const joinUrl = `https://www.notestream.se/test/join.html?game=${gameId}`;
       document.getElementById('joinUrl').textContent = joinUrl;
       generateLobbyQRCode(gameId, 'qrCodeElement');
       
