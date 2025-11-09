@@ -486,6 +486,9 @@
       background: linear-gradient(to right, #FFB300, #FFA000);
     }
   </style>
+  
+  <!-- Spotify Web Playback SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
 </head>
 
 <body>
@@ -528,6 +531,11 @@
       <div class="team-header">
         <div class="team-list" id="teamList">
           <!-- Teams will be rendered here -->
+        </div>
+        <!-- Spotify status (host only) -->
+        <div id="spotifyStatus" style="display: none; position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: rgba(0,0,0,0.7); border-radius: 20px; font-size: 0.8rem; color: #1DB954;">
+          <span id="spotifyStatusIcon">🎵</span>
+          <span id="spotifyStatusText">Spotify</span>
         </div>
       </div>
       
@@ -577,6 +585,10 @@
   <!-- Load lobby.js helper functions -->
   <script src="lobby.js"></script>
   
+  <!-- Spotify Integration -->
+  <script src="spotify-auth.js"></script>
+  <script src="spotify-player.js"></script>
+  
   <script>
     // ============================================
     // GLOBAL VARIABLES
@@ -601,6 +613,11 @@
     let hasStartedInitialTimer = false; // Track if Timer 4 has started at game start
     let hasInitializedScores = false; // Track if scores have been initialized based on revealed cards
     let lastValidationTrigger = null; // Track validation trigger to start Timer 4
+    let previousTimerState = null; // Track previous timer state to detect changes
+    
+    // Spotify state
+    let spotifyInitialized = false;
+    let currentPlayingTrackId = null;
     
     // NOTE: Timer durations should be set in Firebase by lobby.js when starting the game:
     // - currentGameData.guessingTime (in seconds, default: 90)
@@ -634,6 +651,36 @@
       // Initialize game
       initializeGame();
     });
+    
+    // Listen for Spotify player ready event (host only)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('spotifyPlayerReady', (event) => {
+        console.log('[Spotify] Player ready event received:', event.detail);
+        
+        // Show Spotify status indicator for host
+        const gameUrl = new URLSearchParams(window.location.search);
+        const urlTeamId = gameUrl.get('teamId');
+        const urlGameId = gameUrl.get('gameId');
+        
+        if (urlGameId && urlTeamId) {
+          const gameRef = window.firebaseRef(window.firebaseDb, `games/${urlGameId}`);
+          window.firebaseGet(gameRef).then(snapshot => {
+            if (snapshot.exists()) {
+              const gameData = snapshot.val();
+              if (gameData.hostTeam === urlTeamId) {
+                // This is the host - show Spotify indicator
+                const spotifyStatus = document.getElementById('spotifyStatus');
+                if (spotifyStatus) {
+                  spotifyStatus.style.display = 'block';
+                  document.getElementById('spotifyStatusText').textContent = 'Spotify kopplad';
+                  console.log('[Spotify] Status indicator shown');
+                }
+              }
+            }
+          });
+        }
+      });
+    }
     
     // ============================================
     // GAME INITIALIZATION
@@ -817,6 +864,45 @@
             window.firebaseUpdate(window.firebaseRef(window.firebaseDb), clearUpdates);
           }
         }
+      }
+      
+      // Handle Spotify playback (host only)
+      if (isHost && window.spotifyPlayer) {
+        const currentTimerState = currentGameData.timerState;
+        
+        // Detect timer state change to 'guessing' - play new song
+        if (currentTimerState === 'guessing' && previousTimerState !== 'guessing') {
+          console.log('[Spotify] Timer changed to guessing, playing song...');
+          
+          if (currentGameData.currentSong && currentGameData.currentSong.spotifyId) {
+            const spotifyId = currentGameData.currentSong.spotifyId;
+            
+            // Only play if it's a different song
+            if (spotifyId !== currentPlayingTrackId) {
+              console.log('[Spotify] Playing new track:', currentGameData.currentSong.title, 'by', currentGameData.currentSong.artist);
+              
+              window.spotifyPlayer.play(spotifyId)
+                .then(success => {
+                  if (success) {
+                    currentPlayingTrackId = spotifyId;
+                    console.log('[Spotify] Track started successfully');
+                  } else {
+                    console.error('[Spotify] Failed to start track');
+                  }
+                })
+                .catch(error => {
+                  console.error('[Spotify] Error playing track:', error);
+                });
+            } else {
+              console.log('[Spotify] Same track already playing, continuing...');
+            }
+          } else {
+            console.warn('[Spotify] No currentSong or spotifyId available');
+          }
+        }
+        
+        // Update previous timer state
+        previousTimerState = currentTimerState;
       }
       
       // Start initial timer (Timer 4) when game first starts
