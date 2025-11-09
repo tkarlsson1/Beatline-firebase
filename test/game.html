@@ -600,6 +600,7 @@
     let lastVibrateSecond = null;
     let hasStartedInitialTimer = false; // Track if Timer 4 has started at game start
     let hasInitializedScores = false; // Track if scores have been initialized based on revealed cards
+    let lastValidationTrigger = null; // Track validation trigger to start Timer 4
     
     // ============================================
     // INITIALIZATION
@@ -791,6 +792,26 @@
         } else {
           pauseBtn.style.display = 'inline-block';
           resumeBtn.style.display = 'none';
+        }
+        
+        // Check if validation trigger changed (non-host validated their card)
+        if (currentGameData.validationTrigger && currentGameData.validationTrigger !== lastValidationTrigger) {
+          console.log('[Host] Validation trigger detected:', currentGameData.validationTrigger);
+          lastValidationTrigger = currentGameData.validationTrigger;
+          
+          // Start Timer 4 after validation from non-host
+          console.log('[Host] Starting Timer 4 after non-host validation');
+          const nextTeamId = currentGameData.currentTeam;
+          if (nextTeamId && !currentGameData.timerState) {
+            // Only start if no timer is currently active
+            console.log('[Host] Starting between_songs timer for:', nextTeamId);
+            startTimer('between_songs', 10000, nextTeamId);
+            
+            // Clear the trigger
+            const clearUpdates = {};
+            clearUpdates[`games/${gameId}/validationTrigger`] = null;
+            window.firebaseUpdate(window.firebaseRef(window.firebaseDb), clearUpdates);
+          }
         }
       }
       
@@ -1812,7 +1833,70 @@
                 });
             }, 2000);
           } else {
-            console.log('[Game] Not host, waiting for host to start Timer 4');
+            console.log('[Game] Not host, but will update game state to trigger host');
+            
+            setTimeout(() => {
+              console.log('[Game] Non-host updating game state after validation');
+              
+              if (!currentTeams || Object.keys(currentTeams).length === 0) {
+                console.error('[Game] No teams available!');
+                return;
+              }
+              
+              if (!currentGameData) {
+                console.error('[Game] No game data available!');
+                return;
+              }
+              
+              // Calculate next team
+              const teamIds = Object.keys(currentTeams);
+              const currentTeamId = currentGameData.currentTeam;
+              const currentIndex = teamIds.indexOf(currentTeamId);
+              const nextIndex = (currentIndex + 1) % teamIds.length;
+              const nextTeamId = teamIds[nextIndex];
+              
+              console.log('[Game] Current team:', currentTeamId, 'at index', currentIndex);
+              console.log('[Game] Next team:', nextTeamId, 'at index', nextIndex);
+              
+              // Update current team and song in Firebase
+              const currentSongIndex = currentGameData.currentSongIndex || 0;
+              const nextSongIndex = currentSongIndex + 1;
+              const songs = currentGameData.songs || [];
+              
+              console.log('[Game] Next song index:', nextSongIndex, '/', songs.length);
+              
+              if (nextSongIndex >= songs.length) {
+                console.warn('[Game] No more songs in deck!');
+                return;
+              }
+              
+              const nextSong = songs[nextSongIndex];
+              
+              const updates = {};
+              updates[`games/${gameId}/currentTeam`] = nextTeamId;
+              updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+              updates[`games/${gameId}/currentSong`] = nextSong;
+              
+              // Increment round if we wrapped around
+              if (nextIndex === 0) {
+                const newRound = (currentGameData.currentRound || 0) + 1;
+                updates[`games/${gameId}/currentRound`] = newRound;
+                console.log('[Game] New round:', newRound);
+              }
+              
+              // Set a validation trigger that host can see
+              updates[`games/${gameId}/validationTrigger`] = Date.now();
+              
+              console.log('[Game] Non-host applying game updates:', updates);
+              
+              window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+                .then(() => {
+                  console.log('[Game] Non-host game updates applied, host should start Timer 4');
+                })
+                .catch((error) => {
+                  console.error('[Game] Error applying game updates:', error);
+                });
+            }, 2000);
           }
         })
         .catch((error) => {
