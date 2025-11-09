@@ -567,7 +567,9 @@
       <!-- Debug controls (host only) -->
       <div class="debug-controls" id="debugControls" style="display: none;">
         <h3>🔧 HOST KONTROLLER</h3>
-        <button class="debug-btn" onclick="nextTeam()">Nästa lag →</button>
+        <button class="debug-btn" id="pauseBtn" onclick="pauseGame()" style="display: inline-block;">⏸️ Pausa spel</button>
+        <button class="debug-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">▶️ Fortsätt</button>
+        <button class="debug-btn" onclick="forceNextTeam()">Nästa lag →</button>
       </div>
     </div>
   </div>
@@ -741,6 +743,20 @@
       // Update round counter
       document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
       
+      // Update pause/resume button visibility (host only)
+      if (isHost) {
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        
+        if (currentGameData.timerState === 'paused') {
+          pauseBtn.style.display = 'none';
+          resumeBtn.style.display = 'inline-block';
+        } else {
+          pauseBtn.style.display = 'inline-block';
+          resumeBtn.style.display = 'none';
+        }
+      }
+      
       // Start initial timer (Timer 4) when game first starts
       if (!hasStartedInitialTimer && currentGameData.status === 'playing' && isHost) {
         hasStartedInitialTimer = true;
@@ -749,9 +765,9 @@
         // Find the starting team (should already be set in currentTeam)
         const firstTeamId = currentGameData.currentTeam;
         
-        // Start Timer 4 (10s pause) showing the first team
+        // Start Timer 4 (10s between songs) showing the first team
         setTimeout(() => {
-          startTimer('pause', 10000, firstTeamId);
+          startTimer('between_songs', 10000, firstTeamId);
         }, 500); // Small delay to ensure everything is loaded
       }
     }
@@ -827,8 +843,8 @@
       }
       
       // Determine what to show based on timer state
-      if (timerState === 'pause') {
-        // During pause, show next team info
+      if (timerState === 'between_songs') {
+        // During between songs pause, show next team info
         container.className = 'turn-indicator waiting';
         const nextTeamId = currentGameData.nextTeam;
         const nextTeam = currentTeams[nextTeamId];
@@ -844,6 +860,13 @@
             <p class="turn-info"></p>
           `;
         }
+      } else if (timerState === 'paused') {
+        // Game is paused by host
+        container.className = 'turn-indicator waiting';
+        contentDiv.innerHTML = `
+          <h1>⏸️ SPELET ÄR PAUSAT</h1>
+          <p class="turn-info">Väntar på att host fortsätter...</p>
+        `;
       } else {
         // During guessing or no timer
         // Is it my turn?
@@ -1498,9 +1521,8 @@
               
               window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
                 .then(() => {
-                  const afterNextIndex = (nextIndex + 1) % teamIds.length;
-                  const afterNextTeamId = teamIds[afterNextIndex];
-                  startTimer('pause', 10000, afterNextTeamId);
+                  
+                  startTimer("between_songs", 10000, nextTeamId);
                 });
             }, 2000);
           }
@@ -1683,10 +1705,9 @@
               
               window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
                 .then(() => {
-                  // Start pause timer showing the next team
-                  const afterNextIndex = (nextIndex + 1) % teamIds.length;
-                  const afterNextTeamId = teamIds[afterNextIndex];
-                  startTimer('pause', 10000, afterNextTeamId);
+                  // Start between songs timer showing the team that will play next
+                  // (which is the team we just set as currentTeam)
+                  startTimer('between_songs', 10000, nextTeamId);
                 });
             }, 2000);
           }
@@ -1708,9 +1729,8 @@
               
               window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
                 .then(() => {
-                  const afterNextIndex = (nextIndex + 1) % teamIds.length;
-                  const afterNextTeamId = teamIds[afterNextIndex];
-                  startTimer('pause', 10000, afterNextTeamId);
+                  
+                  startTimer("between_songs", 10000, nextTeamId);
                 });
             }, 1000);
           }
@@ -1901,8 +1921,8 @@
       const container = document.getElementById('turnIndicator');
       const timerState = currentGameData.timerState;
       
-      if (!timerState) {
-        // No timer active - don't render timer UI
+      if (!timerState || timerState === 'paused') {
+        // No timer active or game is paused - don't render timer UI
         return;
       }
       
@@ -1932,14 +1952,16 @@
       let labelText = '';
       if (timerState === 'guessing') {
         labelText = 'Tid att gissa';
-      } else if (timerState === 'pause') {
+      } else if (timerState === 'between_songs') {
         const nextTeamId = currentGameData.nextTeam;
         const nextTeam = currentTeams[nextTeamId];
         if (nextTeam) {
           labelText = `NÄSTA TUR: ${escapeHtml(nextTeam.name)}`;
         } else {
-          labelText = 'Paus mellan låtar';
+          labelText = 'Mellan låtar';
         }
+      } else if (timerState === 'paused') {
+        labelText = 'SPELET ÄR PAUSAT';
       }
       
       // Render timer UI
@@ -1989,9 +2011,9 @@
             skipTurn();
           }
         }
-      } else if (timerState === 'pause') {
+      } else if (timerState === 'between_songs') {
         // Timer 4 expired - pause between songs is over
-        console.log('[Timer] Pause timer expired');
+        console.log('[Timer] Between songs timer expired');
         
         if (isHost) {
           // Only host should transition to next turn
@@ -2041,9 +2063,8 @@
           console.log('[Timer] Turn skipped, starting pause timer');
           
           // Start Timer 4 (pause) - show who's next
-          const afterNextIndex = (nextIndex + 1) % teamIds.length;
-          const afterNextTeamId = teamIds[afterNextIndex];
-          startTimer('pause', 10000, afterNextTeamId);
+          
+          startTimer("between_songs", 10000, nextTeamId);
         })
         .catch((error) => {
           console.error('[Timer] Error skipping turn:', error);
@@ -2061,6 +2082,160 @@
       if ('vibrate' in navigator) {
         navigator.vibrate(pattern);
       }
+    }
+    
+    // ============================================
+    // HOST CONTROLS
+    // ============================================
+    function forceNextTeam() {
+      if (!isHost) {
+        console.error('[Host] Only host can force next team');
+        return;
+      }
+      
+      console.log('[Host] Force switching to next team');
+      
+      // Stop current timer
+      stopTimer();
+      
+      // Get list of team IDs
+      const teamIds = Object.keys(currentTeams);
+      
+      if (teamIds.length === 0) {
+        console.error('[Host] No teams in game');
+        return;
+      }
+      
+      // Find current team index
+      const currentTeamId = currentGameData.currentTeam;
+      const currentIndex = teamIds.indexOf(currentTeamId);
+      
+      // Get next team (wrap around)
+      const nextIndex = (currentIndex + 1) % teamIds.length;
+      const nextTeamId = teamIds[nextIndex];
+      
+      console.log('[Host] Next team:', nextTeamId);
+      
+      // Get next song from deck
+      const currentSongIndex = currentGameData.currentSongIndex || 0;
+      const nextSongIndex = currentSongIndex + 1;
+      const songs = currentGameData.songs || [];
+      
+      if (nextSongIndex >= songs.length) {
+        console.warn('[Host] No more songs in deck!');
+        showNotification('Inga fler låtar kvar!', 'error');
+        return;
+      }
+      
+      const nextSong = songs[nextSongIndex];
+      console.log('[Host] Next song:', nextSong.title, 'by', nextSong.artist);
+      
+      // Update Firebase
+      const updates = {};
+      updates[`games/${gameId}/currentTeam`] = nextTeamId;
+      updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+      updates[`games/${gameId}/currentSong`] = nextSong;
+      
+      // Increment round if we wrapped around
+      if (nextIndex === 0) {
+        const newRound = (currentGameData.currentRound || 0) + 1;
+        updates[`games/${gameId}/currentRound`] = newRound;
+        console.log('[Host] New round:', newRound);
+      }
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Host] Team switched successfully');
+          // Start Timer 4 (between songs) showing the next team
+          startTimer('between_songs', 10000, nextTeamId);
+        })
+        .catch((error) => {
+          console.error('[Host] Error switching team:', error);
+        });
+    }
+    
+    function pauseGame() {
+      if (!isHost) {
+        console.error('[Host] Only host can pause');
+        return;
+      }
+      
+      console.log('[Host] Pausing game');
+      
+      // Save current timer state before pausing
+      const updates = {};
+      updates[`games/${gameId}/pausedTimerState`] = currentGameData.timerState;
+      updates[`games/${gameId}/pausedTimerRemaining`] = null; // Will calculate on resume
+      
+      if (currentGameData.timerStartTime && currentGameData.timerDuration) {
+        const elapsed = Date.now() - currentGameData.timerStartTime;
+        const remaining = Math.max(0, currentGameData.timerDuration - elapsed);
+        updates[`games/${gameId}/pausedTimerRemaining`] = remaining;
+      }
+      
+      // Set timer to paused state
+      updates[`games/${gameId}/timerState`] = 'paused';
+      updates[`games/${gameId}/timerStartTime`] = null;
+      updates[`games/${gameId}/timerDuration`] = null;
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Host] Game paused');
+          showNotification('⏸️ Spelet är pausat', 'info');
+          
+          // Toggle buttons
+          document.getElementById('pauseBtn').style.display = 'none';
+          document.getElementById('resumeBtn').style.display = 'inline-block';
+        })
+        .catch((error) => {
+          console.error('[Host] Error pausing game:', error);
+        });
+    }
+    
+    function resumeGame() {
+      if (!isHost) {
+        console.error('[Host] Only host can resume');
+        return;
+      }
+      
+      console.log('[Host] Resuming game');
+      
+      const pausedState = currentGameData.pausedTimerState;
+      const pausedRemaining = currentGameData.pausedTimerRemaining;
+      
+      if (!pausedState) {
+        console.warn('[Host] No paused state to resume from');
+        return;
+      }
+      
+      // Restore timer state
+      const updates = {};
+      updates[`games/${gameId}/pausedTimerState`] = null;
+      updates[`games/${gameId}/pausedTimerRemaining`] = null;
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Host] Game resumed');
+          showNotification('▶️ Spelet fortsätter!', 'success');
+          
+          // Toggle buttons
+          document.getElementById('pauseBtn').style.display = 'inline-block';
+          document.getElementById('resumeBtn').style.display = 'none';
+          
+          // Restart timer with remaining time
+          if (pausedRemaining && pausedRemaining > 0) {
+            const nextTeamId = currentGameData.nextTeam;
+            startTimer(pausedState, pausedRemaining, nextTeamId);
+          } else {
+            // No remaining time or invalid state - start fresh based on current state
+            if (currentGameData.currentTeam) {
+              startTimer('guessing', 90000);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('[Host] Error resuming game:', error);
+        });
     }
     
     console.log('[Game] Script loaded successfully');
