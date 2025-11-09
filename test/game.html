@@ -277,6 +277,184 @@
       font-size: 0.9rem;
       opacity: 0.7;
     }
+    
+    /* Timeline container */
+    .timeline-container {
+      width: 100%;
+      max-width: 95vw;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 1rem 0;
+      margin: 2rem 0;
+    }
+    
+    .timeline {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: min-content;
+      padding: 0 2rem;
+    }
+    
+    /* Card styles */
+    .card {
+      width: 120px;
+      height: 160px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    .card.starting-card {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border: 3px solid #FFD700;
+    }
+    
+    .card.blank-card {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      border: 3px dashed rgba(255, 255, 255, 0.5);
+    }
+    
+    .card.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    
+    .card-year {
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-info {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.9);
+      text-align: center;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    
+    .card-blank-text {
+      font-size: 1.5rem;
+      color: white;
+      text-align: center;
+    }
+    
+    /* Drop zones */
+    .drop-zone {
+      width: 60px;
+      height: 160px;
+      border: 3px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .drop-zone.active {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.2);
+      transform: scale(1.1);
+    }
+    
+    .drop-zone::after {
+      content: '↓';
+      font-size: 2rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .drop-zone.active::after {
+      color: #4CAF50;
+    }
+    
+    /* Current card to place */
+    .current-card-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .current-card-label {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+    
+    .current-card {
+      display: inline-block;
+      touch-action: none;
+      user-select: none;
+    }
+    
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .action-btn {
+      background: var(--accent-color);
+      border: none;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+      font-family: 'Manrope', sans-serif;
+      transition: all 0.3s;
+    }
+    
+    .action-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+    
+    .action-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(to right, #4CAF50, #45a049);
+    }
+    
+    .action-btn.primary:hover:not(:disabled) {
+      background: linear-gradient(to right, #45a049, #3d8b40);
+    }
+    
+    .action-btn.secondary {
+      background: linear-gradient(to right, #FFC107, #FFB300);
+    }
+    
+    .action-btn.secondary:hover:not(:disabled) {
+      background: linear-gradient(to right, #FFB300, #FFA000);
+    }
   </style>
 </head>
 
@@ -325,8 +503,34 @@
       
       <!-- Game area -->
       <div class="game-area">
+        <!-- Turn indicator -->
         <div class="turn-indicator" id="turnIndicator">
           <!-- Turn info will be rendered here -->
+        </div>
+        
+        <!-- Current card to place (only shown when it's your turn) -->
+        <div class="current-card-container" id="currentCardContainer" style="display: none;">
+          <div class="current-card-label">Dra kortet till rätt plats på tidslinjen:</div>
+          <div class="current-card" id="currentCard" draggable="true">
+            <!-- Card will be rendered here -->
+          </div>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="timeline-container" id="timelineContainer">
+          <div class="timeline" id="timeline">
+            <!-- Timeline cards will be rendered here -->
+          </div>
+        </div>
+        
+        <!-- Action buttons -->
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+          <button class="action-btn secondary" id="changeCardBtn" onclick="changeCard()" disabled>
+            🔄 BYT LÅT (1 token)
+          </button>
+          <button class="action-btn primary" id="lockInBtn" onclick="lockInPlacement()" disabled>
+            ✓ LÅS IN PLACERING
+          </button>
         </div>
       </div>
       
@@ -352,6 +556,12 @@
     let currentTeams = {};
     let myTeam = null;
     let listeners = [];
+    
+    // Drag and drop state
+    let isDragging = false;
+    let draggedCard = null;
+    let placementPosition = null; // Where the card will be placed
+    let currentCardElement = null;
     
     // ============================================
     // INITIALIZATION
@@ -473,6 +683,15 @@
       // Update turn indicator
       renderTurnIndicator();
       
+      // Update timeline
+      renderTimeline();
+      
+      // Update current card (if it's my turn)
+      renderCurrentCard();
+      
+      // Update action buttons
+      updateActionButtons();
+      
       // Update round counter
       document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
     }
@@ -550,6 +769,391 @@
           <p class="turn-info">Väntar på att de ska gissa...</p>
         `;
       }
+    }
+    
+    function renderTimeline() {
+      const container = document.getElementById('timeline');
+      const currentTeamId = currentGameData.currentTeam;
+      
+      if (!currentTeamId) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      const displayTeam = currentTeams[currentTeamId];
+      
+      if (!displayTeam || !displayTeam.timeline) {
+        container.innerHTML = '<p style="color: white;">Ingen tidslinje än...</p>';
+        return;
+      }
+      
+      // Get timeline cards sorted by position
+      const timelineCards = Object.entries(displayTeam.timeline)
+        .map(([key, card]) => ({ ...card, key }))
+        .sort((a, b) => a.position - b.position);
+      
+      console.log('[Game] Rendering timeline with', timelineCards.length, 'cards');
+      
+      container.innerHTML = '';
+      
+      // Render cards with drop zones between them
+      timelineCards.forEach((card, index) => {
+        // Add drop zone before first card
+        if (index === 0) {
+          const dropZone = createDropZone(index);
+          container.appendChild(dropZone);
+        }
+        
+        // Add card
+        const cardElement = createCardElement(card);
+        container.appendChild(cardElement);
+        
+        // Add drop zone after card
+        const dropZone = createDropZone(index + 1);
+        container.appendChild(dropZone);
+      });
+      
+      // If no cards, add a single drop zone
+      if (timelineCards.length === 0) {
+        const dropZone = createDropZone(0);
+        container.appendChild(dropZone);
+      }
+    }
+    
+    function createCardElement(card) {
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'card';
+      
+      if (card.position === 0) {
+        cardDiv.classList.add('starting-card');
+      }
+      
+      // Show year if revealed, otherwise show blank
+      if (card.revealed) {
+        cardDiv.innerHTML = `
+          <div class="card-year">${card.year}</div>
+          <div class="card-info">${escapeHtml(card.title)}<br>by ${escapeHtml(card.artist)}</div>
+        `;
+      } else {
+        cardDiv.innerHTML = `
+          <div class="card-blank-text">?</div>
+          <div class="card-info">Placerat kort</div>
+        `;
+        cardDiv.classList.add('blank-card');
+      }
+      
+      return cardDiv;
+    }
+    
+    function createDropZone(position) {
+      const dropZone = document.createElement('div');
+      dropZone.className = 'drop-zone';
+      dropZone.dataset.position = position;
+      
+      // Add event listeners for drag-and-drop
+      dropZone.addEventListener('dragover', handleDragOver);
+      dropZone.addEventListener('dragleave', handleDragLeave);
+      dropZone.addEventListener('drop', handleDrop);
+      
+      // Touch events
+      dropZone.addEventListener('touchmove', handleTouchMove);
+      dropZone.addEventListener('touchend', handleTouchEnd);
+      
+      return dropZone;
+    }
+    
+    function renderCurrentCard() {
+      const container = document.getElementById('currentCardContainer');
+      const currentTeamId = currentGameData.currentTeam;
+      
+      // Only show current card if it's my turn
+      if (currentTeamId !== teamId) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      const currentSong = currentGameData.currentSong;
+      
+      if (!currentSong) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.style.display = 'block';
+      
+      // Create card element
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'card blank-card';
+      cardDiv.id = 'draggableCard';
+      cardDiv.draggable = true;
+      cardDiv.innerHTML = `
+        <div class="card-blank-text">?</div>
+        <div class="card-info">Dra mig till tidslinjen!</div>
+      `;
+      
+      // Add drag event listeners
+      cardDiv.addEventListener('dragstart', handleDragStart);
+      cardDiv.addEventListener('dragend', handleDragEnd);
+      
+      // Touch events
+      cardDiv.addEventListener('touchstart', handleTouchStart);
+      cardDiv.addEventListener('touchmove', handleTouchMove);
+      cardDiv.addEventListener('touchend', handleTouchEnd);
+      
+      // Replace existing card
+      const cardContainer = document.getElementById('currentCard');
+      cardContainer.innerHTML = '';
+      cardContainer.appendChild(cardDiv);
+      
+      currentCardElement = cardDiv;
+    }
+    
+    function updateActionButtons() {
+      const container = document.getElementById('actionButtons');
+      const currentTeamId = currentGameData.currentTeam;
+      
+      // Only show action buttons if it's my turn
+      if (currentTeamId !== teamId) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.style.display = 'flex';
+      
+      // Update button states
+      const changeCardBtn = document.getElementById('changeCardBtn');
+      const lockInBtn = document.getElementById('lockInBtn');
+      
+      // Change card button - enable if team has tokens
+      if (myTeam && myTeam.tokens > 0) {
+        changeCardBtn.disabled = false;
+      } else {
+        changeCardBtn.disabled = true;
+      }
+      
+      // Lock in button - enable if placement position is set
+      if (placementPosition !== null) {
+        lockInBtn.disabled = false;
+      } else {
+        lockInBtn.disabled = true;
+      }
+    }
+    
+    // ============================================
+    // DRAG AND DROP HANDLERS
+    // ============================================
+    function handleDragStart(e) {
+      console.log('[Game] Drag start');
+      isDragging = true;
+      draggedCard = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    
+    function handleDragEnd(e) {
+      console.log('[Game] Drag end');
+      isDragging = false;
+      e.target.classList.remove('dragging');
+      
+      // Remove active class from all drop zones
+      document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.classList.remove('active');
+      });
+    }
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      
+      if (isDragging) {
+        e.currentTarget.classList.add('active');
+      }
+    }
+    
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('active');
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('active');
+      
+      if (!isDragging) return;
+      
+      const position = parseInt(e.currentTarget.dataset.position);
+      console.log('[Game] Dropped at position:', position);
+      
+      placementPosition = position;
+      updateActionButtons();
+      
+      // Visual feedback
+      showNotification(`Kort placerat vid position ${position}`, 'success');
+    }
+    
+    // Touch events for mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let ghostCard = null;
+    
+    function handleTouchStart(e) {
+      console.log('[Game] Touch start');
+      isDragging = true;
+      draggedCard = e.currentTarget;
+      
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      
+      // Create ghost card that follows finger
+      ghostCard = draggedCard.cloneNode(true);
+      ghostCard.style.position = 'fixed';
+      ghostCard.style.zIndex = '10000';
+      ghostCard.style.pointerEvents = 'none';
+      ghostCard.style.opacity = '0.8';
+      ghostCard.style.width = '120px';
+      ghostCard.style.height = '160px';
+      ghostCard.style.left = touch.clientX - 60 + 'px';
+      ghostCard.style.top = touch.clientY - 80 + 'px';
+      document.body.appendChild(ghostCard);
+      
+      draggedCard.classList.add('dragging');
+      e.preventDefault();
+    }
+    
+    function handleTouchMove(e) {
+      if (!isDragging || !ghostCard) return;
+      
+      const touch = e.touches[0];
+      ghostCard.style.left = touch.clientX - 60 + 'px';
+      ghostCard.style.top = touch.clientY - 80 + 'px';
+      
+      // Find drop zone under finger
+      const dropZone = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      // Remove active from all drop zones
+      document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.classList.remove('active');
+      });
+      
+      // Add active to current drop zone
+      if (dropZone && dropZone.classList.contains('drop-zone')) {
+        dropZone.classList.add('active');
+      }
+      
+      e.preventDefault();
+    }
+    
+    function handleTouchEnd(e) {
+      if (!isDragging) return;
+      
+      const touch = e.changedTouches[0];
+      const dropZone = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      if (dropZone && dropZone.classList.contains('drop-zone')) {
+        const position = parseInt(dropZone.dataset.position);
+        console.log('[Game] Touch dropped at position:', position);
+        
+        placementPosition = position;
+        updateActionButtons();
+        showNotification(`Kort placerat vid position ${position}`, 'success');
+      }
+      
+      // Cleanup
+      if (ghostCard) {
+        document.body.removeChild(ghostCard);
+        ghostCard = null;
+      }
+      
+      if (draggedCard) {
+        draggedCard.classList.remove('dragging');
+      }
+      
+      isDragging = false;
+      
+      // Remove active from all drop zones
+      document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.classList.remove('active');
+      });
+      
+      e.preventDefault();
+    }
+    
+    // ============================================
+    // ACTION FUNCTIONS
+    // ============================================
+    function changeCard() {
+      console.log('[Game] Change card requested');
+      
+      if (!myTeam || myTeam.tokens < 1) {
+        showNotification('Du har inga tokens kvar!', 'error');
+        return;
+      }
+      
+      if (!confirm('Byt låt för 1 token?')) {
+        return;
+      }
+      
+      // TODO: Implement card change logic
+      showNotification('Byt låt-funktionen kommer snart!', 'info');
+    }
+    
+    function lockInPlacement() {
+      console.log('[Game] Lock in placement at position:', placementPosition);
+      
+      if (placementPosition === null) {
+        showNotification('Placera kortet först!', 'error');
+        return;
+      }
+      
+      if (!currentGameData.currentSong) {
+        showNotification('Ingen låt att placera!', 'error');
+        return;
+      }
+      
+      // Add card to my timeline
+      const timelineLength = myTeam.timeline ? Object.keys(myTeam.timeline).length : 0;
+      const newCardKey = timelineLength;
+      
+      const newCard = {
+        spotifyId: currentGameData.currentSong.spotifyId,
+        title: currentGameData.currentSong.title,
+        artist: currentGameData.currentSong.artist,
+        year: currentGameData.currentSong.year,
+        position: placementPosition,
+        revealed: false // Will be revealed after checking
+      };
+      
+      console.log('[Game] Adding card to timeline:', newCard);
+      
+      // Update timeline positions (shift cards after placement position)
+      const updates = {};
+      
+      if (myTeam.timeline) {
+        Object.entries(myTeam.timeline).forEach(([key, card]) => {
+          if (card.position >= placementPosition) {
+            // Shift this card one position to the right
+            updates[`games/${gameId}/teams/${teamId}/timeline/${key}/position`] = card.position + 1;
+          }
+        });
+      }
+      
+      // Add new card
+      updates[`games/${gameId}/teams/${teamId}/timeline/${newCardKey}`] = newCard;
+      
+      // TODO: For now, just add the card. Later we'll add validation and scoring logic
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          console.log('[Game] Card added to timeline');
+          showNotification('Kort placerat!', 'success');
+          placementPosition = null;
+          
+          // TODO: Trigger next phase (challenge window, etc.)
+        })
+        .catch((error) => {
+          console.error('[Game] Error adding card:', error);
+          showNotification('Kunde inte placera kort', 'error');
+        });
     }
     
     // ============================================

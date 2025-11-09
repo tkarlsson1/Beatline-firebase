@@ -851,7 +851,7 @@
       // Disable start button
       const startBtn = document.getElementById('startGameBtn');
       startBtn.disabled = true;
-      startBtn.textContent = 'STARTAR...';
+      startBtn.textContent = 'FÖRBEREDER LÅTAR...';
       
       // Get songs from settings
       const gameRef = window.firebaseRef(window.firebaseDb, `games/${gameId}`);
@@ -865,40 +865,141 @@
         }
         
         const gameData = snapshot.val();
+        const settings = gameData.settings;
         
-        // TODO: Shuffle songs from settings.playlists and settings.yearRange
-        // For now, just create empty songs array
-        const songs = [];
+        console.log('[Lobby] Settings:', settings);
         
-        // Pick random starting team
-        const teamIds = Object.keys(currentTeams);
-        const startingTeamId = teamIds[Math.floor(Math.random() * teamIds.length)];
-        
-        console.log('[Lobby] Starting team:', startingTeamId);
-        
-        // Update game data
-        const updates = {
-          [`games/${gameId}/status`]: 'playing',
-          [`games/${gameId}/songs`]: songs,
-          [`games/${gameId}/currentRound`]: 0,
-          [`games/${gameId}/currentTeam`]: startingTeamId,
-          [`games/${gameId}/startingTeam`]: startingTeamId,
-          [`games/${gameId}/currentSong`]: null
-        };
-        
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-          .then(() => {
-            console.log('[Lobby] Game started successfully');
-            // The status listener will redirect automatically
+        // Load and merge songs from selected playlists
+        loadAndShuffleSongs(settings)
+          .then(shuffledSongs => {
+            console.log('[Lobby] Shuffled songs:', shuffledSongs.length);
+            
+            if (shuffledSongs.length === 0) {
+              showNotification('Inga låtar att spela med!', 'error');
+              startBtn.disabled = false;
+              startBtn.textContent = 'STARTA SPEL';
+              return;
+            }
+            
+            // Assign starting card to each team (random from shuffled deck)
+            const teamIds = Object.keys(currentTeams);
+            const teamUpdates = {};
+            
+            teamIds.forEach(teamIdKey => {
+              // Pick random song from shuffled deck as starting card
+              const randomIndex = Math.floor(Math.random() * shuffledSongs.length);
+              const startingCard = shuffledSongs[randomIndex];
+              
+              console.log(`[Lobby] Team ${teamIdKey} starting card:`, startingCard.title, startingCard.year);
+              
+              // Initialize timeline with starting card
+              teamUpdates[`games/${gameId}/teams/${teamIdKey}/timeline`] = {
+                0: {
+                  spotifyId: startingCard.spotifyId,
+                  title: startingCard.title,
+                  artist: startingCard.artist,
+                  year: startingCard.year,
+                  position: 0,
+                  revealed: true // Starting card is always revealed
+                }
+              };
+            });
+            
+            // Pick random starting team
+            const startingTeamId = teamIds[Math.floor(Math.random() * teamIds.length)];
+            
+            console.log('[Lobby] Starting team:', startingTeamId);
+            
+            // Update game data
+            const updates = {
+              [`games/${gameId}/status`]: 'playing',
+              [`games/${gameId}/songs`]: shuffledSongs,
+              [`games/${gameId}/currentRound`]: 1,
+              [`games/${gameId}/currentTeam`]: startingTeamId,
+              [`games/${gameId}/startingTeam`]: startingTeamId,
+              [`games/${gameId}/currentSongIndex`]: 0,
+              [`games/${gameId}/currentSong`]: shuffledSongs[0],
+              ...teamUpdates
+            };
+            
+            window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+              .then(() => {
+                console.log('[Lobby] Game started successfully');
+                // The status listener will redirect automatically
+              })
+              .catch((error) => {
+                console.error('[Lobby] Error starting game:', error);
+                showNotification('Kunde inte starta spelet', 'error');
+                startBtn.disabled = false;
+                startBtn.textContent = 'STARTA SPEL';
+              });
           })
-          .catch((error) => {
-            console.error('[Lobby] Error starting game:', error);
-            showNotification('Kunde inte starta spelet', 'error');
+          .catch(error => {
+            console.error('[Lobby] Error loading songs:', error);
+            showNotification('Kunde inte ladda låtar', 'error');
             startBtn.disabled = false;
             startBtn.textContent = 'STARTA SPEL';
           });
         
       }, { onlyOnce: true });
+    }
+    
+    // ============================================
+    // SONG LOADING AND SHUFFLING
+    // ============================================
+    async function loadAndShuffleSongs(settings) {
+      console.log('[Lobby] Loading songs from playlists...');
+      
+      const allSongs = [];
+      const playlists = settings.playlists || [];
+      const yearRange = settings.yearRange || { min: 1950, max: 2025 };
+      
+      // Load from standard lists and user playlists
+      for (const playlistName of playlists) {
+        // Try standard list first
+        const standardRef = window.firebaseRef(
+          window.firebaseDb, 
+          `standardLists/${playlistName}/songs`
+        );
+        
+        try {
+          const snapshot = await window.firebaseGet(standardRef);
+          if (snapshot.exists()) {
+            const songs = snapshot.val();
+            Object.entries(songs).forEach(([spotifyId, song]) => {
+              const year = parseInt(song.customYear || song.year);
+              
+              // Filter by year range
+              if (year >= yearRange.min && year <= yearRange.max) {
+                allSongs.push({
+                  spotifyId,
+                  title: song.title,
+                  artist: song.artist,
+                  year: year
+                });
+              }
+            });
+            console.log(`[Lobby] Loaded ${Object.keys(songs).length} songs from standard list: ${playlistName}`);
+          }
+        } catch (error) {
+          console.warn(`[Lobby] Could not load standard list ${playlistName}:`, error);
+        }
+        
+        // Also try user playlists (if host has custom playlists with same name)
+        // This would require knowing the userId, skip for now
+      }
+      
+      console.log(`[Lobby] Total songs before filtering: ${allSongs.length}`);
+      
+      // Shuffle using Fisher-Yates algorithm
+      for (let i = allSongs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
+      }
+      
+      console.log(`[Lobby] Songs shuffled: ${allSongs.length}`);
+      
+      return allSongs;
     }
     
     // ============================================
