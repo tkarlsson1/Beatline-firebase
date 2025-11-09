@@ -320,7 +320,7 @@ body {
   color: white;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: pan-x;  /* Tillåt horisontell scrollning */
+  touch-action: manipulation;  /* Tillåt scrollning i alla riktningar */
 }
 
 .card:hover {
