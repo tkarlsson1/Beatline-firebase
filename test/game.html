@@ -1737,30 +1737,55 @@
         .then(() => {
           console.log('[Game] Validation complete, updates applied');
           console.log('[Game] ========== VALIDATION END ==========');
+          console.log('[Game] isHost:', isHost, 'teamId:', teamId);
           
-          // Start Timer 4 after validation
-          // All clients try, but only host actually starts timer (checked in startTimer())
-          setTimeout(() => {
-            console.log('[Game] Attempting to start timer after validation (host will start)');
+          // Start Timer 4 after validation - only host should do this
+          if (isHost) {
+            console.log('[Host] Host will start Timer 4 after 2s delay');
             
-            // Calculate next team
-            const teamIds = Object.keys(currentTeams);
-            const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
-            const nextIndex = (currentIndex + 1) % teamIds.length;
-            const nextTeamId = teamIds[nextIndex];
-            
-            // Update current team and song in Firebase (only host will succeed)
-            if (isHost) {
+            setTimeout(() => {
+              console.log('[Host] setTimeout callback executing');
+              console.log('[Host] currentTeams:', currentTeams ? Object.keys(currentTeams) : 'null');
+              console.log('[Host] currentGameData:', currentGameData ? 'exists' : 'null');
+              
+              if (!currentTeams || Object.keys(currentTeams).length === 0) {
+                console.error('[Host] No teams available!');
+                return;
+              }
+              
+              if (!currentGameData) {
+                console.error('[Host] No game data available!');
+                return;
+              }
+              
+              // Calculate next team
+              const teamIds = Object.keys(currentTeams);
+              const currentTeamId = currentGameData.currentTeam;
+              const currentIndex = teamIds.indexOf(currentTeamId);
+              const nextIndex = (currentIndex + 1) % teamIds.length;
+              const nextTeamId = teamIds[nextIndex];
+              
+              console.log('[Host] Current team:', currentTeamId, 'at index', currentIndex);
+              console.log('[Host] Next team:', nextTeamId, 'at index', nextIndex);
+              
+              // Update current team and song in Firebase
               const currentSongIndex = currentGameData.currentSongIndex || 0;
               const nextSongIndex = currentSongIndex + 1;
               const songs = currentGameData.songs || [];
               
+              console.log('[Host] Current song index:', currentSongIndex);
+              console.log('[Host] Next song index:', nextSongIndex);
+              console.log('[Host] Total songs:', songs.length);
+              
               if (nextSongIndex >= songs.length) {
-                console.warn('[Game] No more songs in deck!');
+                console.warn('[Host] No more songs in deck!');
+                showNotification('Inga fler låtar!', 'error');
                 return;
               }
               
               const nextSong = songs[nextSongIndex];
+              
+              console.log('[Host] Next song:', nextSong ? nextSong.title : 'null');
               
               const updates = {};
               updates[`games/${gameId}/currentTeam`] = nextTeamId;
@@ -1771,16 +1796,24 @@
               if (nextIndex === 0) {
                 const newRound = (currentGameData.currentRound || 0) + 1;
                 updates[`games/${gameId}/currentRound`] = newRound;
+                console.log('[Host] New round:', newRound);
               }
+              
+              console.log('[Host] Applying game updates:', updates);
               
               window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
                 .then(() => {
+                  console.log('[Host] Game updates applied, starting Timer 4');
                   // Start between songs timer showing the team that will play next
-                  // (which is the team we just set as currentTeam)
                   startTimer('between_songs', 10000, nextTeamId);
+                })
+                .catch((error) => {
+                  console.error('[Host] Error applying game updates:', error);
                 });
-            }
-          }, 2000);
+            }, 2000);
+          } else {
+            console.log('[Game] Not host, waiting for host to start Timer 4');
+          }
         })
         .catch((error) => {
           console.error('[Game] Error in validation:', error);
