@@ -1361,15 +1361,22 @@
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
         .then(() => {
           console.log('[Game] Card locked in to timeline');
+          showNotification('Kort låst! Rättar...', 'info');
+          placementPosition = null;
           
-          // Wait a moment for Firebase to update, then validate placement
+          // Validate placement (with longer delay to ensure Firebase has updated)
           setTimeout(() => {
             validateAndScoreCard(newCardKey, newCard);
-          }, 500);
+          }, 1000);
         })
         .catch((error) => {
           console.error('[Game] Error adding card:', error);
           showNotification('Kunde inte placera kort', 'error');
+          
+          // Still move to next team even on error
+          setTimeout(() => {
+            nextTeam();
+          }, 2000);
         });
     }
     
@@ -1377,116 +1384,130 @@
     // VALIDATION AND SCORING
     // ============================================
     function validateAndScoreCard(cardKey, card) {
-      console.log('[Game] Validating card placement:', card);
+      console.log('[Game] ========== VALIDATION START ==========');
+      console.log('[Game] Validating card:', cardKey, card);
       
-      // Get fresh data from Firebase
+      // Get fresh data from Firebase using get() instead of onValue
       const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${teamId}`);
       
-      window.firebaseOnValue(teamRef, (snapshot) => {
-        if (!snapshot.exists()) {
-          console.error('[Game] Team not found for validation');
-          return;
-        }
-        
-        const team = snapshot.val();
-        const timeline = team.timeline || {};
-        
-        // Get all cards sorted by position
-        const sortedCards = Object.entries(timeline)
-          .map(([key, c]) => ({ key, ...c }))
-          .sort((a, b) => a.position - b.position);
-        
-        // Find the card we just placed
-        const cardIndex = sortedCards.findIndex(c => c.key === cardKey);
-        
-        if (cardIndex === -1) {
-          console.error('[Game] Card not found in timeline for validation');
-          return;
-        }
-        
-        const placedCard = sortedCards[cardIndex];
-        const leftCard = cardIndex > 0 ? sortedCards[cardIndex - 1] : null;
-        const rightCard = cardIndex < sortedCards.length - 1 ? sortedCards[cardIndex + 1] : null;
-        
-        console.log('[Game] Validation context:', {
-          placedCard: placedCard.year,
-          leftCard: leftCard ? leftCard.year : 'none',
-          rightCard: rightCard ? rightCard.year : 'none'
-        });
-        
-        // Validate placement
-        let isCorrect = true;
-        
-        // Check left neighbor
-        if (leftCard) {
-          if (placedCard.year < leftCard.year) {
-            isCorrect = false;
-            console.log('[Game] Incorrect: placed year < left year');
-          }
-          // Special case: same year as left neighbor is OK
-          if (placedCard.year === leftCard.year) {
-            console.log('[Game] Special case: same year as left neighbor - OK');
-          }
-        }
-        
-        // Check right neighbor
-        if (rightCard) {
-          if (placedCard.year > rightCard.year) {
-            isCorrect = false;
-            console.log('[Game] Incorrect: placed year > right year');
-          }
-          // Special case: same year as right neighbor is OK
-          if (placedCard.year === rightCard.year) {
-            console.log('[Game] Special case: same year as right neighbor - OK');
-          }
-        }
-        
-        console.log('[Game] Card is', isCorrect ? 'CORRECT ✓' : 'INCORRECT ✗');
-        
-        // Update Firebase based on result
-        const validationUpdates = {};
-        
-        if (isCorrect) {
-          // Reveal the card
-          validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}/revealed`] = true;
-          
-          // Increment score
-          const newScore = (team.score || 0) + 1;
-          validationUpdates[`games/${gameId}/teams/${teamId}/score`] = newScore;
-          
-          console.log('[Game] New score:', newScore);
-          
-          // Check for winner (11 cards)
-          if (newScore >= 11) {
-            console.log('[Game] Team reached 11 cards! Potential winner!');
-            // TODO: Check if all teams have had equal turns, then declare winner
-            showNotification('🎉 11 KORT! Du kan vinna!', 'success');
+      window.firebaseGet(teamRef)
+        .then((snapshot) => {
+          if (!snapshot.exists()) {
+            console.error('[Game] Team not found for validation');
+            // Move to next team anyway
+            setTimeout(() => nextTeam(), 1000);
+            return;
           }
           
-          showNotification('✓ RÄTT! Kortet behålls!', 'success');
-        } else {
-          // Remove the card from timeline
-          validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}`] = null;
+          const team = snapshot.val();
+          const timeline = team.timeline || {};
           
-          showNotification('✗ FEL! Kortet försvinner!', 'error');
-        }
-        
-        // Apply updates
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), validationUpdates)
-          .then(() => {
-            console.log('[Game] Validation complete, updates applied');
-            placementPosition = null;
+          console.log('[Game] Timeline for validation:', timeline);
+          
+          // Get all cards sorted by position
+          const sortedCards = Object.entries(timeline)
+            .map(([key, c]) => ({ key, ...c }))
+            .sort((a, b) => a.position - b.position);
+          
+          console.log('[Game] Sorted cards:', sortedCards.map(c => `${c.year} (pos ${c.position})`));
+          
+          // Find the card we just placed
+          const cardIndex = sortedCards.findIndex(c => c.key === cardKey);
+          
+          if (cardIndex === -1) {
+            console.error('[Game] Card not found in timeline for validation');
+            // Move to next team anyway
+            setTimeout(() => nextTeam(), 1000);
+            return;
+          }
+          
+          const placedCard = sortedCards[cardIndex];
+          const leftCard = cardIndex > 0 ? sortedCards[cardIndex - 1] : null;
+          const rightCard = cardIndex < sortedCards.length - 1 ? sortedCards[cardIndex + 1] : null;
+          
+          console.log('[Game] Validation context:');
+          console.log('  Left card:', leftCard ? `${leftCard.year} (${leftCard.title})` : 'none');
+          console.log('  Placed card:', `${placedCard.year} (${placedCard.title})`);
+          console.log('  Right card:', rightCard ? `${rightCard.year} (${rightCard.title})` : 'none');
+          
+          // Validate placement
+          let isCorrect = true;
+          let reason = '';
+          
+          // Check left neighbor
+          if (leftCard) {
+            if (placedCard.year < leftCard.year) {
+              isCorrect = false;
+              reason = `År ${placedCard.year} < vänster ${leftCard.year}`;
+              console.log('[Game] Incorrect:', reason);
+            } else if (placedCard.year === leftCard.year) {
+              console.log('[Game] Special case: same year as left neighbor - OK');
+            }
+          }
+          
+          // Check right neighbor
+          if (rightCard) {
+            if (placedCard.year > rightCard.year) {
+              isCorrect = false;
+              reason = `År ${placedCard.year} > höger ${rightCard.year}`;
+              console.log('[Game] Incorrect:', reason);
+            } else if (placedCard.year === rightCard.year) {
+              console.log('[Game] Special case: same year as right neighbor - OK');
+            }
+          }
+          
+          console.log('[Game] ====> Result:', isCorrect ? 'CORRECT ✓' : 'INCORRECT ✗');
+          
+          // Update Firebase based on result
+          const validationUpdates = {};
+          
+          if (isCorrect) {
+            // Reveal the card
+            validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}/revealed`] = true;
             
-            // Move to next team after showing result
-            setTimeout(() => {
-              nextTeam();
-            }, 2000);
-          })
-          .catch((error) => {
-            console.error('[Game] Error applying validation updates:', error);
-          });
-        
-      }, { onlyOnce: true });
+            // Increment score
+            const newScore = (team.score || 0) + 1;
+            validationUpdates[`games/${gameId}/teams/${teamId}/score`] = newScore;
+            
+            console.log('[Game] Updating score from', team.score, 'to', newScore);
+            
+            // Check for winner (11 cards)
+            if (newScore >= 11) {
+              console.log('[Game] Team reached 11 cards! Potential winner!');
+              showNotification('🎉 11 KORT! Du kan vinna!', 'success');
+            } else {
+              showNotification('✓ RÄTT! Kortet behålls!', 'success');
+            }
+          } else {
+            // Remove the card from timeline
+            validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}`] = null;
+            
+            console.log('[Game] Removing incorrect card');
+            showNotification(`✗ FEL! ${reason}`, 'error');
+          }
+          
+          console.log('[Game] Applying validation updates:', validationUpdates);
+          
+          // Apply updates
+          return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), validationUpdates);
+        })
+        .then(() => {
+          console.log('[Game] Validation complete, updates applied');
+          console.log('[Game] ========== VALIDATION END ==========');
+          
+          // Always move to next team after validation
+          setTimeout(() => {
+            nextTeam();
+          }, 2000);
+        })
+        .catch((error) => {
+          console.error('[Game] Error in validation:', error);
+          
+          // Move to next team even on error
+          setTimeout(() => {
+            nextTeam();
+          }, 1000);
+        });
     }
     
     // ============================================
