@@ -1080,9 +1080,10 @@
     function renderCurrentCard() {
       const container = document.getElementById('currentCardContainer');
       const currentTeamId = currentGameData.currentTeam;
+      const timerState = currentGameData.timerState;
       
-      // Only show current card if it's my turn
-      if (currentTeamId !== teamId) {
+      // Only show current card if it's my turn AND we're in guessing state (not pause)
+      if (currentTeamId !== teamId || timerState !== 'guessing') {
         container.style.display = 'none';
         return;
       }
@@ -1131,9 +1132,10 @@
     function updateActionButtons() {
       const container = document.getElementById('actionButtons');
       const currentTeamId = currentGameData.currentTeam;
+      const timerState = currentGameData.timerState;
       
-      // Only show action buttons if it's my turn
-      if (currentTeamId !== teamId) {
+      // Only show action buttons if it's my turn AND we're in guessing state
+      if (currentTeamId !== teamId || timerState !== 'guessing') {
         container.style.display = 'none';
         return;
       }
@@ -1425,6 +1427,11 @@
       if (!currentGameData.currentSong) {
         showNotification('Ingen låt att placera!', 'error');
         return;
+      }
+      
+      // Stop timer during validation
+      if (isHost) {
+        stopTimer();
       }
       
       // Remove preview card
@@ -1841,10 +1848,11 @@
     
     function updateTimer() {
       if (!currentGameData.timerState || !currentGameData.timerStartTime || !currentGameData.timerDuration) {
-        // No active timer
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
+        // No active timer - clear any existing timer display
+        const container = document.getElementById('turnIndicator');
+        const timerContainer = container.querySelector('.timer-container');
+        if (timerContainer) {
+          timerContainer.remove();
         }
         return;
       }
@@ -1865,10 +1873,13 @@
         }
       }
       
-      // Check if timer expired
-      if (remaining <= 0) {
+      // Check if timer expired (only host should handle this)
+      if (remaining <= 0 && isHost) {
         console.log('[Timer] Timer expired!');
-        onTimerExpired();
+        // Only call once per expiry
+        if (currentGameData.timerState) {
+          onTimerExpired();
+        }
       }
     }
     
@@ -1939,6 +1950,9 @@
       
       const timerState = currentGameData.timerState;
       
+      // Stop timer FIRST before handling expiry
+      stopTimer();
+      
       if (timerState === 'guessing') {
         // Timer 1 expired - guessing time is up
         console.log('[Timer] Guessing timer expired');
@@ -1970,9 +1984,6 @@
           transitionToNextTurn();
         }
       }
-      
-      // Stop timer
-      stopTimer();
     }
     
     function skipTurn() {
