@@ -248,6 +248,7 @@ body {
 .current-card-container {
   margin: 2rem auto;
   max-width: 280px;
+  text-align: center;
 }
 
 .current-card-container h2 {
@@ -257,11 +258,20 @@ body {
   opacity: 0.9;
 }
 
+.current-card {
+  display: inline-block;
+  touch-action: none;
+  user-select: none;
+}
+
 /* Timeline container */
 .timeline-container {
-  margin: 3rem 0;
+  width: 100%;
+  max-width: 95vw;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 1rem 0;
+  margin: 2rem 0;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -271,6 +281,8 @@ body {
   min-height: 200px;
   padding: 1rem;
   position: relative;
+  align-items: center;
+  min-width: min-content;
 }
 
 .timeline::before {
@@ -291,65 +303,45 @@ body {
 
 /* Cards */
 .card {
-  flex-shrink: 0;
-  width: 180px;
-  height: 240px;
-  background: white;
+  width: 120px;
+  height: 160px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
   position: relative;
-  cursor: grab;
-  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  color: white;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
-  z-index: 1;
-}
-
-.card:active {
-  cursor: grabbing;
 }
 
 .card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Card states */
-.card.revealed {
-  background: white;
-  color: #1a1a1a;
+.card.starting-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: 3px solid #FFD700;
 }
 
-.card.hidden {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.card.hidden .card-year {
-  display: none;
-}
-
-.card.current-card {
-  border: 3px solid var(--accent-color);
-  box-shadow: 0 0 20px rgba(11, 147, 156, 0.5);
-  animation: glow 2s infinite;
-}
-
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(11, 147, 156, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(11, 147, 156, 0.8);
-  }
+.card.blank-card {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border: 3px dashed rgba(255, 255, 255, 0.5);
 }
 
 .card.preview-card {
   opacity: 0.7;
   transform: scale(0.95);
-  pointer-events: none;
+  border: 3px solid #4CAF50;
 }
 
 .card.dragging {
@@ -358,57 +350,44 @@ body {
 }
 
 /* Card content */
-.card-title {
-  font-size: 1.1rem;
+.card-year {
+  font-size: 2rem;
   font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   margin-bottom: 0.5rem;
+}
+
+.card-info {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 
-.card-artist {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.card-year {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  font-size: 1.5rem;
+.card-blank-text {
+  font-size: 3rem;
+  color: white;
   font-weight: bold;
-  text-align: center;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.card.hidden .card-year {
-  display: none;
 }
 
 /* Drop zones */
 .drop-zone {
-  flex-shrink: 0;
-  width: 180px;
-  height: 240px;
-  border: 2px dashed rgba(255, 255, 255, 0.3);
+  width: 60px;
+  height: 160px;
+  border: 3px dashed rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  opacity: 0.5;
+  flex-shrink: 0;
   transition: all 0.3s;
-  z-index: 1;
+  position: relative;
 }
 
 .drop-zone.drag-over {
