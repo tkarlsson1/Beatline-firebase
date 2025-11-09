@@ -1361,19 +1361,132 @@
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
         .then(() => {
           console.log('[Game] Card locked in to timeline');
-          showNotification('Kort låst!', 'success');
-          placementPosition = null;
           
-          // TODO: Trigger next phase (challenge window, scoring, etc.)
-          // For now, just move to next team (everyone can trigger this)
+          // Wait a moment for Firebase to update, then validate placement
           setTimeout(() => {
-            nextTeam();
-          }, 2000);
+            validateAndScoreCard(newCardKey, newCard);
+          }, 500);
         })
         .catch((error) => {
           console.error('[Game] Error adding card:', error);
           showNotification('Kunde inte placera kort', 'error');
         });
+    }
+    
+    // ============================================
+    // VALIDATION AND SCORING
+    // ============================================
+    function validateAndScoreCard(cardKey, card) {
+      console.log('[Game] Validating card placement:', card);
+      
+      // Get fresh data from Firebase
+      const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${teamId}`);
+      
+      window.firebaseOnValue(teamRef, (snapshot) => {
+        if (!snapshot.exists()) {
+          console.error('[Game] Team not found for validation');
+          return;
+        }
+        
+        const team = snapshot.val();
+        const timeline = team.timeline || {};
+        
+        // Get all cards sorted by position
+        const sortedCards = Object.entries(timeline)
+          .map(([key, c]) => ({ key, ...c }))
+          .sort((a, b) => a.position - b.position);
+        
+        // Find the card we just placed
+        const cardIndex = sortedCards.findIndex(c => c.key === cardKey);
+        
+        if (cardIndex === -1) {
+          console.error('[Game] Card not found in timeline for validation');
+          return;
+        }
+        
+        const placedCard = sortedCards[cardIndex];
+        const leftCard = cardIndex > 0 ? sortedCards[cardIndex - 1] : null;
+        const rightCard = cardIndex < sortedCards.length - 1 ? sortedCards[cardIndex + 1] : null;
+        
+        console.log('[Game] Validation context:', {
+          placedCard: placedCard.year,
+          leftCard: leftCard ? leftCard.year : 'none',
+          rightCard: rightCard ? rightCard.year : 'none'
+        });
+        
+        // Validate placement
+        let isCorrect = true;
+        
+        // Check left neighbor
+        if (leftCard) {
+          if (placedCard.year < leftCard.year) {
+            isCorrect = false;
+            console.log('[Game] Incorrect: placed year < left year');
+          }
+          // Special case: same year as left neighbor is OK
+          if (placedCard.year === leftCard.year) {
+            console.log('[Game] Special case: same year as left neighbor - OK');
+          }
+        }
+        
+        // Check right neighbor
+        if (rightCard) {
+          if (placedCard.year > rightCard.year) {
+            isCorrect = false;
+            console.log('[Game] Incorrect: placed year > right year');
+          }
+          // Special case: same year as right neighbor is OK
+          if (placedCard.year === rightCard.year) {
+            console.log('[Game] Special case: same year as right neighbor - OK');
+          }
+        }
+        
+        console.log('[Game] Card is', isCorrect ? 'CORRECT ✓' : 'INCORRECT ✗');
+        
+        // Update Firebase based on result
+        const validationUpdates = {};
+        
+        if (isCorrect) {
+          // Reveal the card
+          validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}/revealed`] = true;
+          
+          // Increment score
+          const newScore = (team.score || 0) + 1;
+          validationUpdates[`games/${gameId}/teams/${teamId}/score`] = newScore;
+          
+          console.log('[Game] New score:', newScore);
+          
+          // Check for winner (11 cards)
+          if (newScore >= 11) {
+            console.log('[Game] Team reached 11 cards! Potential winner!');
+            // TODO: Check if all teams have had equal turns, then declare winner
+            showNotification('🎉 11 KORT! Du kan vinna!', 'success');
+          }
+          
+          showNotification('✓ RÄTT! Kortet behålls!', 'success');
+        } else {
+          // Remove the card from timeline
+          validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${cardKey}`] = null;
+          
+          showNotification('✗ FEL! Kortet försvinner!', 'error');
+        }
+        
+        // Apply updates
+        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), validationUpdates)
+          .then(() => {
+            console.log('[Game] Validation complete, updates applied');
+            placementPosition = null;
+            
+            // Move to next team after showing result
+            setTimeout(() => {
+              nextTeam();
+            }, 2000);
+          })
+          .catch((error) => {
+            console.error('[Game] Error applying validation updates:', error);
+          });
+        
+      }, { onlyOnce: true });
     }
     
     // ============================================
