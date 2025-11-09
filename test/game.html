@@ -1639,15 +1639,18 @@
           }
           
           console.log('[Game] Found card at index:', cardIndex);
+          console.log('[Game] Total cards in sorted array:', sortedCards.length);
           
           const placedCard = sortedCards[cardIndex];
           const leftCard = cardIndex > 0 ? sortedCards[cardIndex - 1] : null;
           const rightCard = cardIndex < sortedCards.length - 1 ? sortedCards[cardIndex + 1] : null;
           
           console.log('[Game] Validation context:');
-          console.log('  Left card:', leftCard ? `${leftCard.year} (${leftCard.title})` : 'none');
-          console.log('  Placed card:', `${placedCard.year} (${placedCard.title})`);
-          console.log('  Right card:', rightCard ? `${rightCard.year} (${rightCard.title})` : 'none');
+          console.log('  Card index:', cardIndex, '/', sortedCards.length - 1, '(max)');
+          console.log('  Left card:', leftCard ? `${leftCard.year} (${leftCard.title}) at position ${leftCard.position}` : 'none');
+          console.log('  Placed card:', `${placedCard.year} (${placedCard.title}) at position ${placedCard.position}`);
+          console.log('  Right card:', rightCard ? `${rightCard.year} (${rightCard.title}) at position ${rightCard.position}` : 'none');
+          console.log('  All cards:', sortedCards.map(c => `${c.year}@pos${c.position}`).join(' → '));
           
           // Validate placement
           let isCorrect = true;
@@ -1661,7 +1664,11 @@
               console.log('[Game] Incorrect:', reason);
             } else if (placedCard.year === leftCard.year) {
               console.log('[Game] Special case: same year as left neighbor - OK');
+            } else {
+              console.log('[Game] Left check passed:', placedCard.year, '>=', leftCard.year);
             }
+          } else {
+            console.log('[Game] No left card - OK (first position)');
           }
           
           // Check right neighbor
@@ -1672,7 +1679,11 @@
               console.log('[Game] Incorrect:', reason);
             } else if (placedCard.year === rightCard.year) {
               console.log('[Game] Special case: same year as right neighbor - OK');
+            } else {
+              console.log('[Game] Right check passed:', placedCard.year, '<=', rightCard.year);
             }
+          } else {
+            console.log('[Game] No right card - OK (last position)');
           }
           
           console.log('[Game] ====> Result:', isCorrect ? 'CORRECT ✓' : 'INCORRECT ✗');
@@ -1727,18 +1738,19 @@
           console.log('[Game] Validation complete, updates applied');
           console.log('[Game] ========== VALIDATION END ==========');
           
-          // Start Timer 4 (pause) after validation - only host should do this
-          if (isHost) {
-            setTimeout(() => {
-              console.log('[Game] Starting pause timer after validation');
-              
-              // Calculate next team
-              const teamIds = Object.keys(currentTeams);
-              const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
-              const nextIndex = (currentIndex + 1) % teamIds.length;
-              const nextTeamId = teamIds[nextIndex];
-              
-              // Update current team and song in Firebase
+          // Start Timer 4 after validation
+          // All clients try, but only host actually starts timer (checked in startTimer())
+          setTimeout(() => {
+            console.log('[Game] Attempting to start timer after validation (host will start)');
+            
+            // Calculate next team
+            const teamIds = Object.keys(currentTeams);
+            const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+            const nextIndex = (currentIndex + 1) % teamIds.length;
+            const nextTeamId = teamIds[nextIndex];
+            
+            // Update current team and song in Firebase (only host will succeed)
+            if (isHost) {
               const currentSongIndex = currentGameData.currentSongIndex || 0;
               const nextSongIndex = currentSongIndex + 1;
               const songs = currentGameData.songs || [];
@@ -1767,8 +1779,8 @@
                   // (which is the team we just set as currentTeam)
                   startTimer('between_songs', 10000, nextTeamId);
                 });
-            }, 2000);
-          }
+            }
+          }, 2000);
         })
         .catch((error) => {
           console.error('[Game] Error in validation:', error);
