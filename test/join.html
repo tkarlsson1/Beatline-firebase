@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#032934">
+  
+  <title>Notestream - Gå med i spel</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Firebase SDK (Compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Firebase Wrapper (exposes Firebase globally) -->
+  <script src="firebase-wrapper.js"></script>
+  
+  <style>
+    /* Join-specific styles */
+    .join-container {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 2rem;
+      color: var(--text-color);
+    }
+    
+    .join-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .join-header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+    }
+    
+    .game-id-display {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+    
+    .form-section {
+      margin: 2rem 0;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1.1rem;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      font-family: 'Manrope', sans-serif;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+    
+    .form-group input.error {
+      border-color: #EA4335;
+    }
+    
+    .error-message {
+      color: #EA4335;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      min-height: 1.2rem;
+    }
+    
+    .char-count {
+      text-align: right;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-top: 0.3rem;
+    }
+    
+    .char-count.warning {
+      color: #FBBC04;
+    }
+    
+    .char-count.error {
+      color: #EA4335;
+    }
+    
+    .join-button {
+      background: linear-gradient(to right, #fb1820, #ff6310);
+      border: none;
+      border-radius: 8px;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      display: block;
+      margin: 2rem auto 0 auto;
+      width: 100%;
+      font-family: 'Manrope', sans-serif;
+    }
+    
+    .join-button:hover:not(:disabled) {
+      background: linear-gradient(to right, #e52e71, #ff8a00);
+      transform: scale(1.05);
+    }
+    
+    .join-button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.6;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 2rem;
+      color: #EA4335;
+      font-size: 1.1rem;
+    }
+    
+    .info-box {
+      background: rgba(66, 133, 244, 0.1);
+      border-left: 4px solid #4285F4;
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1.5rem 0;
+    }
+    
+    .info-box p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    
+    .team-count-info {
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-top: 1rem;
+    }
+    
+    @media (max-width: 600px) {
+      .join-container {
+        padding: 1rem;
+      }
+      
+      .join-header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="join-container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Kontrollerar spel...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <p id="errorMessage"></p>
+      <button onclick="window.location.href='/test/'" class="start-button" style="margin-top: 1.5rem;">
+        Tillbaka till start
+      </button>
+    </div>
+    
+    <!-- Join Form -->
+    <div id="joinForm" style="display: none;">
+      <div class="join-header">
+        <h1>🎮 GÅ MED I SPEL</h1>
+      </div>
+      
+      <div class="game-id-display">
+        Game ID: <span id="gameIdDisplay"></span>
+      </div>
+      
+      <div class="team-count-info">
+        <span id="teamCountDisplay"></span>
+      </div>
+      
+      <div class="form-section">
+        <div class="form-group">
+          <label for="teamNameInput">Välj lagnamn:</label>
+          <input 
+            type="text" 
+            id="teamNameInput" 
+            maxlength="20" 
+            placeholder="Skriv ditt lagnamn här..."
+            autocomplete="off"
+            autofocus
+          >
+          <div class="char-count" id="charCount">0 / 20</div>
+          <div class="error-message" id="teamNameError"></div>
+        </div>
+        
+        <button class="join-button" id="joinButton" onclick="joinGame()">
+          GÅ MED I SPEL
+        </button>
+      </div>
+      
+      <div class="info-box">
+        <p>💡 <strong>Tips:</strong> Välj ett lagnamn som alla i ditt lag känner igen!</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Load lobby.js helper functions -->
+  <script src="lobby.js"></script>
+  
+  <script>
+    // ============================================
+    // GLOBAL VARIABLES
+    // ============================================
+    let gameId = null;
+    let currentGameData = null;
+    let currentTeams = {};
+    
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[Join] Page loaded');
+      
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      gameId = urlParams.get('game');
+      
+      console.log('[Join] Game ID from URL:', gameId);
+      
+      // Validate parameters
+      if (!gameId) {
+        showError('Inget game ID angivet i URL');
+        return;
+      }
+      
+      // Check if Firebase is available
+      if (!window.firebaseDb || !window.firebaseRef) {
+        showError('Firebase inte initialiserat. Gå tillbaka till startsidan.');
+        return;
+      }
+      
+      // Validate game
+      validateGame();
+      
+      // Setup input listeners
+      setupInputListeners();
+    });
+    
+    // ============================================
+    // GAME VALIDATION
+    // ============================================
+    function validateGame() {
+      console.log('[Join] Validating game...');
+      
+      const gameRef = window.firebaseRef(window.firebaseDb, `games/${gameId}`);
+      
+      window.firebaseOnValue(gameRef, (snapshot) => {
+        if (!snapshot.exists()) {
+          showError('Game ID finns inte. Kontrollera att du har rätt ID.');
+          return;
+        }
+        
+        const gameData = snapshot.val();
+        currentGameData = gameData;
+        currentTeams = gameData.teams || {};
+        
+        console.log('[Join] Game data loaded:', gameData);
+        
+        // Check if game is in lobby status
+        if (gameData.status !== 'lobby') {
+          showError('Detta spel har redan startat eller är avslutat.');
+          return;
+        }
+        
+        // Check if lobby is full
+        if (isLobbyFull(currentTeams)) {
+          showError('Lobbyn är full (max 8 lag). Försök ett annat spel.');
+          return;
+        }
+        
+        // Game is valid, show form
+        showJoinForm();
+        
+      }, { onlyOnce: true });
+    }
+    
+    // ============================================
+    // UI DISPLAY
+    // ============================================
+    function showJoinForm() {
+      console.log('[Join] Showing join form');
+      
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('joinForm').style.display = 'block';
+      
+      // Display game ID
+      document.getElementById('gameIdDisplay').textContent = gameId;
+      
+      // Display team count
+      const teamCount = Object.keys(currentTeams).length;
+      document.getElementById('teamCountDisplay').textContent = 
+        `${teamCount} / 8 lag i lobbyn`;
+    }
+    
+    function showError(message) {
+      console.error('[Join] Error:', message);
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').style.display = 'block';
+    }
+    
+    // ============================================
+    // INPUT HANDLING
+    // ============================================
+    function setupInputListeners() {
+      const input = document.getElementById('teamNameInput');
+      const charCount = document.getElementById('charCount');
+      const errorDiv = document.getElementById('teamNameError');
+      const joinButton = document.getElementById('joinButton');
+      
+      // Update character count
+      input.addEventListener('input', () => {
+        const length = input.value.length;
+        charCount.textContent = `${length} / 20`;
+        
+        // Color coding
+        if (length > 18) {
+          charCount.classList.add('error');
+          charCount.classList.remove('warning');
+        } else if (length > 15) {
+          charCount.classList.add('warning');
+          charCount.classList.remove('error');
+        } else {
+          charCount.classList.remove('warning', 'error');
+        }
+        
+        // Clear error when typing
+        if (errorDiv.textContent) {
+          errorDiv.textContent = '';
+          input.classList.remove('error');
+        }
+        
+        // Enable/disable button
+        updateJoinButton();
+      });
+      
+      // Submit on Enter key
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !joinButton.disabled) {
+          joinGame();
+        }
+      });
+    }
+    
+    function updateJoinButton() {
+      const input = document.getElementById('teamNameInput');
+      const joinButton = document.getElementById('joinButton');
+      
+      // Enable button if input has text
+      joinButton.disabled = input.value.trim().length === 0;
+    }
+    
+    // ============================================
+    // JOIN GAME
+    // ============================================
+    function joinGame() {
+      console.log('[Join] Attempting to join game...');
+      
+      const input = document.getElementById('teamNameInput');
+      const teamName = input.value.trim();
+      const errorDiv = document.getElementById('teamNameError');
+      const joinButton = document.getElementById('joinButton');
+      
+      // Validate team name
+      const validation = validateTeamName(teamName, currentTeams);
+      
+      if (!validation.valid) {
+        console.log('[Join] Validation failed:', validation.error);
+        errorDiv.textContent = validation.error;
+        input.classList.add('error');
+        return;
+      }
+      
+      // Clear error
+      errorDiv.textContent = '';
+      input.classList.remove('error');
+      
+      // Disable button and show loading
+      joinButton.disabled = true;
+      joinButton.textContent = 'GÅR MED...';
+      
+      // Generate team ID
+      const teamId = generateTeamId();
+      console.log('[Join] Generated team ID:', teamId);
+      
+      // Get next available color
+      const teamColor = getNextAvailableColor(currentTeams);
+      
+      if (!teamColor) {
+        showNotification('Inga färger tillgängliga (max 8 lag)', 'error');
+        joinButton.disabled = false;
+        joinButton.textContent = 'GÅ MED I SPEL';
+        return;
+      }
+      
+      console.log('[Join] Assigned color:', teamColor.name);
+      
+      // Create team object
+      const teamData = {
+        name: teamName,
+        host: false,
+        userId: null, // No auth for players (for now)
+        tokens: 4,
+        score: 0,
+        timeline: {},
+        color: teamColor.name,
+        joinedAt: Date.now()
+      };
+      
+      console.log('[Join] Team data:', teamData);
+      
+      // Add team to Firebase
+      const teamRef = window.firebaseRef(
+        window.firebaseDb, 
+        `games/${gameId}/teams/${teamId}`
+      );
+      
+      window.firebaseSet(teamRef, teamData)
+        .then(() => {
+          console.log('[Join] Team added successfully');
+          showNotification('Gick med i spelet!', 'success');
+          
+          // Redirect to lobby
+          setTimeout(() => {
+            const lobbyUrl = `lobby.html?gameId=${gameId}&teamId=${teamId}`;
+            console.log('[Join] Redirecting to:', lobbyUrl);
+            window.location.href = lobbyUrl;
+          }, 500);
+        })
+        .catch((error) => {
+          console.error('[Join] Error adding team:', error);
+          showNotification('Kunde inte gå med i spelet', 'error');
+          joinButton.disabled = false;
+          joinButton.textContent = 'GÅ MED I SPEL';
+        });
+    }
+    
+    console.log('[Join] Script loaded successfully');
+  </script>
+</body>
+</html>
