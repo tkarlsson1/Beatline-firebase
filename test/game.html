@@ -1400,9 +1400,25 @@
       
       console.log('[Game] Next team:', nextTeamId);
       
+      // Get next song from deck
+      const currentSongIndex = currentGameData.currentSongIndex || 0;
+      const nextSongIndex = currentSongIndex + 1;
+      const songs = currentGameData.songs || [];
+      
+      if (nextSongIndex >= songs.length) {
+        console.warn('[Game] No more songs in deck! Game should end.');
+        // TODO: End game when out of songs
+        return;
+      }
+      
+      const nextSong = songs[nextSongIndex];
+      console.log('[Game] Next song:', nextSong.title, 'by', nextSong.artist);
+      
       // Update Firebase
       const updates = {};
       updates[`games/${gameId}/currentTeam`] = nextTeamId;
+      updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+      updates[`games/${gameId}/currentSong`] = nextSong;
       
       // Increment round if we wrapped around
       if (nextIndex === 0) {
