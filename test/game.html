@@ -1514,7 +1514,19 @@
         previewCard.remove();
       }
       
-      // Add card to my timeline
+      // Get all non-null cards from timeline and sort by position
+      let existingCards = [];
+      if (myTeam.timeline) {
+        existingCards = Object.entries(myTeam.timeline)
+          .filter(([key, card]) => card !== null) // Filter out deleted cards
+          .map(([key, card]) => ({ ...card, key }))
+          .sort((a, b) => a.position - b.position);
+      }
+      
+      console.log('[Game] Existing cards before placement:', existingCards.map(c => `${c.year}@pos${c.position}`).join(' → '));
+      console.log('[Game] Placing new card at position:', placementPosition);
+      
+      // Create new card
       const timelineLength = myTeam.timeline ? Object.keys(myTeam.timeline).length : 0;
       const newCardKey = timelineLength;
       
@@ -1524,28 +1536,40 @@
         artist: currentGameData.currentSong.artist,
         year: currentGameData.currentSong.year,
         position: placementPosition,
-        revealed: false // Will be revealed after checking
+        revealed: false,
+        key: newCardKey
       };
       
-      console.log('[Game] Adding card to timeline:', newCard);
+      // Insert new card into sorted array at the correct position
+      existingCards.splice(placementPosition, 0, newCard);
       
-      // Update timeline positions for cards at or after placement position
+      console.log('[Game] Cards after insertion:', existingCards.map(c => `${c.year}@key${c.key}`).join(' → '));
+      
+      // Recompact all positions from 0 (no gaps)
       const updates = {};
-      
-      if (myTeam.timeline) {
-        Object.entries(myTeam.timeline).forEach(([key, card]) => {
-          if (card.position >= placementPosition) {
-            // Shift this card one position to the right
-            updates[`games/${gameId}/teams/${teamId}/timeline/${key}/position`] = card.position + 1;
-          }
-        });
-      }
-      
-      // Add new card
-      updates[`games/${gameId}/teams/${teamId}/timeline/${newCardKey}`] = newCard;
+      existingCards.forEach((card, index) => {
+        if (card.key === newCardKey) {
+          // This is the new card - set all its data
+          updates[`games/${gameId}/teams/${teamId}/timeline/${card.key}`] = {
+            spotifyId: card.spotifyId,
+            title: card.title,
+            artist: card.artist,
+            year: card.year,
+            position: index,
+            revealed: false
+          };
+          console.log('[Game] Adding new card', card.key, 'at position', index);
+        } else {
+          // This is an existing card - just update position
+          updates[`games/${gameId}/teams/${teamId}/timeline/${card.key}/position`] = index;
+          console.log('[Game] Updating card', card.key, 'to position', index);
+        }
+      });
       
       // Clear pending card from Firebase
       updates[`games/${gameId}/teams/${teamId}/pendingCard`] = null;
+      
+      console.log('[Game] Applying updates:', Object.keys(updates).length, 'updates');
       
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
         .then(() => {
