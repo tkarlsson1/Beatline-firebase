@@ -602,6 +602,10 @@
     let hasInitializedScores = false; // Track if scores have been initialized based on revealed cards
     let lastValidationTrigger = null; // Track validation trigger to start Timer 4
     
+    // NOTE: Timer durations should be set in Firebase by lobby.js when starting the game:
+    // - currentGameData.guessingTime (in seconds, default: 90)
+    // - currentGameData.betweenSongsTime (in seconds, default: 10)
+    
     // ============================================
     // INITIALIZATION
     // ============================================
@@ -805,7 +809,7 @@
           if (nextTeamId && !currentGameData.timerState) {
             // Only start if no timer is currently active
             console.log('[Host] Starting between_songs timer for:', nextTeamId);
-            startTimer('between_songs', 10000, nextTeamId);
+            startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
             
             // Clear the trigger
             const clearUpdates = {};
@@ -825,7 +829,7 @@
         
         // Start Timer 4 (10s between songs) showing the first team
         setTimeout(() => {
-          startTimer('between_songs', 10000, firstTeamId);
+          startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, firstTeamId);
         }, 500); // Small delay to ensure everything is loaded
       }
     }
@@ -1601,7 +1605,7 @@
               window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
                 .then(() => {
                   
-                  startTimer("between_songs", 10000, nextTeamId);
+                  startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
                 });
             }, 2000);
           }
@@ -1850,7 +1854,7 @@
                 .then(() => {
                   console.log('[Host] Game updates applied, starting Timer 4');
                   // Start between songs timer showing the team that will play next
-                  startTimer('between_songs', 10000, nextTeamId);
+                  startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
                 })
                 .catch((error) => {
                   console.error('[Host] Error applying game updates:', error);
@@ -1941,7 +1945,7 @@
               window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
                 .then(() => {
                   
-                  startTimer("between_songs", 10000, nextTeamId);
+                  startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
                 });
             }, 1000);
           }
@@ -2330,7 +2334,7 @@
           
           // Start Timer 4 (pause) - show who's next
           
-          startTimer("between_songs", 10000, nextTeamId);
+          startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
         })
         .catch((error) => {
           console.error('[Timer] Error skipping turn:', error);
@@ -2341,7 +2345,7 @@
       console.log('[Timer] Transitioning to next turn');
       
       // Just start Timer 1 for the current team
-      startTimer('guessing', 90000);
+      startTimer('guessing', (currentGameData.guessingTime || 90) * 1000);
     }
     
     function vibrate(pattern) {
@@ -2413,7 +2417,7 @@
         .then(() => {
           console.log('[Host] Team switched successfully');
           // Start Timer 4 (between songs) showing the next team
-          startTimer('between_songs', 10000, nextTeamId);
+          startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
         })
         .catch((error) => {
           console.error('[Host] Error switching team:', error);
@@ -2495,7 +2499,7 @@
           } else {
             // No remaining time or invalid state - start fresh based on current state
             if (currentGameData.currentTeam) {
-              startTimer('guessing', 90000);
+              startTimer('guessing', (currentGameData.guessingTime || 90) * 1000);
             }
           }
         })

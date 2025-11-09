@@ -916,6 +916,12 @@
             
             console.log('[Lobby] Starting team:', startingTeamId);
             
+            // Get timer settings from settings or use defaults
+            const guessingTime = (settings.timers && settings.timers.guess) || 90;
+            const betweenSongsTime = (settings.timers && settings.timers.pauseBetweenSongs) || 10;
+            
+            console.log('[Lobby] Timer settings:', { guessingTime, betweenSongsTime });
+            
             // Update game data
             const updates = {
               [`games/${gameId}/status`]: 'playing',
@@ -925,6 +931,8 @@
               [`games/${gameId}/startingTeam`]: startingTeamId,
               [`games/${gameId}/currentSongIndex`]: 0,
               [`games/${gameId}/currentSong`]: shuffledSongs[0],
+              [`games/${gameId}/guessingTime`]: guessingTime,
+              [`games/${gameId}/betweenSongsTime`]: betweenSongsTime,
               ...teamUpdates
             };
             
