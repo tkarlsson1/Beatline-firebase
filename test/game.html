@@ -339,6 +339,23 @@
       color: #4CAF50;
     }
     
+    /* Pulse animation for drop indicator */
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+    }
+    
+    /* Preview card styling */
+    .preview-card {
+      cursor: move;
+    }
+    
     /* Current card to place */
     .current-card-container {
       text-align: center;
@@ -745,33 +762,22 @@
       
       container.innerHTML = '';
       
-      // Render cards with drop zones between them
-      timelineCards.forEach((card, index) => {
-        // Add drop zone before first card
-        if (index === 0) {
-          const dropZone = createDropZone(index);
-          container.appendChild(dropZone);
-        }
-        
-        // Add card
+      // Just render cards, no drop zones (they appear dynamically during drag)
+      timelineCards.forEach((card) => {
         const cardElement = createCardElement(card);
         container.appendChild(cardElement);
-        
-        // Add drop zone after card
-        const dropZone = createDropZone(index + 1);
-        container.appendChild(dropZone);
       });
       
-      // If no cards, add a single drop zone
-      if (timelineCards.length === 0) {
-        const dropZone = createDropZone(0);
-        container.appendChild(dropZone);
+      // Add preview card if placement position is set
+      if (placementPosition !== null && currentTeamId === teamId) {
+        addPreviewCard();
       }
     }
     
     function createCardElement(card) {
       const cardDiv = document.createElement('div');
       cardDiv.className = 'card';
+      cardDiv.dataset.position = card.position;
       
       if (card.position === 0) {
         cardDiv.classList.add('starting-card');
@@ -794,21 +800,160 @@
       return cardDiv;
     }
     
-    function createDropZone(position) {
-      const dropZone = document.createElement('div');
-      dropZone.className = 'drop-zone';
-      dropZone.dataset.position = position;
+    function addPreviewCard() {
+      // Add preview of placed card at the placement position
+      const container = document.getElementById('timeline');
+      const cards = container.querySelectorAll('.card:not(.preview-card)');
       
-      // Add event listeners for drag-and-drop
-      dropZone.addEventListener('dragover', handleDragOver);
-      dropZone.addEventListener('dragleave', handleDragLeave);
-      dropZone.addEventListener('drop', handleDrop);
+      // Remove any existing preview
+      const existingPreview = container.querySelector('.preview-card');
+      if (existingPreview) {
+        existingPreview.remove();
+      }
       
-      // Touch events
-      dropZone.addEventListener('touchmove', handleTouchMove);
-      dropZone.addEventListener('touchend', handleTouchEnd);
+      // Create preview card
+      const previewCard = document.createElement('div');
+      previewCard.className = 'card blank-card preview-card';
+      previewCard.draggable = true;
+      previewCard.innerHTML = `
+        <div class="card-blank-text">?</div>
+        <div class="card-info">Ditt kort<br>(Dra för att flytta)</div>
+      `;
+      previewCard.style.border = '3px solid #4CAF50';
       
-      return dropZone;
+      // Make preview draggable
+      previewCard.addEventListener('dragstart', handlePreviewDragStart);
+      previewCard.addEventListener('dragend', handleDragEnd);
+      previewCard.addEventListener('touchstart', handlePreviewTouchStart);
+      
+      // Insert at correct position
+      if (placementPosition === 0 || cards.length === 0) {
+        container.insertBefore(previewCard, container.firstChild);
+      } else if (placementPosition >= cards.length) {
+        container.appendChild(previewCard);
+      } else {
+        // Find card at placementPosition and insert before it
+        let insertBeforeCard = null;
+        cards.forEach(card => {
+          const pos = parseInt(card.dataset.position);
+          if (pos >= placementPosition && !insertBeforeCard) {
+            insertBeforeCard = card;
+          }
+        });
+        
+        if (insertBeforeCard) {
+          container.insertBefore(previewCard, insertBeforeCard);
+        } else {
+          container.appendChild(previewCard);
+        }
+      }
+    }
+    
+    function getDropPositionFromCoords(x, y) {
+      // Find which position in timeline based on x coordinate
+      const timeline = document.getElementById('timeline');
+      const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
+      
+      if (cards.length === 0) {
+        return 0;
+      }
+      
+      // Check if before first card
+      const firstCard = cards[0];
+      const firstRect = firstCard.getBoundingClientRect();
+      if (x < firstRect.left + firstRect.width / 2) {
+        return 0;
+      }
+      
+      // Check between cards and after last card
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const cardPos = parseInt(card.dataset.position);
+        
+        if (i === cards.length - 1) {
+          // Last card - check if after it
+          if (x > rect.right - rect.width / 2) {
+            return cardPos + 1;
+          }
+        } else {
+          // Check if before next card
+          const nextCard = cards[i + 1];
+          const nextRect = nextCard.getBoundingClientRect();
+          const nextCenter = nextRect.left + nextRect.width / 2;
+          
+          if (x >= cardCenter && x < nextCenter) {
+            return cardPos + 1;
+          }
+        }
+      }
+      
+      // Default to after last card
+      const lastCard = cards[cards.length - 1];
+      const lastPos = parseInt(lastCard.dataset.position);
+      return lastPos + 1;
+    }
+    
+    function showDynamicDropIndicator(x, y) {
+      // Remove existing indicator
+      const existing = document.querySelector('.dynamic-drop-indicator');
+      if (existing) {
+        existing.remove();
+      }
+      
+      const position = getDropPositionFromCoords(x, y);
+      const timeline = document.getElementById('timeline');
+      const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
+      
+      // Create indicator
+      const indicator = document.createElement('div');
+      indicator.className = 'dynamic-drop-indicator';
+      indicator.style.cssText = `
+        width: 80px;
+        height: 160px;
+        border: 3px dashed #4CAF50;
+        border-radius: 12px;
+        background: rgba(76, 175, 80, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 2rem;
+        color: #4CAF50;
+        animation: pulse 1s infinite;
+      `;
+      indicator.textContent = '↓';
+      
+      // Insert at position
+      if (position === 0 || cards.length === 0) {
+        timeline.insertBefore(indicator, timeline.firstChild);
+      } else if (position >= cards.length) {
+        timeline.appendChild(indicator);
+      } else {
+        let insertBeforeCard = null;
+        cards.forEach(card => {
+          const pos = parseInt(card.dataset.position);
+          if (pos >= position && !insertBeforeCard) {
+            insertBeforeCard = card;
+          }
+        });
+        
+        if (insertBeforeCard) {
+          timeline.insertBefore(indicator, insertBeforeCard);
+        } else {
+          timeline.appendChild(indicator);
+        }
+      }
+      
+      return position;
+    }
+    
+    function clearDynamicDropIndicator() {
+      const indicator = document.querySelector('.dynamic-drop-indicator');
+      if (indicator) {
+        indicator.remove();
+      }
     }
     
     function renderCurrentCard() {
@@ -855,6 +1000,11 @@
       cardContainer.appendChild(cardDiv);
       
       currentCardElement = cardDiv;
+      
+      // Add dragover listener to timeline for dynamic indicators
+      const timeline = document.getElementById('timeline');
+      timeline.addEventListener('dragover', handleDragOver);
+      timeline.addEventListener('drop', handleDrop);
     }
     
     function updateActionButtons() {
@@ -892,22 +1042,29 @@
     // DRAG AND DROP HANDLERS
     // ============================================
     function handleDragStart(e) {
-      console.log('[Game] Drag start');
+      console.log('[Game] Drag start (current card)');
       isDragging = true;
       draggedCard = e.target;
       e.target.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
     }
     
+    function handlePreviewDragStart(e) {
+      console.log('[Game] Drag start (preview card)');
+      isDragging = true;
+      draggedCard = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      
+      // Clear current placement position so we can set a new one
+      placementPosition = null;
+    }
+    
     function handleDragEnd(e) {
       console.log('[Game] Drag end');
       isDragging = false;
       e.target.classList.remove('dragging');
-      
-      // Remove active class from all drop zones
-      document.querySelectorAll('.drop-zone').forEach(zone => {
-        zone.classList.remove('active');
-      });
+      clearDynamicDropIndicator();
     }
     
     function handleDragOver(e) {
@@ -915,27 +1072,26 @@
       e.dataTransfer.dropEffect = 'move';
       
       if (isDragging) {
-        e.currentTarget.classList.add('active');
+        const position = showDynamicDropIndicator(e.clientX, e.clientY);
       }
     }
     
     function handleDragLeave(e) {
-      e.currentTarget.classList.remove('active');
+      // Keep indicator visible during drag
     }
     
     function handleDrop(e) {
       e.preventDefault();
-      e.currentTarget.classList.remove('active');
       
       if (!isDragging) return;
       
-      const position = parseInt(e.currentTarget.dataset.position);
+      const position = getDropPositionFromCoords(e.clientX, e.clientY);
       console.log('[Game] Dropped at position:', position);
       
       placementPosition = position;
-      updateActionButtons();
+      clearDynamicDropIndicator();
+      updateGameView(); // Re-render to show preview card
       
-      // Visual feedback
       showNotification(`Kort placerat vid position ${position}`, 'success');
     }
     
@@ -945,7 +1101,7 @@
     let ghostCard = null;
     
     function handleTouchStart(e) {
-      console.log('[Game] Touch start');
+      console.log('[Game] Touch start (current card)');
       isDragging = true;
       draggedCard = e.currentTarget;
       
@@ -969,6 +1125,34 @@
       e.preventDefault();
     }
     
+    function handlePreviewTouchStart(e) {
+      console.log('[Game] Touch start (preview card)');
+      isDragging = true;
+      draggedCard = e.currentTarget;
+      
+      // Clear current placement so we can set a new one
+      placementPosition = null;
+      
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      
+      // Create ghost card
+      ghostCard = draggedCard.cloneNode(true);
+      ghostCard.style.position = 'fixed';
+      ghostCard.style.zIndex = '10000';
+      ghostCard.style.pointerEvents = 'none';
+      ghostCard.style.opacity = '0.8';
+      ghostCard.style.width = '120px';
+      ghostCard.style.height = '160px';
+      ghostCard.style.left = touch.clientX - 60 + 'px';
+      ghostCard.style.top = touch.clientY - 80 + 'px';
+      document.body.appendChild(ghostCard);
+      
+      draggedCard.classList.add('dragging');
+      e.preventDefault();
+    }
+    
     function handleTouchMove(e) {
       if (!isDragging || !ghostCard) return;
       
@@ -976,18 +1160,8 @@
       ghostCard.style.left = touch.clientX - 60 + 'px';
       ghostCard.style.top = touch.clientY - 80 + 'px';
       
-      // Find drop zone under finger
-      const dropZone = document.elementFromPoint(touch.clientX, touch.clientY);
-      
-      // Remove active from all drop zones
-      document.querySelectorAll('.drop-zone').forEach(zone => {
-        zone.classList.remove('active');
-      });
-      
-      // Add active to current drop zone
-      if (dropZone && dropZone.classList.contains('drop-zone')) {
-        dropZone.classList.add('active');
-      }
+      // Show dynamic drop indicator
+      showDynamicDropIndicator(touch.clientX, touch.clientY);
       
       e.preventDefault();
     }
@@ -996,16 +1170,12 @@
       if (!isDragging) return;
       
       const touch = e.changedTouches[0];
-      const dropZone = document.elementFromPoint(touch.clientX, touch.clientY);
+      const position = getDropPositionFromCoords(touch.clientX, touch.clientY);
       
-      if (dropZone && dropZone.classList.contains('drop-zone')) {
-        const position = parseInt(dropZone.dataset.position);
-        console.log('[Game] Touch dropped at position:', position);
-        
-        placementPosition = position;
-        updateActionButtons();
-        showNotification(`Kort placerat vid position ${position}`, 'success');
-      }
+      console.log('[Game] Touch dropped at position:', position);
+      
+      placementPosition = position;
+      clearDynamicDropIndicator();
       
       // Cleanup
       if (ghostCard) {
@@ -1019,10 +1189,8 @@
       
       isDragging = false;
       
-      // Remove active from all drop zones
-      document.querySelectorAll('.drop-zone').forEach(zone => {
-        zone.classList.remove('active');
-      });
+      updateGameView(); // Re-render to show preview card
+      showNotification(`Kort placerat vid position ${position}`, 'success');
       
       e.preventDefault();
     }
@@ -1059,6 +1227,12 @@
         return;
       }
       
+      // Remove preview card
+      const previewCard = document.querySelector('.preview-card');
+      if (previewCard) {
+        previewCard.remove();
+      }
+      
       // Add card to my timeline
       const timelineLength = myTeam.timeline ? Object.keys(myTeam.timeline).length : 0;
       const newCardKey = timelineLength;
@@ -1074,7 +1248,7 @@
       
       console.log('[Game] Adding card to timeline:', newCard);
       
-      // Update timeline positions (shift cards after placement position)
+      // Update timeline positions for cards at or after placement position
       const updates = {};
       
       if (myTeam.timeline) {
@@ -1089,15 +1263,19 @@
       // Add new card
       updates[`games/${gameId}/teams/${teamId}/timeline/${newCardKey}`] = newCard;
       
-      // TODO: For now, just add the card. Later we'll add validation and scoring logic
-      
       window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
         .then(() => {
-          console.log('[Game] Card added to timeline');
-          showNotification('Kort placerat!', 'success');
+          console.log('[Game] Card locked in to timeline');
+          showNotification('Kort låst!', 'success');
           placementPosition = null;
           
-          // TODO: Trigger next phase (challenge window, etc.)
+          // TODO: Trigger next phase (challenge window, scoring, etc.)
+          // For now, just move to next team
+          if (isHost) {
+            setTimeout(() => {
+              nextTeam();
+            }, 2000);
+          }
         })
         .catch((error) => {
           console.error('[Game] Error adding card:', error);
