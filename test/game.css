@@ -320,7 +320,7 @@ body {
   color: white;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
+  touch-action: pan-x;  /* Tillåt horisontell scrollning */
 }
 
 .card:hover {
@@ -342,6 +342,7 @@ body {
   opacity: 0.7;
   transform: scale(0.95);
   border: 3px solid #4CAF50;
+  touch-action: none;  /* Blockera scroll för kortet som ska flyttas */
 }
 
 .card.dragging {
