@@ -214,7 +214,6 @@ function renderTurnIndicator() {
   if (!currentTeamId) {
     contentDiv.innerHTML = `
       <h1>⏳ Väntar på start...</h1>
-      <p class="turn-info">Spelet initialiseras</p>
     `;
     return;
   }
@@ -224,7 +223,6 @@ function renderTurnIndicator() {
   if (!currentTeam) {
     contentDiv.innerHTML = `
       <h1>⚠️ Fel</h1>
-      <p class="turn-info">Aktivt lag finns inte</p>
     `;
     return;
   }
@@ -239,12 +237,10 @@ function renderTurnIndicator() {
     if (nextTeam) {
       contentDiv.innerHTML = `
         <h1>🎵 Nästa låt kommer snart</h1>
-        <p class="turn-info"></p>
       `;
     } else {
       contentDiv.innerHTML = `
         <h1>🎵 Nästa låt kommer snart</h1>
-        <p class="turn-info"></p>
       `;
     }
   } else if (timerState === 'paused') {
@@ -252,7 +248,6 @@ function renderTurnIndicator() {
     container.className = 'turn-indicator waiting';
     contentDiv.innerHTML = `
       <h1>⏸️ SPELET ÄR PAUSAT</h1>
-      <p class="turn-info">Väntar på att host fortsätter...</p>
     `;
   } else {
     // During guessing or no timer
@@ -261,13 +256,11 @@ function renderTurnIndicator() {
       container.className = 'turn-indicator your-turn';
       contentDiv.innerHTML = `
         <h1>🎮 DIN TUR!</h1>
-        <p class="turn-info">Det är dags att gissa!</p>
       `;
     } else {
       container.className = 'turn-indicator waiting';
       contentDiv.innerHTML = `
         <h1>⏳ ${escapeHtml(currentTeam.name)}s tur</h1>
-        <p class="turn-info">Väntar på att de ska gissa...</p>
       `;
     }
   }
