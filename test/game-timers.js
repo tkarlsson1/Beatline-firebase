@@ -144,19 +144,21 @@ function renderTimer(remainingSeconds, totalDuration) {
     container.appendChild(timerContainer);
   }
   
-  // Calculate progress
-  const progress = remainingSeconds / (totalDuration / 1000);
-  const circumference = 2 * Math.PI * 52; // radius = 52
-  const offset = circumference * (1 - progress);
+  // Calculate progress (0-100%)
+  const progress = (remainingSeconds / (totalDuration / 1000)) * 100;
   
   // Determine color based on remaining time
   let colorClass = '';
-  const percentage = (remainingSeconds / (totalDuration / 1000)) * 100;
-  if (percentage <= 20) {
+  if (progress <= 20) {
     colorClass = 'danger';
-  } else if (percentage <= 40) {
+  } else if (progress <= 40) {
     colorClass = 'warning';
   }
+  
+  // Format time display (minutes:seconds)
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
   
   // Timer label text
   let labelText = '';
@@ -174,18 +176,11 @@ function renderTimer(remainingSeconds, totalDuration) {
     labelText = 'SPELET ÄR PAUSAT';
   }
   
-  // Render timer UI
+  // Render timer UI as horizontal bar
   timerContainer.innerHTML = `
-    <div class="timer-circle">
-      <svg viewBox="0 0 120 120">
-        <circle class="timer-circle-bg" cx="60" cy="60" r="52"></circle>
-        <circle class="timer-circle-progress ${colorClass}" 
-                cx="60" cy="60" r="52"
-                stroke-dasharray="${circumference}"
-                stroke-dashoffset="${offset}">
-        </circle>
-      </svg>
-      <div class="timer-text">${remainingSeconds}</div>
+    <div class="timer-bar-wrapper">
+      <div class="timer-bar-progress ${colorClass}" style="width: ${progress}%"></div>
+      <span class="timer-bar-text">${timeDisplay}</span>
     </div>
     <div class="timer-label">${labelText}</div>
   `;
