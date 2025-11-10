@@ -332,7 +332,7 @@ function createCardElement(card, teamColorHex) {
   if (card.revealed) {
     cardDiv.innerHTML = `
       <div class="card-year">${card.year}</div>
-      <div class="card-info">${escapeHtml(card.title)}<br>by ${escapeHtml(card.artist)}</div>
+      <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
     `;
   } else {
     cardDiv.innerHTML = `

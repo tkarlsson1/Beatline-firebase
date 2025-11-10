@@ -84,9 +84,9 @@ function handleTouchStart(e) {
   ghostCard.style.zIndex = '10000';
   ghostCard.style.pointerEvents = 'none';
   ghostCard.style.opacity = '0.8';
-  ghostCard.style.width = '102px';
+  ghostCard.style.width = '82px';
   ghostCard.style.height = '96px';
-  ghostCard.style.left = touch.clientX - 51 + 'px';
+  ghostCard.style.left = touch.clientX - 41 + 'px';
   ghostCard.style.top = touch.clientY - 48 + 'px';
   document.body.appendChild(ghostCard);
   
@@ -121,9 +121,9 @@ function handlePreviewTouchStart(e) {
   ghostCard.style.zIndex = '10000';
   ghostCard.style.pointerEvents = 'none';
   ghostCard.style.opacity = '0.8';
-  ghostCard.style.width = '102px';
+  ghostCard.style.width = '82px';
   ghostCard.style.height = '96px';
-  ghostCard.style.left = touch.clientX - 51 + 'px';
+  ghostCard.style.left = touch.clientX - 41 + 'px';
   ghostCard.style.top = touch.clientY - 48 + 'px';
   document.body.appendChild(ghostCard);
   
