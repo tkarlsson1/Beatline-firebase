@@ -235,9 +235,9 @@ body {
 .current-card-container {
   display: grid;
   grid-template-columns: 130px 1fr 130px;
-  align-items: center;
+  align-items: start;
   gap: 1rem;
-  margin: 1rem auto;
+  margin: 0.3rem auto 1rem auto;
   width: 100%;
   max-width: 500px;
 }
@@ -245,7 +245,7 @@ body {
 .current-card {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: start;
   touch-action: none;
   user-select: none;
 }
