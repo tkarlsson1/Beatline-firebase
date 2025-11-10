@@ -6,10 +6,29 @@
 // HOST CONTROLS
 // ============================================
 
+// Host controls auto-collapse timeout
+let hostControlsTimeout = null;
+
 // Toggle host controls visibility
 function toggleHostControls() {
   const hostButtons = document.getElementById('hostButtons');
+  const isExpanding = !hostButtons.classList.contains('expanded');
+  
   hostButtons.classList.toggle('expanded');
+  
+  // Clear any existing timeout
+  if (hostControlsTimeout) {
+    clearTimeout(hostControlsTimeout);
+    hostControlsTimeout = null;
+  }
+  
+  // If expanding, set timeout to auto-collapse after 5 seconds
+  if (isExpanding) {
+    hostControlsTimeout = setTimeout(() => {
+      hostButtons.classList.remove('expanded');
+      hostControlsTimeout = null;
+    }, 5000);
+  }
 }
 
 // Pause game
