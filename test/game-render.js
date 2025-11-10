@@ -26,9 +26,6 @@ function updateGameView() {
   // Update action buttons
   updateActionButtons();
   
-  // Update round counter
-  document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
-  
   // Initialize scores based on revealed cards (only once at game start)
   if (!hasInitializedScores && currentGameData.status === 'playing' && isHost) {
     hasInitializedScores = true;
@@ -363,9 +360,12 @@ function renderCurrentCard() {
   cardDiv.className = 'card blank-card';
   cardDiv.id = 'draggableCard';
   cardDiv.draggable = true;
+  cardDiv.style.width = '41px';
+  cardDiv.style.height = '48px';
+  cardDiv.style.fontSize = '1.5rem';
+  cardDiv.style.padding = '0.3rem';
   cardDiv.innerHTML = `
-    <div class="card-blank-text">?</div>
-    <div class="card-info">Dra mig till tidslinjen!</div>
+    <div class="card-blank-text" style="font-size: 1.5rem; margin: 0;">?</div>
   `;
   
   // Add drag event listeners

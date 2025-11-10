@@ -207,21 +207,21 @@ body {
 
 /* Current card container */
 .current-card-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 130px 1fr 130px;
   align-items: center;
-  justify-content: center;
   gap: 1rem;
   margin: 1rem auto;
-  max-width: 600px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .current-card {
-  width: 41px;
-  height: 48px;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   touch-action: none;
   user-select: none;
-  flex-shrink: 0;
 }
 
 /* Timeline container */
