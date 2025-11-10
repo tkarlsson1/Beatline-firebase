@@ -151,13 +151,13 @@ function initializeGame() {
   // Setup real-time listeners
   setupListeners();
   
-  // Setup global timer interval that runs every second
+  // Setup global timer interval that runs every 100ms for smooth progress bar
   console.log('[Game] Setting up timer interval');
   timerInterval = setInterval(() => {
     if (currentGameData && currentGameData.timerState) {
       updateTimer();
     }
-  }, 1000);
+  }, 100);
 }
 
 // ============================================

@@ -5,6 +5,10 @@
 // ============================================
 // TIMER FUNCTIONS
 // ============================================
+
+// Counter for logging (to avoid spam with 100ms updates)
+let timerUpdateCounter = 0;
+
 function startTimer(type, duration, nextTeamId = null) {
   console.log('[Timer] startTimer called by', isHost ? 'HOST' : 'NON-HOST', '- type:', type);
   
@@ -79,9 +83,11 @@ function updateTimer() {
   const remaining = Math.max(0, currentGameData.timerDuration - elapsed);
   const remainingSeconds = Math.ceil(remaining / 1000);
   
-  // Log every 5 seconds to avoid spam
-  if (remainingSeconds % 5 === 0) {
+  // Log every 50 updates (~5 seconds with 100ms interval) to avoid spam
+  timerUpdateCounter++;
+  if (timerUpdateCounter >= 50) {
     console.log('[Timer] Update:', remainingSeconds, 'seconds remaining, state:', currentGameData.timerState);
+    timerUpdateCounter = 0;
   }
   
   // Render timer UI (pass remaining ms for smooth progress)
