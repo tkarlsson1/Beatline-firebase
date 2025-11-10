@@ -17,7 +17,7 @@
   
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="game.css?v=13">
+  <link rel="stylesheet" href="game.css?v=32">
   
   <!-- Firebase SDK (Compat mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -66,20 +66,22 @@
     
     <!-- Game View -->
     <div id="gameView" style="display: none;">
-      <!-- Round counter -->
-      <div class="round-counter">
-        Runda <span id="roundDisplay">1</span>
-      </div>
-      
       <!-- Team header -->
       <div class="team-header">
         <div class="team-list" id="teamList">
           <!-- Teams will be rendered here -->
         </div>
-        <!-- Spotify status (host only) -->
-        <div id="spotifyStatus" style="display: none; position: absolute; top: 10px; right: 10px; padding: 8px 12px; background: rgba(0,0,0,0.7); border-radius: 20px; font-size: 0.8rem; color: #1DB954;">
-          <span id="spotifyStatusIcon">🎵</span>
-          <span id="spotifyStatusText">Spotify</span>
+        
+        <!-- Host controls (host only) -->
+        <div class="host-controls" id="hostControls" style="display: none;">
+          <button class="host-toggle-btn" id="hostToggleBtn" onclick="toggleHostControls()">
+            ⚙️
+          </button>
+          <div class="host-buttons" id="hostButtons">
+            <button class="host-btn" id="pauseBtn" onclick="pauseGame()">⏸️ Pausa</button>
+            <button class="host-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">▶️ Fortsätt</button>
+            <button class="host-btn" onclick="forceNextTeam()">Nästa →</button>
+          </div>
         </div>
       </div>
       
@@ -90,12 +92,17 @@
           <!-- Turn info will be rendered here -->
         </div>
         
-        <!-- Current card to place (only shown when it's your turn) -->
+        <!-- Current card to place with action buttons (only shown when it's your turn) -->
         <div class="current-card-container" id="currentCardContainer" style="display: none;">
-          <div class="current-card-label">Dra kortet till rätt plats på tidslinjen:</div>
-          <div class="current-card" id="currentCard" draggable="true">
+          <button class="action-btn secondary" id="changeCardBtn" onclick="changeCard()" disabled>
+            BYT LÅT
+          </button>
+          <div class="current-card" id="currentCard">
             <!-- Card will be rendered here -->
           </div>
+          <button class="action-btn primary" id="lockInBtn" onclick="lockInPlacement()" disabled>
+            LÅS SVAR
+          </button>
         </div>
         
         <!-- Timeline -->
@@ -104,24 +111,6 @@
             <!-- Timeline cards will be rendered here -->
           </div>
         </div>
-        
-        <!-- Action buttons -->
-        <div class="action-buttons" id="actionButtons" style="display: none;">
-          <button class="action-btn secondary" id="changeCardBtn" onclick="changeCard()" disabled>
-            🔄 BYT LÅT (1 token)
-          </button>
-          <button class="action-btn primary" id="lockInBtn" onclick="lockInPlacement()" disabled>
-            ✓ LÅS IN PLACERING
-          </button>
-        </div>
-      </div>
-      
-      <!-- Debug controls (host only) -->
-      <div class="debug-controls" id="debugControls" style="display: none;">
-        <h3>🔧 HOST KONTROLLER</h3>
-        <button class="debug-btn" id="pauseBtn" onclick="pauseGame()" style="display: inline-block;">⏸️ Pausa spel</button>
-        <button class="debug-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">▶️ Fortsätt</button>
-        <button class="debug-btn" onclick="forceNextTeam()">Nästa lag →</button>
       </div>
     </div>
   </div>
