@@ -83,9 +83,9 @@ function updateTimer() {
   const remaining = Math.max(0, currentGameData.timerDuration - elapsed);
   const remainingSeconds = Math.ceil(remaining / 1000);
   
-  // Log every 50 updates (~5 seconds with 100ms interval) to avoid spam
+  // Log every 100 updates (~5 seconds with 50ms interval) to avoid spam
   timerUpdateCounter++;
-  if (timerUpdateCounter >= 50) {
+  if (timerUpdateCounter >= 100) {
     console.log('[Timer] Update:', remainingSeconds, 'seconds remaining, state:', currentGameData.timerState);
     timerUpdateCounter = 0;
   }

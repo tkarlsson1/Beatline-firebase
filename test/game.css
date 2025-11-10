@@ -126,7 +126,7 @@ body {
 .timer-bar-progress {
   height: 100%;
   background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
-  transition: width 0.5s linear, background 0.3s;
+  transition: width 1s linear, background 0.3s;
   border-radius: 20px;
 }
 
