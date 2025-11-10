@@ -234,7 +234,7 @@ body {
   grid-template-columns: 130px 1fr 130px;
   align-items: start;
   gap: 1rem;
-  margin: 0.3rem auto 1rem auto;
+  margin: 0 auto 1rem auto;
   width: 100%;
   max-width: 500px;
 }
@@ -242,10 +242,13 @@ body {
 .current-card {
   display: flex;
   justify-content: center;
-  align-items: start;
+  align-items: flex-start;
   touch-action: none;
   user-select: none;
-  min-height: 48px;
+  height: 48px;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
 }
 
 /* Timeline container */
@@ -408,6 +411,8 @@ body {
   max-width: 120px;
   white-space: nowrap;
   align-self: start;
+  margin: 0;  /* Override styles.css global button margin-bottom */
+  display: inline-block;  /* Prevent block behavior from global styles */
 }
 
 .action-btn:hover:not(:disabled) {
