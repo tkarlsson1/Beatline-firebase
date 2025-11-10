@@ -166,19 +166,22 @@ function renderTeamHeader() {
     const badge = document.createElement('div');
     badge.className = 'team-badge';
     
-    // Highlight active team
-    if (teamIdKey === currentTeamId) {
-      badge.classList.add('active');
-    }
-    
-    // Highlight own team
-    if (teamIdKey === teamId) {
-      badge.classList.add('own-team');
-    }
-    
     // Get team color
     const colorObj = TEAM_COLORS.find(c => c.name === team.color);
     const colorHex = colorObj ? colorObj.hex : '#FFFFFF';
+    
+    // Set border based on active state
+    if (teamIdKey === currentTeamId) {
+      // Active team: thick border in team's own color
+      badge.style.border = `3px solid ${colorHex}`;
+      badge.style.background = `${colorHex}22`; // Light background (hex with alpha)
+      badge.style.boxShadow = `0 0 15px ${colorHex}80`;
+    } else {
+      // Inactive team: thin gray border
+      badge.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+      badge.style.background = 'rgba(255, 255, 255, 0.05)';
+      badge.style.boxShadow = 'none';
+    }
     
     badge.innerHTML = `
       <div class="team-color-dot" style="background: ${colorHex};"></div>
