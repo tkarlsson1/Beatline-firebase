@@ -245,6 +245,7 @@ body {
   align-items: start;
   touch-action: none;
   user-select: none;
+  min-height: 48px;
 }
 
 /* Timeline container */
@@ -403,8 +404,10 @@ body {
   font-family: 'Manrope', sans-serif;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 100%;
   max-width: 120px;
   white-space: nowrap;
+  align-self: start;
 }
 
 .action-btn:hover:not(:disabled) {
