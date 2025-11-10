@@ -138,9 +138,9 @@ function initializeGame() {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('gameView').style.display = 'block';
     
-    // Show debug controls for host
+    // Show host controls for host
     if (isHost) {
-      document.getElementById('debugControls').style.display = 'block';
+      document.getElementById('hostControls').style.display = 'flex';
     }
     
     // Initial render
