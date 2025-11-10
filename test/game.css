@@ -245,8 +245,8 @@ body {
   align-items: flex-start;
   touch-action: none;
   user-select: none;
+  width: 41px;
   height: 48px;
-  overflow: visible;
   padding: 0;
   margin: 0;
 }
