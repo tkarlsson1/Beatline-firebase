@@ -197,73 +197,9 @@ function renderTeamHeader() {
 // TURN INDICATOR
 // ============================================
 function renderTurnIndicator() {
-  const container = document.getElementById('turnIndicator');
-  const currentTeamId = currentGameData.currentTeam;
-  
-  // Check if we need to show timer
-  const timerState = currentGameData.timerState;
-  
-  // Find or create content container (separate from timer)
-  let contentDiv = container.querySelector('.turn-content');
-  if (!contentDiv) {
-    contentDiv = document.createElement('div');
-    contentDiv.className = 'turn-content';
-    container.insertBefore(contentDiv, container.firstChild);
-  }
-  
-  if (!currentTeamId) {
-    contentDiv.innerHTML = `
-      <h1>⏳ Väntar på start...</h1>
-    `;
-    return;
-  }
-  
-  const currentTeam = currentTeams[currentTeamId];
-  
-  if (!currentTeam) {
-    contentDiv.innerHTML = `
-      <h1>⚠️ Fel</h1>
-    `;
-    return;
-  }
-  
-  // Determine what to show based on timer state
-  if (timerState === 'between_songs') {
-    // During between songs pause, show next team info
-    container.className = 'turn-indicator waiting';
-    const nextTeamId = currentGameData.nextTeam;
-    const nextTeam = currentTeams[nextTeamId];
-    
-    if (nextTeam) {
-      contentDiv.innerHTML = `
-        <h1>🎵 Nästa låt kommer snart</h1>
-      `;
-    } else {
-      contentDiv.innerHTML = `
-        <h1>🎵 Nästa låt kommer snart</h1>
-      `;
-    }
-  } else if (timerState === 'paused') {
-    // Game is paused by host
-    container.className = 'turn-indicator waiting';
-    contentDiv.innerHTML = `
-      <h1>⏸️ SPELET ÄR PAUSAT</h1>
-    `;
-  } else {
-    // During guessing or no timer
-    // Is it my turn?
-    if (currentTeamId === teamId) {
-      container.className = 'turn-indicator your-turn';
-      contentDiv.innerHTML = `
-        <h1>🎮 DIN TUR!</h1>
-      `;
-    } else {
-      container.className = 'turn-indicator waiting';
-      contentDiv.innerHTML = `
-        <h1>⏳ ${escapeHtml(currentTeam.name)}s tur</h1>
-      `;
-    }
-  }
+  // Turn indicator text removed - info shown in team badges and card borders instead
+  // Container kept for timer bar rendering
+  return;
 }
 
 // ============================================

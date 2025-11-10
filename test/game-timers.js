@@ -84,8 +84,8 @@ function updateTimer() {
     console.log('[Timer] Update:', remainingSeconds, 'seconds remaining, state:', currentGameData.timerState);
   }
   
-  // Render timer UI
-  renderTimer(remainingSeconds, currentGameData.timerDuration);
+  // Render timer UI (pass remaining ms for smooth progress)
+  renderTimer(remaining, currentGameData.timerDuration, remainingSeconds);
   
   // Vibrate warnings (only for active team during guessing timer)
   if (currentGameData.timerState === 'guessing' && currentGameData.currentTeam === teamId) {
@@ -127,7 +127,7 @@ function updateTimer() {
   }
 }
 
-function renderTimer(remainingSeconds, totalDuration) {
+function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
   const container = document.getElementById('turnIndicator');
   const timerState = currentGameData.timerState;
   
@@ -144,8 +144,8 @@ function renderTimer(remainingSeconds, totalDuration) {
     container.appendChild(timerContainer);
   }
   
-  // Calculate progress (0-100%)
-  const progress = (remainingSeconds / (totalDuration / 1000)) * 100;
+  // Calculate smooth progress based on milliseconds (0-100%)
+  const progress = Math.max(0, Math.min(100, (remainingMs / totalDurationMs) * 100));
   
   // Determine color based on remaining time
   let colorClass = '';
