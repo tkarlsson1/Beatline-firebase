@@ -207,22 +207,21 @@ body {
 
 /* Current card container */
 .current-card-container {
-  margin: 2rem auto;
-  max-width: 200px;
-  text-align: center;
-}
-
-.current-card-container h2 {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem auto;
+  max-width: 600px;
 }
 
 .current-card {
+  width: 41px;
+  height: 48px;
   display: inline-block;
   touch-action: none;
   user-select: none;
+  flex-shrink: 0;
 }
 
 /* Timeline container */
@@ -369,26 +368,20 @@ body {
 }
 
 /* Action buttons */
-.action-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin: 2rem 0;
-  flex-wrap: wrap;
-}
-
 .action-btn {
   background: var(--accent-color);
   border: none;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.6rem 1rem;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
   font-family: 'Manrope', sans-serif;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 120px;
+  white-space: nowrap;
 }
 
 .action-btn:hover:not(:disabled) {
@@ -531,10 +524,6 @@ body {
   
   .game-area {
     padding: 1rem 0.5rem;
-  }
-  
-  .action-buttons {
-    margin: 1rem 0;
   }
   
   .card {

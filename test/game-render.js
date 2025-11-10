@@ -394,21 +394,23 @@ function renderCurrentCard() {
 // ACTION BUTTONS
 // ============================================
 function updateActionButtons() {
-  const container = document.getElementById('actionButtons');
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Only show action buttons if it's my turn AND we're in guessing state
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
-    container.style.display = 'none';
-    return;
-  }
+  // Buttons are now inside currentCardContainer, no need to show/hide separately
+  // Just update button states
   
-  container.style.display = 'flex';
-  
-  // Update button states
   const changeCardBtn = document.getElementById('changeCardBtn');
   const lockInBtn = document.getElementById('lockInBtn');
+  
+  if (!changeCardBtn || !lockInBtn) return;
+  
+  // Only enable buttons if it's my turn AND we're in guessing state
+  if (currentTeamId !== teamId || timerState !== 'guessing') {
+    changeCardBtn.disabled = true;
+    lockInBtn.disabled = true;
+    return;
+  }
   
   // Change card button - enable if team has tokens
   if (myTeam && myTeam.tokens > 0) {
