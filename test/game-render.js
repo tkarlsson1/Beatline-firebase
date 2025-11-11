@@ -96,6 +96,17 @@ function updateGameView() {
         window.firebaseUpdate(window.firebaseRef(window.firebaseDb), clearUpdates);
       }
     }
+    
+    // NEW: Check if challengeState changed (someone challenged) - Start Timer 3
+    const challengeState = currentGameData.challengeState;
+    if (challengeState && challengeState.isActive && challengeState.timestamp !== lastChallengeTimestamp) {
+      console.log('[Host] Challenge detected! Starting Timer 3');
+      lastChallengeTimestamp = challengeState.timestamp;
+      
+      // Stop Timer 2 and start Timer 3
+      const placeChallengeTime = currentGameData.placeChallengeTime || 20;
+      startTimer('challenge_placement', placeChallengeTime * 1000);
+    }
   }
   
   // Handle Spotify playback (host only)
@@ -199,9 +210,10 @@ function renderTeamHeader() {
 // TURN INDICATOR
 // ============================================
 function renderTurnIndicator() {
-  // Turn indicator text removed - info shown in team badges and card borders instead
-  // Container kept for timer bar rendering
-  return;
+  const container = document.getElementById('turnIndicator');
+  
+  // Container only holds the timer - timer is rendered separately in updateTimer()
+  // Keep the container for timer to render into
 }
 
 // ============================================
@@ -209,172 +221,81 @@ function renderTurnIndicator() {
 // ============================================
 function renderTimeline() {
   const container = document.getElementById('timeline');
-  const currentTeamId = currentGameData.currentTeam;
+  container.innerHTML = '';
   
-  if (!currentTeamId) {
-    container.innerHTML = '';
+  if (!myTeam || !myTeam.timeline) {
     return;
   }
   
-  const displayTeam = currentTeams[currentTeamId];
-  
-  if (!displayTeam || !displayTeam.timeline) {
-    container.innerHTML = '<p style="color: white;">Ingen tidslinje än...</p>';
-    return;
-  }
-  
-  // Get timeline cards sorted by position
-  const timelineCards = Object.entries(displayTeam.timeline)
+  // Get all cards from my timeline, sorted by position
+  const timelineCards = Object.entries(myTeam.timeline)
+    .filter(([key, card]) => card !== null)
     .map(([key, card]) => ({ ...card, key }))
     .sort((a, b) => a.position - b.position);
   
-  console.log('[Game] Rendering timeline with', timelineCards.length, 'cards');
+  console.log('[Timeline] Rendering', timelineCards.length, 'cards');
   
-  // Get team color for border
-  const teamColor = displayTeam.color || 'blue'; // Fallback to blue
-  const colorObj = TEAM_COLORS.find(c => c.name === teamColor);
-  const teamColorHex = colorObj ? colorObj.hex : '#0B939C'; // Fallback to default accent
-  
-  container.innerHTML = '';
-  
-  // Just render cards, no drop zones (they appear dynamically during drag)
-  timelineCards.forEach((card) => {
-    // Check if this is my preview card OR a challenge card
-    const isMyCard = (teamId === currentTeamId) && !card.revealed;
-    
-    // Check if we're in challenge placement and this is a card from the challenging team
-    const challengeState = currentGameData.challengeState;
-    const isChallengeCard = challengeState && 
-                           challengeState.isActive && 
-                           !card.revealed && 
-                           currentGameData.timerState === 'challenge_placement';
-    
-    const cardDiv = document.createElement('div');
-    cardDiv.className = 'card';
-    cardDiv.dataset.position = card.position;
-    
-    // Add preview-card class if this is my card or a challenge card
-    if (isMyCard || isChallengeCard) {
-      cardDiv.classList.add('preview-card');
-    }
-    
-    // Different border styles for revealed vs preview cards
+  // Render each card
+  timelineCards.forEach((card, index) => {
     if (card.revealed) {
       // Revealed card - show year and info
-      cardDiv.style.border = `6px solid ${teamColorHex}`;
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'card';
+      cardDiv.dataset.position = card.position;
+      cardDiv.dataset.cardKey = card.key;
+      
       cardDiv.innerHTML = `
-      <div class="card-year">${card.year}</div>
-      <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
-    `;
+        <div class="card-year">${card.year}</div>
+        <div class="card-info">
+          <strong>${escapeHtml(card.title)}</strong><br>
+          ${escapeHtml(card.artist)}
+        </div>
+      `;
+      
+      container.appendChild(cardDiv);
     } else {
-      // Unrevealed card (preview) - ALWAYS show as blank until validated
-      // Border style depends on whether it's my card or another team's
-      if (isMyCard) {
-        cardDiv.style.border = `4px dashed ${teamColorHex}`;
-      } else if (isChallengeCard) {
-        // Challenge card - show in red or different color
-        cardDiv.style.border = `4px dashed #EA4335`;
+      // Unrevealed card (preview) - show as "?"
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'card preview-card blank-card';
+      cardDiv.dataset.position = card.position;
+      cardDiv.dataset.cardKey = card.key;
+      cardDiv.id = `preview-${card.key}`;
+      
+      // Check if this is a challenging team's card during Timer 3
+      const challengeState = currentGameData.challengeState;
+      const isChallengingCard = challengeState && 
+                                challengeState.isActive && 
+                                currentGameData.timerState === 'challenge_placement' &&
+                                currentGameData.currentTeam !== teamId; // I'm NOT the active team
+      
+      if (isChallengingCard) {
+        // Challenging team's card - red border
+        cardDiv.style.border = '3px dashed #EA4335';
+        cardDiv.style.background = 'linear-gradient(135deg, #EA4335 0%, #C62828 100%)';
       } else {
-        cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
+        // Active team's card during challenge - team color border
+        const colorObj = TEAM_COLORS.find(c => c.name === myTeam.color);
+        const colorHex = colorObj ? colorObj.hex : '#667eea';
+        cardDiv.style.border = `3px dashed ${colorHex}`;
       }
+      
       cardDiv.innerHTML = `
-      <div class="card-blank-text">?</div>
-    `;
+        <div class="card-blank-text">?</div>
+      `;
+      
+      // Add touch/drag events to preview cards so they can be moved
+      cardDiv.draggable = true;
+      cardDiv.addEventListener('dragstart', handlePreviewDragStart);
+      cardDiv.addEventListener('dragend', handleDragEnd);
+      cardDiv.addEventListener('touchstart', handlePreviewTouchStart);
+      cardDiv.addEventListener('touchmove', handleTouchMove);
+      cardDiv.addEventListener('touchend', handleTouchEnd);
+      
+      container.appendChild(cardDiv);
     }
-    
-    container.appendChild(cardDiv);
   });
   
-  // Check if we need to render a preview card at a specific position
-  // (happens when dragging or after placing card but before revealing)
-  const previewCard = displayTeam.pendingCard;
-  if (previewCard && previewCard.position !== undefined) {
-    renderPreviewCard(previewCard, teamColorHex);
-  }
-  
-  // Auto-scroll to center card when team changes
-  if (currentTeamId !== previousCurrentTeam) {
-    console.log('[Timeline] Team changed from', previousCurrentTeam, 'to', currentTeamId, '- auto-scrolling to center');
-    previousCurrentTeam = currentTeamId;
-    
-    // Use requestAnimationFrame to ensure DOM is updated before scrolling
-    requestAnimationFrame(() => {
-      const timelineContainer = document.getElementById('timelineContainer');
-      const allCards = container.querySelectorAll('.card');
-      
-      if (allCards.length > 0) {
-        // Find middle card
-        const middleIndex = Math.floor(allCards.length / 2);
-        const middleCard = allCards[middleIndex];
-        
-        if (middleCard && timelineContainer) {
-          console.log('[Timeline] Scrolling to middle card at index', middleIndex, 'of', allCards.length, 'cards');
-          
-          // Calculate the position to scroll to
-          const cardRect = middleCard.getBoundingClientRect();
-          const containerRect = timelineContainer.getBoundingClientRect();
-          const cardCenter = middleCard.offsetLeft + (cardRect.width / 2);
-          const containerCenter = containerRect.width / 2;
-          const scrollPosition = cardCenter - containerCenter;
-          
-          // Scroll to position
-          timelineContainer.scrollTo({
-            left: scrollPosition,
-            behavior: 'smooth'
-          });
-        }
-      }
-    });
-  }
-}
-
-function renderPreviewCard(card, teamColorHex) {
-  const container = document.getElementById('timeline');
-  const position = card.position;
-  
-  // Check if this is my card (so I can drag it)
-  const isMyCard = (teamId === currentGameData.currentTeam);
-  
-  const previewCard = document.createElement('div');
-  previewCard.className = 'card preview-card';
-  previewCard.dataset.position = position;
-  previewCard.id = 'timelinePreviewCard';
-  
-  // IMPORTANT: Preview cards are ALWAYS blank until validated
-  // Only show year/title/artist after lockInPlacement() -> validation -> revealed
-  previewCard.style.border = `4px dashed ${teamColorHex}`;
-  previewCard.innerHTML = `
-    <div class="card-blank-text">?</div>
-  `;
-  
-  // Make preview draggable only if it's my card
-  if (isMyCard) {
-    previewCard.draggable = true;
-    previewCard.addEventListener('dragstart', handlePreviewDragStart);
-    previewCard.addEventListener('dragend', handleDragEnd);
-    previewCard.addEventListener('touchstart', handlePreviewTouchStart);
-    previewCard.addEventListener('touchmove', handleTouchMove);
-    previewCard.addEventListener('touchend', handleTouchEnd);
-    previewCard.style.cursor = 'move';
-  }
-  
-  // Update local placementPosition to match Firebase (for lock in button)
-  if (isMyCard) {
-    placementPosition = position;
-  }
-  
-  // Insert at correct position based on index
-  // Position from Firebase should correspond to index in DOM
-  const cards = container.querySelectorAll('.card:not(.preview-card)');
-  if (position === 0 || cards.length === 0) {
-    container.insertBefore(previewCard, container.firstChild);
-  } else if (position >= cards.length) {
-    container.appendChild(previewCard);
-  } else {
-    // Insert before the card at this index
-    const insertBeforeCard = cards[position];
-    container.insertBefore(previewCard, insertBeforeCard);
-  }
+  console.log('[Timeline] Rendered', timelineCards.length, 'total cards');
 }
 
 // ============================================
@@ -384,11 +305,11 @@ function renderCurrentCard() {
   const container = document.getElementById('currentCardContainer');
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
+  const challengeState = currentGameData.challengeState;
   
   // Show current card if:
-  // 1. It's my turn AND timer is 'guessing'
-  // 2. OR it's Timer 3 (challenge_placement) and I'm the challenging team
-  const challengeState = currentGameData.challengeState;
+  // 1. It's my turn during guessing (Timer 1)
+  // 2. OR I'm the challenging team during challenge_placement (Timer 3)
   const isMyTurn = currentTeamId === teamId && timerState === 'guessing';
   const isMyChallenge = challengeState && 
                         challengeState.isActive && 
@@ -598,108 +519,109 @@ function getDropPositionFromCoords(x, y) {
   // Find which position in timeline based on x coordinate
   // Position is based on actual index in DOM, not dataset.position
   const timeline = document.getElementById('timeline');
-  const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
+  const cards = Array.from(timeline.children);
   
   if (cards.length === 0) {
-    return 0;
+    return 0; // First position
   }
   
-  // Check if before first card
-  const firstCard = cards[0];
-  const firstRect = firstCard.getBoundingClientRect();
-  if (x < firstRect.left + firstRect.width / 2) {
-    return 0;
-  }
+  // Find the card closest to drop point
+  let closestIndex = 0;
+  let closestDistance = Infinity;
   
-  // Check if after last card
-  const lastCard = cards[cards.length - 1];
-  const lastRect = lastCard.getBoundingClientRect();
-  if (x > lastRect.right - lastRect.width / 2) {
-    return cards.length;
-  }
-  
-  // Check between cards
-  for (let i = 0; i < cards.length - 1; i++) {
-    const currentCard = cards[i];
-    const nextCard = cards[i + 1];
+  cards.forEach((card, index) => {
+    const rect = card.getBoundingClientRect();
+    const cardCenter = rect.left + rect.width / 2;
+    const distance = Math.abs(cardCenter - x);
     
-    const currentRect = currentCard.getBoundingClientRect();
-    const nextRect = nextCard.getBoundingClientRect();
-    
-    const currentCenter = currentRect.left + currentRect.width / 2;
-    const nextCenter = nextRect.left + nextRect.width / 2;
-    
-    // If x is between current card center and next card center
-    if (x >= currentCenter && x < nextCenter) {
-      return i + 1;
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
     }
-  }
+  });
   
-  // Default to after last card
-  return cards.length;
+  // Determine if drop is before or after the closest card
+  const closestCard = cards[closestIndex];
+  const rect = closestCard.getBoundingClientRect();
+  const cardCenter = rect.left + rect.width / 2;
+  
+  if (x < cardCenter) {
+    // Drop before this card
+    return closestIndex;
+  } else {
+    // Drop after this card
+    return closestIndex + 1;
+  }
 }
 
 function showDynamicDropIndicator(x, y) {
-  // Remove existing indicator
-  const existing = document.querySelector('.dynamic-drop-indicator');
-  if (existing) {
-    existing.remove();
+  // Remove any existing indicator
+  clearDynamicDropIndicator();
+  
+  const timeline = document.getElementById('timeline');
+  const cards = Array.from(timeline.children);
+  
+  if (cards.length === 0) {
+    // Empty timeline - show indicator in middle
+    const indicator = document.createElement('div');
+    indicator.id = 'dynamicDropIndicator';
+    indicator.className = 'drop-zone first';
+    indicator.style.position = 'absolute';
+    indicator.style.left = '50%';
+    indicator.style.transform = 'translateX(-50%)';
+    timeline.appendChild(indicator);
+    return 0;
   }
   
+  // Find position based on x coordinate
   const position = getDropPositionFromCoords(x, y);
   
-  // Create and position indicator
-  const timeline = document.getElementById('timeline');
-  const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
-  
+  // Create indicator
   const indicator = document.createElement('div');
-  indicator.className = 'dynamic-drop-indicator';
-  indicator.style.cssText = `
-    width: 4px;
-    height: 80%;
-    background: #4CAF50;
-    position: relative;
-    flex-shrink: 0;
-    margin: auto 0.5rem;
-    border-radius: 2px;
-    box-shadow: 0 0 10px #4CAF50;
-    animation: pulse 1s infinite;
-  `;
+  indicator.id = 'dynamicDropIndicator';
+  indicator.className = 'drop-zone';
   
-  // Add arrow indicator
-  indicator.innerHTML = `
-    <div style="
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      color: #4CAF50;
-      animation: pulse 1s infinite;
-    ">↓</div>
-  `;
+  if (position === 0) {
+    indicator.classList.add('first');
+  } else if (position === cards.length) {
+    indicator.classList.add('last');
+  } else {
+    indicator.classList.add('between');
+  }
   
-  // Insert at position based on actual index
-  if (position === 0 || cards.length === 0) {
-    // Insert before first card
-    timeline.insertBefore(indicator, timeline.firstChild);
-  } else if (position >= cards.length) {
-    // Insert after last card
+  // Insert indicator at the correct position
+  if (position >= cards.length) {
     timeline.appendChild(indicator);
   } else {
-    // Insert before the card at this index
-    const insertBeforeCard = cards[position];
-    timeline.insertBefore(indicator, insertBeforeCard);
+    timeline.insertBefore(indicator, cards[position]);
   }
   
   return position;
 }
 
 function clearDynamicDropIndicator() {
-  const indicator = document.querySelector('.dynamic-drop-indicator');
+  const indicator = document.getElementById('dynamicDropIndicator');
   if (indicator) {
     indicator.remove();
   }
+}
+
+// ============================================
+// AUTO-SCROLL TIMELINE
+// ============================================
+function autoScrollTimeline() {
+  const container = document.querySelector('.timeline-container');
+  if (!container) return;
+  
+  // Scroll to center of timeline
+  const scrollWidth = container.scrollWidth;
+  const clientWidth = container.clientWidth;
+  const scrollPosition = (scrollWidth - clientWidth) / 2;
+  
+  container.scrollTo({
+    left: scrollPosition,
+    behavior: 'smooth'
+  });
 }
 
 console.log('[Game] Render module loaded');

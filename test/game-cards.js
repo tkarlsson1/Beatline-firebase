@@ -413,13 +413,8 @@ function challengeCard() {
       console.log('[Challenge] Challenge registered successfully');
       showNotification(`Du utmanar ${currentTeams[activeTeamId].name}!`, 'success');
       
-      // Host starts Timer 3
-      if (isHost) {
-        console.log('[Host] Starting Timer 3 (challenge placement)');
-        setTimeout(() => {
-          startTimer('challenge_placement', (currentGameData.placeChallengeTime || 20) * 1000);
-        }, 1000);
-      }
+      // Timer 3 will be started by host when they detect challengeState change in game-render.js
+      console.log('[Challenge] Waiting for host to start Timer 3...');
     })
     .catch((error) => {
       console.error('[Challenge] Error registering challenge:', error);
@@ -710,11 +705,30 @@ function validateChallenge() {
     
     if (isChallengingCorrect) {
       // Challenging team correct - they get the point
-      updates[`games/${gameId}/teams/${activeTeamId}/timeline/${challengingCardKey}/revealed`] = true;
+      // IMPORTANT: Move card from active team's timeline to challenging team's timeline
+      
+      // Remove from active team's timeline
+      updates[`games/${gameId}/teams/${activeTeamId}/timeline/${challengingCardKey}`] = null;
+      
+      // Find position in challenging team's timeline
+      const challengingTimeline = challengingTeam.timeline || {};
+      const challengingTimelineCards = Object.values(challengingTimeline).filter(c => c !== null);
+      const newPosition = challengingTimelineCards.length;
+      
+      // Generate a unique key for the new card
+      const newCardKey = `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Add to challenging team's timeline
+      updates[`games/${gameId}/teams/${challengingTeamId}/timeline/${newCardKey}`] = {
+        ...challengingCard,
+        position: newPosition,
+        revealed: true
+      };
+      
       const challengingNewScore = (challengingTeam.score || 0) + 1;
       updates[`games/${gameId}/teams/${challengingTeamId}/score`] = challengingNewScore;
       
-      console.log('[Challenge] Challenging team correct - they get point');
+      console.log('[Challenge] Challenging team correct - moving card to their timeline at position', newPosition);
       showNotification(`✓ ${challengingTeam.name} hade rätt! ${activeTeam.name} hade fel.`, 'success');
       
       // Check for winner
@@ -790,6 +804,14 @@ function transitionToNextTeam() {
   updates[`games/${gameId}/currentTeam`] = nextTeamId;
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
   updates[`games/${gameId}/currentSong`] = nextSong;
+  
+  // Clean up challenge state (if any)
+  updates[`games/${gameId}/challengeState`] = null;
+  
+  // Clean up pending cards for all teams
+  teamIds.forEach(teamId => {
+    updates[`games/${gameId}/teams/${teamId}/pendingCard`] = null;
+  });
   
   // Increment round if wrapped around
   if (nextIndex === 0) {
