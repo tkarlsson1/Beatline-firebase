@@ -26,6 +26,9 @@ function updateGameView() {
   // Update action buttons
   updateActionButtons();
   
+  // Update challenge button (if Timer 2 is active)
+  renderChallengeButton();
+  
   // Initialize scores based on revealed cards (only once at game start)
   if (!hasInitializedScores && currentGameData.status === 'playing' && isHost) {
     hasInitializedScores = true;
@@ -75,22 +78,21 @@ function updateGameView() {
       resumeBtn.style.display = 'none';
     }
     
-    // Check if validation trigger changed (non-host validated their card)
-    if (currentGameData.validationTrigger && currentGameData.validationTrigger !== lastValidationTrigger) {
-      console.log('[Host] Validation trigger detected:', currentGameData.validationTrigger);
-      lastValidationTrigger = currentGameData.validationTrigger;
+    // Check if challenge trigger changed (non-host locked in card)
+    if (currentGameData.challengeTrigger && currentGameData.challengeTrigger !== lastValidationTrigger) {
+      console.log('[Host] Challenge trigger detected:', currentGameData.challengeTrigger);
+      lastValidationTrigger = currentGameData.challengeTrigger;
       
-      // Start Timer 4 after validation from non-host
-      console.log('[Host] Starting Timer 4 after non-host validation');
-      const nextTeamId = currentGameData.currentTeam;
-      if (nextTeamId && !currentGameData.timerState) {
+      // Start Timer 2 (challenge window)
+      console.log('[Host] Starting Timer 2 after non-host lock in');
+      if (!currentGameData.timerState) {
         // Only start if no timer is currently active
-        console.log('[Host] Starting between_songs timer for:', nextTeamId);
-        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+        console.log('[Host] Starting challenge_window timer');
+        startTimer('challenge_window', (currentGameData.challengeTime || 10) * 1000);
         
         // Clear the trigger
         const clearUpdates = {};
-        clearUpdates[`games/${gameId}/validationTrigger`] = null;
+        clearUpdates[`games/${gameId}/challengeTrigger`] = null;
         window.firebaseUpdate(window.firebaseRef(window.firebaseDb), clearUpdates);
       }
     }
@@ -237,15 +239,22 @@ function renderTimeline() {
   
   // Just render cards, no drop zones (they appear dynamically during drag)
   timelineCards.forEach((card) => {
-    // Check if this is my preview card
+    // Check if this is my preview card OR a challenge card
     const isMyCard = (teamId === currentTeamId) && !card.revealed;
+    
+    // Check if we're in challenge placement and this is a card from the challenging team
+    const challengeState = currentGameData.challengeState;
+    const isChallengeCard = challengeState && 
+                           challengeState.isActive && 
+                           !card.revealed && 
+                           currentGameData.timerState === 'challenge_placement';
     
     const cardDiv = document.createElement('div');
     cardDiv.className = 'card';
     cardDiv.dataset.position = card.position;
     
-    // Add preview-card class if this is my card
-    if (isMyCard) {
+    // Add preview-card class if this is my card or a challenge card
+    if (isMyCard || isChallengeCard) {
       cardDiv.classList.add('preview-card');
     }
     
@@ -262,6 +271,9 @@ function renderTimeline() {
       // Border style depends on whether it's my card or another team's
       if (isMyCard) {
         cardDiv.style.border = `4px dashed ${teamColorHex}`;
+      } else if (isChallengeCard) {
+        // Challenge card - show in red or different color
+        cardDiv.style.border = `4px dashed #EA4335`;
       } else {
         cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
       }
@@ -373,8 +385,17 @@ function renderCurrentCard() {
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Only show current card if it's my turn AND we're in guessing state (not pause)
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
+  // Show current card if:
+  // 1. It's my turn AND timer is 'guessing'
+  // 2. OR it's Timer 3 (challenge_placement) and I'm the challenging team
+  const challengeState = currentGameData.challengeState;
+  const isMyTurn = currentTeamId === teamId && timerState === 'guessing';
+  const isMyChallenge = challengeState && 
+                        challengeState.isActive && 
+                        challengeState.challengingTeam === teamId && 
+                        timerState === 'challenge_placement';
+  
+  if (!isMyTurn && !isMyChallenge) {
     container.style.visibility = 'hidden';
     return;
   }
@@ -457,6 +478,116 @@ function updateActionButtons() {
     lockInBtn.disabled = false;
   } else {
     lockInBtn.disabled = true;
+  }
+}
+
+// ============================================
+// CHALLENGE BUTTON
+// ============================================
+function renderChallengeButton() {
+  const timerState = currentGameData.timerState;
+  const currentTeamId = currentGameData.currentTeam;
+  const challengeState = currentGameData.challengeState;
+  
+  // Find or create challenge button container
+  let challengeContainer = document.getElementById('challengeButtonContainer');
+  
+  // Only show challenge button during Timer 2 (challenge_window)
+  if (timerState !== 'challenge_window') {
+    if (challengeContainer) {
+      challengeContainer.style.display = 'none';
+    }
+    return;
+  }
+  
+  // Create container if it doesn't exist
+  if (!challengeContainer) {
+    challengeContainer = document.createElement('div');
+    challengeContainer.id = 'challengeButtonContainer';
+    challengeContainer.style.cssText = `
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 1rem auto;
+      max-width: 400px;
+    `;
+    
+    // Insert after timer container
+    const turnIndicator = document.getElementById('turnIndicator');
+    turnIndicator.parentNode.insertBefore(challengeContainer, turnIndicator.nextSibling);
+  }
+  
+  challengeContainer.style.display = 'flex';
+  
+  // Check if I should see the challenge button
+  // Show if: NOT the active team AND have tokens > 0 AND no one has challenged yet
+  const isActiveTeam = currentTeamId === teamId;
+  const hasTokens = myTeam && myTeam.tokens > 0;
+  const alreadyChallenged = challengeState && challengeState.isActive;
+  
+  if (isActiveTeam) {
+    // I'm the active team - show waiting message
+    challengeContainer.innerHTML = `
+      <div style="
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        text-align: center;
+        opacity: 0.8;
+      ">Väntar på utmaningar...</div>
+    `;
+  } else if (alreadyChallenged) {
+    // Someone has already challenged
+    const challengingTeam = currentTeams[challengeState.challengingTeam];
+    challengeContainer.innerHTML = `
+      <div style="
+        color: #FFC107;
+        font-size: 1.1rem;
+        font-weight: bold;
+        text-align: center;
+      ">${escapeHtml(challengingTeam.name)} utmanar!</div>
+    `;
+  } else if (!hasTokens) {
+    // I don't have tokens
+    challengeContainer.innerHTML = `
+      <button 
+        disabled 
+        style="
+          background: #555;
+          border: none;
+          color: white;
+          padding: 1rem 2rem;
+          border-radius: 8px;
+          font-size: 1.2rem;
+          font-weight: bold;
+          cursor: not-allowed;
+          opacity: 0.5;
+          font-family: 'Manrope', sans-serif;
+        "
+      >UTMANA (Inga tokens)</button>
+    `;
+  } else {
+    // I can challenge!
+    challengeContainer.innerHTML = `
+      <button 
+        onclick="challengeCard()" 
+        style="
+          background: #EA4335;
+          border: none;
+          color: white;
+          padding: 1rem 2rem;
+          border-radius: 8px;
+          font-size: 1.2rem;
+          font-weight: bold;
+          cursor: pointer;
+          font-family: 'Manrope', sans-serif;
+          box-shadow: 0 4px 12px rgba(234, 67, 53, 0.4);
+          transition: all 0.3s;
+        "
+        onmouseover="this.style.background='#C62828'; this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.background='#EA4335'; this.style.transform='translateY(0)'"
+      >UTMANA (1 🎫)</button>
+    `;
   }
 }
 
