@@ -257,18 +257,14 @@ function renderTimeline() {
       <div class="card-year">${card.year}</div>
       <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
     `;
-    } else if (isMyCard) {
-      // Preview card (not yet revealed, showing to player only)
-      cardDiv.style.border = `4px dashed ${teamColorHex}`;
-      cardDiv.innerHTML = `
-      <div class="card-year">${card.year}</div>
-      <div class="card-info" style="opacity: 0.7; font-size: 0.7rem;">
-        ${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}
-      </div>
-    `;
     } else {
-      // Hidden card (preview for another team) - show blank card
-      cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
+      // Unrevealed card (preview) - ALWAYS show as blank until validated
+      // Border style depends on whether it's my card or another team's
+      if (isMyCard) {
+        cardDiv.style.border = `4px dashed ${teamColorHex}`;
+      } else {
+        cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
+      }
       cardDiv.innerHTML = `
       <div class="card-blank-text">?</div>
     `;
@@ -289,34 +285,20 @@ function renderPreviewCard(card, teamColorHex) {
   const container = document.getElementById('timeline');
   const position = card.position;
   
-  // Check if this is my card (so I can see it and drag it)
+  // Check if this is my card (so I can drag it)
   const isMyCard = (teamId === currentGameData.currentTeam);
-  
-  // Get current song data from Firebase
-  const currentSong = currentGameData.currentSong;
   
   const previewCard = document.createElement('div');
   previewCard.className = 'card preview-card';
   previewCard.dataset.position = position;
   previewCard.id = 'timelinePreviewCard';
   
-  // Style based on whether it's my card or not
-  if (isMyCard && currentSong) {
-    // My card - show details with dashed border
-    previewCard.style.border = `4px dashed ${teamColorHex}`;
-    previewCard.innerHTML = `
-      <div class="card-year">${currentSong.year}</div>
-      <div class="card-info" style="opacity: 0.7; font-size: 0.7rem;">
-        ${escapeHtml(currentSong.title)}<br>${escapeHtml(currentSong.artist)}
-      </div>
-    `;
-  } else {
-    // Someone else's card OR no song data - show as blank
-    previewCard.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
-    previewCard.innerHTML = `
-      <div class="card-blank-text">?</div>
-    `;
-  }
+  // IMPORTANT: Preview cards are ALWAYS blank until validated
+  // Only show year/title/artist after lockInPlacement() -> validation -> revealed
+  previewCard.style.border = `4px dashed ${teamColorHex}`;
+  previewCard.innerHTML = `
+    <div class="card-blank-text">?</div>
+  `;
   
   // Make preview draggable only if it's my card
   if (isMyCard) {
