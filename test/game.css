@@ -308,7 +308,7 @@ body {
   color: white;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;  /* TillÃ¥t scrollning i alla riktningar */
+  touch-action: manipulation;  /* Tillåt scrollning i alla riktningar */
 }
 
 .card:hover {
@@ -323,7 +323,7 @@ body {
 .card.preview-card {
   opacity: 0.7;
   transform: scale(0.95);
-  touch-action: none;  /* Blockera scroll fÃ¶r kortet som ska flyttas */
+  touch-action: none;  /* Blockera scroll för kortet som ska flyttas */
 }
 
 .card.dragging {
@@ -384,15 +384,15 @@ body {
 }
 
 .drop-zone.first::after {
-  content: 'â—€ï¸';
+  content: '◀️';
 }
 
 .drop-zone.between::after {
-  content: 'â¬‡ï¸';
+  content: '⬇️';
 }
 
 .drop-zone.last::after {
-  content: 'â–¶ï¸';
+  content: '▶️';
 }
 
 /* Action buttons */

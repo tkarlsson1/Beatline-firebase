@@ -177,12 +177,12 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
     const nextTeamId = currentGameData.nextTeam;
     const nextTeam = currentTeams[nextTeamId];
     if (nextTeam) {
-      labelText = `NÃ„STA TUR: ${escapeHtml(nextTeam.name)}`;
+      labelText = `NÄSTA TUR: ${escapeHtml(nextTeam.name)}`;
     } else {
-      labelText = 'Mellan lÃ¥tar';
+      labelText = 'Mellan låtar';
     }
   } else if (timerState === 'paused') {
-    labelText = 'SPELET Ã„R PAUSAT';
+    labelText = 'SPELET ÄR PAUSAT';
   }
   
   // Render timer UI as horizontal bar
@@ -273,7 +273,7 @@ function onTimerExpired() {
 function skipTurn() {
   console.log('[Timer] Skipping turn for team:', currentGameData.currentTeam);
   
-  showNotification('â±ï¸ Tiden Ã¤r ute! Turen hoppar Ã¶ver', 'info');
+  showNotification('⏱️ Tiden är ute! Turen hoppar över', 'info');
   
   // Move to next team immediately, but start with Timer 4 (pause)
   const teamIds = Object.keys(currentTeams);
