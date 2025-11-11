@@ -292,23 +292,26 @@ function renderPreviewCard(card, teamColorHex) {
   // Check if this is my card (so I can see it and drag it)
   const isMyCard = (teamId === currentGameData.currentTeam);
   
+  // Get current song data from Firebase
+  const currentSong = currentGameData.currentSong;
+  
   const previewCard = document.createElement('div');
   previewCard.className = 'card preview-card';
   previewCard.dataset.position = position;
   previewCard.id = 'timelinePreviewCard';
   
   // Style based on whether it's my card or not
-  if (isMyCard) {
+  if (isMyCard && currentSong) {
     // My card - show details with dashed border
     previewCard.style.border = `4px dashed ${teamColorHex}`;
     previewCard.innerHTML = `
-      <div class="card-year">${card.year}</div>
+      <div class="card-year">${currentSong.year}</div>
       <div class="card-info" style="opacity: 0.7; font-size: 0.7rem;">
-        ${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}
+        ${escapeHtml(currentSong.title)}<br>${escapeHtml(currentSong.artist)}
       </div>
     `;
   } else {
-    // Someone else's card - show as blank
+    // Someone else's card OR no song data - show as blank
     previewCard.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
     previewCard.innerHTML = `
       <div class="card-blank-text">?</div>
