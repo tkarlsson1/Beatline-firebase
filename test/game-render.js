@@ -237,70 +237,82 @@ function renderTimeline() {
   
   // Just render cards, no drop zones (they appear dynamically during drag)
   timelineCards.forEach((card) => {
-    const cardElement = createCardElement(card, teamColorHex);
-    container.appendChild(cardElement);
-  });
-  
-  // Add preview card if team has pending card in Firebase
-  if (displayTeam.pendingCard) {
-    addPreviewCardFromFirebase(displayTeam.pendingCard, currentTeamId === teamId, teamColorHex);
-  }
-}
-
-function createCardElement(card, teamColorHex) {
-  const cardDiv = document.createElement('div');
-  cardDiv.className = 'card';
-  cardDiv.dataset.position = card.position;
-  
-  // Apply team-colored border (6px solid)
-  if (teamColorHex) {
-    cardDiv.style.border = `6px solid ${teamColorHex}`;
-  }
-  
-  // Show year if revealed, otherwise show blank
-  if (card.revealed) {
-    cardDiv.innerHTML = `
+    // Check if this is my preview card
+    const isMyCard = (teamId === currentTeamId) && !card.revealed;
+    
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    cardDiv.dataset.position = card.position;
+    
+    // Add preview-card class if this is my card
+    if (isMyCard) {
+      cardDiv.classList.add('preview-card');
+    }
+    
+    // Different border styles for revealed vs preview cards
+    if (card.revealed) {
+      // Revealed card - show year and info
+      cardDiv.style.border = `6px solid ${teamColorHex}`;
+      cardDiv.innerHTML = `
       <div class="card-year">${card.year}</div>
       <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
     `;
-  } else {
-    cardDiv.innerHTML = `
-      <div class="card-blank-text">?</div>
-      <div class="card-info">Placerat kort</div>
+    } else if (isMyCard) {
+      // Preview card (not yet revealed, showing to player only)
+      cardDiv.style.border = `4px dashed ${teamColorHex}`;
+      cardDiv.innerHTML = `
+      <div class="card-year">${card.year}</div>
+      <div class="card-info" style="opacity: 0.7; font-size: 0.7rem;">
+        ${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}
+      </div>
     `;
-    cardDiv.classList.add('blank-card');
-  }
+    } else {
+      // Hidden card (preview for another team) - show blank card
+      cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
+      cardDiv.innerHTML = `
+      <div class="card-blank-text">?</div>
+    `;
+    }
+    
+    container.appendChild(cardDiv);
+  });
   
-  return cardDiv;
+  // Check if we need to render a preview card at a specific position
+  // (happens when dragging or after placing card but before revealing)
+  const previewCard = displayTeam.previewCard;
+  if (previewCard && previewCard.position !== undefined) {
+    renderPreviewCard(previewCard, teamColorHex);
+  }
 }
 
-function addPreviewCardFromFirebase(pendingCard, isMyCard, teamColorHex) {
-  // Add preview of placed card at the placement position from Firebase
+function renderPreviewCard(card, teamColorHex) {
   const container = document.getElementById('timeline');
-  const cards = container.querySelectorAll('.card:not(.preview-card)');
+  const position = card.position;
   
-  // Remove any existing preview
-  const existingPreview = container.querySelector('.preview-card');
-  if (existingPreview) {
-    existingPreview.remove();
-  }
+  // Check if this is my card (so I can see it and drag it)
+  const isMyCard = (teamId === currentGameData.currentTeam);
   
-  const position = pendingCard.position;
-  
-  // Create preview card
   const previewCard = document.createElement('div');
-  previewCard.className = 'card blank-card preview-card';
-  previewCard.innerHTML = `
-    <div class="card-blank-text">?</div>
-    <div class="card-info">${isMyCard ? 'Ditt kort<br>(Dra för att flytta)' : 'Väntar...'}</div>
-  `;
+  previewCard.className = 'card preview-card';
+  previewCard.dataset.position = position;
+  previewCard.id = 'timelinePreviewCard';
   
-  // Apply team-colored border (6px solid, brighter for preview)
-  if (teamColorHex) {
-    previewCard.style.border = `6px solid ${teamColorHex}`;
-    previewCard.style.boxShadow = `0 0 15px ${teamColorHex}`;
+  // Style based on whether it's my card or not
+  if (isMyCard) {
+    // My card - show details with dashed border
+    previewCard.style.border = `4px dashed ${teamColorHex}`;
+    previewCard.innerHTML = `
+      <div class="card-year">${card.year}</div>
+      <div class="card-info" style="opacity: 0.7; font-size: 0.7rem;">
+        ${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}
+      </div>
+    `;
   } else {
-    previewCard.style.border = '6px solid #4CAF50';
+    // Someone else's card - show as blank
+    previewCard.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
+    previewCard.innerHTML = `
+      <div class="card-blank-text">?</div>
+    `;
   }
   
   // Make preview draggable only if it's my card
@@ -321,6 +333,7 @@ function addPreviewCardFromFirebase(pendingCard, isMyCard, teamColorHex) {
   
   // Insert at correct position based on index
   // Position from Firebase should correspond to index in DOM
+  const cards = container.querySelectorAll('.card:not(.preview-card)');
   if (position === 0 || cards.length === 0) {
     container.insertBefore(previewCard, container.firstChild);
   } else if (position >= cards.length) {
@@ -353,7 +366,7 @@ function renderCurrentCard() {
     return;
   }
   
-  container.style.display = 'block';
+  container.style.display = 'grid';
   
   // Create card element
   const cardDiv = document.createElement('div');
