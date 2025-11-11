@@ -340,18 +340,18 @@ function renderCurrentCard() {
   
   // Only show current card if it's my turn AND we're in guessing state (not pause)
   if (currentTeamId !== teamId || timerState !== 'guessing') {
-    container.style.display = 'none';
+    container.style.visibility = 'hidden';
     return;
   }
   
   const currentSong = currentGameData.currentSong;
   
   if (!currentSong) {
-    container.style.display = 'none';
+    container.style.visibility = 'hidden';
     return;
   }
   
-  container.style.display = 'grid';
+  container.style.visibility = 'visible';
   
   // Create card element
   const cardDiv = document.createElement('div');

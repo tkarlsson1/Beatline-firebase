@@ -17,7 +17,7 @@
   
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="game.css?v=41">
+  <link rel="stylesheet" href="game.css?v=42">
   
   <!-- Firebase SDK (Compat mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -93,7 +93,7 @@
         </div>
         
         <!-- Current card to place with action buttons (only shown when it's your turn) -->
-        <div class="current-card-container" id="currentCardContainer" style="display: none;">
+        <div class="current-card-container" id="currentCardContainer" style="visibility: hidden;">
           <button class="action-btn secondary" id="changeCardBtn" onclick="changeCard()" disabled>
             BYT LÅT
           </button>
