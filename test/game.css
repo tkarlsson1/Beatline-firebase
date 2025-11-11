@@ -102,7 +102,7 @@ body {
 .timer-container {
   width: 100%;
   max-width: 600px;
-  margin: 0.8rem auto;
+  margin: 0.4rem auto;
 }
 
 .timer-bar-wrapper {
@@ -234,7 +234,7 @@ body {
   grid-template-columns: 130px 1fr 130px;
   align-items: start;
   gap: 1rem;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 0.3rem auto;
   width: 100%;
   max-width: 500px;
 }
