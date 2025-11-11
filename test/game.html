@@ -17,7 +17,7 @@
   
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="game.css?v=42">
+  <link rel="stylesheet" href="game.css?v=43">
   
   <!-- Firebase SDK (Compat mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -42,10 +42,10 @@
       <rect x="20" y="35" width="40" height="60" rx="5"/>
       <circle cx="40" cy="90" r="3" fill="white"/>
       <path d="M 70 50 L 85 50 L 85 35 L 70 35" stroke-dasharray="3,3"/>
-      <text x="78" y="42" fill="white" font-size="8">↻</text>
+      <text x="78" y="42" fill="white" font-size="8">â†»</text>
     </svg>
-    <h2>🔄 Vänd din telefon</h2>
-    <p>Spelet kräver liggande läge (landscape mode)</p>
+    <h2>ðŸ"„ VÃ¤nd din telefon</h2>
+    <p>Spelet krÃ¤ver liggande lÃ¤ge (landscape mode)</p>
   </div>
   
   <!-- Game container (shown in landscape) -->
@@ -75,12 +75,12 @@
         <!-- Host controls (host only) -->
         <div class="host-controls" id="hostControls" style="display: none;">
           <button class="host-toggle-btn" id="hostToggleBtn" onclick="toggleHostControls()">
-            ⚙️
+            âš™ï¸
           </button>
           <div class="host-buttons" id="hostButtons">
-            <button class="host-btn" id="pauseBtn" onclick="pauseGame()">⏸️ Pausa</button>
-            <button class="host-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">▶️ Fortsätt</button>
-            <button class="host-btn" onclick="forceNextTeam()">Nästa →</button>
+            <button class="host-btn" id="pauseBtn" onclick="pauseGame()">â¸ï¸ Pausa</button>
+            <button class="host-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">â–¶ï¸ FortsÃ¤tt</button>
+            <button class="host-btn" onclick="forceNextTeam()">NÃ¤sta â†'</button>
           </div>
         </div>
       </div>
@@ -89,19 +89,19 @@
       <div class="game-area">
         <!-- Turn indicator -->
         <div class="turn-indicator" id="turnIndicator">
-          <!-- Turn info will be rendered here -->
+          <div class="timer-container"></div>
         </div>
         
         <!-- Current card to place with action buttons (only shown when it's your turn) -->
         <div class="current-card-container" id="currentCardContainer" style="visibility: hidden;">
           <button class="action-btn secondary" id="changeCardBtn" onclick="changeCard()" disabled>
-            BYT LÅT
+            BYT LÃ…T
           </button>
           <div class="current-card" id="currentCard">
             <!-- Card will be rendered here -->
           </div>
           <button class="action-btn primary" id="lockInBtn" onclick="lockInPlacement()" disabled>
-            LÅS SVAR
+            LÃ…S SVAR
           </button>
         </div>
         

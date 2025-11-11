@@ -68,13 +68,16 @@ function stopTimer() {
 
 function updateTimer() {
   if (!currentGameData || !currentGameData.timerState || !currentGameData.timerStartTime || !currentGameData.timerDuration) {
-    // No active timer - clear any existing timer display
+    // No active timer - clear timer display but keep container
     const container = document.getElementById('turnIndicator');
     if (container) {
-      const timerContainer = container.querySelector('.timer-container');
-      if (timerContainer) {
-        timerContainer.remove();
+      let timerContainer = container.querySelector('.timer-container');
+      if (!timerContainer) {
+        timerContainer = document.createElement('div');
+        timerContainer.className = 'timer-container';
+        container.appendChild(timerContainer);
       }
+      timerContainer.innerHTML = '';
     }
     return;
   }
@@ -174,12 +177,12 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
     const nextTeamId = currentGameData.nextTeam;
     const nextTeam = currentTeams[nextTeamId];
     if (nextTeam) {
-      labelText = `NÄSTA TUR: ${escapeHtml(nextTeam.name)}`;
+      labelText = `NÃ„STA TUR: ${escapeHtml(nextTeam.name)}`;
     } else {
-      labelText = 'Mellan låtar';
+      labelText = 'Mellan lÃ¥tar';
     }
   } else if (timerState === 'paused') {
-    labelText = 'SPELET ÄR PAUSAT';
+    labelText = 'SPELET Ã„R PAUSAT';
   }
   
   // Render timer UI as horizontal bar
@@ -270,7 +273,7 @@ function onTimerExpired() {
 function skipTurn() {
   console.log('[Timer] Skipping turn for team:', currentGameData.currentTeam);
   
-  showNotification('⏱️ Tiden är ute! Turen hoppar över', 'info');
+  showNotification('â±ï¸ Tiden Ã¤r ute! Turen hoppar Ã¶ver', 'info');
   
   // Move to next team immediately, but start with Timer 4 (pause)
   const teamIds = Object.keys(currentTeams);
