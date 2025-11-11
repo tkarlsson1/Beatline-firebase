@@ -279,6 +279,35 @@ function renderTimeline() {
   if (previewCard && previewCard.position !== undefined) {
     renderPreviewCard(previewCard, teamColorHex);
   }
+  
+  // Auto-scroll to center card when team changes
+  if (currentTeamId !== previousCurrentTeam) {
+    console.log('[Timeline] Team changed from', previousCurrentTeam, 'to', currentTeamId, '- auto-scrolling to center');
+    previousCurrentTeam = currentTeamId;
+    
+    // Use requestAnimationFrame to ensure DOM is updated before scrolling
+    requestAnimationFrame(() => {
+      const timelineContainer = document.getElementById('timelineContainer');
+      const allCards = container.querySelectorAll('.card');
+      
+      if (allCards.length > 0) {
+        // Find middle card
+        const middleIndex = Math.floor(allCards.length / 2);
+        const middleCard = allCards[middleIndex];
+        
+        if (middleCard) {
+          console.log('[Timeline] Scrolling to middle card at index', middleIndex, 'of', allCards.length, 'cards');
+          
+          // Scroll middle card to center of viewport
+          middleCard.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+          });
+        }
+      }
+    });
+  }
 }
 
 function renderPreviewCard(card, teamColorHex) {

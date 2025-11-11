@@ -27,6 +27,9 @@ let hasInitializedScores = false; // Track if scores have been initialized based
 let lastValidationTrigger = null; // Track validation trigger to start Timer 4
 let previousTimerState = null; // Track previous timer state to detect changes
 
+// Timeline state
+let previousCurrentTeam = null; // Track previous team to detect team changes for auto-scroll
+
 // Spotify state
 let spotifyInitialized = false;
 let currentPlayingTrackId = null;

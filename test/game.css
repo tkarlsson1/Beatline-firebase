@@ -27,7 +27,7 @@ body {
 /* Team header */
 .team-header {
   background: rgba(0, 0, 0, 0.5);
-  padding: 0.4rem 1rem;
+  padding: 0.8rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,11 +38,8 @@ body {
 .team-list {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
   flex: 1;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.2rem 0;
 }
 
 .team-badge {
@@ -52,8 +49,19 @@ body {
   background: rgba(255, 255, 255, 0.05);
   padding: 0.5rem 0.8rem;
   border-radius: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid transparent;
   transition: all 0.3s;
+}
+
+.team-badge.active {
+  border-color: #FBBC04;
+  background: rgba(251, 188, 4, 0.2);
+  box-shadow: 0 0 15px rgba(251, 188, 4, 0.5);
+}
+
+.team-badge.own-team {
+  border-color: var(--accent-color);
+  background: rgba(11, 147, 156, 0.2);
 }
 
 .team-color-dot {
@@ -88,124 +96,131 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 1rem;
+  padding: 2rem 1rem;
   position: relative;
   overflow-y: auto;
 }
 
-/* Turn indicator - Container only (for timer bar) */
+/* Turn indicator */
 .turn-indicator {
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
-/* Timer display - Horizontal bar */
-.timer-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0.4rem auto;
-  min-height: 60px;
+.turn-indicator h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
-.timer-bar-wrapper {
-  position: relative;
-  width: 100%;
-  height: 25px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.turn-indicator.your-turn h1 {
+  color: #4CAF50;
+  animation: pulse 2s infinite;
 }
 
-.timer-bar-progress {
-  height: 100%;
-  background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
-  transition: width 1s linear, background 0.3s;
-  border-radius: 20px;
+.turn-indicator.waiting h1 {
+  color: #FFC107;
 }
 
-.timer-bar-progress.warning {
-  background: linear-gradient(90deg, #FFC107 0%, #FFD54F 100%);
-}
-
-.timer-bar-progress.danger {
-  background: linear-gradient(90deg, #EA4335 0%, #EF5350 100%);
-  animation: pulse-bar 1s infinite;
-}
-
-@keyframes pulse-bar {
+@keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+  50% { opacity: 0.7; }
 }
 
-.timer-bar-text {
+.turn-info {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+/* Timer display */
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.timer-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.timer-circle svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.timer-circle-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 8;
+}
+
+.timer-circle-progress {
+  fill: none;
+  stroke: #4CAF50;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s linear, stroke 0.3s;
+}
+
+.timer-circle-progress.warning {
+  stroke: #FFC107;
+}
+
+.timer-circle-progress.danger {
+  stroke: #EA4335;
+}
+
+.timer-text {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 1.1rem;
+  font-size: 2rem;
   font-weight: bold;
   color: white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-  z-index: 1;
 }
 
 .timer-label {
+  font-size: 1rem;
+  opacity: 0.8;
   text-align: center;
-  font-size: 0.85rem;
-  opacity: 0.7;
-  margin-top: 0.3rem;
 }
 
 /* Debug controls (host only) */
-/* Host controls in header */
-.host-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: 1rem;
+.debug-controls {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.host-toggle-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 0.5rem 0.8rem;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.host-toggle-btn:hover {
+.debug-controls h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
   opacity: 0.7;
 }
 
-.host-buttons {
-  display: none;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.host-buttons.expanded {
-  display: flex;
-}
-
-.host-btn {
+.debug-btn {
   background: var(--accent-color);
   border: none;
   color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-family: 'Manrope', sans-serif;
   transition: background 0.3s;
-  white-space: nowrap;
 }
 
-.host-btn:hover {
+.debug-btn:hover {
   background: var(--accent-hover);
 }
 
@@ -231,25 +246,22 @@ body {
 
 /* Current card container */
 .current-card-container {
-  display: grid;
-  grid-template-columns: 130px 1fr 130px;
-  align-items: start;
-  gap: 1rem;
-  margin: 0 auto 0.3rem auto;
-  width: 100%;
-  max-width: 500px;
+  margin: 2rem auto;
+  max-width: 200px;
+  text-align: center;
+}
+
+.current-card-container h2 {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
 }
 
 .current-card {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  display: inline-block;
   touch-action: none;
   user-select: none;
-  width: auto;
-  height: 48px;
-  padding: 0;
-  margin: 0 auto;  /* Center horizontally in grid cell */
 }
 
 /* Timeline container */
@@ -258,8 +270,8 @@ body {
   max-width: 95vw;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0;
-  margin: 0;
+  padding: 1rem 0;
+  margin: 2rem 0;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -267,7 +279,7 @@ body {
   display: flex;
   gap: 1rem;
   min-height: 150px;
-  padding: 0.5rem;
+  padding: 1rem;
   position: relative;
   align-items: center;
   min-width: min-content;
@@ -291,7 +303,7 @@ body {
 
 /* Cards */
 .card {
-  width: 82px;
+  width: 102px;
   height: 96px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
@@ -396,24 +408,26 @@ body {
 }
 
 /* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
 .action-btn {
   background: var(--accent-color);
   border: none;
   color: white;
-  padding: 0.6rem 1rem;
+  padding: 1rem 2rem;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
   font-family: 'Manrope', sans-serif;
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 120px;
-  white-space: nowrap;
-  align-self: start;
-  margin: 0;  /* Override styles.css global button margin-bottom */
-  display: inline-block;  /* Prevent block behavior from global styles */
 }
 
 .action-btn:hover:not(:disabled) {
@@ -430,15 +444,10 @@ body {
 
 .action-btn.secondary {
   background: #555;
-  justify-self: end;  /* Align right in grid cell for symmetry */
 }
 
 .action-btn.secondary:hover:not(:disabled) {
   background: #666;
-}
-
-.action-btn.primary {
-  justify-self: start;  /* Align left in grid cell for symmetry */
 }
 
 /* Spotify status (host only) */
@@ -563,13 +572,17 @@ body {
     padding: 1rem 0.5rem;
   }
   
+  .turn-indicator h1 {
+    font-size: 1.5rem;
+  }
+  
   .card {
-    width: 82px;
-    height: 96px;
+    width: 160px;
+    height: 220px;
   }
   
   .drop-zone {
-    width: 60px;
-    height: 96px;
+    width: 160px;
+    height: 220px;
   }
 }
