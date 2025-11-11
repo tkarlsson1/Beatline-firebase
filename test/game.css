@@ -27,7 +27,7 @@ body {
 /* Team header */
 .team-header {
   background: rgba(0, 0, 0, 0.5);
-  padding: 0.8rem 1rem;
+  padding: 0.4rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
