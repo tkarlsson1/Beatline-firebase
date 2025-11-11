@@ -43,6 +43,7 @@ body {
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 0.2rem 0;
+  flex-wrap: nowrap;
 }
 
 .team-badge {
@@ -54,6 +55,7 @@ body {
   border-radius: 20px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s;
+  flex-shrink: 0;
 }
 
 .team-color-dot {

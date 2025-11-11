@@ -162,6 +162,7 @@ function renderTeamHeader() {
   Object.entries(currentTeams).forEach(([teamIdKey, team]) => {
     const badge = document.createElement('div');
     badge.className = 'team-badge';
+    badge.dataset.teamId = teamIdKey;
     
     // Get team color
     const colorObj = TEAM_COLORS.find(c => c.name === team.color);
@@ -180,9 +181,15 @@ function renderTeamHeader() {
       badge.style.boxShadow = 'none';
     }
     
+    // Truncate team name if longer than 20 characters
+    let displayName = team.name;
+    if (displayName.length > 20) {
+      displayName = displayName.substring(0, 20) + '...';
+    }
+    
     badge.innerHTML = `
       <div class="team-color-dot" style="background: ${colorHex};"></div>
-      <div class="team-name">${escapeHtml(team.name)}</div>
+      <div class="team-name">${escapeHtml(displayName)}</div>
       <div class="team-stats">
         <span class="team-score">🎵 ${team.score || 0}</span>
         <span class="team-tokens">🎫 ${team.tokens || 0}</span>
@@ -191,6 +198,33 @@ function renderTeamHeader() {
     
     container.appendChild(badge);
   });
+  
+  // Auto-scroll to center active team when team changes
+  if (currentTeamId !== previousCurrentTeam) {
+    console.log('[TeamHeader] Team changed, scrolling to center active team');
+    
+    // Use requestAnimationFrame to ensure DOM is updated before scrolling
+    requestAnimationFrame(() => {
+      const activeBadge = container.querySelector(`[data-team-id="${currentTeamId}"]`);
+      
+      if (activeBadge && container) {
+        console.log('[TeamHeader] Scrolling to active team badge');
+        
+        // Calculate the position to scroll to
+        const badgeRect = activeBadge.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const badgeCenter = activeBadge.offsetLeft + (badgeRect.width / 2);
+        const containerCenter = containerRect.width / 2;
+        const scrollPosition = badgeCenter - containerCenter;
+        
+        // Scroll to position
+        container.scrollTo({
+          left: scrollPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  }
 }
 
 // ============================================
