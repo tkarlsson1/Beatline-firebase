@@ -429,10 +429,15 @@ body {
 
 .action-btn.secondary {
   background: #555;
+  justify-self: end;  /* Align right in grid cell for symmetry */
 }
 
 .action-btn.secondary:hover:not(:disabled) {
   background: #666;
+}
+
+.action-btn.primary {
+  justify-self: start;  /* Align left in grid cell for symmetry */
 }
 
 /* Spotify status (host only) */
