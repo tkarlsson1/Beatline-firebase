@@ -279,7 +279,7 @@ function renderTimeline() {
   
   // Check if we need to render a preview card at a specific position
   // (happens when dragging or after placing card but before revealing)
-  const previewCard = displayTeam.previewCard;
+  const previewCard = displayTeam.pendingCard;
   if (previewCard && previewCard.position !== undefined) {
     renderPreviewCard(previewCard, teamColorHex);
   }
