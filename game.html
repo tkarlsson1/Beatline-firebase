@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#032934">
+  
+  <title>Notestream - Spel</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="game.css?v=43">
+  
+  <!-- Firebase SDK (Compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  
+  <!-- Firebase Wrapper -->
+  <script src="firebase-wrapper.js"></script>
+  
+  <!-- Eruda - Mobile Console for Debugging -->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
+  
+  <!-- Spotify Web Playback SDK -->
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+</head>
+
+<body>
+  <!-- Rotate message (shown in portrait) -->
+  <div id="rotateMessage">
+    <svg viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="2">
+      <rect x="20" y="35" width="40" height="60" rx="5"/>
+      <circle cx="40" cy="90" r="3" fill="white"/>
+      <path d="M 70 50 L 85 50 L 85 35 L 70 35" stroke-dasharray="3,3"/>
+      <text x="78" y="42" fill="white" font-size="8">↻</text>
+    </svg>
+    <h2>🔄 Vänd din telefon</h2>
+    <p>Spelet kräver liggande läge (landscape mode)</p>
+  </div>
+  
+  <!-- Game container (shown in landscape) -->
+  <div id="gameContainer">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Laddar spel...</p>
+    </div>
+    
+    <!-- Error State -->
+    <div id="errorState" class="error-state" style="display: none;">
+      <p id="errorMessage"></p>
+      <button onclick="window.location.href='/test/'" class="start-button">
+        Tillbaka till start
+      </button>
+    </div>
+    
+    <!-- Game View -->
+    <div id="gameView" style="display: none;">
+      <!-- Team header -->
+      <div class="team-header">
+        <div class="team-list" id="teamList">
+          <!-- Teams will be rendered here -->
+        </div>
+        
+        <!-- Host controls (host only) -->
+        <div class="host-controls" id="hostControls" style="display: none;">
+          <button class="host-toggle-btn" id="hostToggleBtn" onclick="toggleHostControls()">
+            ⚙️
+          </button>
+          <div class="host-buttons" id="hostButtons">
+            <button class="host-btn" id="pauseBtn" onclick="pauseGame()">⏸️ Pausa</button>
+            <button class="host-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">▶️ Fortsätt</button>
+            <button class="host-btn" onclick="forceNextTeam()">Nästa →</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Game area -->
+      <div class="game-area">
+        <!-- Turn indicator -->
+        <div class="turn-indicator" id="turnIndicator">
+          <div class="timer-container"></div>
+        </div>
+        
+        <!-- Current card to place with action buttons (only shown when it's your turn) -->
+        <div class="current-card-container" id="currentCardContainer" style="visibility: hidden;">
+          <button class="action-btn secondary" id="changeCardBtn" onclick="changeCard()" disabled>
+            BYT LÅT
+          </button>
+          <div class="current-card" id="currentCard">
+            <!-- Card will be rendered here -->
+          </div>
+          <button class="action-btn primary" id="lockInBtn" onclick="lockInPlacement()" disabled>
+            LÅS SVAR
+          </button>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="timeline-container" id="timelineContainer">
+          <div class="timeline" id="timeline">
+            <!-- Timeline cards will be rendered here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Load helper functions and dependencies first -->
+  <script src="lobby.js"></script>
+  
+  <!-- Spotify Integration -->
+  <script src="spotify-auth.js"></script>
+  <script src="spotify-player.js"></script>
+  
+  <!-- Game modules (order matters!) -->
+  <script src="game-utils.js"></script>          <!-- 1. Utility functions (showError, escapeHtml) -->
+  <script src="game-init.js?v=43"></script>      <!-- 2. Global variables and initialization -->
+  <script src="game-render.js?v=43"></script>    <!-- 3. Rendering functions -->
+  <script src="game-cards.js"></script>          <!-- 4. Drag & drop and validation -->
+  <script src="game-timers.js?v=43"></script>    <!-- 5. Timer system -->
+  <script src="game-host.js"></script>           <!-- 6. Host controls -->
+  
+  <script>
+    console.log('[Game] All modules loaded successfully');
+  </script>
+</body>
+</html>
