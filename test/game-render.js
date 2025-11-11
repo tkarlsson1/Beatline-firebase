@@ -295,14 +295,20 @@ function renderTimeline() {
         const middleIndex = Math.floor(allCards.length / 2);
         const middleCard = allCards[middleIndex];
         
-        if (middleCard) {
+        if (middleCard && timelineContainer) {
           console.log('[Timeline] Scrolling to middle card at index', middleIndex, 'of', allCards.length, 'cards');
           
-          // Scroll middle card to center of viewport
-          middleCard.scrollIntoView({
-            behavior: 'smooth',
-            inline: 'center',
-            block: 'nearest'
+          // Calculate the position to scroll to
+          const cardRect = middleCard.getBoundingClientRect();
+          const containerRect = timelineContainer.getBoundingClientRect();
+          const cardCenter = middleCard.offsetLeft + (cardRect.width / 2);
+          const containerCenter = containerRect.width / 2;
+          const scrollPosition = cardCenter - containerCenter;
+          
+          // Scroll to position
+          timelineContainer.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
           });
         }
       }
