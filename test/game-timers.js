@@ -132,24 +132,6 @@ function updateTimer() {
           console.log('[Timer] Not host, ignoring between_songs timer expiry');
         }
       }
-      // For challenge_window timer: only host should handle
-      else if (timerState === 'challenge_window') {
-        if (isHost) {
-          console.log('[Timer] Handling challenge_window timer expiry as host');
-          onTimerExpired();
-        } else {
-          console.log('[Timer] Not host, ignoring challenge_window timer expiry');
-        }
-      }
-      // For challenge_placement timer: only host should handle
-      else if (timerState === 'challenge_placement') {
-        if (isHost) {
-          console.log('[Timer] Handling challenge_placement timer expiry as host');
-          onTimerExpired();
-        } else {
-          console.log('[Timer] Not host, ignoring challenge_placement timer expiry');
-        }
-      }
     }
   }
 }
@@ -191,28 +173,6 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
   let labelText = '';
   if (timerState === 'guessing') {
     labelText = 'Tid att gissa';
-  } else if (timerState === 'challenge_window') {
-    // Timer 2 - Challenge window
-    const activeTeamId = currentGameData.currentTeam;
-    const activeTeam = currentTeams[activeTeamId];
-    if (activeTeam) {
-      labelText = `Vill ni utmana ${escapeHtml(activeTeam.name)}?`;
-    } else {
-      labelText = 'Utmaningsfönster';
-    }
-  } else if (timerState === 'challenge_placement') {
-    // Timer 3 - Challenge placement
-    const challengeState = currentGameData.challengeState;
-    if (challengeState && challengeState.challengingTeam) {
-      const challengingTeam = currentTeams[challengeState.challengingTeam];
-      if (challengingTeam) {
-        labelText = `${escapeHtml(challengingTeam.name)} - Placera ditt kort!`;
-      } else {
-        labelText = 'Placera utmaningskort';
-      }
-    } else {
-      labelText = 'Placera utmaningskort';
-    }
   } else if (timerState === 'between_songs') {
     const nextTeamId = currentGameData.nextTeam;
     const nextTeam = currentTeams[nextTeamId];
@@ -248,8 +208,8 @@ function onTimerExpired() {
   if (timerState === 'guessing') {
     // For guessing: current team or host can stop
     shouldStopTimer = (currentGameData.currentTeam === teamId) || isHost;
-  } else if (timerState === 'between_songs' || timerState === 'challenge_window' || timerState === 'challenge_placement') {
-    // For between_songs, challenge_window, and challenge_placement: only host can stop
+  } else if (timerState === 'between_songs') {
+    // For between_songs: only host can stop
     shouldStopTimer = isHost;
   }
   
@@ -297,66 +257,6 @@ function onTimerExpired() {
       if (isHost) {
         // Only host should call skipTurn to avoid race conditions
         skipTurn();
-      }
-    }
-  } else if (timerState === 'challenge_window') {
-    // Timer 2 expired - challenge window is over, no one challenged
-    console.log('[Timer] Challenge window expired, no challenge made');
-    
-    if (isHost) {
-      // No one challenged - validate the active team's card directly
-      console.log('[Timer] No challenge, validating active team card');
-      
-      // Check if there's a card to validate in active team's timeline
-      const activeTeamId = currentGameData.currentTeam;
-      const activeTeam = currentTeams[activeTeamId];
-      
-      if (activeTeam && activeTeam.timeline) {
-        // Find unrevealed cards (should be just one - the most recent)
-        const timelineCards = Object.entries(activeTeam.timeline);
-        const unrevealedCards = timelineCards.filter(([key, card]) => card && !card.revealed);
-        
-        if (unrevealedCards.length > 0) {
-          console.log('[Timer] Found unrevealed card to validate');
-          // Call validateCard which is in game-cards.js
-          // validateCard() will handle the validation and start Timer 4
-          if (typeof validateCard === 'function') {
-            validateCard();
-          } else {
-            console.error('[Timer] validateCard function not found!');
-          }
-        } else {
-          console.warn('[Timer] No unrevealed cards found to validate');
-          // Skip to next team
-          skipTurn();
-        }
-      } else {
-        console.warn('[Timer] Active team has no timeline');
-        // Skip to next team
-        skipTurn();
-      }
-    }
-  } else if (timerState === 'challenge_placement') {
-    // Timer 3 expired - challenge placement time is up
-    console.log('[Timer] Challenge placement timer expired');
-    
-    if (isHost) {
-      // Validate both cards (active team + challenging team)
-      console.log('[Timer] Validating challenge');
-      
-      // Call validateChallenge which will be in game-cards.js
-      // validateChallenge() will handle validation of both cards and start Timer 4
-      if (typeof validateChallenge === 'function') {
-        validateChallenge();
-      } else {
-        console.error('[Timer] validateChallenge function not found!');
-        // Fallback: clear challenge state and skip to next team
-        const updates = {};
-        updates[`games/${gameId}/challengeState`] = null;
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-          .then(() => {
-            skipTurn();
-          });
       }
     }
   } else if (timerState === 'between_songs') {

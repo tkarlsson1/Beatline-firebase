@@ -24,8 +24,7 @@ let timerInterval = null;
 let lastVibrateSecond = null;
 let hasStartedInitialTimer = false; // Track if Timer 4 has started at game start
 let hasInitializedScores = false; // Track if scores have been initialized based on revealed cards
-let lastValidationTrigger = null; // Track validation trigger to start Timer 2
-let lastChallengeTimestamp = null; // Track challenge state timestamp to start Timer 3
+let lastValidationTrigger = null; // Track validation trigger to start Timer 4
 let previousTimerState = null; // Track previous timer state to detect changes
 
 // Timeline state
