@@ -26,9 +26,6 @@ function updateGameView() {
   // Update action buttons
   updateActionButtons();
   
-  // Update round counter
-  document.getElementById('roundDisplay').textContent = currentGameData.currentRound || 1;
-  
   // Initialize scores based on revealed cards (only once at game start)
   if (!hasInitializedScores && currentGameData.status === 'playing' && isHost) {
     hasInitializedScores = true;
@@ -166,19 +163,22 @@ function renderTeamHeader() {
     const badge = document.createElement('div');
     badge.className = 'team-badge';
     
-    // Highlight active team
-    if (teamIdKey === currentTeamId) {
-      badge.classList.add('active');
-    }
-    
-    // Highlight own team
-    if (teamIdKey === teamId) {
-      badge.classList.add('own-team');
-    }
-    
     // Get team color
     const colorObj = TEAM_COLORS.find(c => c.name === team.color);
     const colorHex = colorObj ? colorObj.hex : '#FFFFFF';
+    
+    // Set border based on active state
+    if (teamIdKey === currentTeamId) {
+      // Active team: thick border in team's own color
+      badge.style.border = `3px solid ${colorHex}`;
+      badge.style.background = `${colorHex}22`; // Light background (hex with alpha)
+      badge.style.boxShadow = `0 0 15px ${colorHex}80`;
+    } else {
+      // Inactive team: thin gray border
+      badge.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+      badge.style.background = 'rgba(255, 255, 255, 0.05)';
+      badge.style.boxShadow = 'none';
+    }
     
     badge.innerHTML = `
       <div class="team-color-dot" style="background: ${colorHex};"></div>
@@ -197,80 +197,9 @@ function renderTeamHeader() {
 // TURN INDICATOR
 // ============================================
 function renderTurnIndicator() {
-  const container = document.getElementById('turnIndicator');
-  const currentTeamId = currentGameData.currentTeam;
-  
-  // Check if we need to show timer
-  const timerState = currentGameData.timerState;
-  
-  // Find or create content container (separate from timer)
-  let contentDiv = container.querySelector('.turn-content');
-  if (!contentDiv) {
-    contentDiv = document.createElement('div');
-    contentDiv.className = 'turn-content';
-    container.insertBefore(contentDiv, container.firstChild);
-  }
-  
-  if (!currentTeamId) {
-    contentDiv.innerHTML = `
-      <h1>⏳ Väntar på start...</h1>
-      <p class="turn-info">Spelet initialiseras</p>
-    `;
-    return;
-  }
-  
-  const currentTeam = currentTeams[currentTeamId];
-  
-  if (!currentTeam) {
-    contentDiv.innerHTML = `
-      <h1>⚠️ Fel</h1>
-      <p class="turn-info">Aktivt lag finns inte</p>
-    `;
-    return;
-  }
-  
-  // Determine what to show based on timer state
-  if (timerState === 'between_songs') {
-    // During between songs pause, show next team info
-    container.className = 'turn-indicator waiting';
-    const nextTeamId = currentGameData.nextTeam;
-    const nextTeam = currentTeams[nextTeamId];
-    
-    if (nextTeam) {
-      contentDiv.innerHTML = `
-        <h1>🎵 Nästa låt kommer snart</h1>
-        <p class="turn-info"></p>
-      `;
-    } else {
-      contentDiv.innerHTML = `
-        <h1>🎵 Nästa låt kommer snart</h1>
-        <p class="turn-info"></p>
-      `;
-    }
-  } else if (timerState === 'paused') {
-    // Game is paused by host
-    container.className = 'turn-indicator waiting';
-    contentDiv.innerHTML = `
-      <h1>⏸️ SPELET ÄR PAUSAT</h1>
-      <p class="turn-info">Väntar på att host fortsätter...</p>
-    `;
-  } else {
-    // During guessing or no timer
-    // Is it my turn?
-    if (currentTeamId === teamId) {
-      container.className = 'turn-indicator your-turn';
-      contentDiv.innerHTML = `
-        <h1>🎮 DIN TUR!</h1>
-        <p class="turn-info">Det är dags att gissa!</p>
-      `;
-    } else {
-      container.className = 'turn-indicator waiting';
-      contentDiv.innerHTML = `
-        <h1>⏳ ${escapeHtml(currentTeam.name)}s tur</h1>
-        <p class="turn-info">Väntar på att de ska gissa...</p>
-      `;
-    }
-  }
+  // Turn indicator text removed - info shown in team badges and card borders instead
+  // Container kept for timer bar rendering
+  return;
 }
 
 // ============================================
@@ -308,71 +237,97 @@ function renderTimeline() {
   
   // Just render cards, no drop zones (they appear dynamically during drag)
   timelineCards.forEach((card) => {
-    const cardElement = createCardElement(card, teamColorHex);
-    container.appendChild(cardElement);
+    // Check if this is my preview card
+    const isMyCard = (teamId === currentTeamId) && !card.revealed;
+    
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    cardDiv.dataset.position = card.position;
+    
+    // Add preview-card class if this is my card
+    if (isMyCard) {
+      cardDiv.classList.add('preview-card');
+    }
+    
+    // Different border styles for revealed vs preview cards
+    if (card.revealed) {
+      // Revealed card - show year and info
+      cardDiv.style.border = `6px solid ${teamColorHex}`;
+      cardDiv.innerHTML = `
+      <div class="card-year">${card.year}</div>
+      <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
+    `;
+    } else {
+      // Unrevealed card (preview) - ALWAYS show as blank until validated
+      // Border style depends on whether it's my card or another team's
+      if (isMyCard) {
+        cardDiv.style.border = `4px dashed ${teamColorHex}`;
+      } else {
+        cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
+      }
+      cardDiv.innerHTML = `
+      <div class="card-blank-text">?</div>
+    `;
+    }
+    
+    container.appendChild(cardDiv);
   });
   
-  // Add preview card if team has pending card in Firebase
-  if (displayTeam.pendingCard) {
-    addPreviewCardFromFirebase(displayTeam.pendingCard, currentTeamId === teamId, teamColorHex);
+  // Check if we need to render a preview card at a specific position
+  // (happens when dragging or after placing card but before revealing)
+  const previewCard = displayTeam.pendingCard;
+  if (previewCard && previewCard.position !== undefined) {
+    renderPreviewCard(previewCard, teamColorHex);
+  }
+  
+  // Auto-scroll to center card when team changes
+  if (currentTeamId !== previousCurrentTeam) {
+    console.log('[Timeline] Team changed from', previousCurrentTeam, 'to', currentTeamId, '- auto-scrolling to center');
+    previousCurrentTeam = currentTeamId;
+    
+    // Use requestAnimationFrame to ensure DOM is updated before scrolling
+    requestAnimationFrame(() => {
+      const timelineContainer = document.getElementById('timelineContainer');
+      const allCards = container.querySelectorAll('.card');
+      
+      if (allCards.length > 0) {
+        // Find middle card
+        const middleIndex = Math.floor(allCards.length / 2);
+        const middleCard = allCards[middleIndex];
+        
+        if (middleCard) {
+          console.log('[Timeline] Scrolling to middle card at index', middleIndex, 'of', allCards.length, 'cards');
+          
+          // Scroll middle card to center of viewport
+          middleCard.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+          });
+        }
+      }
+    });
   }
 }
 
-function createCardElement(card, teamColorHex) {
-  const cardDiv = document.createElement('div');
-  cardDiv.className = 'card';
-  cardDiv.dataset.position = card.position;
-  
-  // Apply team-colored border (6px solid)
-  if (teamColorHex) {
-    cardDiv.style.border = `6px solid ${teamColorHex}`;
-  }
-  
-  // Show year if revealed, otherwise show blank
-  if (card.revealed) {
-    cardDiv.innerHTML = `
-      <div class="card-year">${card.year}</div>
-      <div class="card-info">${escapeHtml(card.title)}<br>by ${escapeHtml(card.artist)}</div>
-    `;
-  } else {
-    cardDiv.innerHTML = `
-      <div class="card-blank-text">?</div>
-      <div class="card-info">Placerat kort</div>
-    `;
-    cardDiv.classList.add('blank-card');
-  }
-  
-  return cardDiv;
-}
-
-function addPreviewCardFromFirebase(pendingCard, isMyCard, teamColorHex) {
-  // Add preview of placed card at the placement position from Firebase
+function renderPreviewCard(card, teamColorHex) {
   const container = document.getElementById('timeline');
-  const cards = container.querySelectorAll('.card:not(.preview-card)');
+  const position = card.position;
   
-  // Remove any existing preview
-  const existingPreview = container.querySelector('.preview-card');
-  if (existingPreview) {
-    existingPreview.remove();
-  }
+  // Check if this is my card (so I can drag it)
+  const isMyCard = (teamId === currentGameData.currentTeam);
   
-  const position = pendingCard.position;
-  
-  // Create preview card
   const previewCard = document.createElement('div');
-  previewCard.className = 'card blank-card preview-card';
+  previewCard.className = 'card preview-card';
+  previewCard.dataset.position = position;
+  previewCard.id = 'timelinePreviewCard';
+  
+  // IMPORTANT: Preview cards are ALWAYS blank until validated
+  // Only show year/title/artist after lockInPlacement() -> validation -> revealed
+  previewCard.style.border = `4px dashed ${teamColorHex}`;
   previewCard.innerHTML = `
     <div class="card-blank-text">?</div>
-    <div class="card-info">${isMyCard ? 'Ditt kort<br>(Dra för att flytta)' : 'Väntar...'}</div>
   `;
-  
-  // Apply team-colored border (6px solid, brighter for preview)
-  if (teamColorHex) {
-    previewCard.style.border = `6px solid ${teamColorHex}`;
-    previewCard.style.boxShadow = `0 0 15px ${teamColorHex}`;
-  } else {
-    previewCard.style.border = '6px solid #4CAF50';
-  }
   
   // Make preview draggable only if it's my card
   if (isMyCard) {
@@ -392,6 +347,7 @@ function addPreviewCardFromFirebase(pendingCard, isMyCard, teamColorHex) {
   
   // Insert at correct position based on index
   // Position from Firebase should correspond to index in DOM
+  const cards = container.querySelectorAll('.card:not(.preview-card)');
   if (position === 0 || cards.length === 0) {
     container.insertBefore(previewCard, container.firstChild);
   } else if (position >= cards.length) {
@@ -413,27 +369,30 @@ function renderCurrentCard() {
   
   // Only show current card if it's my turn AND we're in guessing state (not pause)
   if (currentTeamId !== teamId || timerState !== 'guessing') {
-    container.style.display = 'none';
+    container.style.visibility = 'hidden';
     return;
   }
   
   const currentSong = currentGameData.currentSong;
   
   if (!currentSong) {
-    container.style.display = 'none';
+    container.style.visibility = 'hidden';
     return;
   }
   
-  container.style.display = 'block';
+  container.style.visibility = 'visible';
   
   // Create card element
   const cardDiv = document.createElement('div');
   cardDiv.className = 'card blank-card';
   cardDiv.id = 'draggableCard';
   cardDiv.draggable = true;
+  cardDiv.style.width = '41px';
+  cardDiv.style.height = '48px';
+  cardDiv.style.fontSize = '1.5rem';
+  cardDiv.style.padding = '0.3rem';
   cardDiv.innerHTML = `
-    <div class="card-blank-text">?</div>
-    <div class="card-info">Dra mig till tidslinjen!</div>
+    <div class="card-blank-text" style="font-size: 1.5rem; margin: 0;">?</div>
   `;
   
   // Add drag event listeners
@@ -462,21 +421,23 @@ function renderCurrentCard() {
 // ACTION BUTTONS
 // ============================================
 function updateActionButtons() {
-  const container = document.getElementById('actionButtons');
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Only show action buttons if it's my turn AND we're in guessing state
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
-    container.style.display = 'none';
-    return;
-  }
+  // Buttons are now inside currentCardContainer, no need to show/hide separately
+  // Just update button states
   
-  container.style.display = 'flex';
-  
-  // Update button states
   const changeCardBtn = document.getElementById('changeCardBtn');
   const lockInBtn = document.getElementById('lockInBtn');
+  
+  if (!changeCardBtn || !lockInBtn) return;
+  
+  // Only enable buttons if it's my turn AND we're in guessing state
+  if (currentTeamId !== teamId || timerState !== 'guessing') {
+    changeCardBtn.disabled = true;
+    lockInBtn.disabled = true;
+    return;
+  }
   
   // Change card button - enable if team has tokens
   if (myTeam && myTeam.tokens > 0) {
