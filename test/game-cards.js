@@ -350,26 +350,6 @@ function lockInPlacement() {
     .catch((error) => {
       console.error('[Game] Error adding card:', error);
       showNotification('Kunde inte placera kort', 'error');
-      
-      // Start pause timer even on error - only host
-      if (isHost) {
-        setTimeout(() => {
-          const teamIds = Object.keys(currentTeams);
-          const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
-          const nextIndex = (currentIndex + 1) % teamIds.length;
-          const nextTeamId = teamIds[nextIndex];
-          
-          // Update to next team
-          const updates = {};
-          updates[`games/${gameId}/currentTeam`] = nextTeamId;
-          
-          window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-            .then(() => {
-              
-              startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-            });
-        }, 2000);
-      }
     });
 }
 
@@ -547,149 +527,83 @@ function validateAndScoreCard(cardKey, card) {
     .then(() => {
       console.log('[Game] Validation complete, updates applied');
       console.log('[Game] ========== VALIDATION END ==========');
-      console.log('[Game] isHost:', isHost, 'teamId:', teamId);
       
-      // Start Timer 4 after validation - only host should do this
-      if (isHost) {
-        console.log('[Host] Host will start Timer 4 after 2s delay');
+      // Only the active team should transition to next team and start Timer 4
+      setTimeout(() => {
+        // Check if we're still the active team (avoid race conditions)
+        if (currentGameData.currentTeam !== teamId) {
+          console.log('[Game] Not active team anymore, skipping transition');
+          return;
+        }
         
-        setTimeout(() => {
-          console.log('[Host] setTimeout callback executing');
-          console.log('[Host] currentTeams:', currentTeams ? Object.keys(currentTeams) : 'null');
-          console.log('[Host] currentGameData:', currentGameData ? 'exists' : 'null');
-          
-          if (!currentTeams || Object.keys(currentTeams).length === 0) {
-            console.error('[Host] No teams available!');
-            return;
-          }
-          
-          if (!currentGameData) {
-            console.error('[Host] No game data available!');
-            return;
-          }
-          
-          // Calculate next team
-          const teamIds = Object.keys(currentTeams);
-          const currentTeamId = currentGameData.currentTeam;
-          const currentIndex = teamIds.indexOf(currentTeamId);
-          const nextIndex = (currentIndex + 1) % teamIds.length;
-          const nextTeamId = teamIds[nextIndex];
-          
-          console.log('[Host] Current team:', currentTeamId, 'at index', currentIndex);
-          console.log('[Host] Next team:', nextTeamId, 'at index', nextIndex);
-          
-          // Update current team and song in Firebase
-          const currentSongIndex = currentGameData.currentSongIndex || 0;
-          const nextSongIndex = currentSongIndex + 1;
-          const songs = currentGameData.songs || [];
-          
-          console.log('[Host] Next song index:', nextSongIndex, '/', songs.length);
-          
-          if (nextSongIndex >= songs.length) {
-            console.warn('[Host] No more songs in deck!');
-            return;
-          }
-          
-          const nextSong = songs[nextSongIndex];
-          
-          console.log('[Host] Next song:', nextSong ? nextSong.title : 'null');
-          
-          const updates = {};
-          updates[`games/${gameId}/currentTeam`] = nextTeamId;
-          updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
-          updates[`games/${gameId}/currentSong`] = nextSong;
-          
-          // Increment round if we wrapped around
-          if (nextIndex === 0) {
-            const newRound = (currentGameData.currentRound || 0) + 1;
-            updates[`games/${gameId}/currentRound`] = newRound;
-            console.log('[Host] New round:', newRound);
-          }
-          
-          console.log('[Host] Applying game updates:', updates);
-          
-          window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-            .then(() => {
-              console.log('[Host] Game updates applied, starting Timer 4');
-              // Start between songs timer showing the team that will play next
-              startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-            })
-            .catch((error) => {
-              console.error('[Host] Error applying game updates:', error);
-            });
-        }, 2000);
-      } else {
-        console.log('[Game] Not host, but will update game state to trigger host');
+        console.log('[Game] Active team transitioning to next team after 2s delay');
         
-        setTimeout(() => {
-          console.log('[Game] Non-host updating game state after validation');
-          
-          if (!currentTeams || Object.keys(currentTeams).length === 0) {
-            console.error('[Game] No teams available!');
-            return;
-          }
-          
-          if (!currentGameData) {
-            console.error('[Game] No game data available!');
-            return;
-          }
-          
-          // Calculate next team
-          const teamIds = Object.keys(currentTeams);
-          const currentTeamId = currentGameData.currentTeam;
-          const currentIndex = teamIds.indexOf(currentTeamId);
-          const nextIndex = (currentIndex + 1) % teamIds.length;
-          const nextTeamId = teamIds[nextIndex];
-          
-          console.log('[Game] Current team:', currentTeamId, 'at index', currentIndex);
-          console.log('[Game] Next team:', nextTeamId, 'at index', nextIndex);
-          
-          // Update current team and song in Firebase
-          const currentSongIndex = currentGameData.currentSongIndex || 0;
-          const nextSongIndex = currentSongIndex + 1;
-          const songs = currentGameData.songs || [];
-          
-          console.log('[Game] Next song index:', nextSongIndex, '/', songs.length);
-          
-          if (nextSongIndex >= songs.length) {
-            console.warn('[Game] No more songs in deck!');
-            return;
-          }
-          
-          const nextSong = songs[nextSongIndex];
-          
-          const updates = {};
-          updates[`games/${gameId}/currentTeam`] = nextTeamId;
-          updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
-          updates[`games/${gameId}/currentSong`] = nextSong;
-          
-          // Increment round if we wrapped around
-          if (nextIndex === 0) {
-            const newRound = (currentGameData.currentRound || 0) + 1;
-            updates[`games/${gameId}/currentRound`] = newRound;
-            console.log('[Game] New round:', newRound);
-          }
-          
-          // Set a validation trigger that host can see
-          updates[`games/${gameId}/validationTrigger`] = Date.now();
-          
-          console.log('[Game] Non-host applying game updates:', updates);
-          
-          window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-            .then(() => {
-              console.log('[Game] Non-host game updates applied, host should start Timer 4');
-            })
-            .catch((error) => {
-              console.error('[Game] Error applying game updates:', error);
-            });
-        }, 2000);
-      }
+        if (!currentTeams || Object.keys(currentTeams).length === 0) {
+          console.error('[Game] No teams available!');
+          return;
+        }
+        
+        if (!currentGameData) {
+          console.error('[Game] No game data available!');
+          return;
+        }
+        
+        // Calculate next team
+        const teamIds = Object.keys(currentTeams);
+        const currentTeamId = currentGameData.currentTeam;
+        const currentIndex = teamIds.indexOf(currentTeamId);
+        const nextIndex = (currentIndex + 1) % teamIds.length;
+        const nextTeamId = teamIds[nextIndex];
+        
+        console.log('[Game] Current team:', currentTeamId, 'at index', currentIndex);
+        console.log('[Game] Next team:', nextTeamId, 'at index', nextIndex);
+        
+        // Update current team and song in Firebase
+        const currentSongIndex = currentGameData.currentSongIndex || 0;
+        const nextSongIndex = currentSongIndex + 1;
+        const songs = currentGameData.songs || [];
+        
+        console.log('[Game] Next song index:', nextSongIndex, '/', songs.length);
+        
+        if (nextSongIndex >= songs.length) {
+          console.warn('[Game] No more songs in deck!');
+          return;
+        }
+        
+        const nextSong = songs[nextSongIndex];
+        
+        console.log('[Game] Next song:', nextSong ? nextSong.title : 'null');
+        
+        const updates = {};
+        updates[`games/${gameId}/currentTeam`] = nextTeamId;
+        updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+        updates[`games/${gameId}/currentSong`] = nextSong;
+        
+        // Increment round if we wrapped around
+        if (nextIndex === 0) {
+          const newRound = (currentGameData.currentRound || 0) + 1;
+          updates[`games/${gameId}/currentRound`] = newRound;
+          console.log('[Game] New round:', newRound);
+        }
+        
+        console.log('[Game] Applying game updates:', updates);
+        
+        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+          .then(() => {
+            console.log('[Game] Game updates applied, starting Timer 4');
+            // Start between songs timer showing the team that will play next
+            startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+          })
+          .catch((error) => {
+            console.error('[Game] Error applying game updates:', error);
+          });
+      }, 2000);
     })
     .catch((error) => {
       console.error('[Game] Error in validation:', error);
       
-      // Start pause timer even on error - only host
-      if (isHost) {
+      // On error, still transition to next team if we're the active team
+      if (currentGameData.currentTeam === teamId) {
         setTimeout(() => {
           const teamIds = Object.keys(currentTeams);
           const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
@@ -702,8 +616,7 @@ function validateAndScoreCard(cardKey, card) {
           
           window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
             .then(() => {
-              
-              startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+              startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
             });
         }, 1000);
       }

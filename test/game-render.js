@@ -27,7 +27,7 @@ function updateGameView() {
   updateActionButtons();
   
   // Initialize scores based on revealed cards (only once at game start)
-  if (!hasInitializedScores && currentGameData.status === 'playing' && isHost) {
+  if (!hasInitializedScores && currentGameData.status === 'playing') {
     hasInitializedScores = true;
     console.log('[Game] Initializing scores based on revealed cards');
     
@@ -73,26 +73,6 @@ function updateGameView() {
     } else {
       pauseBtn.style.display = 'inline-block';
       resumeBtn.style.display = 'none';
-    }
-    
-    // Check if validation trigger changed (non-host validated their card)
-    if (currentGameData.validationTrigger && currentGameData.validationTrigger !== lastValidationTrigger) {
-      console.log('[Host] Validation trigger detected:', currentGameData.validationTrigger);
-      lastValidationTrigger = currentGameData.validationTrigger;
-      
-      // Start Timer 4 after validation from non-host
-      console.log('[Host] Starting Timer 4 after non-host validation');
-      const nextTeamId = currentGameData.currentTeam;
-      if (nextTeamId && !currentGameData.timerState) {
-        // Only start if no timer is currently active
-        console.log('[Host] Starting between_songs timer for:', nextTeamId);
-        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-        
-        // Clear the trigger
-        const clearUpdates = {};
-        clearUpdates[`games/${gameId}/validationTrigger`] = null;
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), clearUpdates);
-      }
     }
   }
   

@@ -10,14 +10,6 @@
 let timerUpdateCounter = 0;
 
 function startTimer(type, duration, nextTeamId = null) {
-  console.log('[Timer] startTimer called by', isHost ? 'HOST' : 'NON-HOST', '- type:', type);
-  
-  // Only host should start timers
-  if (!isHost) {
-    console.log('[Timer] Not host, skipping timer start');
-    return;
-  }
-  
   console.log('[Timer] Starting timer:', type, 'duration:', duration, 'nextTeam:', nextTeamId);
   
   const updates = {};
@@ -44,13 +36,7 @@ function stopTimer() {
   // Reset vibrate tracking
   lastVibrateSecond = null;
   
-  // Only host should update Firebase
-  if (!isHost) {
-    console.log('[Timer] Not host, skipping Firebase update');
-    return;
-  }
-  
-  // Clear Firebase timer state (only host does this)
+  // Clear Firebase timer state
   const updates = {};
   updates[`games/${gameId}/timerState`] = null;
   updates[`games/${gameId}/timerStartTime`] = null;
