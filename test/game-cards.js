@@ -260,6 +260,73 @@ function changeCard() {
   showNotification('Byt låt-funktionen kommer snart!', 'info');
 }
 
+// ============================================
+// CHALLENGE CARD
+// ============================================
+function challengeCard() {
+  console.log('[Game] Challenge card requested');
+  
+  // Check if we have tokens
+  if (!myTeam || myTeam.tokens < 1) {
+    showNotification('Du har inga tokens kvar!', 'error');
+    return;
+  }
+  
+  // Check if we're in challenge window
+  if (!currentGameData.timerState || currentGameData.timerState !== 'challenge_window') {
+    showNotification('Inte rätt tid att utmana!', 'error');
+    return;
+  }
+  
+  // Check if someone already challenged
+  if (currentGameData.challengeState && currentGameData.challengeState.isActive) {
+    showNotification('Någon har redan utmanat!', 'error');
+    return;
+  }
+  
+  // Check that we're not the active team
+  if (currentGameData.currentTeam === teamId) {
+    showNotification('Du kan inte utmana dig själv!', 'error');
+    return;
+  }
+  
+  console.log('[Game] Challenge accepted! Setting challengeState...');
+  
+  const updates = {};
+  
+  // Set challenge state
+  updates[`games/${gameId}/challengeState`] = {
+    isActive: true,
+    challengingTeam: teamId,
+    activeTeam: currentGameData.currentTeam,
+    timestamp: Date.now()
+  };
+  
+  // Deduct token
+  const newTokenCount = myTeam.tokens - 1;
+  updates[`games/${gameId}/teams/${teamId}/tokens`] = newTokenCount;
+  
+  // Stop Timer 2
+  updates[`games/${gameId}/timerState`] = null;
+  updates[`games/${gameId}/timerStartTime`] = null;
+  updates[`games/${gameId}/timerDuration`] = null;
+  
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+    .then(() => {
+      console.log('[Game] Challenge registered! Starting Timer 3...');
+      showNotification('💥 UTMANING! Placera ditt kort!', 'success');
+      
+      // Start Timer 3 (challenge placement)
+      const placeChallengeTime = (currentGameData.placeChallengeTime || 20) * 1000;
+      startTimer('challenge_placement', placeChallengeTime);
+    })
+    .catch((error) => {
+      console.error('[Game] Error challenging:', error);
+      showNotification('Kunde inte utmana', 'error');
+    });
+}
+
+
 function lockInPlacement() {
   console.log('[Game] Lock in placement at position:', placementPosition);
   
@@ -339,13 +406,16 @@ function lockInPlacement() {
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
     .then(() => {
       console.log('[Game] Card locked in to timeline');
-      showNotification('Kort låst! Rättar...', 'info');
+      showNotification('Kort låst!', 'info');
       placementPosition = null;
       
-      // Validate placement (with longer delay to ensure Firebase has updated)
-      setTimeout(() => {
-        validateAndScoreCard(newCardKey, newCard);
-      }, 1000);
+      // Start Timer 2 (challenge window) - other teams can challenge now
+      console.log('[Game] Starting Timer 2 (challenge_window)');
+      const challengeTime = (currentGameData.challengeTime || 10) * 1000;
+      startTimer('challenge_window', challengeTime);
+      
+      // Store card info for later validation
+      window.pendingValidationCard = { key: newCardKey, card: newCard };
     })
     .catch((error) => {
       console.error('[Game] Error adding card:', error);

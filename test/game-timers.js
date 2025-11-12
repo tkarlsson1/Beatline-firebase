@@ -159,6 +159,28 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
   let labelText = '';
   if (timerState === 'guessing') {
     labelText = 'Tid att gissa';
+  } else if (timerState === 'challenge_window') {
+    // Timer 2 - Challenge window
+    const activeTeamId = currentGameData.currentTeam;
+    const activeTeam = currentTeams[activeTeamId];
+    if (activeTeam) {
+      labelText = `Vill ni utmana ${escapeHtml(activeTeam.name)}?`;
+    } else {
+      labelText = 'Utmaningsfönster';
+    }
+  } else if (timerState === 'challenge_placement') {
+    // Timer 3 - Challenge placement
+    if (currentGameData.challengeState) {
+      const challengingTeamId = currentGameData.challengeState.challengingTeam;
+      const challengingTeam = currentTeams[challengingTeamId];
+      if (challengingTeam) {
+        labelText = `${escapeHtml(challengingTeam.name)} - Placera ditt kort!`;
+      } else {
+        labelText = 'Utmaning pågår';
+      }
+    } else {
+      labelText = 'Utmaning pågår';
+    }
   } else if (timerState === 'between_songs') {
     const nextTeamId = currentGameData.nextTeam;
     const nextTeam = currentTeams[nextTeamId];
@@ -194,6 +216,12 @@ function onTimerExpired() {
   if (timerState === 'guessing') {
     // For guessing: current team or host can stop
     shouldStopTimer = (currentGameData.currentTeam === teamId) || isHost;
+  } else if (timerState === 'challenge_window') {
+    // For challenge_window: active team should handle (no one challenged)
+    shouldStopTimer = (currentGameData.currentTeam === teamId);
+  } else if (timerState === 'challenge_placement') {
+    // For challenge_placement: active team should handle (will validate both cards)
+    shouldStopTimer = (currentGameData.currentTeam === teamId);
   } else if (timerState === 'between_songs') {
     // For between_songs: only host can stop
     shouldStopTimer = isHost;
@@ -245,6 +273,33 @@ function onTimerExpired() {
         skipTurn();
       }
     }
+  } else if (timerState === 'challenge_window') {
+    // Timer 2 expired - no one challenged
+    console.log('[Timer] Challenge window expired - no challenge');
+    
+    // Check if challenge state is set (someone challenged during timer)
+    if (currentGameData.challengeState && currentGameData.challengeState.isActive) {
+      console.log('[Timer] Challenge state active, Timer 3 should have started already');
+      return;
+    }
+    
+    // No challenge - proceed with normal validation
+    console.log('[Timer] No challenge detected, validating card normally');
+    
+    if (window.pendingValidationCard) {
+      const { key, card } = window.pendingValidationCard;
+      validateAndScoreCard(key, card);
+      window.pendingValidationCard = null;
+    } else {
+      console.error('[Timer] No pending validation card found!');
+    }
+  } else if (timerState === 'challenge_placement') {
+    // Timer 3 expired - validate challenge
+    console.log('[Timer] Challenge placement timer expired');
+    
+    // TODO: Implement validateChallenge() in Steg 6
+    console.log('[Timer] validateChallenge() not implemented yet - will come in Steg 5-6');
+    showNotification('⏱️ Utmaningstiden är ute!', 'info');
   } else if (timerState === 'between_songs') {
     // Timer 4 expired - pause between songs is over
     console.log('[Timer] Between songs timer expired');

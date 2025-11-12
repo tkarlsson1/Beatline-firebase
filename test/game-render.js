@@ -26,6 +26,9 @@ function updateGameView() {
   // Update action buttons
   updateActionButtons();
   
+  // Render challenge button (if Timer 2 is active)
+  renderChallengeButton();
+  
   // Initialize scores based on revealed cards (only once at game start)
   if (!hasInitializedScores && currentGameData.status === 'playing') {
     hasInitializedScores = true;
@@ -438,6 +441,61 @@ function updateActionButtons() {
   } else {
     lockInBtn.disabled = true;
   }
+}
+
+// ============================================
+// CHALLENGE BUTTON
+// ============================================
+function renderChallengeButton() {
+  const container = document.getElementById('challengeButtonContainer');
+  
+  if (!container) {
+    console.warn('[Game] Challenge button container not found in HTML');
+    return;
+  }
+  
+  const timerState = currentGameData.timerState;
+  const currentTeamId = currentGameData.currentTeam;
+  
+  // Only show during Timer 2 (challenge_window)
+  if (timerState !== 'challenge_window') {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+  
+  // Don't show to active team
+  if (currentTeamId === teamId) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+  
+  // Check if someone already challenged
+  if (currentGameData.challengeState && currentGameData.challengeState.isActive) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+  
+  // Show button
+  container.style.display = 'flex';
+  
+  const hasTokens = myTeam && myTeam.tokens > 0;
+  const buttonDisabled = !hasTokens;
+  
+  container.innerHTML = `
+    <button 
+      id="challengeBtn" 
+      class="challenge-btn"
+      ${buttonDisabled ? 'disabled' : ''}
+      onclick="challengeCard()"
+    >
+      UTMANA (1 🎫)
+    </button>
+  `;
+  
+  console.log('[Game] Challenge button rendered, disabled:', buttonDisabled);
 }
 
 // ============================================
