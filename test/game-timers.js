@@ -109,6 +109,26 @@ function updateTimer() {
           console.log('[Timer] Not current team or host, ignoring guessing timer expiry');
         }
       }
+      // For challenge_window: active team should handle
+      else if (timerState === 'challenge_window') {
+        const isCurrentTeam = currentGameData.currentTeam === teamId;
+        if (isCurrentTeam) {
+          console.log('[Timer] Handling challenge_window expiry as active team');
+          onTimerExpired();
+        } else {
+          console.log('[Timer] Not active team, ignoring challenge_window expiry');
+        }
+      }
+      // For challenge_placement: active team should handle
+      else if (timerState === 'challenge_placement') {
+        const isCurrentTeam = currentGameData.currentTeam === teamId;
+        if (isCurrentTeam) {
+          console.log('[Timer] Handling challenge_placement expiry as active team');
+          onTimerExpired();
+        } else {
+          console.log('[Timer] Not active team, ignoring challenge_placement expiry');
+        }
+      }
       // For between_songs timer: only host should handle
       else if (timerState === 'between_songs') {
         if (isHost) {

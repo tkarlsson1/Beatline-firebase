@@ -122,6 +122,12 @@ function forceNextTeam() {
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
   updates[`games/${gameId}/currentSong`] = nextSong;
   
+  // Clear challenge state and all pending cards
+  updates[`games/${gameId}/challengeState`] = null;
+  Object.keys(currentTeams).forEach(tId => {
+    updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+  });
+  
   // Increment round if we wrapped around
   if (nextIndex === 0) {
     const newRound = (currentGameData.currentRound || 0) + 1;
