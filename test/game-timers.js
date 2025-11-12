@@ -300,6 +300,52 @@ function onTimerExpired() {
     // TODO: Implement validateChallenge() in Steg 6
     console.log('[Timer] validateChallenge() not implemented yet - will come in Steg 5-6');
     showNotification('⏱️ Utmaningstiden är ute!', 'info');
+    
+    // For now: just clean up and transition to next team
+    const updates = {};
+    updates[`games/${gameId}/challengeState`] = null;
+    
+    // Clear all pending cards
+    Object.keys(currentTeams).forEach(tId => {
+      updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+    });
+    
+    window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+      .then(() => {
+        console.log('[Timer] Challenge state cleared, transitioning to next team');
+        
+        // Transition to next team (same logic as after validation)
+        const teamIds = Object.keys(currentTeams);
+        const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+        const nextIndex = (currentIndex + 1) % teamIds.length;
+        const nextTeamId = teamIds[nextIndex];
+        
+        const currentSongIndex = currentGameData.currentSongIndex || 0;
+        const nextSongIndex = currentSongIndex + 1;
+        const songs = currentGameData.songs || [];
+        
+        if (nextSongIndex >= songs.length) {
+          console.warn('[Timer] No more songs in deck!');
+          return;
+        }
+        
+        const nextSong = songs[nextSongIndex];
+        
+        const transitionUpdates = {};
+        transitionUpdates[`games/${gameId}/currentTeam`] = nextTeamId;
+        transitionUpdates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+        transitionUpdates[`games/${gameId}/currentSong`] = nextSong;
+        
+        if (nextIndex === 0) {
+          const newRound = (currentGameData.currentRound || 0) + 1;
+          transitionUpdates[`games/${gameId}/currentRound`] = newRound;
+        }
+        
+        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), transitionUpdates)
+          .then(() => {
+            startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+          });
+      });
   } else if (timerState === 'between_songs') {
     // Timer 4 expired - pause between songs is over
     console.log('[Timer] Between songs timer expired');

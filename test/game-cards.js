@@ -306,6 +306,11 @@ function challengeCard() {
   const newTokenCount = myTeam.tokens - 1;
   updates[`games/${gameId}/teams/${teamId}/tokens`] = newTokenCount;
   
+  // Clear all pending cards (clean slate for challenge)
+  Object.keys(currentTeams).forEach(tId => {
+    updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+  });
+  
   // Stop Timer 2
   updates[`games/${gameId}/timerState`] = null;
   updates[`games/${gameId}/timerStartTime`] = null;
@@ -649,6 +654,14 @@ function validateAndScoreCard(cardKey, card) {
         updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
         updates[`games/${gameId}/currentSong`] = nextSong;
         
+        // Clear challenge state
+        updates[`games/${gameId}/challengeState`] = null;
+        
+        // Clear all pending cards
+        Object.keys(currentTeams).forEach(tId => {
+          updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+        });
+        
         // Increment round if we wrapped around
         if (nextIndex === 0) {
           const newRound = (currentGameData.currentRound || 0) + 1;
@@ -683,6 +696,12 @@ function validateAndScoreCard(cardKey, card) {
           // Update to next team
           const updates = {};
           updates[`games/${gameId}/currentTeam`] = nextTeamId;
+          
+          // Clear challenge state and pending cards even on error
+          updates[`games/${gameId}/challengeState`] = null;
+          Object.keys(currentTeams).forEach(tId => {
+            updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+          });
           
           window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
             .then(() => {
