@@ -1,5 +1,6 @@
 // ============================================
 // NOTESTREAM - GAME TIMERS MODULE
+// BUGFIX v4: Guard mot race conditions + error handling + konsoliderade uppdateringar
 // ============================================
 
 // ============================================
@@ -93,7 +94,7 @@ function updateTimer() {
   
   // Check if timer expired - but only let appropriate clients handle it to avoid race conditions
   if (remaining <= 0) {
-    console.log('[Timer] Timer expired!');
+    console.log('[Timer] ⏱️ Timer expired! State:', currentGameData.timerState, 'Team:', teamId);
     
     // Only call if timer state still exists
     if (currentGameData.timerState) {
@@ -103,39 +104,39 @@ function updateTimer() {
       if (timerState === 'guessing') {
         const isCurrentTeam = currentGameData.currentTeam === teamId;
         if (isCurrentTeam || isHost) {
-          console.log('[Timer] Handling guessing timer expiry as', isCurrentTeam ? 'current team' : 'host backup');
+          console.log('[Timer] 🎯 Handling guessing timer expiry as', isCurrentTeam ? 'current team' : 'host backup');
           onTimerExpired();
         } else {
-          console.log('[Timer] Not current team or host, ignoring guessing timer expiry');
+          console.log('[Timer] ⏭️ Not current team or host, ignoring guessing timer expiry');
         }
       }
       // For challenge_window: active team should handle
       else if (timerState === 'challenge_window') {
         const isCurrentTeam = currentGameData.currentTeam === teamId;
         if (isCurrentTeam) {
-          console.log('[Timer] Handling challenge_window expiry as active team');
+          console.log('[Timer] 🎯 Handling challenge_window expiry as active team');
           onTimerExpired();
         } else {
-          console.log('[Timer] Not active team, ignoring challenge_window expiry');
+          console.log('[Timer] ⏭️ Not active team, ignoring challenge_window expiry');
         }
       }
       // For challenge_placement: active team should handle
       else if (timerState === 'challenge_placement') {
         const isCurrentTeam = currentGameData.currentTeam === teamId;
         if (isCurrentTeam) {
-          console.log('[Timer] Handling challenge_placement expiry as active team');
+          console.log('[Timer] 🎯 Handling challenge_placement expiry as active team');
           onTimerExpired();
         } else {
-          console.log('[Timer] Not active team, ignoring challenge_placement expiry');
+          console.log('[Timer] ⏭️ Not active team, ignoring challenge_placement expiry');
         }
       }
       // For between_songs timer: only host should handle
       else if (timerState === 'between_songs') {
         if (isHost) {
-          console.log('[Timer] Handling between_songs timer expiry as host');
+          console.log('[Timer] 🎯 Handling between_songs timer expiry as host');
           onTimerExpired();
         } else {
-          console.log('[Timer] Not host, ignoring between_songs timer expiry');
+          console.log('[Timer] ⏭️ Not host, ignoring between_songs timer expiry');
         }
       }
     }
@@ -216,7 +217,7 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
   // Render timer UI as horizontal bar
   timerContainer.innerHTML = `
     <div class="timer-bar-wrapper">
-      <div class="timer-bar-progress ${colorClass}" style="width: ${progress}%"></div>
+      <div class="timer-bar ${colorClass}" style="width: ${progress}%"></div>
       <span class="timer-bar-text">${timeDisplay}</span>
     </div>
     <div class="timer-label">${labelText}</div>
@@ -224,9 +225,23 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
 }
 
 function onTimerExpired() {
-  console.log('[Timer] onTimerExpired called, state:', currentGameData.timerState);
+  console.log('[Timer] ========== TIMER EXPIRED ==========');
+  console.log('[Timer] State:', currentGameData.timerState);
   console.log('[Timer] Called by:', isHost ? 'HOST' : 'NON-HOST', 'teamId:', teamId);
   console.log('[Timer] Current team:', currentGameData.currentTeam);
+  console.log('[Timer] Challenge state:', currentGameData.challengeState);
+  
+  // ============================================
+  // BUGFIX v4: GUARD AGAINST RACE CONDITIONS
+  // ============================================
+  if (isProcessingTimerExpiry) {
+    console.log('[Timer] ⚠️ GUARD: Already processing expiry, skipping duplicate call');
+    console.log('[Timer] This prevents multiple parallel Firebase updates');
+    return;
+  }
+  
+  console.log('[Timer] ✅ GUARD: Setting processing flag');
+  isProcessingTimerExpiry = true;
   
   const timerState = currentGameData.timerState;
   
@@ -247,134 +262,241 @@ function onTimerExpired() {
     shouldStopTimer = isHost;
   }
   
+  console.log('[Timer] Should stop timer:', shouldStopTimer);
+  
   if (!shouldStopTimer) {
-    console.log('[Timer] Not authorized to stop this timer, skipping');
+    console.log('[Timer] ❌ Not authorized to stop this timer, skipping');
+    isProcessingTimerExpiry = false;
     return;
   }
-  
-  // Stop timer by clearing Firebase
-  console.log('[Timer] Stopping timer in Firebase');
-  const timerUpdates = {};
-  timerUpdates[`games/${gameId}/timerState`] = null;
-  timerUpdates[`games/${gameId}/timerStartTime`] = null;
-  timerUpdates[`games/${gameId}/timerDuration`] = null;
-  timerUpdates[`games/${gameId}/nextTeam`] = null;
-  
-  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), timerUpdates)
-    .then(() => {
-      console.log('[Timer] Timer stopped in Firebase');
-    })
-    .catch((error) => {
-      console.error('[Timer] Error stopping timer:', error);
-    });
   
   // Reset vibrate tracking
   lastVibrateSecond = null;
   
+  // ============================================
+  // HANDLE DIFFERENT TIMER STATES
+  // ============================================
+  
   if (timerState === 'guessing') {
     // Timer 1 expired - guessing time is up
-    console.log('[Timer] Guessing timer expired');
+    console.log('[Timer] 🎲 Guessing timer expired');
+    
+    // Stop timer first
+    stopTimer();
     
     // Check if current team has placed a card
     const currentTeam = currentTeams[currentGameData.currentTeam];
     
     if (currentTeam && currentTeam.pendingCard) {
       // Has pending card - lock it in automatically
-      console.log('[Timer] Auto-locking pending card');
+      console.log('[Timer] 🔒 Auto-locking pending card');
       if (currentGameData.currentTeam === teamId) {
         // Only the current team should lock in
         lockInPlacement();
       }
     } else {
       // No pending card - skip this team's turn
-      console.log('[Timer] No pending card - skipping turn');
+      console.log('[Timer] ⏭️ No pending card - skipping turn');
       if (isHost) {
         // Only host should call skipTurn to avoid race conditions
         skipTurn();
       }
     }
+    
+    // Reset guard after handling
+    setTimeout(() => {
+      isProcessingTimerExpiry = false;
+      console.log('[Timer] ✅ GUARD: Reset after guessing timer');
+    }, 1000);
+    
   } else if (timerState === 'challenge_window') {
     // Timer 2 expired - no one challenged
-    console.log('[Timer] Challenge window expired - no challenge');
+    console.log('[Timer] ⏰ Challenge window expired - no challenge');
+    
+    // Stop timer first
+    stopTimer();
     
     // Check if challenge state is set (someone challenged during timer)
     if (currentGameData.challengeState && currentGameData.challengeState.isActive) {
-      console.log('[Timer] Challenge state active, Timer 3 should have started already');
+      console.log('[Timer] ⚠️ Challenge state active, Timer 3 should have started already');
+      isProcessingTimerExpiry = false;
       return;
     }
     
     // No challenge - proceed with normal validation
-    console.log('[Timer] No challenge detected, validating card normally');
+    console.log('[Timer] ✅ No challenge detected, validating card normally');
     
     if (window.pendingValidationCard) {
       const { key, card } = window.pendingValidationCard;
       validateAndScoreCard(key, card);
       window.pendingValidationCard = null;
     } else {
-      console.error('[Timer] No pending validation card found!');
+      console.error('[Timer] ❌ No pending validation card found!');
     }
+    
+    // Reset guard after handling
+    setTimeout(() => {
+      isProcessingTimerExpiry = false;
+      console.log('[Timer] ✅ GUARD: Reset after challenge window');
+    }, 1000);
+    
   } else if (timerState === 'challenge_placement') {
-    // Timer 3 expired - validate challenge
-    console.log('[Timer] Challenge placement timer expired');
+    // ============================================
+    // BUGFIX v4: KONSOLIDERADE FIREBASE-UPPDATERINGAR + ERROR HANDLING
+    // ============================================
+    console.log('[Timer] 💥 Challenge placement timer expired');
+    console.log('[Timer] 🔍 DEBUG: Current game state:');
+    console.log('  - currentTeam:', currentGameData.currentTeam);
+    console.log('  - currentSongIndex:', currentGameData.currentSongIndex);
+    console.log('  - challengeState:', currentGameData.challengeState);
+    console.log('  - Available teams:', Object.keys(currentTeams));
+    console.log('  - Total songs:', currentGameData.songs ? currentGameData.songs.length : 0);
     
-    // TODO: Implement validateChallenge() in Steg 6
-    console.log('[Timer] validateChallenge() not implemented yet - will come in Steg 5-6');
-    showNotification('⏱️ Utmaningstiden är ute!', 'info');
+    // Calculate next team and song FIRST (before any Firebase operations)
+    console.log('[Timer] 📊 Calculating next team...');
+    const teamIds = Object.keys(currentTeams);
+    const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+    const nextIndex = (currentIndex + 1) % teamIds.length;
+    const nextTeamId = teamIds[nextIndex];
     
-    // For now: just clean up and transition to next team
-    const updates = {};
-    updates[`games/${gameId}/challengeState`] = null;
+    console.log('[Timer] Current index:', currentIndex, 'Next index:', nextIndex, 'Next team:', nextTeamId);
     
-    // Clear all pending cards
+    const currentSongIndex = currentGameData.currentSongIndex || 0;
+    const nextSongIndex = currentSongIndex + 1;
+    const songs = currentGameData.songs || [];
+    
+    console.log('[Timer] Current song index:', currentSongIndex, 'Next song index:', nextSongIndex, 'Total songs:', songs.length);
+    
+    if (nextSongIndex >= songs.length) {
+      console.error('[Timer] ❌ No more songs in deck!');
+      showNotification('Inga fler låtar!', 'error');
+      isProcessingTimerExpiry = false;
+      return;
+    }
+    
+    const nextSong = songs[nextSongIndex];
+    console.log('[Timer] ✅ Next song:', nextSong ? nextSong.title : 'null');
+    
+    // ============================================
+    // ONE ATOMIC FIREBASE UPDATE WITH EVERYTHING
+    // ============================================
+    console.log('[Timer] 🚀 Creating consolidated Firebase update...');
+    const allUpdates = {};
+    
+    // 1. Stop timer
+    allUpdates[`games/${gameId}/timerState`] = null;
+    allUpdates[`games/${gameId}/timerStartTime`] = null;
+    allUpdates[`games/${gameId}/timerDuration`] = null;
+    allUpdates[`games/${gameId}/nextTeam`] = null;
+    console.log('[Timer]   ✓ Added timer stop to update batch');
+    
+    // 2. Clear challenge state
+    allUpdates[`games/${gameId}/challengeState`] = null;
+    console.log('[Timer]   ✓ Added challengeState clear to update batch');
+    
+    // 3. Clear all pending cards
     Object.keys(currentTeams).forEach(tId => {
-      updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+      allUpdates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
     });
+    console.log('[Timer]   ✓ Added pendingCard clears for', Object.keys(currentTeams).length, 'teams');
     
-    window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+    // 4. Update game state
+    allUpdates[`games/${gameId}/currentTeam`] = nextTeamId;
+    allUpdates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+    allUpdates[`games/${gameId}/currentSong`] = nextSong;
+    console.log('[Timer]   ✓ Added game state updates (team, song)');
+    
+    // 5. Increment round if wrapped around
+    if (nextIndex === 0) {
+      const newRound = (currentGameData.currentRound || 0) + 1;
+      allUpdates[`games/${gameId}/currentRound`] = newRound;
+      console.log('[Timer]   ✓ Added round increment to', newRound);
+    }
+    
+    console.log('[Timer] 📦 Total updates in batch:', Object.keys(allUpdates).length);
+    console.log('[Timer] 🔄 Applying atomic Firebase update...');
+    
+    // Apply all updates in ONE transaction
+    window.firebaseUpdate(window.firebaseRef(window.firebaseDb), allUpdates)
       .then(() => {
-        console.log('[Timer] Challenge state cleared, transitioning to next team');
+        console.log('[Timer] ✅ SUCCESS: All updates applied atomically');
+        showNotification('⏱️ Utmaningstiden är ute!', 'info');
         
-        // Transition to next team (same logic as after validation)
-        const teamIds = Object.keys(currentTeams);
-        const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
-        const nextIndex = (currentIndex + 1) % teamIds.length;
-        const nextTeamId = teamIds[nextIndex];
+        // Small delay to let Firebase propagate
+        console.log('[Timer] ⏳ Waiting 200ms for Firebase propagation...');
+        return new Promise(resolve => setTimeout(resolve, 200));
+      })
+      .then(() => {
+        console.log('[Timer] 🎬 Starting Timer 4 (between_songs)...');
+        const betweenSongsTime = (currentGameData.betweenSongsTime || 10) * 1000;
+        console.log('[Timer] Timer 4 duration:', betweenSongsTime, 'ms for team:', nextTeamId);
+        startTimer('between_songs', betweenSongsTime, nextTeamId);
+        console.log('[Timer] ✅ Timer 4 started successfully');
+      })
+      .catch((error) => {
+        // ============================================
+        // COMPREHENSIVE ERROR HANDLING WITH RECOVERY
+        // ============================================
+        console.error('[Timer] ❌❌❌ CRITICAL ERROR in Timer 3 expiry ❌❌❌');
+        console.error('[Timer] Error details:', error);
+        console.error('[Timer] Error message:', error.message);
+        console.error('[Timer] Error code:', error.code);
+        console.error('[Timer] Stack trace:', error.stack);
         
-        const currentSongIndex = currentGameData.currentSongIndex || 0;
-        const nextSongIndex = currentSongIndex + 1;
-        const songs = currentGameData.songs || [];
+        showNotification('⚠️ Timer-fel, försöker återställa...', 'error');
         
-        if (nextSongIndex >= songs.length) {
-          console.warn('[Timer] No more songs in deck!');
-          return;
-        }
+        // RECOVERY ATTEMPT
+        console.log('[Timer] 🔧 Attempting recovery...');
+        console.log('[Timer] Recovery strategy: Simplified update with just essentials');
         
-        const nextSong = songs[nextSongIndex];
+        const recoveryUpdates = {};
+        recoveryUpdates[`games/${gameId}/timerState`] = null;
+        recoveryUpdates[`games/${gameId}/challengeState`] = null;
+        recoveryUpdates[`games/${gameId}/currentTeam`] = nextTeamId;
         
-        const transitionUpdates = {};
-        transitionUpdates[`games/${gameId}/currentTeam`] = nextTeamId;
-        transitionUpdates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
-        transitionUpdates[`games/${gameId}/currentSong`] = nextSong;
-        
-        if (nextIndex === 0) {
-          const newRound = (currentGameData.currentRound || 0) + 1;
-          transitionUpdates[`games/${gameId}/currentRound`] = newRound;
-        }
-        
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), transitionUpdates)
+        console.log('[Timer] 🔄 Applying recovery update...');
+        return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), recoveryUpdates)
           .then(() => {
+            console.log('[Timer] ✅ Recovery update successful');
+            console.log('[Timer] 🎬 Starting Timer 4 (recovery mode)...');
             startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+            showNotification('⚠️ Återställt - fortsätter spelet', 'info');
+          })
+          .catch((recoveryError) => {
+            console.error('[Timer] ❌❌❌ RECOVERY FAILED ❌❌❌');
+            console.error('[Timer] Recovery error:', recoveryError);
+            showNotification('❌ Kritiskt fel - host måste trycka "Nästa"', 'error');
           });
+      })
+      .finally(() => {
+        // Always reset guard, even if errors occurred
+        console.log('[Timer] 🏁 Finally block - resetting guard');
+        setTimeout(() => {
+          isProcessingTimerExpiry = false;
+          console.log('[Timer] ✅ GUARD: Reset after challenge placement (finally)');
+        }, 1000);
       });
+    
   } else if (timerState === 'between_songs') {
     // Timer 4 expired - pause between songs is over
-    console.log('[Timer] Between songs timer expired');
+    console.log('[Timer] ⏭️ Between songs timer expired');
+    
+    // Stop timer first
+    stopTimer();
     
     if (isHost) {
       // Only host should transition to next turn
       transitionToNextTurn();
     }
+    
+    // Reset guard after handling
+    setTimeout(() => {
+      isProcessingTimerExpiry = false;
+      console.log('[Timer] ✅ GUARD: Reset after between songs');
+    }, 1000);
   }
+  
+  console.log('[Timer] ========== TIMER EXPIRED END ==========');
 }
 
 function skipTurn() {
@@ -439,4 +561,4 @@ function vibrate(pattern) {
   }
 }
 
-console.log('[Game] Timers module loaded');
+console.log('[Game] Timers module loaded (BUGFIX v4)');

@@ -26,6 +26,9 @@ let hasStartedInitialTimer = false; // Track if Timer 4 has started at game star
 let hasInitializedScores = false; // Track if scores have been initialized based on revealed cards
 let previousTimerState = null; // Track previous timer state to detect changes
 
+// Timer expiry guard (BUGFIX v4: Prevent race conditions)
+let isProcessingTimerExpiry = false;
+
 // Timeline state
 let previousCurrentTeam = null; // Track previous team to detect team changes for auto-scroll
 

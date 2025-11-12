@@ -262,72 +262,120 @@ function changeCard() {
 
 // ============================================
 // CHALLENGE CARD
+// BUGFIX v4: Bättre error handling och debug-loggar
 // ============================================
 function challengeCard() {
-  console.log('[Game] Challenge card requested');
+  console.log('[Game] ========== CHALLENGE REQUESTED ==========');
+  console.log('[Game] 🎯 Team:', teamId, 'requesting challenge');
+  console.log('[Game] 🔍 Current state:');
+  console.log('  - timerState:', currentGameData.timerState);
+  console.log('  - currentTeam:', currentGameData.currentTeam);
+  console.log('  - My tokens:', myTeam ? myTeam.tokens : 'N/A');
+  console.log('  - challengeState:', currentGameData.challengeState);
   
   // Check if we have tokens
   if (!myTeam || myTeam.tokens < 1) {
+    console.log('[Game] ❌ No tokens available');
     showNotification('Du har inga tokens kvar!', 'error');
     return;
   }
   
   // Check if we're in challenge window
   if (!currentGameData.timerState || currentGameData.timerState !== 'challenge_window') {
+    console.log('[Game] ❌ Not in challenge window. Current state:', currentGameData.timerState);
     showNotification('Inte rätt tid att utmana!', 'error');
     return;
   }
   
   // Check if someone already challenged
   if (currentGameData.challengeState && currentGameData.challengeState.isActive) {
+    console.log('[Game] ❌ Someone already challenged:', currentGameData.challengeState);
     showNotification('Någon har redan utmanat!', 'error');
     return;
   }
   
   // Check that we're not the active team
   if (currentGameData.currentTeam === teamId) {
+    console.log('[Game] ❌ Cannot challenge yourself');
     showNotification('Du kan inte utmana dig själv!', 'error');
     return;
   }
   
-  console.log('[Game] Challenge accepted! Setting challengeState...');
+  console.log('[Game] ✅ All checks passed! Proceeding with challenge...');
+  console.log('[Game] 💥 Challenge accepted! Setting challengeState...');
   
   const updates = {};
   
   // Set challenge state
-  updates[`games/${gameId}/challengeState`] = {
+  const challengeState = {
     isActive: true,
     challengingTeam: teamId,
     activeTeam: currentGameData.currentTeam,
     timestamp: Date.now()
   };
+  updates[`games/${gameId}/challengeState`] = challengeState;
+  console.log('[Game]   ✓ Added challengeState:', challengeState);
   
   // Deduct token
-  const newTokenCount = myTeam.tokens - 1;
+  const oldTokenCount = myTeam.tokens;
+  const newTokenCount = oldTokenCount - 1;
   updates[`games/${gameId}/teams/${teamId}/tokens`] = newTokenCount;
+  console.log('[Game]   ✓ Token deduction:', oldTokenCount, '→', newTokenCount);
   
   // Clear all pending cards (clean slate for challenge)
+  const teamCount = Object.keys(currentTeams).length;
   Object.keys(currentTeams).forEach(tId => {
     updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
   });
+  console.log('[Game]   ✓ Cleared pendingCards for', teamCount, 'teams');
   
   // Stop Timer 2
   updates[`games/${gameId}/timerState`] = null;
   updates[`games/${gameId}/timerStartTime`] = null;
   updates[`games/${gameId}/timerDuration`] = null;
+  console.log('[Game]   ✓ Added Timer 2 stop');
+  
+  console.log('[Game] 📦 Total updates:', Object.keys(updates).length);
+  console.log('[Game] 🔄 Applying Firebase update...');
   
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
     .then(() => {
-      console.log('[Game] Challenge registered! Starting Timer 3...');
+      console.log('[Game] ✅ Challenge registered successfully!');
+      console.log('[Game] 🎬 Starting Timer 3 (challenge_placement)...');
+      
       showNotification('💥 UTMANING! Placera ditt kort!', 'success');
       
       // Start Timer 3 (challenge placement)
       const placeChallengeTime = (currentGameData.placeChallengeTime || 20) * 1000;
+      console.log('[Game] Timer 3 duration:', placeChallengeTime, 'ms');
       startTimer('challenge_placement', placeChallengeTime);
+      console.log('[Game] ✅ Timer 3 started');
+      console.log('[Game] ========== CHALLENGE COMPLETE ==========');
     })
     .catch((error) => {
-      console.error('[Game] Error challenging:', error);
-      showNotification('Kunde inte utmana', 'error');
+      console.error('[Game] ❌❌❌ ERROR IN CHALLENGE ❌❌❌');
+      console.error('[Game] Error details:', error);
+      console.error('[Game] Error message:', error.message);
+      console.error('[Game] Error code:', error.code);
+      console.error('[Game] Updates that failed:', updates);
+      
+      showNotification('❌ Kunde inte utmana - försök igen', 'error');
+      
+      // Recovery: Try to restore token if Firebase update failed
+      console.log('[Game] 🔧 Attempting token recovery...');
+      const recoveryUpdate = {};
+      recoveryUpdate[`games/${gameId}/teams/${teamId}/tokens`] = oldTokenCount;
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), recoveryUpdate)
+        .then(() => {
+          console.log('[Game] ✅ Token restored to', oldTokenCount);
+        })
+        .catch((recoveryError) => {
+          console.error('[Game] ❌ Token recovery failed:', recoveryError);
+          console.error('[Game] User may have lost a token - manual fix needed');
+        });
+      
+      console.log('[Game] ========== CHALLENGE FAILED ==========');
     });
 }
 
