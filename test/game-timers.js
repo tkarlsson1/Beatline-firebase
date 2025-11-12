@@ -342,140 +342,77 @@ function onTimerExpired() {
     
   } else if (timerState === 'challenge_placement') {
     // ============================================
-    // BUGFIX v4: KONSOLIDERADE FIREBASE-UPPDATERINGAR + ERROR HANDLING
+    // TIMER 3: VALIDATE ACTIVE TEAM'S CARD
     // ============================================
     console.log('[Timer] 💥 Challenge placement timer expired');
-    console.log('[Timer] 🔍 DEBUG: Current game state:');
-    console.log('  - currentTeam:', currentGameData.currentTeam);
-    console.log('  - currentSongIndex:', currentGameData.currentSongIndex);
-    console.log('  - challengeState:', currentGameData.challengeState);
-    console.log('  - Available teams:', Object.keys(currentTeams));
-    console.log('  - Total songs:', currentGameData.songs ? currentGameData.songs.length : 0);
+    console.log('[Timer] 🎯 Validating active team\'s card...');
     
-    // Calculate next team and song FIRST (before any Firebase operations)
-    console.log('[Timer] 📊 Calculating next team...');
-    const teamIds = Object.keys(currentTeams);
-    const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
-    const nextIndex = (currentIndex + 1) % teamIds.length;
-    const nextTeamId = teamIds[nextIndex];
+    // Stop timer first
+    stopTimer();
     
-    console.log('[Timer] Current index:', currentIndex, 'Next index:', nextIndex, 'Next team:', nextTeamId);
-    
-    const currentSongIndex = currentGameData.currentSongIndex || 0;
-    const nextSongIndex = currentSongIndex + 1;
-    const songs = currentGameData.songs || [];
-    
-    console.log('[Timer] Current song index:', currentSongIndex, 'Next song index:', nextSongIndex, 'Total songs:', songs.length);
-    
-    if (nextSongIndex >= songs.length) {
-      console.error('[Timer] ❌ No more songs in deck!');
-      showNotification('Inga fler låtar!', 'error');
-      isProcessingTimerExpiry = false;
-      return;
-    }
-    
-    const nextSong = songs[nextSongIndex];
-    console.log('[Timer] ✅ Next song:', nextSong ? nextSong.title : 'null');
-    
-    // ============================================
-    // ONE ATOMIC FIREBASE UPDATE WITH EVERYTHING
-    // ============================================
-    console.log('[Timer] 🚀 Creating consolidated Firebase update...');
-    const allUpdates = {};
-    
-    // 1. Stop timer
-    allUpdates[`games/${gameId}/timerState`] = null;
-    allUpdates[`games/${gameId}/timerStartTime`] = null;
-    allUpdates[`games/${gameId}/timerDuration`] = null;
-    allUpdates[`games/${gameId}/nextTeam`] = null;
-    console.log('[Timer]   ✓ Added timer stop to update batch');
-    
-    // 2. Clear challenge state
-    allUpdates[`games/${gameId}/challengeState`] = null;
-    console.log('[Timer]   ✓ Added challengeState clear to update batch');
-    
-    // 3. Clear all pending cards
-    Object.keys(currentTeams).forEach(tId => {
-      allUpdates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
-    });
-    console.log('[Timer]   ✓ Added pendingCard clears for', Object.keys(currentTeams).length, 'teams');
-    
-    // 4. Update game state
-    allUpdates[`games/${gameId}/currentTeam`] = nextTeamId;
-    allUpdates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
-    allUpdates[`games/${gameId}/currentSong`] = nextSong;
-    console.log('[Timer]   ✓ Added game state updates (team, song)');
-    
-    // 5. Increment round if wrapped around
-    if (nextIndex === 0) {
-      const newRound = (currentGameData.currentRound || 0) + 1;
-      allUpdates[`games/${gameId}/currentRound`] = newRound;
-      console.log('[Timer]   ✓ Added round increment to', newRound);
-    }
-    
-    console.log('[Timer] 📦 Total updates in batch:', Object.keys(allUpdates).length);
-    console.log('[Timer] 🔄 Applying atomic Firebase update...');
-    
-    // Apply all updates in ONE transaction
-    window.firebaseUpdate(window.firebaseRef(window.firebaseDb), allUpdates)
-      .then(() => {
-        console.log('[Timer] ✅ SUCCESS: All updates applied atomically');
-        showNotification('⏱️ Utmaningstiden är ute!', 'info');
-        
-        // Small delay to let Firebase propagate
-        console.log('[Timer] ⏳ Waiting 200ms for Firebase propagation...');
-        return new Promise(resolve => setTimeout(resolve, 200));
-      })
-      .then(() => {
-        console.log('[Timer] 🎬 Starting Timer 4 (between_songs)...');
-        const betweenSongsTime = (currentGameData.betweenSongsTime || 10) * 1000;
-        console.log('[Timer] Timer 4 duration:', betweenSongsTime, 'ms for team:', nextTeamId);
-        startTimer('between_songs', betweenSongsTime, nextTeamId);
-        console.log('[Timer] ✅ Timer 4 started successfully');
-      })
-      .catch((error) => {
-        // ============================================
-        // COMPREHENSIVE ERROR HANDLING WITH RECOVERY
-        // ============================================
-        console.error('[Timer] ❌❌❌ CRITICAL ERROR in Timer 3 expiry ❌❌❌');
-        console.error('[Timer] Error details:', error);
-        console.error('[Timer] Error message:', error.message);
-        console.error('[Timer] Error code:', error.code);
-        console.error('[Timer] Stack trace:', error.stack);
-        
-        showNotification('⚠️ Timer-fel, försöker återställa...', 'error');
-        
-        // RECOVERY ATTEMPT
-        console.log('[Timer] 🔧 Attempting recovery...');
-        console.log('[Timer] Recovery strategy: Simplified update with just essentials');
-        
-        const recoveryUpdates = {};
-        recoveryUpdates[`games/${gameId}/timerState`] = null;
-        recoveryUpdates[`games/${gameId}/challengeState`] = null;
-        recoveryUpdates[`games/${gameId}/currentTeam`] = nextTeamId;
-        
-        console.log('[Timer] 🔄 Applying recovery update...');
-        return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), recoveryUpdates)
-          .then(() => {
-            console.log('[Timer] ✅ Recovery update successful');
-            console.log('[Timer] 🎬 Starting Timer 4 (recovery mode)...');
-            startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-            showNotification('⚠️ Återställt - fortsätter spelet', 'info');
-          })
-          .catch((recoveryError) => {
-            console.error('[Timer] ❌❌❌ RECOVERY FAILED ❌❌❌');
-            console.error('[Timer] Recovery error:', recoveryError);
-            showNotification('❌ Kritiskt fel - host måste trycka "Nästa"', 'error');
-          });
-      })
-      .finally(() => {
-        // Always reset guard, even if errors occurred
-        console.log('[Timer] 🏁 Finally block - resetting guard');
-        setTimeout(() => {
-          isProcessingTimerExpiry = false;
-          console.log('[Timer] ✅ GUARD: Reset after challenge placement (finally)');
-        }, 1000);
+    // Check if we have pending validation card (from active team's lockInPlacement)
+    if (window.pendingValidationCard) {
+      console.log('[Timer] ✅ Found pending validation card:', window.pendingValidationCard);
+      const { key, card } = window.pendingValidationCard;
+      
+      // validateAndScoreCard() will:
+      // - Validate the card (correct/incorrect placement)
+      // - Clear challengeState
+      // - Clear all pendingCards
+      // - Update currentTeam/currentSong
+      // - Start Timer 4
+      validateAndScoreCard(key, card);
+      window.pendingValidationCard = null;
+      
+      console.log('[Timer] ✅ Validation initiated');
+    } else {
+      console.error('[Timer] ❌ No pending validation card found!');
+      console.error('[Timer] This should not happen - active team should have locked a card');
+      showNotification('⚠️ Inget kort att validera', 'error');
+      
+      // Fallback: Still transition to next team
+      console.log('[Timer] 🔧 Fallback: Transitioning to next team anyway...');
+      const teamIds = Object.keys(currentTeams);
+      const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
+      const nextIndex = (currentIndex + 1) % teamIds.length;
+      const nextTeamId = teamIds[nextIndex];
+      
+      const currentSongIndex = currentGameData.currentSongIndex || 0;
+      const nextSongIndex = currentSongIndex + 1;
+      const songs = currentGameData.songs || [];
+      
+      if (nextSongIndex >= songs.length) {
+        console.warn('[Timer] No more songs in deck!');
+        isProcessingTimerExpiry = false;
+        return;
+      }
+      
+      const nextSong = songs[nextSongIndex];
+      
+      const updates = {};
+      updates[`games/${gameId}/challengeState`] = null;
+      updates[`games/${gameId}/currentTeam`] = nextTeamId;
+      updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+      updates[`games/${gameId}/currentSong`] = nextSong;
+      
+      Object.keys(currentTeams).forEach(tId => {
+        updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
       });
+      
+      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+        .then(() => {
+          startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+        })
+        .catch((error) => {
+          console.error('[Timer] Fallback update failed:', error);
+        });
+    }
+    
+    // Reset guard after handling
+    setTimeout(() => {
+      isProcessingTimerExpiry = false;
+      console.log('[Timer] ✅ GUARD: Reset after challenge placement');
+    }, 1000);
     
   } else if (timerState === 'between_songs') {
     // Timer 4 expired - pause between songs is over
