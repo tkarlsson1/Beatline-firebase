@@ -574,3 +574,46 @@ body {
     height: 96px;
   }
 }
+
+/* ============================================
+   CHALLENGE BUTTON STYLING
+   ============================================ */
+
+#challengeButtonContainer {
+  display: none;
+  margin: 20px 0;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.challenge-btn {
+  background: #EA4335; /* Röd */
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(234, 67, 53, 0.3);
+  font-family: 'Manrope', sans-serif;
+}
+
+.challenge-btn:hover:not(:disabled) {
+  background: #C5221F;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(234, 67, 53, 0.4);
+}
+
+.challenge-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(234, 67, 53, 0.3);
+}
+
+.challenge-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
