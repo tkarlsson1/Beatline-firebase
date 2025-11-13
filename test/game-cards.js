@@ -7,7 +7,7 @@
 // GUARD VARIABLES
 // ============================================
 let isChangingCard = false;
-let isLockingInPlacement = false; // v2.2: Prevent duplicate lock-in calls
+let isLockingInPlacement = false;
 
 // ============================================
 // DRAG AND DROP HANDLERS (MOUSE)
@@ -586,34 +586,23 @@ function challengeCard() {
 
 
 function lockInPlacement(targetTeamId = null) {
-  console.log('[Game] ========== LOCK IN PLACEMENT ==========');
-  console.log('[Game] Placement position:', placementPosition);
-  console.log('[Game] Target team:', targetTeamId || 'self (current player)');
+  console.log('[Game] Lock in placement at position:', placementPosition);
+  console.log('[Game] Target team:', targetTeamId || 'self');
   
-  // ============================================
-  // v2.2: GUARD AGAINST DUPLICATE CALLS
-  // ============================================
   if (isLockingInPlacement) {
-    console.log('[Game] ⚠️ GUARD: Already locking in placement, skipping duplicate call');
+    console.log('[Game] ⚠️ GUARD: Already locking, skipping');
     return;
   }
   isLockingInPlacement = true;
-  console.log('[Game] ✅ GUARD: Lock-in flag set');
   
-  // ============================================
-  // v2.2: SUPPORT HOST BACKUP
-  // Allow host to lock in for another team
-  // ============================================
   const effectiveTeamId = targetTeamId || teamId;
   const effectiveTeam = targetTeamId ? currentTeams[targetTeamId] : myTeam;
   
   if (!effectiveTeam) {
-    console.error('[Game] ❌ Target team not found:', effectiveTeamId);
+    console.error('[Game] ❌ Team not found:', effectiveTeamId);
     isLockingInPlacement = false;
     return;
   }
-  
-  console.log('[Game] Effective team:', effectiveTeam.name, '(ID:', effectiveTeamId, ')');
   
   if (placementPosition === null) {
     showNotification('Placera kortet först!', 'error');
@@ -653,10 +642,7 @@ function lockInPlacement(targetTeamId = null) {
         console.log('[Game] Challenging card locked, timer stopped');
         showNotification('💥 Challenge-kort låst! Validerar...', 'success');
         placementPosition = null;
-        
-        // v2.2: Reset guard
         isLockingInPlacement = false;
-        console.log('[Game] ✅ GUARD: Reset after challenge lock-in success');
         
         // Wait a bit for Firebase to propagate, then validate
         setTimeout(() => {
@@ -667,18 +653,14 @@ function lockInPlacement(targetTeamId = null) {
       .catch((error) => {
         console.error('[Game] Error locking challenging card:', error);
         showNotification('Kunde inte låsa kort', 'error');
-        
-        // v2.2: Reset guard on error
         isLockingInPlacement = false;
-        console.log('[Game] ✅ GUARD: Reset after challenge lock-in error');
       });
     
     return;
   }
   
   // ============================================
-  // NORMAL MODE: Lock in to timeline
-  // v2.2: Now supports locking for other teams (host backup)
+  // NORMAL MODE: Lock in to my timeline
   // ============================================
   
   // Remove preview card
@@ -731,7 +713,7 @@ function lockInPlacement(targetTeamId = null) {
         position: index,
         revealed: false
       };
-      console.log('[Game] Adding new card', card.key, 'at position', index, 'for team', effectiveTeamId);
+      console.log('[Game] Adding new card', card.key, 'at position', index);
     } else {
       // This is an existing card - just update position
       updates[`games/${gameId}/teams/${effectiveTeamId}/timeline/${card.key}/position`] = index;
@@ -749,10 +731,7 @@ function lockInPlacement(targetTeamId = null) {
       console.log('[Game] Card locked in to timeline');
       showNotification('Kort låst!', 'info');
       placementPosition = null;
-      
-      // v2.2: Reset guard
       isLockingInPlacement = false;
-      console.log('[Game] ✅ GUARD: Reset after normal lock-in success');
       
       // Start Timer 2 (challenge window) - other teams can challenge now
       console.log('[Game] Starting Timer 2 (challenge_window)');
@@ -765,10 +744,7 @@ function lockInPlacement(targetTeamId = null) {
     .catch((error) => {
       console.error('[Game] Error adding card:', error);
       showNotification('Kunde inte placera kort', 'error');
-      
-      // v2.2: Reset guard on error
       isLockingInPlacement = false;
-      console.log('[Game] ✅ GUARD: Reset after normal lock-in error');
     });
 }
 
