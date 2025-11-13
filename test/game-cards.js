@@ -458,16 +458,31 @@ function lockInPlacement() {
       currentGameData.challengeState &&
       currentGameData.challengeState.challengingTeam === teamId) {
     
-    console.log('[Game] Challenge mode: locking challenging card');
+    console.log('[Game] Challenge mode: locking challenging card and triggering validation');
     
     const updates = {};
+    
+    // Lock the card
     updates[`games/${gameId}/challengeState/challengingCard/locked`] = true;
+    
+    // Stop Timer 3
+    updates[`games/${gameId}/timerState`] = null;
+    updates[`games/${gameId}/timerStartTime`] = null;
+    updates[`games/${gameId}/timerDuration`] = null;
+    
+    console.log('[Game] Locking card and stopping Timer 3');
     
     window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
       .then(() => {
-        console.log('[Game] Challenging card locked');
-        showNotification('💥 Challenge-kort låst!', 'success');
+        console.log('[Game] Challenging card locked, timer stopped');
+        showNotification('💥 Challenge-kort låst! Validerar...', 'success');
         placementPosition = null;
+        
+        // Wait a bit for Firebase to propagate, then validate
+        setTimeout(() => {
+          console.log('[Game] Triggering challenge validation...');
+          validateChallenge();
+        }, 500);
       })
       .catch((error) => {
         console.error('[Game] Error locking challenging card:', error);
@@ -855,11 +870,19 @@ function validateAndScoreCard(cardKey, card) {
 function validateChallenge() {
   console.log('[Game] ========== VALIDATE CHALLENGE ==========');
   
+  // GUARD: Prevent multiple simultaneous validations
+  if (window.isValidatingChallenge) {
+    console.log('[Game] ⚠️ Already validating challenge, skipping duplicate call');
+    return;
+  }
+  window.isValidatingChallenge = true;
+  
   // 1. GET DATA
   const challengeState = currentGameData.challengeState;
   
   if (!challengeState || !challengeState.isActive) {
     console.error('[Game] No active challenge state!');
+    window.isValidatingChallenge = false;
     return;
   }
   
@@ -1063,6 +1086,11 @@ function validateChallenge() {
       setTimeout(() => {
         transitionAfterChallenge();
       }, 1000);
+    })
+    .finally(() => {
+      // Reset guard
+      window.isValidatingChallenge = false;
+      console.log('[Game] ✅ Validation guard reset');
     });
 }
 
