@@ -93,6 +93,13 @@ function forceNextTeam() {
     return;
   }
   
+  // Check if validation modal is active
+  if (currentGameData.validationModal && currentGameData.validationModal.isVisible) {
+    console.log('[Host] ⚠️ Validation modal is active');
+    showNotification('Stäng valideringsrutan först!', 'error');
+    return;
+  }
+  
   // Stop current timer
   stopTimer();
   

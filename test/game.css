@@ -617,3 +617,164 @@ body {
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+/* ============================================
+   VALIDATION MODAL STYLING
+   ============================================ */
+
+.validation-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.validation-modal {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+  border: 3px solid var(--accent-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  animation: slideUp 0.4s ease-out;
+}
+
+.validation-modal-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.validation-modal-title.correct {
+  color: #4CAF50;
+}
+
+.validation-modal-title.wrong {
+  color: #EA4335;
+}
+
+.validation-modal-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.validation-modal-song {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.validation-modal-song-year {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.validation-modal-song-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: white;
+}
+
+.validation-modal-song-artist {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.validation-modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.validation-modal-btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  font-family: 'Manrope', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.validation-modal-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.validation-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.validation-modal-btn.token {
+  background: #FFC107;
+  color: #1a1a1a;
+}
+
+.validation-modal-btn.token:hover:not(:disabled) {
+  background: #FFD54F;
+}
+
+.validation-modal-btn.next {
+  background: var(--accent-color);
+  color: white;
+}
+
+.validation-modal-btn.next:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Blur game content when modal is active */
+#gameContainer.modal-active #gameView {
+  filter: blur(5px);
+  pointer-events: none;
+}

@@ -29,6 +29,9 @@ function updateGameView() {
   // Render challenge button (if Timer 2 is active)
   renderChallengeButton();
   
+  // Render validation modal (if active)
+  renderValidationModal();
+  
   // Initialize scores based on revealed cards (only once at game start)
   if (!hasInitializedScores && currentGameData.status === 'playing') {
     hasInitializedScores = true;
@@ -651,5 +654,130 @@ function clearDynamicDropIndicator() {
     indicator.remove();
   }
 }
+
+// ============================================
+// VALIDATION MODAL RENDERING
+// ============================================
+function renderValidationModal() {
+  const container = document.getElementById('validationModalContainer');
+  const gameContainer = document.getElementById('gameContainer');
+  
+  if (!container || !gameContainer) {
+    console.warn('[Game] Modal containers not found');
+    return;
+  }
+  
+  const modal = currentGameData.validationModal;
+  
+  // Check if modal should be visible
+  if (!modal || !modal.isVisible) {
+    // Hide modal and remove blur
+    container.innerHTML = '';
+    gameContainer.classList.remove('modal-active');
+    return;
+  }
+  
+  console.log('[Game] Rendering validation modal:', modal);
+  
+  // Add blur class to game container
+  gameContainer.classList.add('modal-active');
+  
+  // Determine title and subtitle based on result
+  let titleText = '';
+  let titleClass = '';
+  let subtitleText = '';
+  
+  if (modal.challengingTeamId) {
+    // Challenge scenario
+    if (modal.result === 'active_correct') {
+      titleText = `✅ ${escapeHtml(modal.activeTeamName)} HADE RÄTT!`;
+      titleClass = 'correct';
+      subtitleText = `${escapeHtml(modal.challengingTeamName)} förlorade utmaningen`;
+    } else if (modal.result === 'challenging_won') {
+      titleText = `✅ ${escapeHtml(modal.challengingTeamName)} VANN UTMANINGEN!`;
+      titleClass = 'correct';
+      subtitleText = `${escapeHtml(modal.activeTeamName)} placerade fel`;
+    } else {
+      // both_wrong
+      titleText = `❌ BÅDA LAGEN HADE FEL`;
+      titleClass = 'wrong';
+      subtitleText = `${escapeHtml(modal.activeTeamName)} och ${escapeHtml(modal.challengingTeamName)}`;
+    }
+  } else {
+    // Normal validation (no challenge)
+    if (modal.result === 'active_correct') {
+      titleText = `✅ ${escapeHtml(modal.activeTeamName)} FICK KORTET!`;
+      titleClass = 'correct';
+      subtitleText = '';
+    } else {
+      titleText = `❌ ${escapeHtml(modal.activeTeamName)} PLACERADE FEL`;
+      titleClass = 'wrong';
+      subtitleText = '';
+    }
+  }
+  
+  // Build modal HTML
+  let modalHTML = `
+    <div class="validation-modal-overlay">
+      <div class="validation-modal">
+        <div class="validation-modal-title ${titleClass}">
+          ${titleText}
+        </div>
+  `;
+  
+  if (subtitleText) {
+    modalHTML += `
+      <div class="validation-modal-subtitle">
+        ${subtitleText}
+      </div>
+    `;
+  }
+  
+  modalHTML += `
+    <div class="validation-modal-song">
+      <div class="validation-modal-song-year">${modal.song.year}</div>
+      <div class="validation-modal-song-title">${escapeHtml(modal.song.title)}</div>
+      <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
+    </div>
+    
+    <div class="validation-modal-buttons">
+  `;
+  
+  // Show +TOKEN button only if canGiveToken and not already given
+  if (modal.canGiveToken && !modal.tokenGiven) {
+    modalHTML += `
+      <button 
+        class="validation-modal-btn token" 
+        onclick="giveTokenToActiveTeam()"
+        ${modal.isProcessing ? 'disabled' : ''}
+      >
+        🎫 +TOKEN
+      </button>
+    `;
+  }
+  
+  // Show NÄSTA LÅT button (always visible)
+  modalHTML += `
+    <button 
+      class="validation-modal-btn next" 
+      onclick="closeValidationModal()"
+      ${modal.isProcessing ? 'disabled' : ''}
+    >
+      NÄSTA LÅT →
+    </button>
+  `;
+  
+  modalHTML += `
+    </div>
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = modalHTML;
+  
+  console.log('[Game] Validation modal rendered');
+}
+
+console.log('[Game] Render module loaded');
 
 console.log('[Game] Render module loaded');

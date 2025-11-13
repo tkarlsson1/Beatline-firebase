@@ -347,6 +347,14 @@ function changeCard() {
     return;
   }
   
+  // Must not have validation modal active
+  if (currentGameData.validationModal && currentGameData.validationModal.isVisible) {
+    console.log('[Game] ❌ Validation modal is active');
+    showNotification('Vänta tills valideringen är klar!', 'error');
+    isChangingCard = false;
+    return;
+  }
+  
   // Check if more songs available
   const currentSongIndex = currentGameData.currentSongIndex || 0;
   const nextSongIndex = currentSongIndex + 1;
@@ -892,84 +900,59 @@ function validateAndScoreCard(cardKey, card) {
       console.log('[Game] Validation complete, updates applied');
       console.log('[Game] ========== VALIDATION END ==========');
       
-      // Only the active team should transition to next team and start Timer 4
-      setTimeout(() => {
-        // Check if we're still the active team (avoid race conditions)
-        if (currentGameData.currentTeam !== teamId) {
-          console.log('[Game] Not active team anymore, skipping transition');
-          return;
-        }
+      // ============================================
+      // SET VALIDATION MODAL (instead of transitioning immediately)
+      // ============================================
+      
+      // Only the active team should set the validation modal
+      if (currentGameData.currentTeam !== teamId) {
+        console.log('[Game] Not active team anymore, skipping modal setup');
+        return;
+      }
+      
+      console.log('[Game] Setting up validation modal...');
+      
+      const activeTeam = currentTeams[teamId];
+      
+      const validationModal = {
+        isVisible: true,
+        isProcessing: false,
         
-        console.log('[Game] Active team transitioning to next team after 2s delay');
+        // Active team info (team that had the turn)
+        activeTeamId: teamId,
+        activeTeamName: activeTeam ? activeTeam.name : 'Unknown',
         
-        if (!currentTeams || Object.keys(currentTeams).length === 0) {
-          console.error('[Game] No teams available!');
-          return;
-        }
+        // No challenge info for normal validation
+        challengingTeamId: null,
+        challengingTeamName: null,
         
-        if (!currentGameData) {
-          console.error('[Game] No game data available!');
-          return;
-        }
+        // Result
+        result: isCorrect ? 'active_correct' : 'active_wrong',
         
-        // Calculate next team
-        const teamIds = Object.keys(currentTeams);
-        const currentTeamId = currentGameData.currentTeam;
-        const currentIndex = teamIds.indexOf(currentTeamId);
-        const nextIndex = (currentIndex + 1) % teamIds.length;
-        const nextTeamId = teamIds[nextIndex];
+        // Song info
+        song: {
+          year: placedCard.year,
+          title: placedCard.title,
+          artist: placedCard.artist
+        },
         
-        console.log('[Game] Current team:', currentTeamId, 'at index', currentIndex);
-        console.log('[Game] Next team:', nextTeamId, 'at index', nextIndex);
+        // Can give bonus token only if correct
+        canGiveToken: isCorrect,
+        tokenGiven: false,
         
-        // Update current team and song in Firebase
-        const currentSongIndex = currentGameData.currentSongIndex || 0;
-        const nextSongIndex = currentSongIndex + 1;
-        const songs = currentGameData.songs || [];
-        
-        console.log('[Game] Next song index:', nextSongIndex, '/', songs.length);
-        
-        if (nextSongIndex >= songs.length) {
-          console.warn('[Game] No more songs in deck!');
-          return;
-        }
-        
-        const nextSong = songs[nextSongIndex];
-        
-        console.log('[Game] Next song:', nextSong ? nextSong.title : 'null');
-        
-        const updates = {};
-        updates[`games/${gameId}/currentTeam`] = nextTeamId;
-        updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
-        updates[`games/${gameId}/currentSong`] = nextSong;
-        
-        // Clear challenge state
-        updates[`games/${gameId}/challengeState`] = null;
-        
-        // Clear all pending cards
-        Object.keys(currentTeams).forEach(tId => {
-          updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
-        });
-        
-        // Increment round if we wrapped around
-        if (nextIndex === 0) {
-          const newRound = (currentGameData.currentRound || 0) + 1;
-          updates[`games/${gameId}/currentRound`] = newRound;
-          console.log('[Game] New round:', newRound);
-        }
-        
-        console.log('[Game] Applying game updates:', updates);
-        
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-          .then(() => {
-            console.log('[Game] Game updates applied, starting Timer 4');
-            // Start between songs timer showing the team that will play next
-            startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-          })
-          .catch((error) => {
-            console.error('[Game] Error applying game updates:', error);
-          });
-      }, 2000);
+        timestamp: Date.now()
+      };
+      
+      console.log('[Game] Validation modal data:', validationModal);
+      
+      const modalUpdates = {};
+      modalUpdates[`games/${gameId}/validationModal`] = validationModal;
+      
+      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), modalUpdates);
+    })
+    .then(() => {
+      console.log('[Game] ✅ Validation modal set successfully');
+      console.log('[Game] Modal will be displayed to all players');
     })
     .catch((error) => {
       console.error('[Game] Error in validation:', error);
@@ -1193,11 +1176,37 @@ function validateChallenge() {
     }
   }
   
-  // 4. CLEAN UP
-  console.log('[Game] Cleaning up after challenge...');
+  // 4. DETERMINE RESULT FOR MODAL
+  console.log('[Game] Determining result for validation modal...');
   
-  // Clear challenge state
-  updates[`games/${gameId}/challengeState`] = null;
+  let result;
+  if (activeCorrect) {
+    result = 'active_correct';
+  } else {
+    const challengingCard = challengeState.challengingCard;
+    if (challengingCard && challengingCard.locked) {
+      // We validated challenging card above
+      // Check if it was correct by looking if we added it to updates
+      const challengingCardWasAdded = Object.keys(updates).some(key => 
+        key.includes(`teams/${challengingTeamId}/timeline`) && key.includes('year')
+      );
+      
+      if (challengingCardWasAdded) {
+        result = 'challenging_won';
+      } else {
+        result = 'both_wrong';
+      }
+    } else {
+      // Challenging team didn't place a card
+      result = 'both_wrong';
+    }
+  }
+  
+  console.log('[Game] Final result:', result);
+  
+  // 5. DON'T CLEAR CHALLENGE STATE YET
+  // (will be cleared when modal is closed)
+  console.log('[Game] Keeping challengeState for modal (will clear when modal closes)');
   
   // Clear all pending cards
   Object.keys(currentTeams).forEach(tId => {
@@ -1213,22 +1222,208 @@ function validateChallenge() {
       console.log('[Game] Challenge validation complete');
       console.log('[Game] ========== VALIDATE CHALLENGE END ==========');
       
-      // Wait a bit, then transition to next team
-      setTimeout(() => {
-        transitionAfterChallenge();
-      }, 2000);
+      // ============================================
+      // SET VALIDATION MODAL (instead of transitioning immediately)
+      // ============================================
+      
+      console.log('[Game] Setting up validation modal for challenge...');
+      
+      const validationModal = {
+        isVisible: true,
+        isProcessing: false,
+        
+        // Active team info (team that was challenged)
+        activeTeamId: activeTeamId,
+        activeTeamName: activeTeam ? activeTeam.name : 'Unknown',
+        
+        // Challenge info
+        challengingTeamId: challengingTeamId,
+        challengingTeamName: challengingTeam ? challengingTeam.name : 'Unknown',
+        
+        // Result
+        result: result,
+        
+        // Song info
+        song: {
+          year: activeCard.year,
+          title: activeCard.title,
+          artist: activeCard.artist
+        },
+        
+        // Can give bonus token only if active team won
+        canGiveToken: (result === 'active_correct'),
+        tokenGiven: false,
+        
+        timestamp: Date.now()
+      };
+      
+      console.log('[Game] Validation modal data:', validationModal);
+      
+      const modalUpdates = {};
+      modalUpdates[`games/${gameId}/validationModal`] = validationModal;
+      
+      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), modalUpdates);
+    })
+    .then(() => {
+      console.log('[Game] ✅ Validation modal set successfully');
+      console.log('[Game] Modal will be displayed to all players');
     })
     .catch((error) => {
       console.error('[Game] Error in validateChallenge:', error);
-      // Fallback: still transition
-      setTimeout(() => {
-        transitionAfterChallenge();
-      }, 1000);
     })
     .finally(() => {
       // Reset guard
       window.isValidatingChallenge = false;
       console.log('[Game] ✅ Validation guard reset');
+    });
+}
+
+// ============================================
+// CLOSE VALIDATION MODAL & TRANSITION TO NEXT TEAM
+// ============================================
+function closeValidationModal() {
+  console.log('[Game] ========== CLOSE VALIDATION MODAL ==========');
+  
+  // GUARD: Prevent multiple simultaneous closes
+  if (!currentGameData.validationModal || currentGameData.validationModal.isProcessing) {
+    console.log('[Game] ⚠️ Already processing or no modal, skipping');
+    return;
+  }
+  
+  console.log('[Game] Closing validation modal and transitioning to next team...');
+  
+  // Set processing flag
+  const processingUpdate = {};
+  processingUpdate[`games/${gameId}/validationModal/isProcessing`] = true;
+  
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), processingUpdate)
+    .then(() => {
+      console.log('[Game] Processing flag set');
+      
+      // Calculate next team
+      const teamIds = Object.keys(currentTeams);
+      const currentTeamId = currentGameData.currentTeam;
+      const currentIndex = teamIds.indexOf(currentTeamId);
+      const nextIndex = (currentIndex + 1) % teamIds.length;
+      const nextTeamId = teamIds[nextIndex];
+      
+      console.log('[Game] Current team:', currentTeamId);
+      console.log('[Game] Next team:', nextTeamId);
+      
+      // Get next song
+      const currentSongIndex = currentGameData.currentSongIndex || 0;
+      const nextSongIndex = currentSongIndex + 1;
+      const songs = currentGameData.songs || [];
+      
+      if (nextSongIndex >= songs.length) {
+        console.warn('[Game] No more songs in deck!');
+        showNotification('Inga fler låtar!', 'error');
+        return;
+      }
+      
+      const nextSong = songs[nextSongIndex];
+      console.log('[Game] Next song:', nextSong.title);
+      
+      // Prepare updates
+      const updates = {};
+      
+      // Clear validation modal
+      updates[`games/${gameId}/validationModal`] = null;
+      
+      // Update game state
+      updates[`games/${gameId}/currentTeam`] = nextTeamId;
+      updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+      updates[`games/${gameId}/currentSong`] = nextSong;
+      
+      // Clear challenge state
+      updates[`games/${gameId}/challengeState`] = null;
+      
+      // Clear all pending cards
+      Object.keys(currentTeams).forEach(tId => {
+        updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+      });
+      
+      // Increment round if we wrapped around
+      if (nextIndex === 0) {
+        const newRound = (currentGameData.currentRound || 0) + 1;
+        updates[`games/${gameId}/currentRound`] = newRound;
+        console.log('[Game] New round:', newRound);
+      }
+      
+      console.log('[Game] Applying', Object.keys(updates).length, 'updates...');
+      
+      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates);
+    })
+    .then(() => {
+      console.log('[Game] ✅ Modal closed, game state updated');
+      
+      // Start Timer 4 (between songs)
+      console.log('[Game] Starting Timer 4 (between songs)...');
+      
+      const teamIds = Object.keys(currentTeams);
+      const currentTeamId = currentGameData.currentTeam;
+      const currentIndex = teamIds.indexOf(currentTeamId);
+      const nextIndex = (currentIndex + 1) % teamIds.length;
+      const nextTeamId = teamIds[nextIndex];
+      
+      startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      
+      console.log('[Game] ========== CLOSE VALIDATION MODAL END ==========');
+    })
+    .catch((error) => {
+      console.error('[Game] ❌ Error closing validation modal:', error);
+      showNotification('Ett fel uppstod', 'error');
+    });
+}
+
+// ============================================
+// GIVE BONUS TOKEN TO ACTIVE TEAM
+// ============================================
+function giveTokenToActiveTeam() {
+  console.log('[Game] ========== GIVE BONUS TOKEN ==========');
+  
+  const modal = currentGameData.validationModal;
+  
+  if (!modal || !modal.isVisible) {
+    console.log('[Game] ⚠️ No active modal');
+    return;
+  }
+  
+  if (!modal.canGiveToken) {
+    console.log('[Game] ⚠️ Cannot give token (team was wrong)');
+    showNotification('Kan inte ge token - laget hade fel!', 'error');
+    return;
+  }
+  
+  if (modal.tokenGiven) {
+    console.log('[Game] ⚠️ Token already given');
+    showNotification('Token redan utdelad!', 'error');
+    return;
+  }
+  
+  const activeTeamId = modal.activeTeamId;
+  const activeTeam = currentTeams[activeTeamId];
+  
+  if (!activeTeam) {
+    console.error('[Game] ❌ Active team not found');
+    return;
+  }
+  
+  console.log('[Game] Giving bonus token to', activeTeam.name);
+  
+  const updates = {};
+  updates[`games/${gameId}/teams/${activeTeamId}/tokens`] = (activeTeam.tokens || 0) + 1;
+  updates[`games/${gameId}/validationModal/tokenGiven`] = true;
+  
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+    .then(() => {
+      console.log('[Game] ✅ Bonus token given!');
+      showNotification(`🎫 ${activeTeam.name} fick en bonus-token!`, 'success');
+      console.log('[Game] ========== GIVE BONUS TOKEN END ==========');
+    })
+    .catch((error) => {
+      console.error('[Game] ❌ Error giving token:', error);
+      showNotification('Kunde inte ge token', 'error');
     });
 }
 
