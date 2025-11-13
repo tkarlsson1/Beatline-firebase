@@ -458,6 +458,38 @@ function updateActionButtons() {
   
   if (!changeCardBtn || !lockInBtn) return;
   
+  // BUGFIX: During Timer 2 (challenge window), replace "BYT KORT" with "UTMANA"
+  if (timerState === 'challenge_window') {
+    // Check if someone already challenged
+    const alreadyChallenged = currentGameData.challengeState && currentGameData.challengeState.isActive;
+    
+    // Don't show to active team or if already challenged
+    if (currentTeamId === teamId || alreadyChallenged) {
+      changeCardBtn.style.display = 'none';
+      lockInBtn.style.display = 'none';
+      return;
+    }
+    
+    // Show UTMANA button
+    changeCardBtn.style.display = 'inline-block';
+    changeCardBtn.textContent = 'UTMANA (1 🎫)';
+    changeCardBtn.onclick = challengeCard;
+    
+    // Enable if team has tokens
+    const hasTokens = myTeam && myTeam.tokens > 0;
+    changeCardBtn.disabled = !hasTokens;
+    
+    // Hide lock in button during challenge window
+    lockInBtn.style.display = 'none';
+    return;
+  }
+  
+  // Reset to normal state (not challenge window)
+  changeCardBtn.style.display = 'inline-block';
+  changeCardBtn.textContent = 'BYT LÅT';
+  changeCardBtn.onclick = changeCard;
+  lockInBtn.style.display = 'inline-block';
+  
   // Check if we're in challenge mode and I'm the challenging team
   const isChallengingTeam = (
     timerState === 'challenge_placement' && 
@@ -493,55 +525,16 @@ function updateActionButtons() {
 // CHALLENGE BUTTON
 // ============================================
 function renderChallengeButton() {
+  // BUGFIX: Challenge button is now handled in updateActionButtons()
+  // This function is kept for backwards compatibility but does nothing
   const container = document.getElementById('challengeButtonContainer');
   
-  if (!container) {
-    console.warn('[Game] Challenge button container not found in HTML');
-    return;
-  }
-  
-  const timerState = currentGameData.timerState;
-  const currentTeamId = currentGameData.currentTeam;
-  
-  // Only show during Timer 2 (challenge_window)
-  if (timerState !== 'challenge_window') {
+  if (container) {
     container.innerHTML = '';
     container.style.display = 'none';
-    return;
   }
   
-  // Don't show to active team
-  if (currentTeamId === teamId) {
-    container.innerHTML = '';
-    container.style.display = 'none';
-    return;
-  }
-  
-  // Check if someone already challenged
-  if (currentGameData.challengeState && currentGameData.challengeState.isActive) {
-    container.innerHTML = '';
-    container.style.display = 'none';
-    return;
-  }
-  
-  // Show button
-  container.style.display = 'flex';
-  
-  const hasTokens = myTeam && myTeam.tokens > 0;
-  const buttonDisabled = !hasTokens;
-  
-  container.innerHTML = `
-    <button 
-      id="challengeBtn" 
-      class="challenge-btn"
-      ${buttonDisabled ? 'disabled' : ''}
-      onclick="challengeCard()"
-    >
-      UTMANA (1 🎫)
-    </button>
-  `;
-  
-  console.log('[Game] Challenge button rendered, disabled:', buttonDisabled);
+  return;
 }
 
 // ============================================
