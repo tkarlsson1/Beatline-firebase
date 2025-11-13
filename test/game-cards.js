@@ -1304,6 +1304,17 @@ function closeValidationModal() {
   
   console.log('[Game] Closing validation modal and transitioning to next team...');
   
+  // BUGFIX: Calculate next team ONCE at the start (before Firebase update)
+  // This prevents Timer 4 from showing the wrong team (race condition)
+  const teamIds = Object.keys(currentTeams);
+  const currentTeamId = currentGameData.currentTeam;
+  const currentIndex = teamIds.indexOf(currentTeamId);
+  const nextIndex = (currentIndex + 1) % teamIds.length;
+  const nextTeamId = teamIds[nextIndex];
+  
+  console.log('[Game] Current team:', currentTeamId);
+  console.log('[Game] Next team:', nextTeamId);
+  
   // Set processing flag
   const processingUpdate = {};
   processingUpdate[`games/${gameId}/validationModal/isProcessing`] = true;
@@ -1311,16 +1322,6 @@ function closeValidationModal() {
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), processingUpdate)
     .then(() => {
       console.log('[Game] Processing flag set');
-      
-      // Calculate next team
-      const teamIds = Object.keys(currentTeams);
-      const currentTeamId = currentGameData.currentTeam;
-      const currentIndex = teamIds.indexOf(currentTeamId);
-      const nextIndex = (currentIndex + 1) % teamIds.length;
-      const nextTeamId = teamIds[nextIndex];
-      
-      console.log('[Game] Current team:', currentTeamId);
-      console.log('[Game] Next team:', nextTeamId);
       
       // Get next song
       const currentSongIndex = currentGameData.currentSongIndex || 0;
@@ -1370,13 +1371,8 @@ function closeValidationModal() {
       console.log('[Game] ✅ Modal closed, game state updated');
       
       // Start Timer 4 (between songs)
-      console.log('[Game] Starting Timer 4 (between songs)...');
-      
-      const teamIds = Object.keys(currentTeams);
-      const currentTeamId = currentGameData.currentTeam;
-      const currentIndex = teamIds.indexOf(currentTeamId);
-      const nextIndex = (currentIndex + 1) % teamIds.length;
-      const nextTeamId = teamIds[nextIndex];
+      // BUGFIX: Use nextTeamId calculated at the start (not recalculated)
+      console.log('[Game] Starting Timer 4 for next team:', nextTeamId);
       
       startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
       
