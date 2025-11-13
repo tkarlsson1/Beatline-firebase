@@ -290,6 +290,12 @@ function onTimerExpired() {
     if (currentTeam && currentTeam.pendingCard) {
       // Has pending card - lock it in automatically
       console.log('[Timer] 🔒 Auto-locking pending card');
+      
+      // BUGFIX: Set placementPosition from Firebase before calling lockInPlacement()
+      // This fixes the issue where auto-lock didn't work because placementPosition was null
+      placementPosition = currentTeam.pendingCard.position;
+      console.log('[Timer] Set placementPosition from pendingCard:', placementPosition);
+      
       if (currentGameData.currentTeam === teamId) {
         // Only the current team should lock in
         lockInPlacement();
