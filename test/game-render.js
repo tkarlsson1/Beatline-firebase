@@ -263,6 +263,25 @@ function renderTimeline() {
     renderPreviewCard(previewCard, teamColorHex);
   }
   
+  // Check if we need to render a challenging card (during Timer 3)
+  if (currentGameData.timerState === 'challenge_placement' && 
+      currentGameData.challengeState && 
+      currentGameData.challengeState.challengingCard) {
+    
+    const challengingCard = currentGameData.challengeState.challengingCard;
+    const challengingTeamId = currentGameData.challengeState.challengingTeam;
+    const challengingTeam = currentTeams[challengingTeamId];
+    
+    if (challengingCard.position !== undefined && challengingTeam) {
+      // Get challenging team's color
+      const challengingTeamColor = challengingTeam.color || 'blue';
+      const challengingColorObj = TEAM_COLORS.find(c => c.name === challengingTeamColor);
+      const challengingColorHex = challengingColorObj ? challengingColorObj.hex : '#0B939C';
+      
+      renderPreviewCard(challengingCard, challengingColorHex);
+    }
+  }
+  
   // Auto-scroll to center card when team changes
   if (currentTeamId !== previousCurrentTeam) {
     console.log('[Timeline] Team changed from', previousCurrentTeam, 'to', currentTeamId, '- auto-scrolling to center');
@@ -303,8 +322,13 @@ function renderPreviewCard(card, teamColorHex) {
   const container = document.getElementById('timeline');
   const position = card.position;
   
-  // Check if this is my card (so I can drag it)
-  const isMyCard = (teamId === currentGameData.currentTeam);
+  // Check if this is my card:
+  // 1. Normal gameplay: I'm the active team
+  // 2. Challenge mode: I'm the challenging team
+  const isMyCard = (teamId === currentGameData.currentTeam) || 
+                   (currentGameData.timerState === 'challenge_placement' && 
+                    currentGameData.challengeState && 
+                    currentGameData.challengeState.challengingTeam === teamId);
   
   const previewCard = document.createElement('div');
   previewCard.className = 'card preview-card';
@@ -356,8 +380,18 @@ function renderCurrentCard() {
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Only show current card if it's my turn AND we're in guessing state (not pause)
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
+  // Show current card if:
+  // 1. It's my turn AND we're in guessing state (normal gameplay)
+  // 2. OR we're in challenge_placement AND I'm the challenging team
+  
+  const isMyTurn = (currentTeamId === teamId && timerState === 'guessing');
+  const isChallengingTeam = (
+    timerState === 'challenge_placement' && 
+    currentGameData.challengeState && 
+    currentGameData.challengeState.challengingTeam === teamId
+  );
+  
+  if (!isMyTurn && !isChallengingTeam) {
     container.style.visibility = 'hidden';
     return;
   }
@@ -421,15 +455,24 @@ function updateActionButtons() {
   
   if (!changeCardBtn || !lockInBtn) return;
   
-  // Only enable buttons if it's my turn AND we're in guessing state
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
+  // Check if we're in challenge mode and I'm the challenging team
+  const isChallengingTeam = (
+    timerState === 'challenge_placement' && 
+    currentGameData.challengeState && 
+    currentGameData.challengeState.challengingTeam === teamId
+  );
+  
+  // Normal gameplay: only enable if it's my turn AND guessing state
+  const isMyTurn = (currentTeamId === teamId && timerState === 'guessing');
+  
+  if (!isMyTurn && !isChallengingTeam) {
     changeCardBtn.disabled = true;
     lockInBtn.disabled = true;
     return;
   }
   
-  // Change card button - enable if team has tokens
-  if (myTeam && myTeam.tokens > 0) {
+  // Change card button - enable if team has tokens (not available during challenge)
+  if (isMyTurn && myTeam && myTeam.tokens > 0) {
     changeCardBtn.disabled = false;
   } else {
     changeCardBtn.disabled = true;

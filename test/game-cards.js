@@ -205,6 +205,40 @@ function handleTouchEnd(e) {
 function savePendingCard(position) {
   console.log('[Game] Saving pending card to Firebase at position:', position);
   
+  // Check if we're in challenge mode
+  if (currentGameData.timerState === 'challenge_placement' && 
+      currentGameData.challengeState &&
+      currentGameData.challengeState.challengingTeam === teamId) {
+    
+    console.log('[Game] Challenge mode: saving to challengeState.challengingCard');
+    
+    const challengingCardRef = window.firebaseRef(
+      window.firebaseDb, 
+      `games/${gameId}/challengeState/challengingCard`
+    );
+    
+    const challengingCard = {
+      year: currentGameData.currentSong.year,
+      title: currentGameData.currentSong.title,
+      artist: currentGameData.currentSong.artist,
+      spotifyId: currentGameData.currentSong.spotifyId,
+      position: position,
+      locked: false,
+      timestamp: Date.now()
+    };
+    
+    window.firebaseSet(challengingCardRef, challengingCard)
+      .then(() => {
+        console.log('[Game] Challenging card saved to challengeState');
+      })
+      .catch((error) => {
+        console.error('[Game] Error saving challenging card:', error);
+      });
+    
+    return;
+  }
+  
+  // Normal mode: save to team's pendingCard
   const pendingCardRef = window.firebaseRef(
     window.firebaseDb, 
     `games/${gameId}/teams/${teamId}/pendingCard`
@@ -227,6 +261,30 @@ function savePendingCard(position) {
 function clearPendingCard() {
   console.log('[Game] Clearing pending card from Firebase');
   
+  // Check if we're in challenge mode
+  if (currentGameData.timerState === 'challenge_placement' && 
+      currentGameData.challengeState &&
+      currentGameData.challengeState.challengingTeam === teamId) {
+    
+    console.log('[Game] Challenge mode: clearing challengeState.challengingCard');
+    
+    const challengingCardRef = window.firebaseRef(
+      window.firebaseDb, 
+      `games/${gameId}/challengeState/challengingCard`
+    );
+    
+    window.firebaseSet(challengingCardRef, null)
+      .then(() => {
+        console.log('[Game] Challenging card cleared');
+      })
+      .catch((error) => {
+        console.error('[Game] Error clearing challenging card:', error);
+      });
+    
+    return;
+  }
+  
+  // Normal mode: clear team's pendingCard
   const pendingCardRef = window.firebaseRef(
     window.firebaseDb, 
     `games/${gameId}/teams/${teamId}/pendingCard`
@@ -392,6 +450,36 @@ function lockInPlacement() {
     showNotification('Ingen låt att placera!', 'error');
     return;
   }
+  
+  // ============================================
+  // CHALLENGE MODE: Lock in challenging card
+  // ============================================
+  if (currentGameData.timerState === 'challenge_placement' && 
+      currentGameData.challengeState &&
+      currentGameData.challengeState.challengingTeam === teamId) {
+    
+    console.log('[Game] Challenge mode: locking challenging card');
+    
+    const updates = {};
+    updates[`games/${gameId}/challengeState/challengingCard/locked`] = true;
+    
+    window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+      .then(() => {
+        console.log('[Game] Challenging card locked');
+        showNotification('💥 Challenge-kort låst!', 'success');
+        placementPosition = null;
+      })
+      .catch((error) => {
+        console.error('[Game] Error locking challenging card:', error);
+        showNotification('Kunde inte låsa kort', 'error');
+      });
+    
+    return;
+  }
+  
+  // ============================================
+  // NORMAL MODE: Lock in to my timeline
+  // ============================================
   
   // Remove preview card
   const previewCard = document.querySelector('.preview-card');
@@ -757,6 +845,356 @@ function validateAndScoreCard(cardKey, card) {
             });
         }, 1000);
       }
+    });
+}
+
+// ============================================
+// VALIDATE CHALLENGE
+// Called when Timer 3 expires
+// ============================================
+function validateChallenge() {
+  console.log('[Game] ========== VALIDATE CHALLENGE ==========');
+  
+  // 1. GET DATA
+  const challengeState = currentGameData.challengeState;
+  
+  if (!challengeState || !challengeState.isActive) {
+    console.error('[Game] No active challenge state!');
+    return;
+  }
+  
+  const activeTeamId = challengeState.activeTeam;
+  const challengingTeamId = challengeState.challengingTeam;
+  const activeTeam = currentTeams[activeTeamId];
+  const challengingTeam = currentTeams[challengingTeamId];
+  
+  console.log('[Game] Active team:', activeTeamId, activeTeam ? activeTeam.name : 'N/A');
+  console.log('[Game] Challenging team:', challengingTeamId, challengingTeam ? challengingTeam.name : 'N/A');
+  
+  // 2. FIND ACTIVE TEAM'S UNREVEALED CARD
+  const activeTimeline = activeTeam.timeline || {};
+  const activeCardEntries = Object.entries(activeTimeline).filter(([key, card]) => 
+    card && card.revealed === false
+  );
+  
+  if (activeCardEntries.length === 0) {
+    console.error('[Game] No unrevealed card found for active team!');
+    transitionAfterChallenge();
+    return;
+  }
+  
+  // Should only be one unrevealed card
+  const [activeCardKey, activeCard] = activeCardEntries[0];
+  console.log('[Game] Found active team card:', activeCard.year, activeCard.title, 'at position', activeCard.position);
+  
+  // 3. VALIDATE ACTIVE TEAM'S CARD
+  const activeCorrect = isCardPlacementCorrect(activeCard, activeTimeline);
+  console.log('[Game] Active team placement correct?', activeCorrect);
+  
+  const updates = {};
+  
+  if (activeCorrect) {
+    // ============================================
+    // ACTIVE TEAM WON
+    // ============================================
+    console.log('[Game] ✅ Active team won!');
+    
+    // Reveal card
+    updates[`games/${gameId}/teams/${activeTeamId}/timeline/${activeCardKey}/revealed`] = true;
+    
+    // Update score
+    const newScore = (activeTeam.score || 0) + 1;
+    updates[`games/${gameId}/teams/${activeTeamId}/score`] = newScore;
+    
+    console.log('[Game] Active team score:', (activeTeam.score || 0), '→', newScore);
+    
+    showNotification(`✅ ${activeTeam.name} hade rätt!`, 'success');
+    
+    // Challenging team loses their token (already deducted)
+    // Challenging team's card disappears (do nothing, it's only in challengeState)
+    
+  } else {
+    // ============================================
+    // ACTIVE TEAM WAS WRONG
+    // ============================================
+    console.log('[Game] ❌ Active team was wrong');
+    
+    // Remove active team's card
+    updates[`games/${gameId}/teams/${activeTeamId}/timeline/${activeCardKey}`] = null;
+    console.log('[Game] Removing active team card at key:', activeCardKey);
+    
+    // Recompact active team's timeline
+    const remainingCards = Object.entries(activeTimeline)
+      .filter(([key, card]) => key !== activeCardKey && card !== null)
+      .map(([key, card]) => ({ ...card, key }))
+      .sort((a, b) => a.position - b.position);
+    
+    remainingCards.forEach((card, index) => {
+      updates[`games/${gameId}/teams/${activeTeamId}/timeline/${card.key}/position`] = index;
+    });
+    
+    console.log('[Game] Recompacted active team timeline:', remainingCards.length, 'cards remain');
+    
+    showNotification(`❌ ${activeTeam.name} hade fel!`, 'error');
+    
+    // Check if challenging team placed a card
+    const challengingCard = challengeState.challengingCard;
+    
+    if (challengingCard && challengingCard.locked) {
+      console.log('[Game] 🎯 Validating challenging team card...');
+      console.log('[Game] Challenging card:', challengingCard.year, challengingCard.title, 'at position', challengingCard.position);
+      
+      // VALIDATE AGAINST ACTIVE TEAM'S TIMELINE (after removing their wrong card)
+      // Create simulated timeline for validation
+      const simulatedTimeline = {};
+      remainingCards.forEach((card, index) => {
+        simulatedTimeline[card.key] = { ...card, position: index };
+      });
+      
+      console.log('[Game] Simulated timeline for validation:', Object.keys(simulatedTimeline).length, 'cards');
+      
+      const challengingCorrect = isCardPlacementCorrectInTimeline(
+        challengingCard, 
+        simulatedTimeline
+      );
+      
+      console.log('[Game] Challenging team placement correct?', challengingCorrect);
+      
+      if (challengingCorrect) {
+        // ============================================
+        // CHALLENGING TEAM WON!
+        // ============================================
+        console.log('[Game] ✅ Challenging team won!');
+        
+        // Find correct position in challenging team's timeline (based on year)
+        const challengingTimeline = challengingTeam.timeline || {};
+        const challengingCards = Object.entries(challengingTimeline)
+          .filter(([key, card]) => card !== null)
+          .map(([key, card]) => ({ ...card, key }))
+          .sort((a, b) => a.position - b.position);
+        
+        // Find insert position based on year
+        let insertPosition = challengingCards.length; // Default: end
+        for (let i = 0; i < challengingCards.length; i++) {
+          if (challengingCard.year <= challengingCards[i].year) {
+            insertPosition = i;
+            break;
+          }
+        }
+        
+        console.log('[Game] Insert position in challenging team timeline:', insertPosition);
+        
+        // Create new card key
+        const newCardKey = Object.keys(challengingTimeline).length;
+        
+        // Add card at correct position
+        updates[`games/${gameId}/teams/${challengingTeamId}/timeline/${newCardKey}`] = {
+          year: challengingCard.year,
+          title: challengingCard.title,
+          artist: challengingCard.artist,
+          spotifyId: challengingCard.spotifyId,
+          position: insertPosition,
+          revealed: true
+        };
+        
+        console.log('[Game] Adding card to challenging team timeline at key:', newCardKey, 'position:', insertPosition);
+        
+        // Recompact challenging team's timeline (shift cards after insert position)
+        challengingCards.forEach((card, index) => {
+          const newPosition = index >= insertPosition ? index + 1 : index;
+          if (newPosition !== card.position) {
+            updates[`games/${gameId}/teams/${challengingTeamId}/timeline/${card.key}/position`] = newPosition;
+          }
+        });
+        
+        // Update score
+        const newScore = (challengingTeam.score || 0) + 1;
+        updates[`games/${gameId}/teams/${challengingTeamId}/score`] = newScore;
+        
+        console.log('[Game] Challenging team score:', (challengingTeam.score || 0), '→', newScore);
+        
+        // Give back token (they won!)
+        const newTokens = (challengingTeam.tokens || 0) + 1;
+        updates[`games/${gameId}/teams/${challengingTeamId}/tokens`] = newTokens;
+        
+        console.log('[Game] Challenging team tokens:', (challengingTeam.tokens || 0), '→', newTokens);
+        
+        showNotification(`✅ ${challengingTeam.name} vann utmaningen!`, 'success');
+        
+      } else {
+        // ============================================
+        // BOTH TEAMS WERE WRONG
+        // ============================================
+        console.log('[Game] ❌ Both teams were wrong');
+        
+        showNotification('❌ Båda lagen hade fel!', 'error');
+        
+        // Challenging team keeps their lost token (no token back)
+      }
+    } else {
+      console.log('[Game] Challenging team did not place a card');
+      showNotification(`${challengingTeam.name} placerade inget kort`, 'info');
+    }
+  }
+  
+  // 4. CLEAN UP
+  console.log('[Game] Cleaning up after challenge...');
+  
+  // Clear challenge state
+  updates[`games/${gameId}/challengeState`] = null;
+  
+  // Clear all pending cards
+  Object.keys(currentTeams).forEach(tId => {
+    updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+  });
+  
+  console.log('[Game] Total updates:', Object.keys(updates).length);
+  console.log('[Game] Applying updates...');
+  
+  // Apply all updates
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+    .then(() => {
+      console.log('[Game] Challenge validation complete');
+      console.log('[Game] ========== VALIDATE CHALLENGE END ==========');
+      
+      // Wait a bit, then transition to next team
+      setTimeout(() => {
+        transitionAfterChallenge();
+      }, 2000);
+    })
+    .catch((error) => {
+      console.error('[Game] Error in validateChallenge:', error);
+      // Fallback: still transition
+      setTimeout(() => {
+        transitionAfterChallenge();
+      }, 1000);
+    });
+}
+
+// ============================================
+// HELPER: VALIDATE CARD PLACEMENT
+// ============================================
+function isCardPlacementCorrect(card, timeline) {
+  // Convert timeline to sorted array
+  const sortedCards = Object.values(timeline)
+    .filter(c => c !== null)
+    .sort((a, b) => a.position - b.position);
+  
+  // Find the card
+  const cardIndex = sortedCards.findIndex(c => 
+    c.position === card.position && c.year === card.year
+  );
+  
+  if (cardIndex === -1) {
+    console.error('[Game] Card not found in timeline for validation');
+    return false;
+  }
+  
+  const leftCard = cardIndex > 0 ? sortedCards[cardIndex - 1] : null;
+  const rightCard = cardIndex < sortedCards.length - 1 ? sortedCards[cardIndex + 1] : null;
+  
+  console.log('[Game] Validation context:');
+  console.log('  Left:', leftCard ? `${leftCard.year}` : 'none');
+  console.log('  Card:', `${card.year}`);
+  console.log('  Right:', rightCard ? `${rightCard.year}` : 'none');
+  
+  // Check left neighbor
+  if (leftCard && card.year < leftCard.year) {
+    console.log('[Game] Failed: card.year < leftCard.year');
+    return false;
+  }
+  
+  // Check right neighbor
+  if (rightCard && card.year > rightCard.year) {
+    console.log('[Game] Failed: card.year > rightCard.year');
+    return false;
+  }
+  
+  return true;
+}
+
+// Helper for challenging card validation (similar but takes timeline as param)
+function isCardPlacementCorrectInTimeline(card, timeline) {
+  // Convert timeline to sorted array
+  const sortedCards = Object.values(timeline)
+    .filter(c => c !== null)
+    .sort((a, b) => a.position - b.position);
+  
+  // Find where card WOULD be inserted based on its position
+  const position = card.position;
+  
+  // Get left and right neighbors at this position
+  const leftCard = position > 0 && sortedCards[position - 1] ? sortedCards[position - 1] : null;
+  const rightCard = position < sortedCards.length && sortedCards[position] ? sortedCards[position] : null;
+  
+  console.log('[Game] Validation context (simulated):');
+  console.log('  Left:', leftCard ? `${leftCard.year}` : 'none');
+  console.log('  Card:', `${card.year} (at position ${position})`);
+  console.log('  Right:', rightCard ? `${rightCard.year}` : 'none');
+  
+  // Check left neighbor
+  if (leftCard && card.year < leftCard.year) {
+    console.log('[Game] Failed: card.year < leftCard.year');
+    return false;
+  }
+  
+  // Check right neighbor
+  if (rightCard && card.year > rightCard.year) {
+    console.log('[Game] Failed: card.year > rightCard.year');
+    return false;
+  }
+  
+  return true;
+}
+
+// ============================================
+// HELPER: TRANSITION AFTER CHALLENGE
+// ============================================
+function transitionAfterChallenge() {
+  console.log('[Game] Transitioning to next team after challenge...');
+  
+  // Calculate next team
+  const teamIds = Object.keys(currentTeams);
+  const currentTeamId = currentGameData.currentTeam;
+  const currentIndex = teamIds.indexOf(currentTeamId);
+  const nextIndex = (currentIndex + 1) % teamIds.length;
+  const nextTeamId = teamIds[nextIndex];
+  
+  console.log('[Game] Next team:', nextTeamId);
+  
+  // Get next song
+  const currentSongIndex = currentGameData.currentSongIndex || 0;
+  const nextSongIndex = currentSongIndex + 1;
+  const songs = currentGameData.songs || [];
+  
+  if (nextSongIndex >= songs.length) {
+    console.warn('[Game] No more songs in deck!');
+    return;
+  }
+  
+  const nextSong = songs[nextSongIndex];
+  
+  // Update game state
+  const updates = {};
+  updates[`games/${gameId}/currentTeam`] = nextTeamId;
+  updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+  updates[`games/${gameId}/currentSong`] = nextSong;
+  
+  // Increment round if we wrapped around
+  if (nextIndex === 0) {
+    const newRound = (currentGameData.currentRound || 0) + 1;
+    updates[`games/${gameId}/currentRound`] = newRound;
+    console.log('[Game] New round:', newRound);
+  }
+  
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+    .then(() => {
+      console.log('[Game] Transitioned to next team');
+      // Start Timer 4 (between songs)
+      startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+    })
+    .catch((error) => {
+      console.error('[Game] Error transitioning:', error);
     });
 }
 

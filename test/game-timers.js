@@ -342,71 +342,25 @@ function onTimerExpired() {
     
   } else if (timerState === 'challenge_placement') {
     // ============================================
-    // TIMER 3: VALIDATE ACTIVE TEAM'S CARD
+    // TIMER 3: VALIDATE CHALLENGE
     // ============================================
     console.log('[Timer] 💥 Challenge placement timer expired');
-    console.log('[Timer] 🎯 Validating active team\'s card...');
+    console.log('[Timer] 🎯 Validating challenge...');
     
     // Stop timer first
     stopTimer();
     
-    // Check if we have pending validation card (from active team's lockInPlacement)
-    if (window.pendingValidationCard) {
-      console.log('[Timer] ✅ Found pending validation card:', window.pendingValidationCard);
-      const { key, card } = window.pendingValidationCard;
-      
-      // validateAndScoreCard() will:
-      // - Validate the card (correct/incorrect placement)
-      // - Clear challengeState
-      // - Clear all pendingCards
-      // - Update currentTeam/currentSong
-      // - Start Timer 4
-      validateAndScoreCard(key, card);
-      window.pendingValidationCard = null;
-      
-      console.log('[Timer] ✅ Validation initiated');
-    } else {
-      console.error('[Timer] ❌ No pending validation card found!');
-      console.error('[Timer] This should not happen - active team should have locked a card');
-      showNotification('⚠️ Inget kort att validera', 'error');
-      
-      // Fallback: Still transition to next team
-      console.log('[Timer] 🔧 Fallback: Transitioning to next team anyway...');
-      const teamIds = Object.keys(currentTeams);
-      const currentIndex = teamIds.indexOf(currentGameData.currentTeam);
-      const nextIndex = (currentIndex + 1) % teamIds.length;
-      const nextTeamId = teamIds[nextIndex];
-      
-      const currentSongIndex = currentGameData.currentSongIndex || 0;
-      const nextSongIndex = currentSongIndex + 1;
-      const songs = currentGameData.songs || [];
-      
-      if (nextSongIndex >= songs.length) {
-        console.warn('[Timer] No more songs in deck!');
-        isProcessingTimerExpiry = false;
-        return;
-      }
-      
-      const nextSong = songs[nextSongIndex];
-      
-      const updates = {};
-      updates[`games/${gameId}/challengeState`] = null;
-      updates[`games/${gameId}/currentTeam`] = nextTeamId;
-      updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
-      updates[`games/${gameId}/currentSong`] = nextSong;
-      
-      Object.keys(currentTeams).forEach(tId => {
-        updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
-      });
-      
-      window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-        .then(() => {
-          startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-        })
-        .catch((error) => {
-          console.error('[Timer] Fallback update failed:', error);
-        });
-    }
+    // Call validateChallenge() which will:
+    // - Find active team's unrevealed card
+    // - Validate active team's card
+    // - If wrong, validate challenging team's card (if placed)
+    // - Update scores, tokens, timelines
+    // - Clear challengeState and pendingCards
+    // - Transition to next team
+    // - Start Timer 4
+    validateChallenge();
+    
+    console.log('[Timer] ✅ Challenge validation initiated');
     
     // Reset guard after handling
     setTimeout(() => {
