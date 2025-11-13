@@ -482,6 +482,7 @@ function updateActionButtons() {
     changeCardBtn.style.display = 'inline-block';
     changeCardBtn.style.gridColumn = '1 / -1';  // Span all columns
     changeCardBtn.style.justifySelf = 'center'; // Center in grid
+    changeCardBtn.style.height = '48px';  // Match card height to prevent container jump
     changeCardBtn.textContent = 'UTMANA (1 🎫)';
     changeCardBtn.onclick = challengeCard;
     
@@ -499,6 +500,7 @@ function updateActionButtons() {
   changeCardBtn.style.display = 'inline-block';
   changeCardBtn.style.gridColumn = '';  // Reset to default (1 column)
   changeCardBtn.style.justifySelf = '';  // Reset to CSS default
+  changeCardBtn.style.height = '';  // Reset to CSS default height
   changeCardBtn.textContent = 'BYT LÅT';
   changeCardBtn.onclick = changeCard;
   lockInBtn.style.display = 'inline-block';

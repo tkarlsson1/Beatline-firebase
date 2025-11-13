@@ -926,13 +926,23 @@
             const betweenSongsTime = (settings && settings.timers && settings.timers.pauseBetweenSongs) 
               ? parseInt(settings.timers.pauseBetweenSongs) 
               : 10;
+            const challengeTime = (settings && settings.timers && settings.timers.challenge) 
+              ? parseInt(settings.timers.challenge) 
+              : 10;
+            const placeChallengeTime = (settings && settings.timers && settings.timers.placeChallenge) 
+              ? parseInt(settings.timers.placeChallenge) 
+              : 20;
             
             console.log('[Lobby] Timer settings extracted:', { 
               guessingTime, 
               betweenSongsTime,
+              challengeTime,
+              placeChallengeTime,
               fromSettings: !!(settings && settings.timers),
               rawGuess: settings && settings.timers ? settings.timers.guess : 'N/A',
-              rawPause: settings && settings.timers ? settings.timers.pauseBetweenSongs : 'N/A'
+              rawPause: settings && settings.timers ? settings.timers.pauseBetweenSongs : 'N/A',
+              rawChallenge: settings && settings.timers ? settings.timers.challenge : 'N/A',
+              rawPlaceChallenge: settings && settings.timers ? settings.timers.placeChallenge : 'N/A'
             });
             
             // Update game data
@@ -946,6 +956,8 @@
               [`games/${gameId}/currentSong`]: shuffledSongs[0],
               [`games/${gameId}/guessingTime`]: guessingTime,
               [`games/${gameId}/betweenSongsTime`]: betweenSongsTime,
+              [`games/${gameId}/challengeTime`]: challengeTime,
+              [`games/${gameId}/placeChallengeTime`]: placeChallengeTime,
               ...teamUpdates
             };
             
