@@ -1012,12 +1012,7 @@ function validateChallenge() {
         updates[`games/${gameId}/teams/${challengingTeamId}/score`] = newScore;
         
         console.log('[Game] Challenging team score:', (challengingTeam.score || 0), '→', newScore);
-        
-        // Give back token (they won!)
-        const newTokens = (challengingTeam.tokens || 0) + 1;
-        updates[`games/${gameId}/teams/${challengingTeamId}/tokens`] = newTokens;
-        
-        console.log('[Game] Challenging team tokens:', (challengingTeam.tokens || 0), '→', newTokens);
+        console.log('[Game] Token is consumed (not returned even on win)');
         
         showNotification(`✅ ${challengingTeam.name} vann utmaningen!`, 'success');
         
