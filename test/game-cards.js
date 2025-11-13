@@ -1049,6 +1049,9 @@ function validateChallenge() {
   
   const updates = {};
   
+  // BUGFIX: Declare challengingCorrect in larger scope so we can use it for result determination
+  let challengingCorrect = false;
+  
   if (activeCorrect) {
     // ============================================
     // ACTIVE TEAM WON
@@ -1109,7 +1112,8 @@ function validateChallenge() {
       
       console.log('[Game] Simulated timeline for validation:', Object.keys(simulatedTimeline).length, 'cards');
       
-      const challengingCorrect = isCardPlacementCorrectInTimeline(
+      // BUGFIX: Assign to challengingCorrect (declared in larger scope) instead of declaring locally
+      challengingCorrect = isCardPlacementCorrectInTimeline(
         challengingCard, 
         simulatedTimeline
       );
@@ -1191,25 +1195,17 @@ function validateChallenge() {
   // 4. DETERMINE RESULT FOR MODAL
   console.log('[Game] Determining result for validation modal...');
   
+  // BUGFIX: Use challengingCorrect directly instead of checking updates keys
   let result;
   if (activeCorrect) {
     result = 'active_correct';
   } else {
     const challengingCard = challengeState.challengingCard;
-    if (challengingCard && challengingCard.locked) {
-      // We validated challenging card above
-      // Check if it was correct by looking if we added it to updates
-      const challengingCardWasAdded = Object.keys(updates).some(key => 
-        key.includes(`teams/${challengingTeamId}/timeline`) && key.includes('year')
-      );
-      
-      if (challengingCardWasAdded) {
-        result = 'challenging_won';
-      } else {
-        result = 'both_wrong';
-      }
+    if (challengingCard && challengingCard.locked && challengingCorrect) {
+      // Challenging team was correct
+      result = 'challenging_won';
     } else {
-      // Challenging team didn't place a card
+      // Both were wrong (or challenging team didn't place)
       result = 'both_wrong';
     }
   }
@@ -1304,7 +1300,7 @@ function closeValidationModal() {
   
   console.log('[Game] Closing validation modal and transitioning to next team...');
   
-  // BUGFIX: Calculate next team ONCE at the start (before Firebase update)
+  // BUGFIX (Problem 1): Calculate next team ONCE at the start (before Firebase update)
   // This prevents Timer 4 from showing the wrong team (race condition)
   const teamIds = Object.keys(currentTeams);
   const currentTeamId = currentGameData.currentTeam;
@@ -1371,7 +1367,7 @@ function closeValidationModal() {
       console.log('[Game] ✅ Modal closed, game state updated');
       
       // Start Timer 4 (between songs)
-      // BUGFIX: Use nextTeamId calculated at the start (not recalculated)
+      // BUGFIX (Problem 1): Use nextTeamId calculated at the start (not recalculated)
       console.log('[Game] Starting Timer 4 for next team:', nextTeamId);
       
       startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
