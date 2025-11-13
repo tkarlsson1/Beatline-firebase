@@ -637,20 +637,22 @@ body {
 
 .validation-modal {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border-radius: 20px;
-  padding: 3rem;
-  max-width: 600px;
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 500px;
+  max-height: 320px;
   width: 90%;
   text-align: center;
   border: 3px solid var(--accent-color);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   animation: slideUp 0.4s ease-out;
+  overflow-y: auto;
 }
 
 .validation-modal-title {
-  font-size: 2rem;
+  font-size: 1.3rem;
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin-bottom: 0.8rem;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -664,50 +666,50 @@ body {
 }
 
 .validation-modal-subtitle {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .validation-modal-song {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .validation-modal-song-year {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: bold;
   color: var(--accent-color);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .validation-modal-song-title {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: bold;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
   color: white;
 }
 
 .validation-modal-song-artist {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .validation-modal-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 0.8rem;
   justify-content: center;
   align-items: center;
 }
 
 .validation-modal-btn {
-  padding: 1rem 2rem;
+  padding: 0.7rem 1.5rem;
   border: none;
-  border-radius: 10px;
-  font-size: 1.1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
   font-weight: bold;
   font-family: 'Manrope', sans-serif;
   cursor: pointer;

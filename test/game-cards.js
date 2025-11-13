@@ -893,15 +893,29 @@ function validateAndScoreCard(cardKey, card) {
       
       console.log('[Game] Applying validation updates:', validationUpdates);
       
-      // Apply updates
-      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), validationUpdates);
+      // Return validation data to next .then()
+      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), validationUpdates)
+        .then(() => {
+          // Return data needed for modal
+          return {
+            isCorrect: isCorrect,
+            placedCard: placedCard,
+            activeTeam: currentTeams[teamId]
+          };
+        });
     })
-    .then(() => {
+    .then((validationData) => {
+      if (!validationData) {
+        // Early return happened (not active team)
+        console.log('[Game] No validation data, skipping modal');
+        return;
+      }
+      
       console.log('[Game] Validation complete, updates applied');
       console.log('[Game] ========== VALIDATION END ==========');
       
       // ============================================
-      // SET VALIDATION MODAL (instead of transitioning immediately)
+      // SET VALIDATION MODAL
       // ============================================
       
       // Only the active team should set the validation modal
@@ -912,32 +926,30 @@ function validateAndScoreCard(cardKey, card) {
       
       console.log('[Game] Setting up validation modal...');
       
-      const activeTeam = currentTeams[teamId];
-      
       const validationModal = {
         isVisible: true,
         isProcessing: false,
         
         // Active team info (team that had the turn)
         activeTeamId: teamId,
-        activeTeamName: activeTeam ? activeTeam.name : 'Unknown',
+        activeTeamName: validationData.activeTeam ? validationData.activeTeam.name : 'Unknown',
         
         // No challenge info for normal validation
         challengingTeamId: null,
         challengingTeamName: null,
         
         // Result
-        result: isCorrect ? 'active_correct' : 'active_wrong',
+        result: validationData.isCorrect ? 'active_correct' : 'active_wrong',
         
         // Song info
         song: {
-          year: placedCard.year,
-          title: placedCard.title,
-          artist: placedCard.artist
+          year: validationData.placedCard.year,
+          title: validationData.placedCard.title,
+          artist: validationData.placedCard.artist
         },
         
         // Can give bonus token only if correct
-        canGiveToken: isCorrect,
+        canGiveToken: validationData.isCorrect,
         tokenGiven: false,
         
         timestamp: Date.now()
