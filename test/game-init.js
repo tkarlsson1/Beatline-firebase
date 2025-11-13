@@ -176,11 +176,31 @@ function setupListeners() {
   
   window.firebaseOnValue(gameRef, (snapshot) => {
     if (snapshot.exists()) {
+      const prevTimerState = currentGameData?.timerState;
+      
       currentGameData = snapshot.val();
       currentTeams = currentGameData.teams || {};
       myTeam = currentTeams[teamId];
       
       console.log('[Game] Game state updated');
+      
+      // CRITICAL: Detect timer expiry via state change
+      // If timer was 'guessing' and now is null, trigger expiry handler
+      if (prevTimerState === 'guessing' && currentGameData.timerState === null) {
+        console.log('[Game] 🚨 Detected Timer 1 expired via state change');
+        // Give updateTimer a chance to handle it first
+        setTimeout(() => {
+          // Check if it's still unhandled (no Timer 2 started)
+          if (currentGameData.timerState === null && 
+              !currentGameData.validationModal?.isVisible) {
+            console.log('[Game] 🚨 Timer 1 expired but not handled - triggering manually');
+            // Temporarily restore timer state for onTimerExpired to work correctly
+            currentGameData.timerState = 'guessing';
+            window.onTimerExpired();
+          }
+        }, 100);
+      }
+      
       updateGameView();
     }
   });

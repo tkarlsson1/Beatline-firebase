@@ -498,4 +498,7 @@ function vibrate(pattern) {
   }
 }
 
+// Expose onTimerExpired globally for game-init.js to call
+window.onTimerExpired = onTimerExpired;
+
 console.log('[Game] Timers module loaded (BUGFIX v4)');
