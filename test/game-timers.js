@@ -291,14 +291,38 @@ function onTimerExpired() {
       // Has pending card - lock it in automatically
       console.log('[Timer] 🔒 Auto-locking pending card');
       
-      // BUGFIX: Set placementPosition from Firebase before calling lockInPlacement()
-      // This fixes the issue where auto-lock didn't work because placementPosition was null
+      // BUGFIX v2.2: Set placementPosition from Firebase before calling lockInPlacement()
       placementPosition = currentTeam.pendingCard.position;
       console.log('[Timer] Set placementPosition from pendingCard:', placementPosition);
       
       if (currentGameData.currentTeam === teamId) {
-        // Only the current team should lock in
+        // Current team handles their own lock-in
+        console.log('[Timer] Current team auto-locking...');
         lockInPlacement();
+      } else if (isHost) {
+        // BUGFIX v2.2: HOST BACKUP
+        // If current team is not this client, host backs up after a delay
+        console.log('[Timer] ⚠️ Host detected - preparing backup lock-in after 500ms delay...');
+        
+        setTimeout(() => {
+          // Check if lock-in has already happened (by currentTeam)
+          // We check if Timer 2 has started, which means lockInPlacement() was successful
+          if (currentGameData.timerState === 'challenge_window') {
+            console.log('[Timer] ✅ Current team already locked in (Timer 2 active), host backup not needed');
+            return;
+          }
+          
+          // Check if validation modal is active (lock-in happened via Timer 2 expiry)
+          if (currentGameData.validationModal && currentGameData.validationModal.isVisible) {
+            console.log('[Timer] ✅ Validation already started, host backup not needed');
+            return;
+          }
+          
+          console.log('[Timer] 🔧 Host backing up lock-in for team:', currentTeam.name);
+          
+          // Host locks in for the current team using targetTeamId parameter
+          lockInPlacement(currentGameData.currentTeam);
+        }, 500);
       }
     } else {
       // No pending card - skip this team's turn

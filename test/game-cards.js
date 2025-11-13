@@ -7,6 +7,7 @@
 // GUARD VARIABLES
 // ============================================
 let isChangingCard = false;
+let isLockingInPlacement = false; // BUGFIX v2.2: Prevent duplicate lock-in calls
 
 // ============================================
 // DRAG AND DROP HANDLERS (MOUSE)
@@ -584,16 +585,44 @@ function challengeCard() {
 }
 
 
-function lockInPlacement() {
+function lockInPlacement(targetTeamId = null) {
   console.log('[Game] Lock in placement at position:', placementPosition);
+  console.log('[Game] Target team:', targetTeamId || 'self');
+  
+  // ============================================
+  // BUGFIX v2.2: GUARD AGAINST DUPLICATE CALLS
+  // ============================================
+  if (isLockingInPlacement) {
+    console.log('[Game] ⚠️ GUARD: Already locking in placement, skipping duplicate call');
+    return;
+  }
+  isLockingInPlacement = true;
+  console.log('[Game] ✅ GUARD: Setting lock-in flag');
+  
+  // ============================================
+  // BUGFIX v2.2: SUPPORT HOST BACKUP
+  // Allow host to lock in for another team
+  // ============================================
+  const effectiveTeamId = targetTeamId || teamId;
+  const effectiveTeam = targetTeamId ? currentTeams[targetTeamId] : myTeam;
+  
+  if (!effectiveTeam) {
+    console.error('[Game] ❌ Target team not found:', effectiveTeamId);
+    isLockingInPlacement = false;
+    return;
+  }
+  
+  console.log('[Game] Effective team:', effectiveTeam.name, '(', effectiveTeamId, ')');
   
   if (placementPosition === null) {
     showNotification('Placera kortet först!', 'error');
+    isLockingInPlacement = false;
     return;
   }
   
   if (!currentGameData.currentSong) {
     showNotification('Ingen låt att placera!', 'error');
+    isLockingInPlacement = false;
     return;
   }
   
@@ -624,6 +653,10 @@ function lockInPlacement() {
         showNotification('💥 Challenge-kort låst! Validerar...', 'success');
         placementPosition = null;
         
+        // Reset guard
+        isLockingInPlacement = false;
+        console.log('[Game] ✅ GUARD: Reset after challenge lock-in');
+        
         // Wait a bit for Firebase to propagate, then validate
         setTimeout(() => {
           console.log('[Game] Triggering challenge validation...');
@@ -633,13 +666,17 @@ function lockInPlacement() {
       .catch((error) => {
         console.error('[Game] Error locking challenging card:', error);
         showNotification('Kunde inte låsa kort', 'error');
+        
+        // Reset guard on error
+        isLockingInPlacement = false;
+        console.log('[Game] ✅ GUARD: Reset after challenge lock-in error');
       });
     
     return;
   }
   
   // ============================================
-  // NORMAL MODE: Lock in to my timeline
+  // NORMAL MODE: Lock in to timeline
   // ============================================
   
   // Remove preview card
@@ -650,8 +687,8 @@ function lockInPlacement() {
   
   // Get all non-null cards from timeline and sort by position
   let existingCards = [];
-  if (myTeam.timeline) {
-    existingCards = Object.entries(myTeam.timeline)
+  if (effectiveTeam.timeline) {
+    existingCards = Object.entries(effectiveTeam.timeline)
       .filter(([key, card]) => card !== null) // Filter out deleted cards
       .map(([key, card]) => ({ ...card, key }))
       .sort((a, b) => a.position - b.position);
@@ -661,7 +698,7 @@ function lockInPlacement() {
   console.log('[Game] Placing new card at position:', placementPosition);
   
   // Create new card
-  const timelineLength = myTeam.timeline ? Object.keys(myTeam.timeline).length : 0;
+  const timelineLength = effectiveTeam.timeline ? Object.keys(effectiveTeam.timeline).length : 0;
   const newCardKey = timelineLength;
   
   const newCard = {
@@ -684,7 +721,7 @@ function lockInPlacement() {
   existingCards.forEach((card, index) => {
     if (card.key === newCardKey) {
       // This is the new card - set all its data
-      updates[`games/${gameId}/teams/${teamId}/timeline/${card.key}`] = {
+      updates[`games/${gameId}/teams/${effectiveTeamId}/timeline/${card.key}`] = {
         spotifyId: card.spotifyId,
         title: card.title,
         artist: card.artist,
@@ -695,13 +732,13 @@ function lockInPlacement() {
       console.log('[Game] Adding new card', card.key, 'at position', index);
     } else {
       // This is an existing card - just update position
-      updates[`games/${gameId}/teams/${teamId}/timeline/${card.key}/position`] = index;
+      updates[`games/${gameId}/teams/${effectiveTeamId}/timeline/${card.key}/position`] = index;
       console.log('[Game] Updating card', card.key, 'to position', index);
     }
   });
   
   // Clear pending card from Firebase
-  updates[`games/${gameId}/teams/${teamId}/pendingCard`] = null;
+  updates[`games/${gameId}/teams/${effectiveTeamId}/pendingCard`] = null;
   
   console.log('[Game] Applying updates:', Object.keys(updates).length, 'updates');
   
@@ -710,6 +747,10 @@ function lockInPlacement() {
       console.log('[Game] Card locked in to timeline');
       showNotification('Kort låst!', 'info');
       placementPosition = null;
+      
+      // Reset guard
+      isLockingInPlacement = false;
+      console.log('[Game] ✅ GUARD: Reset after normal lock-in');
       
       // Start Timer 2 (challenge window) - other teams can challenge now
       console.log('[Game] Starting Timer 2 (challenge_window)');
@@ -722,6 +763,10 @@ function lockInPlacement() {
     .catch((error) => {
       console.error('[Game] Error adding card:', error);
       showNotification('Kunde inte placera kort', 'error');
+      
+      // Reset guard on error
+      isLockingInPlacement = false;
+      console.log('[Game] ✅ GUARD: Reset after normal lock-in error');
     });
 }
 
