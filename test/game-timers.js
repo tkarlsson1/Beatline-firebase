@@ -291,20 +291,26 @@ function onTimerExpired() {
       // Has pending card - lock it in automatically
       console.log('[Timer] 🔒 Auto-locking pending card');
       
-      // BUGFIX v2.2: Set placementPosition from Firebase before calling lockInPlacement()
+      // v2.1: Set placementPosition from Firebase before calling lockInPlacement()
       placementPosition = currentTeam.pendingCard.position;
       console.log('[Timer] Set placementPosition from pendingCard:', placementPosition);
       
       if (currentGameData.currentTeam === teamId) {
         // Current team handles their own lock-in
-        console.log('[Timer] Current team auto-locking...');
+        console.log('[Timer] 💚 Current team auto-locking their own card...');
         lockInPlacement();
       } else if (isHost) {
-        // BUGFIX v2.2: HOST BACKUP
+        // ============================================
+        // v2.2: HOST BACKUP
         // If current team is not this client, host backs up after a delay
+        // ============================================
         console.log('[Timer] ⚠️ Host detected - preparing backup lock-in after 500ms delay...');
+        console.log('[Timer] Current team ID:', currentGameData.currentTeam);
+        console.log('[Timer] This client team ID:', teamId);
         
         setTimeout(() => {
+          console.log('[Timer] 🔧 Host backup timer expired, checking if lock-in needed...');
+          
           // Check if lock-in has already happened (by currentTeam)
           // We check if Timer 2 has started, which means lockInPlacement() was successful
           if (currentGameData.timerState === 'challenge_window') {
@@ -318,7 +324,13 @@ function onTimerExpired() {
             return;
           }
           
-          console.log('[Timer] 🔧 Host backing up lock-in for team:', currentTeam.name);
+          // Check if timer is still null (hasn't been restarted)
+          if (currentGameData.timerState !== null) {
+            console.log('[Timer] ⚠️ Timer state changed to', currentGameData.timerState, ', host backup not needed');
+            return;
+          }
+          
+          console.log('[Timer] 🚨 HOST BACKING UP: Locking in card for team:', currentTeam.name);
           
           // Host locks in for the current team using targetTeamId parameter
           lockInPlacement(currentGameData.currentTeam);
