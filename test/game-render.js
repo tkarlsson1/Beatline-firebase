@@ -386,6 +386,7 @@ function renderCurrentCard() {
   // Show current card if:
   // 1. It's my turn AND we're in guessing state (normal gameplay)
   // 2. OR we're in challenge_placement AND I'm the challenging team
+  // 3. OR Timer 2 (challenge_window) AND I'm NOT the active team (for UTMANA button)
   
   const isMyTurn = (currentTeamId === teamId && timerState === 'guessing');
   const isChallengingTeam = (
@@ -393,8 +394,9 @@ function renderCurrentCard() {
     currentGameData.challengeState && 
     currentGameData.challengeState.challengingTeam === teamId
   );
+  const isChallengeWindow = (timerState === 'challenge_window' && currentTeamId !== teamId);
   
-  if (!isMyTurn && !isChallengingTeam) {
+  if (!isMyTurn && !isChallengingTeam && !isChallengeWindow) {
     container.style.visibility = 'hidden';
     return;
   }
@@ -408,7 +410,15 @@ function renderCurrentCard() {
   
   container.style.visibility = 'visible';
   
-  // Create card element
+  // BUGFIX PROBLEM 4: During challenge window (Timer 2), don't create card for non-active teams
+  // The UTMANA button will be shown instead by updateActionButtons()
+  if (isChallengeWindow) {
+    const cardContainer = document.getElementById('currentCard');
+    cardContainer.innerHTML = '';  // Clear any existing card
+    return;  // Don't create a new card
+  }
+  
+  // Create card element (for active team or challenging team)
   const cardDiv = document.createElement('div');
   cardDiv.className = 'card blank-card';
   cardDiv.id = 'draggableCard';
@@ -450,28 +460,28 @@ function updateActionButtons() {
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Buttons are now inside currentCardContainer, no need to show/hide separately
-  // Just update button states
-  
   const changeCardBtn = document.getElementById('changeCardBtn');
   const lockInBtn = document.getElementById('lockInBtn');
+  const cardContainer = document.getElementById('currentCard');
   
-  if (!changeCardBtn || !lockInBtn) return;
+  if (!changeCardBtn || !lockInBtn || !cardContainer) return;
   
-  // BUGFIX: During Timer 2 (challenge window), replace "BYT KORT" with "UTMANA"
+  // BUGFIX PROBLEM 4: During Timer 2 (challenge window), show UTMANA centered
   if (timerState === 'challenge_window') {
-    // Check if someone already challenged
     const alreadyChallenged = currentGameData.challengeState && currentGameData.challengeState.isActive;
     
     // Don't show to active team or if already challenged
     if (currentTeamId === teamId || alreadyChallenged) {
       changeCardBtn.style.display = 'none';
       lockInBtn.style.display = 'none';
+      cardContainer.style.display = 'none';
       return;
     }
     
-    // Show UTMANA button
+    // Show UTMANA button centered across entire grid
     changeCardBtn.style.display = 'inline-block';
+    changeCardBtn.style.gridColumn = '1 / -1';  // Span all columns
+    changeCardBtn.style.justifySelf = 'center'; // Center in grid
     changeCardBtn.textContent = 'UTMANA (1 🎫)';
     changeCardBtn.onclick = challengeCard;
     
@@ -479,16 +489,20 @@ function updateActionButtons() {
     const hasTokens = myTeam && myTeam.tokens > 0;
     changeCardBtn.disabled = !hasTokens;
     
-    // Hide lock in button during challenge window
+    // Hide other elements
     lockInBtn.style.display = 'none';
+    cardContainer.style.display = 'none';
     return;
   }
   
   // Reset to normal state (not challenge window)
   changeCardBtn.style.display = 'inline-block';
+  changeCardBtn.style.gridColumn = '';  // Reset to default (1 column)
+  changeCardBtn.style.justifySelf = '';  // Reset to CSS default
   changeCardBtn.textContent = 'BYT LÅT';
   changeCardBtn.onclick = changeCard;
   lockInBtn.style.display = 'inline-block';
+  cardContainer.style.display = 'flex';  // Show card container
   
   // Check if we're in challenge mode and I'm the challenging team
   const isChallengingTeam = (
@@ -525,7 +539,7 @@ function updateActionButtons() {
 // CHALLENGE BUTTON
 // ============================================
 function renderChallengeButton() {
-  // BUGFIX: Challenge button is now handled in updateActionButtons()
+  // BUGFIX PROBLEM 4: Challenge button is now handled in updateActionButtons()
   // This function is kept for backwards compatibility but does nothing
   const container = document.getElementById('challengeButtonContainer');
   
