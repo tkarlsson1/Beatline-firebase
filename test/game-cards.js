@@ -4,6 +4,11 @@
 // ============================================
 
 // ============================================
+// GUARD VARIABLES
+// ============================================
+let isChangingCard = false;
+
+// ============================================
 // DRAG AND DROP HANDLERS (MOUSE)
 // ============================================
 function handleDragStart(e) {
@@ -303,19 +308,152 @@ function clearPendingCard() {
 // ACTION FUNCTIONS
 // ============================================
 function changeCard() {
-  console.log('[Game] Change card requested');
+  console.log('[Game] ========== BYT KORT ==========');
   
+  // ============================================
+  // GUARD: Prevent multiple simultaneous card changes
+  // ============================================
+  if (isChangingCard) {
+    console.log('[Game] ⚠️ Already changing card, skipping duplicate call');
+    return;
+  }
+  isChangingCard = true;
+  
+  // ============================================
+  // VALIDATION
+  // ============================================
+  
+  // Check tokens
   if (!myTeam || myTeam.tokens < 1) {
+    console.log('[Game] ❌ No tokens available');
     showNotification('Du har inga tokens kvar!', 'error');
+    isChangingCard = false;
     return;
   }
   
+  // Must be active team
+  if (currentGameData.currentTeam !== teamId) {
+    console.log('[Game] ❌ Not active team');
+    showNotification('Det är inte din tur!', 'error');
+    isChangingCard = false;
+    return;
+  }
+  
+  // Must be during Timer 1 (guessing)
+  if (currentGameData.timerState !== 'guessing') {
+    console.log('[Game] ❌ Not in guessing state. Current state:', currentGameData.timerState);
+    showNotification('Kan bara byta kort under gissning!', 'error');
+    isChangingCard = false;
+    return;
+  }
+  
+  // Check if more songs available
+  const currentSongIndex = currentGameData.currentSongIndex || 0;
+  const nextSongIndex = currentSongIndex + 1;
+  const songs = currentGameData.songs || [];
+  
+  if (nextSongIndex >= songs.length) {
+    console.log('[Game] ❌ No more songs in deck');
+    showNotification('Inga fler låtar i listan!', 'error');
+    isChangingCard = false;
+    return;
+  }
+  
+  console.log('[Game] ✅ All validation checks passed');
+  
+  // Confirm action
   if (!confirm('Byt låt för 1 token?')) {
+    console.log('[Game] User cancelled');
+    isChangingCard = false;
     return;
   }
   
-  // TODO: Implement card change logic
-  showNotification('Byt låt-funktionen kommer snart!', 'info');
+  // ============================================
+  // STEP 1: STOP TIMER FIRST (ATOMIC)
+  // This prevents race conditions with timer expiry
+  // ============================================
+  console.log('[Game] 🛑 Step 1: Stopping timer atomically...');
+  
+  const stopUpdates = {};
+  stopUpdates[`games/${gameId}/timerState`] = null;
+  stopUpdates[`games/${gameId}/timerStartTime`] = null;
+  stopUpdates[`games/${gameId}/timerDuration`] = null;
+  
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), stopUpdates)
+    .then(() => {
+      console.log('[Game] ✅ Timer stopped successfully');
+      
+      // Wait for Firebase propagation (300ms)
+      console.log('[Game] ⏳ Waiting for Firebase propagation (300ms)...');
+      return new Promise(resolve => setTimeout(resolve, 300));
+    })
+    .then(() => {
+      // ============================================
+      // STEP 2: SWAP CARD + DEDUCT TOKEN
+      // ============================================
+      console.log('[Game] 🔄 Step 2: Swapping card and deducting token...');
+      
+      const nextSong = songs[nextSongIndex];
+      console.log('[Game] Current song:', currentGameData.currentSong.title);
+      console.log('[Game] Next song:', nextSong.title);
+      console.log('[Game] Song index:', currentSongIndex, '→', nextSongIndex);
+      console.log('[Game] Tokens:', myTeam.tokens, '→', myTeam.tokens - 1);
+      
+      const swapUpdates = {};
+      
+      // Deduct token
+      swapUpdates[`games/${gameId}/teams/${teamId}/tokens`] = myTeam.tokens - 1;
+      
+      // Update song
+      swapUpdates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+      swapUpdates[`games/${gameId}/currentSong`] = nextSong;
+      
+      // Clear pending card
+      swapUpdates[`games/${gameId}/teams/${teamId}/pendingCard`] = null;
+      placementPosition = null;
+      
+      console.log('[Game] Applying', Object.keys(swapUpdates).length, 'updates...');
+      
+      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), swapUpdates);
+    })
+    .then(() => {
+      console.log('[Game] ✅ Card swapped successfully');
+      showNotification('🔄 Ny låt! Lyssna noga...', 'success');
+      
+      // Wait for Firebase propagation (200ms)
+      console.log('[Game] ⏳ Waiting for Firebase propagation (200ms)...');
+      return new Promise(resolve => setTimeout(resolve, 200));
+    })
+    .then(() => {
+      // ============================================
+      // STEP 3: START NEW TIMER
+      // ============================================
+      console.log('[Game] ▶️ Step 3: Starting new timer with full duration...');
+      
+      const guessingTime = (currentGameData.guessingTime || 90) * 1000;
+      console.log('[Game] Timer duration:', guessingTime, 'ms');
+      
+      // This will trigger Spotify playback automatically via updateGameView()
+      // when timerState changes to 'guessing'
+      startTimer('guessing', guessingTime);
+      
+      console.log('[Game] ✅ Timer started - Spotify will auto-play new song');
+      console.log('[Game] ========== BYT KORT COMPLETE ==========');
+    })
+    .catch((error) => {
+      console.error('[Game] ❌❌❌ ERROR IN CHANGECARD ❌❌❌');
+      console.error('[Game] Error details:', error);
+      console.error('[Game] Error message:', error.message);
+      
+      showNotification('❌ Kunde inte byta kort - försök igen', 'error');
+      
+      console.log('[Game] ========== BYT KORT FAILED ==========');
+    })
+    .finally(() => {
+      // Always reset guard
+      isChangingCard = false;
+      console.log('[Game] ✅ Guard reset');
+    });
 }
 
 // ============================================
