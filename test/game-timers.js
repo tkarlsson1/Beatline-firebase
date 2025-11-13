@@ -217,7 +217,7 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
   // Render timer UI as horizontal bar
   timerContainer.innerHTML = `
     <div class="timer-bar-wrapper">
-      <div class="timer-bar ${colorClass}" style="width: ${progress}%"></div>
+      <div class="timer-bar-progress ${colorClass}" style="width: ${progress}%"></div>
       <span class="timer-bar-text">${timeDisplay}</span>
     </div>
     <div class="timer-label">${labelText}</div>
