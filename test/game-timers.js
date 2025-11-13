@@ -284,72 +284,95 @@ function onTimerExpired() {
     // Stop timer first
     stopTimer();
     
-    // Check if current team has placed a card
-    const currentTeam = currentTeams[currentGameData.currentTeam];
+    // ============================================
+    // v2.2 CRITICAL FIX: FRESH FIREBASE READ
+    // Don't trust cached currentTeams - do a fresh read to ensure pendingCard is current
+    // ============================================
+    const currentTeamId = currentGameData.currentTeam;
+    console.log('[Timer] Current team ID:', currentTeamId);
+    console.log('[Timer] Fetching fresh team data from Firebase...');
     
-    if (currentTeam && currentTeam.pendingCard) {
-      // Has pending card - lock it in automatically
-      console.log('[Timer] 🔒 Auto-locking pending card');
+    const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${currentTeamId}`);
+    
+    window.firebaseGet(teamRef).then(snapshot => {
+      if (!snapshot.exists()) {
+        console.error('[Timer] ❌ Current team not found in Firebase!');
+        isProcessingTimerExpiry = false;
+        return;
+      }
       
-      // v2.1: Set placementPosition from Firebase before calling lockInPlacement()
-      placementPosition = currentTeam.pendingCard.position;
-      console.log('[Timer] Set placementPosition from pendingCard:', placementPosition);
+      const freshTeamData = snapshot.val();
+      console.log('[Timer] Fresh team data:', freshTeamData.name);
+      console.log('[Timer] Has pendingCard:', !!freshTeamData.pendingCard);
       
-      if (currentGameData.currentTeam === teamId) {
-        // Current team handles their own lock-in
-        console.log('[Timer] 💚 Current team auto-locking their own card...');
-        lockInPlacement();
-      } else if (isHost) {
-        // ============================================
-        // v2.2: HOST BACKUP
-        // If current team is not this client, host backs up after a delay
-        // ============================================
-        console.log('[Timer] ⚠️ Host detected - preparing backup lock-in after 500ms delay...');
-        console.log('[Timer] Current team ID:', currentGameData.currentTeam);
-        console.log('[Timer] This client team ID:', teamId);
+      if (freshTeamData.pendingCard) {
+        // Has pending card - lock it in automatically
+        console.log('[Timer] 🔒 Auto-locking pending card from fresh data');
+        console.log('[Timer] Pending card position:', freshTeamData.pendingCard.position);
         
-        setTimeout(() => {
-          console.log('[Timer] 🔧 Host backup timer expired, checking if lock-in needed...');
+        // Set placementPosition from FRESH Firebase data
+        placementPosition = freshTeamData.pendingCard.position;
+        console.log('[Timer] Set placementPosition:', placementPosition);
+        
+        if (currentTeamId === teamId) {
+          // Current team handles their own lock-in
+          console.log('[Timer] 💚 Current team (this client) auto-locking...');
+          lockInPlacement();
+        } else if (isHost) {
+          // ============================================
+          // v2.2: HOST BACKUP
+          // If current team is not this client, host backs up after a delay
+          // ============================================
+          console.log('[Timer] ⚠️ Host detected - preparing backup lock-in after 500ms delay...');
+          console.log('[Timer] This client team ID:', teamId);
           
-          // Check if lock-in has already happened (by currentTeam)
-          // We check if Timer 2 has started, which means lockInPlacement() was successful
-          if (currentGameData.timerState === 'challenge_window') {
-            console.log('[Timer] ✅ Current team already locked in (Timer 2 active), host backup not needed');
-            return;
-          }
-          
-          // Check if validation modal is active (lock-in happened via Timer 2 expiry)
-          if (currentGameData.validationModal && currentGameData.validationModal.isVisible) {
-            console.log('[Timer] ✅ Validation already started, host backup not needed');
-            return;
-          }
-          
-          // Check if timer is still null (hasn't been restarted)
-          if (currentGameData.timerState !== null) {
-            console.log('[Timer] ⚠️ Timer state changed to', currentGameData.timerState, ', host backup not needed');
-            return;
-          }
-          
-          console.log('[Timer] 🚨 HOST BACKING UP: Locking in card for team:', currentTeam.name);
-          
-          // Host locks in for the current team using targetTeamId parameter
-          lockInPlacement(currentGameData.currentTeam);
-        }, 500);
+          setTimeout(() => {
+            console.log('[Timer] 🔧 Host backup timer expired, checking if lock-in needed...');
+            
+            // Check if lock-in has already happened (by currentTeam)
+            // We check if Timer 2 has started, which means lockInPlacement() was successful
+            if (currentGameData.timerState === 'challenge_window') {
+              console.log('[Timer] ✅ Current team already locked in (Timer 2 active), host backup not needed');
+              return;
+            }
+            
+            // Check if validation modal is active (lock-in happened via Timer 2 expiry)
+            if (currentGameData.validationModal && currentGameData.validationModal.isVisible) {
+              console.log('[Timer] ✅ Validation already started, host backup not needed');
+              return;
+            }
+            
+            // Check if timer is still null (hasn't been restarted)
+            if (currentGameData.timerState !== null) {
+              console.log('[Timer] ⚠️ Timer state changed to', currentGameData.timerState, ', host backup not needed');
+              return;
+            }
+            
+            console.log('[Timer] 🚨 HOST BACKING UP: Locking in card for team:', freshTeamData.name);
+            
+            // Host locks in for the current team using targetTeamId parameter
+            lockInPlacement(currentTeamId);
+          }, 500);
+        }
+      } else {
+        // No pending card - skip this team's turn
+        console.log('[Timer] ⏭️ No pending card in fresh data - skipping turn');
+        if (isHost) {
+          // Only host should call skipTurn to avoid race conditions
+          skipTurn();
+        }
       }
-    } else {
-      // No pending card - skip this team's turn
-      console.log('[Timer] ⏭️ No pending card - skipping turn');
-      if (isHost) {
-        // Only host should call skipTurn to avoid race conditions
-        skipTurn();
-      }
-    }
-    
-    // Reset guard after handling
-    setTimeout(() => {
+      
+      // Reset guard after handling
+      setTimeout(() => {
+        isProcessingTimerExpiry = false;
+        console.log('[Timer] ✅ GUARD: Reset after guessing timer');
+      }, 1000);
+      
+    }).catch(error => {
+      console.error('[Timer] ❌ Error fetching fresh team data:', error);
       isProcessingTimerExpiry = false;
-      console.log('[Timer] ✅ GUARD: Reset after guessing timer');
-    }, 1000);
+    });
     
   } else if (timerState === 'challenge_window') {
     // Timer 2 expired - no one challenged
