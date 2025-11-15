@@ -150,12 +150,37 @@ async function playTrack(spotifyTrackId) {
       console.log('Track started playing:', spotifyTrackId);
       return true;
     } else {
-      const error = await response.json();
-      console.error('Failed to play track:', error);
+      // BUGFIX: Handle both JSON and non-JSON error responses
+      const contentType = response.headers.get('content-type');
+      let errorMessage = `HTTP ${response.status}`;
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const error = await response.json();
+          errorMessage = error.error?.message || JSON.stringify(error);
+          console.error('[Spotify] Failed to play track (JSON error):', error);
+        } catch (parseError) {
+          console.error('[Spotify] Failed to parse JSON error:', parseError);
+        }
+      } else {
+        // Not JSON - read as text
+        errorMessage = await response.text();
+        console.error('[Spotify] Failed to play track (non-JSON error):', errorMessage);
+      }
+      
+      console.error('[Spotify] Full error details:', {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: contentType,
+        message: errorMessage
+      });
+      
+      alert('Kunde inte spela låt: ' + errorMessage);
       return false;
     }
   } catch (error) {
-    console.error('Error playing track:', error);
+    console.error('[Spotify] Error playing track:', error);
+    alert('Spotify-fel: ' + error.message);
     return false;
   }
 }
