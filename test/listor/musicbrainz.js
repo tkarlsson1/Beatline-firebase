@@ -237,10 +237,7 @@ async function searchByArtistTitle(artist, title) {
  */
 async function validateTrack(track, onProgress) {
   const result = {
-    spotifyId: track.spotifyId,
-    title: track.title,
-    artist: track.artist,
-    spotifyYear: track.spotifyYear,
+    ...track, // Preserve all original Spotify data
     mbYear: null,
     mbFirstReleaseDate: null,
     mbRecordingId: null,
