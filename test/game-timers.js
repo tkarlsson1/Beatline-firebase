@@ -369,10 +369,8 @@ function onTimerExpired() {
         }
       } else {
         // No pending card - skip turn
-        console.log('[Timer] ⏭️ No pending card');
-        if (isHost) {
-          skipTurn();
-        }
+        console.log('[Timer] ⏭️ No pending card, skipping turn');
+        skipTurn();
       }
       
       // Reset guard
