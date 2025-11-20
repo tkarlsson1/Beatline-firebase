@@ -100,12 +100,67 @@ function updateTimer() {
     if (currentGameData.timerState) {
       const timerState = currentGameData.timerState;
       
-      // For guessing timer: only current team (or host as backup) should handle
+      // For guessing timer: only current team should handle immediately
+      // Host provides backup after delay if current team fails
       if (timerState === 'guessing') {
         const isCurrentTeam = currentGameData.currentTeam === teamId;
-        if (isCurrentTeam || isHost) {
-          console.log('[Timer] 🎯 Handling guessing timer expiry as', isCurrentTeam ? 'current team' : 'host backup');
+        if (isCurrentTeam) {
+          console.log('[Timer] 🎯 Handling guessing timer expiry as current team');
           onTimerExpired();
+        } else if (isHost) {
+          // Host waits 2 seconds before handling (backup only if current team fails)
+          console.log('[Timer] ⏰ Host scheduling backup in 2 seconds...');
+          setTimeout(() => {
+            // Re-check game state - current team may have handled it by now
+            const freshData = currentGameData; // Updated by Firebase listener
+            
+            // Check if validation is already happening
+            if (freshData.validationModal?.isVisible) {
+              console.log('[Timer] ✅ Validation active, host backup not needed');
+              return;
+            }
+            
+            // Check if Timer 2 already started
+            if (freshData.timerState === 'challenge_window') {
+              console.log('[Timer] ✅ Timer 2 started, host backup not needed');
+              return;
+            }
+            
+            // Check if timer is still running (shouldn't happen, but safety check)
+            if (freshData.timerState === 'guessing') {
+              console.log('[Timer] ⚠️ Timer still running, host backup not needed');
+              return;
+            }
+            
+            // Timer stopped but nothing happened - current team failed
+            if (freshData.timerState === null) {
+              console.log('[Timer] 🚨 Host backup: current team failed, taking over');
+              
+              // Get current team data
+              const currentTeamId = freshData.currentTeam;
+              const teamRef = window.firebaseRef(window.firebaseDb, `games/${gameId}/teams/${currentTeamId}`);
+              
+              window.firebaseGet(teamRef).then(snapshot => {
+                if (snapshot.exists()) {
+                  const teamData = snapshot.val();
+                  if (teamData.pendingCard) {
+                    // Current team has a card - lock it in for them
+                    placementPosition = teamData.pendingCard.position;
+                    console.log('[Timer] 🚨 Host backup: locking card at position', placementPosition);
+                    lockInPlacement(currentTeamId);
+                  } else {
+                    // No card - skip turn
+                    console.log('[Timer] 🚨 Host backup: skipping turn');
+                    skipTurn();
+                  }
+                }
+              }).catch(error => {
+                console.error('[Timer] ❌ Host backup error:', error);
+              });
+            } else {
+              console.log('[Timer] ✅ Game state changed, host backup not needed');
+            }
+          }, 2000);
         } else {
           console.log('[Timer] ⏭️ Not current team or host, ignoring guessing timer expiry');
         }
@@ -311,30 +366,6 @@ function onTimerExpired() {
           // Current team handles their own lock-in
           console.log('[Timer] 💚 Current team auto-locking');
           lockInPlacement();
-        } else if (isHost) {
-          // Host backup after delay
-          console.log('[Timer] ⚠️ Host backup in 500ms');
-          
-          setTimeout(() => {
-            // Check if already handled
-            if (currentGameData.timerState === 'challenge_window') {
-              console.log('[Timer] ✅ Already handled, host backup not needed');
-              return;
-            }
-            
-            if (currentGameData.validationModal && currentGameData.validationModal.isVisible) {
-              console.log('[Timer] ✅ Validation active, host backup not needed');
-              return;
-            }
-            
-            if (currentGameData.timerState !== null) {
-              console.log('[Timer] ⚠️ Timer state changed, host backup not needed');
-              return;
-            }
-            
-            console.log('[Timer] 🚨 HOST BACKING UP');
-            lockInPlacement(currentTeamId);
-          }, 500);
         }
       } else {
         // No pending card - skip turn
