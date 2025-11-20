@@ -31,17 +31,30 @@ async function rateLimitedFetch(url) {
   
   lastRequestTime = Date.now();
   
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'Notestream/2.4 (https://notestream.se)'
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Notestream/2.4 (https://notestream.se)'
+      }
+    });
+    
+    if (!response.ok) {
+      // MusicBrainz rate limit = 503
+      if (response.status === 503) {
+        throw new Error('MusicBrainz rate limit nådd. Vänta en stund och försök igen.');
+      }
+      throw new Error(`MusicBrainz API error: ${response.status}`);
     }
-  });
-  
-  if (!response.ok) {
-    throw new Error(`MusicBrainz API error: ${response.status}`);
+    
+    return response.json();
+    
+  } catch (error) {
+    // Network error or timeout
+    if (error.name === 'TypeError') {
+      throw new Error('Nätverksfel: Kunde inte nå MusicBrainz API');
+    }
+    throw error;
   }
-  
-  return response.json();
 }
 
 /**
@@ -288,6 +301,8 @@ async function validateTrack(track, onProgress) {
  */
 async function validatePlaylist(tracks, onProgress, onTrackComplete) {
   const results = [];
+  let consecutiveErrors = 0;
+  const MAX_CONSECUTIVE_ERRORS = 5;
   
   for (let i = 0; i < tracks.length; i++) {
     const track = tracks[i];
@@ -301,21 +316,49 @@ async function validatePlaylist(tracks, onProgress, onTrackComplete) {
       });
     }
     
-    const result = await validateTrack(track, (msg) => {
-      if (onProgress) {
-        onProgress({
-          current: i + 1,
-          total: tracks.length,
-          track: track,
-          message: msg
-        });
+    try {
+      const result = await validateTrack(track, (msg) => {
+        if (onProgress) {
+          onProgress({
+            current: i + 1,
+            total: tracks.length,
+            track: track,
+            message: msg
+          });
+        }
+      });
+      
+      results.push(result);
+      consecutiveErrors = 0; // Reset on success
+      
+      if (onTrackComplete) {
+        onTrackComplete(result, i + 1, tracks.length);
       }
-    });
-    
-    results.push(result);
-    
-    if (onTrackComplete) {
-      onTrackComplete(result, i + 1, tracks.length);
+      
+    } catch (error) {
+      console.error(`Failed to validate track ${i + 1}:`, error);
+      consecutiveErrors++;
+      
+      // If too many consecutive errors, bail out
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        throw new Error(`Validering misslyckades: ${consecutiveErrors} låtar i rad kunde inte valideras. MusicBrainz kan vara nere.`);
+      }
+      
+      // Add track with error flag
+      results.push({
+        ...track,
+        mbYear: null,
+        mbFirstReleaseDate: null,
+        mbRecordingId: null,
+        matchMethod: 'error',
+        confidence: 'none',
+        mbData: null,
+        validationError: error.message
+      });
+      
+      if (onTrackComplete) {
+        onTrackComplete(results[results.length - 1], i + 1, tracks.length);
+      }
     }
   }
   

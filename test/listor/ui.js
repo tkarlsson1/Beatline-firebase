@@ -177,6 +177,12 @@ async function startValidation(tracks) {
       null
     );
     
+    // Check if validation had too many errors
+    const errorCount = validatedTracks.filter(t => t.matchMethod === 'error').length;
+    if (errorCount > tracks.length * 0.5) {
+      throw new Error(`För många valideringsfel (${errorCount}/${tracks.length}). MusicBrainz kan vara nere eller otillgänglig.`);
+    }
+    
     // Analyze and flag tracks
     const analyzedTracks = window.validator.analyzeAndFlagTracks(validatedTracks);
     
@@ -184,13 +190,32 @@ async function startValidation(tracks) {
     currentState.tracks = window.validator.sortTracksByStatus(analyzedTracks);
     currentState.stats = window.validator.calculatePlaylistStats(analyzedTracks);
     
+    // Show warning if there were errors
+    if (errorCount > 0) {
+      showNotification(`⚠️ ${errorCount} låtar kunde inte valideras mot MusicBrainz`, 'warning');
+    }
+    
     // Move to review phase
     currentState.phase = 'review';
     renderReviewPhase();
     
   } catch (error) {
     console.error('Validation failed:', error);
-    showError(`Validering misslyckades: ${error.message}`);
+    
+    // User-friendly error messages
+    let errorMessage = error.message;
+    
+    if (error.message.includes('rate limit')) {
+      errorMessage = 'MusicBrainz rate limit nådd. Vänta 1 minut och försök igen.';
+    } else if (error.message.includes('network') || error.message.includes('Nätverksfel')) {
+      errorMessage = 'Nätverksfel: Kontrollera din internetanslutning och försök igen.';
+    } else if (error.message.includes('För många valideringsfel')) {
+      errorMessage = error.message + ' Försök igen om en stund.';
+    }
+    
+    showError(errorMessage);
+    
+    // Return to input phase
     currentState.phase = 'input';
     renderInputPhase();
   }

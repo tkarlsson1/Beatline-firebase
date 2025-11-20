@@ -311,7 +311,11 @@ function exportToJSON(playlistData) {
  */
 async function saveToFirebase(playlistData) {
   if (!window.validatorFirebase) {
-    throw new Error('Firebase not initialized');
+    throw new Error('Firebase är inte initialiserad');
+  }
+  
+  if (!playlistData || !playlistData.songs || playlistData.songs.length === 0) {
+    throw new Error('Ingen data att spara');
   }
   
   try {
@@ -329,7 +333,16 @@ async function saveToFirebase(playlistData) {
     
   } catch (error) {
     console.error('Failed to save to Firebase:', error);
-    throw error;
+    
+    // Better error messages
+    if (error.code === 'PERMISSION_DENIED') {
+      throw new Error('Firebase-behörighet nekad. Kontrollera security rules.');
+    }
+    if (error.message.includes('network')) {
+      throw new Error('Nätverksfel: Kunde inte spara till Firebase.');
+    }
+    
+    throw new Error(`Firebase-fel: ${error.message}`);
   }
 }
 

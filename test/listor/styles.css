@@ -559,6 +559,10 @@ button {
   background: var(--color-error);
 }
 
+.notification-warning {
+  background: var(--color-warning);
+}
+
 .notification-info {
   background: var(--color-primary);
 }

@@ -35,31 +35,31 @@ function initValidatorFirebase() {
 
 // Helper functions for validator database
 const validatorFirebase = {
-  ref: (path) => firebase.database.ref(validatorDb, path),
+  ref: (path) => validatorDb.ref(path),
   
   set: async (path, data) => {
-    const ref = firebase.database.ref(validatorDb, path);
-    return firebase.database.set(ref, data);
+    const ref = validatorDb.ref(path);
+    return ref.set(data);
   },
   
   get: async (path) => {
-    const ref = firebase.database.ref(validatorDb, path);
-    return firebase.database.get(ref);
+    const ref = validatorDb.ref(path);
+    return ref.once('value');
   },
   
   update: async (path, updates) => {
-    const ref = firebase.database.ref(validatorDb, path);
-    return firebase.database.update(ref, updates);
+    const ref = validatorDb.ref(path);
+    return ref.update(updates);
   },
   
   push: async (path, data) => {
-    const ref = firebase.database.ref(validatorDb, path);
-    return firebase.database.push(ref, data);
+    const ref = validatorDb.ref(path);
+    return ref.push(data);
   },
   
   remove: async (path) => {
-    const ref = firebase.database.ref(validatorDb, path);
-    return firebase.database.remove(ref);
+    const ref = validatorDb.ref(path);
+    return ref.remove();
   }
 };
 

@@ -27,6 +27,10 @@ async function getBackendSpotifyToken() {
 
     const data = await response.json();
     
+    if (!data.access_token) {
+      throw new Error('No access token in response');
+    }
+    
     cachedToken = data.access_token;
     // Cache for slightly less than expires_in to be safe
     tokenExpiry = Date.now() + ((data.expires_in - 60) * 1000);
@@ -36,7 +40,7 @@ async function getBackendSpotifyToken() {
     
   } catch (error) {
     console.error('Failed to get backend token:', error);
-    throw error;
+    throw new Error(`Kunde inte hämta Spotify-token: ${error.message}`);
   }
 }
 
@@ -80,7 +84,12 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     throw new Error('Ogiltig Spotify playlist URL');
   }
   
-  const token = await getBackendSpotifyToken();
+  let token;
+  try {
+    token = await getBackendSpotifyToken();
+  } catch (error) {
+    throw new Error(`Kunde inte hämta Spotify-token: ${error.message}`);
+  }
   
   try {
     // Fetch playlist details
@@ -95,12 +104,19 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('Playlist hittades inte');
+        throw new Error('Playlist hittades inte. Kontrollera att länken är korrekt.');
+      }
+      if (response.status === 401) {
+        throw new Error('Spotify-autentisering misslyckades. Försök igen.');
       }
       throw new Error(`Spotify API error: ${response.status}`);
     }
     
     const data = await response.json();
+    
+    if (!data.tracks || !data.tracks.items) {
+      throw new Error('Spellistan har ingen data');
+    }
     
     // Extract track information
     const tracks = data.tracks.items
@@ -123,6 +139,10 @@ async function fetchSpotifyPlaylist(playlistUrl) {
         };
       });
     
+    if (tracks.length === 0) {
+      throw new Error('Spellistan är tom eller innehåller inga giltiga låtar');
+    }
+    
     console.log(`✅ Loaded playlist: ${data.name} (${tracks.length} tracks)`);
     
     return {
@@ -135,7 +155,13 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     
   } catch (error) {
     console.error('Failed to fetch playlist:', error);
-    throw error;
+    
+    // Re-throw with better message if not already formatted
+    if (error.message.includes('Spotify') || error.message.includes('Playlist')) {
+      throw error;
+    }
+    
+    throw new Error(`Kunde inte ladda spellista: ${error.message}`);
   }
 }
 
