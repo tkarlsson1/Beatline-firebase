@@ -175,14 +175,55 @@ function updateTimer() {
           console.log('[Timer] ⏭️ Not active team, ignoring challenge_window expiry');
         }
       }
-      // For challenge_placement: active team should handle
+      // For challenge_placement: challenging team should handle immediately
+      // Host provides backup after delay if challenging team fails
       else if (timerState === 'challenge_placement') {
-        const isCurrentTeam = currentGameData.currentTeam === teamId;
-        if (isCurrentTeam) {
-          console.log('[Timer] 🎯 Handling challenge_placement expiry as active team');
+        const challengingTeamId = currentGameData.challengeState?.challengingTeam;
+        const isChallengingTeam = challengingTeamId === teamId;
+        
+        if (isChallengingTeam) {
+          console.log('[Timer] 🎯 Handling challenge_placement expiry as challenging team');
           onTimerExpired();
+        } else if (isHost) {
+          // Host waits 2 seconds before handling (backup only if challenging team fails)
+          console.log('[Timer] ⏰ Host scheduling challenge validation backup in 2 seconds...');
+          setTimeout(() => {
+            // Re-check game state - challenging team may have handled it by now
+            const freshData = currentGameData; // Updated by Firebase listener
+            
+            // Check if validation is already happening
+            if (freshData.validationModal?.isVisible) {
+              console.log('[Timer] ✅ Validation active, host backup not needed');
+              return;
+            }
+            
+            // Check if Timer 4 already started
+            if (freshData.timerState === 'between_songs') {
+              console.log('[Timer] ✅ Timer 4 started, host backup not needed');
+              return;
+            }
+            
+            // Check if timer is still running (shouldn't happen, but safety check)
+            if (freshData.timerState === 'challenge_placement') {
+              console.log('[Timer] ⚠️ Timer still running, host backup not needed');
+              return;
+            }
+            
+            // Timer stopped but nothing happened - challenging team failed
+            if (freshData.timerState === null && freshData.challengeState?.isActive) {
+              console.log('[Timer] 🚨 Host backup: challenging team failed, validating challenge');
+              
+              // Temporarily set timer state for onTimerExpired validation check
+              const originalState = currentGameData.timerState;
+              currentGameData.timerState = 'challenge_placement';
+              onTimerExpired();
+              currentGameData.timerState = originalState;
+            } else {
+              console.log('[Timer] ✅ Game state changed, host backup not needed');
+            }
+          }, 2000);
         } else {
-          console.log('[Timer] ⏭️ Not active team, ignoring challenge_placement expiry');
+          console.log('[Timer] ⏭️ Not challenging team or host, ignoring challenge_placement expiry');
         }
       }
       // For between_songs timer: only host should handle
@@ -310,8 +351,9 @@ function onTimerExpired() {
     // For challenge_window: active team should handle (no one challenged)
     shouldStopTimer = (currentGameData.currentTeam === teamId);
   } else if (timerState === 'challenge_placement') {
-    // For challenge_placement: active team should handle (will validate both cards)
-    shouldStopTimer = (currentGameData.currentTeam === teamId);
+    // For challenge_placement: challenging team (or host backup) should handle
+    const challengingTeamId = currentGameData.challengeState?.challengingTeam;
+    shouldStopTimer = (challengingTeamId === teamId) || isHost;
   } else if (timerState === 'between_songs') {
     // For between_songs: only host can stop
     shouldStopTimer = isHost;
