@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlist Validator - NOTESTREAM</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- UI will be rendered here by ui.js -->
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <!-- Our modules -->
+  <script src="firebase-config.js"></script>
+  <script src="spotify-helper.js"></script>
+  <script src="musicbrainz.js"></script>
+  <script src="validator.js"></script>
+  <script src="ui.js"></script>
+
+  <!-- Initialize -->
+  <script>
+    // Initialize Firebase for validator database
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Initializing Playlist Validator...');
+      
+      // Init Firebase
+      const db = window.initValidatorFirebase();
+      if (!db) {
+        console.error('❌ Failed to initialize Firebase');
+        alert('Firebase-anslutning misslyckades. Kontrollera konsolen.');
+        return;
+      }
+      
+      // Init UI
+      window.initUI();
+      
+      console.log('✅ Playlist Validator ready');
+    });
+  </script>
+</body>
+</html>
