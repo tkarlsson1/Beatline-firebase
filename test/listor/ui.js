@@ -291,7 +291,7 @@ function renderReviewPhase() {
               <th>Titel</th>
               <th>Artist</th>
               <th>Spotify År</th>
-              <th>MB År</th>
+              <th>Original År</th>
               <th>Verifierat År</th>
               <th>Flaggor</th>
               <th>Åtgärder</th>
@@ -357,11 +357,11 @@ function renderTrackRow(track) {
       ${track.spotifyYear} (Spotify)
     </option>`);
     
-    // Add MusicBrainz year option if different
-    if (track.mbYear && track.mbYear !== track.spotifyYear) {
-      const selected = track.mbYear <= track.spotifyYear ? 'selected' : '';
-      options.push(`<option value="${track.mbYear}" ${selected}>
-        ${track.mbYear} (MusicBrainz)
+    // Add earliestRecordingYear if available and different
+    if (track.earliestRecordingYear && track.earliestRecordingYear !== track.spotifyYear) {
+      const selected = track.earliestRecordingYear < track.spotifyYear ? 'selected' : '';
+      options.push(`<option value="${track.earliestRecordingYear}" ${selected}>
+        ${track.earliestRecordingYear} (Original från samma artist)
       </option>`);
     }
     
@@ -419,7 +419,7 @@ function renderTrackRow(track) {
       <td class="title-cell">${escapeHtml(track.title)}</td>
       <td class="artist-cell">${escapeHtml(track.allArtists)}</td>
       <td class="year-cell">${track.spotifyYear}</td>
-      <td class="year-cell">${track.mbYear || '-'}</td>
+      <td class="year-cell">${track.earliestRecordingYear || '-'}</td>
       <td class="year-cell">${yearControl}</td>
       <td class="flags-cell">${flagsHtml}</td>
       <td class="actions-cell">

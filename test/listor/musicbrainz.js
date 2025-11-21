@@ -108,7 +108,31 @@ async function searchByISRC(isrc) {
 }
 
 /**
- * Normalize string for search (remove special chars, etc)
+ * Normalize artist name - remove features, collaborations, etc
+ * Used to identify the BASE artist
+ */
+function normalizeArtist(artistName) {
+  if (!artistName) return '';
+  
+  return artistName
+    .toLowerCase()
+    // Split on common separators and take first artist
+    .split(/\sfeat\.?\s/i)[0]
+    .split(/\sft\.?\s/i)[0]
+    .split(/\s&\s/)[0]
+    .split(/\sx\s/i)[0]
+    .split(/,/)[0]
+    // Remove common suffixes
+    .replace(/\sremix$/i, '')
+    .replace(/\(.*?\)/g, '') // Remove parentheses
+    .replace(/\[.*?\]/g, '') // Remove brackets
+    // Clean up
+    .replace(/[^\w\s]/g, '') // Remove special chars
+    .trim();
+}
+
+/**
+ * Normalize string for search (title)
  */
 function normalizeForSearch(str) {
   return str
@@ -164,11 +188,11 @@ function levenshteinDistance(str1, str2) {
 
 /**
  * Search MusicBrainz by artist + title (fallback)
- * Returns: { found, recordingId, firstReleaseDate, title, artist, confidence }
+ * Returns: { found, recordings[] } where recordings contain all matches
  */
 async function searchByArtistTitle(artist, title) {
   if (!artist || !title) {
-    return { found: false };
+    return { found: false, recordings: [] };
   }
   
   try {
@@ -178,70 +202,117 @@ async function searchByArtistTitle(artist, title) {
     
     // Build query
     const query = `artist:"${cleanArtist}" AND recording:"${cleanTitle}"`;
-    const url = `${MUSICBRAINZ_API_BASE}/recording?query=${encodeURIComponent(query)}&fmt=json&limit=5`;
+    const url = `${MUSICBRAINZ_API_BASE}/recording?query=${encodeURIComponent(query)}&fmt=json&limit=10`;
     
     const data = await rateLimitedFetch(url);
     
     if (!data.recordings || data.recordings.length === 0) {
-      return { found: false };
+      return { found: false, recordings: [] };
     }
     
-    // Find best match
-    let bestMatch = null;
-    let bestScore = 0;
-    
-    for (const recording of data.recordings) {
+    // Convert all recordings to our format
+    const recordings = data.recordings.map(recording => {
+      // Find earliest release date
+      let earliestDate = recording['first-release-date'] || null;
+      
+      if (recording.releases && recording.releases.length > 0) {
+        recording.releases.forEach(release => {
+          const releaseDate = release.date || release['release-events']?.[0]?.date;
+          if (releaseDate && (!earliestDate || releaseDate < earliestDate)) {
+            earliestDate = releaseDate;
+          }
+        });
+      }
+      
+      // Calculate similarity for this recording
       const mbTitle = normalizeForSearch(recording.title);
       const mbArtist = normalizeForSearch(recording['artist-credit']?.[0]?.name || '');
       
-      // Calculate similarity scores
       const titleSim = stringSimilarity(cleanTitle, mbTitle);
       const artistSim = stringSimilarity(cleanArtist, mbArtist);
-      const combinedScore = (titleSim * 0.6) + (artistSim * 0.4); // Title weighted more
+      const combinedScore = (titleSim * 0.6) + (artistSim * 0.4);
       
-      if (combinedScore > bestScore) {
-        bestScore = combinedScore;
-        bestMatch = recording;
-      }
+      return {
+        recordingId: recording.id,
+        firstReleaseDate: earliestDate,
+        year: earliestDate ? parseInt(earliestDate.split('-')[0]) : null,
+        title: recording.title,
+        artist: recording['artist-credit']?.[0]?.name || 'Unknown',
+        similarityScore: combinedScore,
+        mbScore: recording.score
+      };
+    });
+    
+    // Sort by similarity score
+    recordings.sort((a, b) => b.similarityScore - a.similarityScore);
+    
+    // Find best match
+    const bestMatch = recordings[0];
+    
+    if (!bestMatch || bestMatch.similarityScore < 0.5) {
+      return { found: false, recordings: [], reason: 'No good match (score too low)' };
     }
     
-    if (!bestMatch || bestScore < 0.5) {
-      return { found: false, reason: 'No good match (score too low)' };
-    }
-    
-    // Find earliest release date
-    let earliestDate = bestMatch['first-release-date'] || null;
-    
-    if (bestMatch.releases && bestMatch.releases.length > 0) {
-      bestMatch.releases.forEach(release => {
-        const releaseDate = release.date || release['release-events']?.[0]?.date;
-        if (releaseDate && (!earliestDate || releaseDate < earliestDate)) {
-          earliestDate = releaseDate;
-        }
-      });
-    }
-    
-    // Determine confidence based on similarity score
+    // Determine confidence based on best match
     let confidence;
-    if (bestScore >= 0.9) confidence = 'high';
-    else if (bestScore >= 0.7) confidence = 'medium';
+    if (bestMatch.similarityScore >= 0.9) confidence = 'high';
+    else if (bestMatch.similarityScore >= 0.7) confidence = 'medium';
     else confidence = 'low';
     
     return {
       found: true,
-      recordingId: bestMatch.id,
-      firstReleaseDate: earliestDate,
-      title: bestMatch.title,
-      artist: bestMatch['artist-credit']?.[0]?.name || 'Unknown',
-      confidence: confidence,
-      similarityScore: bestScore,
-      mbScore: bestMatch.score
+      recordings: recordings, // Return ALL recordings
+      bestMatch: bestMatch,
+      confidence: confidence
     };
     
   } catch (error) {
     console.error(`MusicBrainz search failed for "${artist} - ${title}":`, error);
-    return { found: false, error: error.message };
+    return { found: false, recordings: [], error: error.message };
   }
+}
+
+/**
+ * Get earliest recording year for matching artist
+ * Filters recordings to same BASE artist (ignoring feat/remix/etc)
+ */
+function getEarliestRecordingForMatchingArtist(spotifyArtist, recordings) {
+  if (!recordings || recordings.length === 0) {
+    return null;
+  }
+  
+  // Normalize Spotify artist to base artist
+  const spotifyBaseArtist = normalizeArtist(spotifyArtist);
+  
+  // Filter recordings to matching base artist
+  const matchingRecordings = recordings.filter(rec => {
+    const mbBaseArtist = normalizeArtist(rec.artist);
+    
+    // Check if base artists are similar
+    const similarity = stringSimilarity(spotifyBaseArtist, mbBaseArtist);
+    return similarity >= 0.8; // 80% similarity threshold
+  });
+  
+  if (matchingRecordings.length === 0) {
+    return null;
+  }
+  
+  // Find earliest year among matching recordings
+  const years = matchingRecordings
+    .filter(rec => rec.year !== null)
+    .map(rec => rec.year);
+  
+  if (years.length === 0) {
+    return null;
+  }
+  
+  const earliestYear = Math.min(...years);
+  
+  return {
+    earliestYear,
+    matchingCount: matchingRecordings.length,
+    allRecordings: matchingRecordings
+  };
 }
 
 /**
@@ -254,6 +325,7 @@ async function validateTrack(track, onProgress) {
     mbYear: null,
     mbFirstReleaseDate: null,
     mbRecordingId: null,
+    earliestRecordingYear: null, // NEW: Earliest year from same artist
     matchMethod: 'none',
     confidence: 'none',
     mbData: null
@@ -274,6 +346,9 @@ async function validateTrack(track, onProgress) {
       result.confidence = 'high';
       result.mbData = isrcResult;
       
+      // For ISRC match, the recording year IS the earliest for this specific recording
+      result.earliestRecordingYear = result.mbYear;
+      
       return result;
     }
   }
@@ -284,13 +359,28 @@ async function validateTrack(track, onProgress) {
   const searchResult = await searchByArtistTitle(track.artist, track.title);
   
   if (searchResult.found) {
-    result.mbYear = searchResult.firstReleaseDate ? 
-      parseInt(searchResult.firstReleaseDate.split('-')[0]) : null;
-    result.mbFirstReleaseDate = searchResult.firstReleaseDate;
-    result.mbRecordingId = searchResult.recordingId;
+    // Store best match data
+    const bestMatch = searchResult.bestMatch;
+    result.mbYear = bestMatch.year;
+    result.mbFirstReleaseDate = bestMatch.firstReleaseDate;
+    result.mbRecordingId = bestMatch.recordingId;
     result.matchMethod = 'search';
     result.confidence = searchResult.confidence;
-    result.mbData = searchResult;
+    result.mbData = bestMatch;
+    
+    // NEW: Find earliest recording from SAME base artist
+    const earliestData = getEarliestRecordingForMatchingArtist(
+      track.artist,
+      searchResult.recordings
+    );
+    
+    if (earliestData) {
+      result.earliestRecordingYear = earliestData.earliestYear;
+      result.earliestRecordingData = earliestData; // For debugging
+    } else {
+      // No matching artist found - might be feature/remix
+      result.earliestRecordingYear = null;
+    }
   }
   
   return result;
@@ -371,6 +461,8 @@ window.musicBrainz = {
   searchByArtistTitle,
   validateTrack,
   validatePlaylist,
+  normalizeArtist,
   normalizeForSearch,
-  stringSimilarity
+  stringSimilarity,
+  getEarliestRecordingForMatchingArtist
 };

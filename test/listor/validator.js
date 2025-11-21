@@ -7,17 +7,33 @@ function analyzeAndFlagTracks(tracks) {
   return tracks.map(track => {
     const flags = [];
     
+    // Get earliest recording year from SAME artist
+    const earliestYear = track.earliestRecordingYear;
+    const hasEarliestData = earliestYear !== null && earliestYear !== undefined;
+    
     // FLAG 1: Multiple artists (potential modern version/feature)
+    // BUT: Don't flag if earliestYear is null (means different artist - expected)
     if (track.allArtists.includes('feat.') || 
         track.allArtists.includes('ft.') ||
         track.allArtists.includes('&') ||
         track.allArtists.includes(',') ||
         track.allArtists.includes(' x ')) {
-      flags.push({
-        type: 'multiple_artists',
-        severity: 'warning',
-        message: 'Flera artister - kan vara modern version eller feature'
-      });
+      
+      if (hasEarliestData) {
+        // Same base artist but with features - might be compilation
+        flags.push({
+          type: 'multiple_artists',
+          severity: 'info',
+          message: 'Flera artister listade'
+        });
+      } else {
+        // Different base artist - this is expected for features
+        flags.push({
+          type: 'feature_collaboration',
+          severity: 'info',
+          message: 'Feature/collaboration - använder nytt årtal (korrekt)'
+        });
+      }
     }
     
     // FLAG 2: Modified version in title
@@ -35,87 +51,89 @@ function analyzeAndFlagTracks(tracks) {
       flags.push({
         type: 'compilation',
         severity: 'info',
-        message: 'Från samlingsalbum - år kan vara albumets release istället för originalet'
+        message: 'Från samlingsalbum'
       });
     }
     
-    // FLAG 4: Spotify year > MusicBrainz year (modern re-release)
-    if (track.mbYear && track.spotifyYear > track.mbYear) {
-      const diff = track.spotifyYear - track.mbYear;
-      const severity = diff > 10 ? 'error' : 'warning';
+    // FLAG 4: CRITICAL - Compilation + Same artist + Older recording exists
+    if (hasEarliestData && earliestYear < track.spotifyYear) {
+      const diff = track.spotifyYear - earliestYear;
       
-      flags.push({
-        type: 'year_mismatch_newer',
-        severity: severity,
-        message: `Spotify år (${track.spotifyYear}) är nyare än originalår (${track.mbYear}) - skillnad: ${diff} år`
-      });
+      // Only flag if significant difference (>2 years) and from compilation
+      if (diff > 2 && track.albumType === 'compilation') {
+        flags.push({
+          type: 'compilation_wrong_year',
+          severity: 'error',
+          message: `Samlingsalbums-år (${track.spotifyYear}) men original är från ${earliestYear} (${diff} år skillnad)`
+        });
+      } else if (diff > 2) {
+        flags.push({
+          type: 'year_mismatch_potential',
+          severity: 'warning',
+          message: `Spotify: ${track.spotifyYear}, Original från samma artist: ${earliestYear} (${diff} år skillnad)`
+        });
+      }
     }
     
-    // FLAG 5: Spotify year < MusicBrainz year (suspicious)
-    if (track.mbYear && track.spotifyYear < track.mbYear) {
-      flags.push({
-        type: 'suspicious_year',
-        severity: 'error',
-        message: `Spotify år (${track.spotifyYear}) är äldre än MusicBrainz (${track.mbYear}) - troligt datafel`
-      });
+    // FLAG 5: MB says NEWER than Spotify (MB data error - IGNORE)
+    if (hasEarliestData && earliestYear > track.spotifyYear) {
+      const diff = earliestYear - track.spotifyYear;
+      if (diff > 2) {
+        flags.push({
+          type: 'mb_data_error',
+          severity: 'info',
+          message: `MusicBrainz har nyare årtal (${earliestYear}) - troligt MB-fel, ignorera`
+        });
+      }
     }
     
-    // FLAG 6: No MusicBrainz match
+    // FLAG 6: No MusicBrainz match at all
     if (track.matchMethod === 'none') {
       flags.push({
         type: 'no_match',
-        severity: 'warning',
-        message: 'Ingen match i MusicBrainz - manuell kontroll krävs'
+        severity: 'info',
+        message: 'Ingen match i MusicBrainz'
       });
     }
     
     // FLAG 7: Low confidence match
-    if (track.confidence === 'low') {
+    if (track.confidence === 'low' && track.matchMethod === 'search') {
       flags.push({
         type: 'low_confidence',
-        severity: 'warning',
-        message: 'Osäker match i MusicBrainz - verifiera manuellt'
-      });
-    }
-    
-    // FLAG 8: No ISRC (less reliable)
-    if (!track.isrc) {
-      flags.push({
-        type: 'no_isrc',
         severity: 'info',
-        message: 'Ingen ISRC-kod - använder artist+titel-sökning'
+        message: 'Osäker match i MusicBrainz'
       });
     }
     
-    // FLAG 9: Very old track with modern album type
-    if (track.mbYear && track.mbYear < 1990 && track.albumType === 'compilation') {
+    // FLAG 8: Artist doesn't match (feature/remix detected)
+    if (!hasEarliestData && track.matchMethod !== 'none') {
       flags.push({
-        type: 'old_on_compilation',
-        severity: 'warning',
-        message: 'Gammal låt på samlingsalbum - kontrollera årtalet'
+        type: 'different_artist',
+        severity: 'info',
+        message: 'Artist skiljer sig från original - använder nytt årtal (korrekt)'
       });
     }
     
     // Determine overall status based on flags
     let status = 'green'; // OK to use
     
-    if (flags.some(f => f.severity === 'error')) {
+    // Red if: compilation wrong year
+    if (flags.some(f => f.type === 'compilation_wrong_year')) {
       status = 'red'; // Must review
-    } else if (flags.some(f => f.severity === 'warning')) {
+    }
+    // Yellow if: potential year mismatch or modified version
+    else if (flags.some(f => f.type === 'year_mismatch_potential' || f.type === 'modified_version')) {
       status = 'yellow'; // Should review
     }
     
     // Determine recommended year
     let recommendedYear = track.spotifyYear;
     
-    if (track.mbYear) {
-      // If MusicBrainz year exists and is older or same, prefer it
-      if (track.mbYear <= track.spotifyYear) {
-        recommendedYear = track.mbYear;
-      }
-      // If Spotify is older (suspicious), flag for manual review but suggest Spotify
-      else {
-        recommendedYear = track.spotifyYear;
+    if (hasEarliestData && earliestYear < track.spotifyYear) {
+      // Only recommend earliest if it's older AND significant difference
+      const diff = track.spotifyYear - earliestYear;
+      if (diff > 2) {
+        recommendedYear = earliestYear;
       }
     }
     
