@@ -448,6 +448,49 @@ button {
   max-width: 350px;
 }
 
+.validation-sources {
+  background: var(--color-bg);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.85rem;
+  border-left: 3px solid var(--color-primary);
+}
+
+.compilation-info {
+  background: var(--color-bg);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.85rem;
+  border-left: 3px solid var(--color-warning);
+}
+
+.compilation-info small {
+  color: var(--color-text-dim);
+}
+
+.confidence-very_high {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.confidence-high {
+  color: var(--color-success);
+}
+
+.confidence-medium {
+  color: var(--color-warning);
+}
+
+.confidence-low {
+  color: var(--color-error);
+}
+
+.confidence-none {
+  color: var(--color-text-dim);
+}
+
 .flags-list {
   list-style: none;
   font-size: 0.85rem;

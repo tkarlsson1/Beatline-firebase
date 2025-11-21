@@ -322,16 +322,50 @@ function getEarliestRecordingForMatchingArtist(spotifyArtist, recordings) {
 async function validateTrack(track, onProgress) {
   const result = {
     ...track, // Preserve all original Spotify data
+    
+    // Album data (to be fetched)
+    albumData: null,
+    
+    // MusicBrainz data
     mbYear: null,
     mbFirstReleaseDate: null,
     mbRecordingId: null,
-    earliestRecordingYear: null, // NEW: Earliest year from same artist
+    earliestRecordingYear: null,
     matchMethod: 'none',
     confidence: 'none',
-    mbData: null
+    mbData: null,
+    
+    // Last.fm data
+    lastFmYear: null,
+    lastFmData: null
   };
   
-  // Try ISRC first (most accurate)
+  // 1. Fetch full Spotify album data
+  if (onProgress) onProgress(`Hämtar album-data från Spotify...`);
+  
+  try {
+    const albumData = await window.spotifyHelper.fetchAlbum(track.albumId);
+    result.albumData = albumData;
+  } catch (error) {
+    console.warn(`Failed to fetch album data for ${track.albumId}:`, error);
+    // Continue without album data
+  }
+  
+  // 2. Try Last.fm first (fast and often accurate for modern tracks)
+  if (onProgress) onProgress(`Checking Last.fm...`);
+  
+  try {
+    const lastFmData = await window.lastFm.getTrackInfo(track.artist, track.title);
+    if (lastFmData.found) {
+      result.lastFmYear = lastFmData.year;
+      result.lastFmData = lastFmData;
+    }
+  } catch (error) {
+    console.warn(`Last.fm lookup failed:`, error);
+    // Continue without Last.fm data
+  }
+  
+  // 3. Try ISRC in MusicBrainz (most accurate)
   if (track.isrc) {
     if (onProgress) onProgress(`Checking ISRC: ${track.isrc}...`);
     
@@ -353,8 +387,8 @@ async function validateTrack(track, onProgress) {
     }
   }
   
-  // Fallback: search by artist + title
-  if (onProgress) onProgress(`Searching: ${track.artist} - ${track.title}...`);
+  // 4. Fallback: search MusicBrainz by artist + title
+  if (onProgress) onProgress(`Searching MusicBrainz: ${track.artist} - ${track.title}...`);
   
   const searchResult = await searchByArtistTitle(track.artist, track.title);
   
@@ -368,7 +402,7 @@ async function validateTrack(track, onProgress) {
     result.confidence = searchResult.confidence;
     result.mbData = bestMatch;
     
-    // NEW: Find earliest recording from SAME base artist
+    // Find earliest recording from SAME base artist
     const earliestData = getEarliestRecordingForMatchingArtist(
       track.artist,
       searchResult.recordings

@@ -351,18 +351,44 @@ function renderTrackRow(track) {
   if (track.status === 'red' || track.status === 'yellow') {
     // Dropdown for tracks that need review
     const options = [];
+    const years = new Set();
     
     // Add Spotify year option
     options.push(`<option value="${track.spotifyYear}">
       ${track.spotifyYear} (Spotify)
     </option>`);
+    years.add(track.spotifyYear);
     
-    // Add earliestRecordingYear if available and different
-    if (track.earliestRecordingYear && track.earliestRecordingYear !== track.spotifyYear) {
-      const selected = track.earliestRecordingYear < track.spotifyYear ? 'selected' : '';
-      options.push(`<option value="${track.earliestRecordingYear}" ${selected}>
-        ${track.earliestRecordingYear} (Original från samma artist)
+    // Add validation bestYear if available and different
+    if (track.validation && track.validation.bestYear && !years.has(track.validation.bestYear)) {
+      const sourcesText = track.validation.sources
+        .filter(s => s.year === track.validation.bestYear)
+        .map(s => s.name)
+        .join('+');
+      
+      const selected = track.validation.confidence === 'very_high' || 
+                       track.validation.confidence === 'high' ? 'selected' : '';
+      
+      options.push(`<option value="${track.validation.bestYear}" ${selected}>
+        ${track.validation.bestYear} (${sourcesText} - ${track.validation.confidence})
       </option>`);
+      years.add(track.validation.bestYear);
+    }
+    
+    // Add earliestRecordingYear if different from above
+    if (track.earliestRecordingYear && !years.has(track.earliestRecordingYear)) {
+      options.push(`<option value="${track.earliestRecordingYear}">
+        ${track.earliestRecordingYear} (MusicBrainz äldsta)
+      </option>`);
+      years.add(track.earliestRecordingYear);
+    }
+    
+    // Add Last.fm year if different
+    if (track.lastFmYear && !years.has(track.lastFmYear)) {
+      options.push(`<option value="${track.lastFmYear}">
+        ${track.lastFmYear} (Last.fm)
+      </option>`);
+      years.add(track.lastFmYear);
     }
     
     // Custom input option
@@ -381,16 +407,54 @@ function renderTrackRow(track) {
     yearControl = `<span class="year-display">${year}</span>`;
   }
   
-  // Flags display
-  const flagsHtml = track.flags.length > 0 ? `
-    <ul class="flags-list">
-      ${track.flags.map(flag => `
-        <li class="flag flag-${flag.severity}">
-          ${flag.message}
-        </li>
-      `).join('')}
-    </ul>
-  ` : '<span class="no-flags">-</span>';
+  // Flags display with sources info
+  let flagsHtml = '';
+  
+  // Show validation sources first
+  if (track.validation && track.validation.sources.length > 0) {
+    const sourcesText = track.validation.sources
+      .map(s => `${s.name}: ${s.year}`)
+      .join(', ');
+    
+    flagsHtml += `
+      <div class="validation-sources">
+        <strong>Källor:</strong> ${sourcesText}
+        <br>
+        <strong>Confidence:</strong> 
+        <span class="confidence-${track.validation.confidence}">
+          ${track.validation.confidence.replace('_', ' ')}
+        </span>
+      </div>
+    `;
+  }
+  
+  // Show compilation analysis
+  if (track.compilationAnalysis && track.compilationAnalysis.isCompilation) {
+    flagsHtml += `
+      <div class="compilation-info">
+        <strong>Samlingsalbum:</strong> ${track.compilationAnalysis.confidence}
+        <br>
+        <small>${track.compilationAnalysis.reasons.slice(0, 2).join(', ')}</small>
+      </div>
+    `;
+  }
+  
+  // Show flags
+  if (track.flags.length > 0) {
+    flagsHtml += `
+      <ul class="flags-list">
+        ${track.flags.map(flag => `
+          <li class="flag flag-${flag.severity}">
+            ${flag.message}
+          </li>
+        `).join('')}
+      </ul>
+    `;
+  }
+  
+  if (!flagsHtml) {
+    flagsHtml = '<span class="no-flags">-</span>';
+  }
   
   // Action buttons
   const actions = track.verified ? `

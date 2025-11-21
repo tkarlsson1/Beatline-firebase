@@ -130,6 +130,7 @@ async function fetchSpotifyPlaylist(playlistUrl) {
           artist: track.artists[0]?.name || 'Unknown',
           allArtists: track.artists.map(a => a.name).join(', '),
           album: track.album.name,
+          albumId: track.album.id,
           albumType: track.album.album_type, // 'album', 'single', 'compilation'
           spotifyYear: parseInt(track.album.release_date.split('-')[0]),
           releaseDate: track.album.release_date,
@@ -172,10 +173,74 @@ function isValidPlaylistUrl(url) {
   return extractPlaylistId(url) !== null;
 }
 
+/**
+ * Fetch full album data from Spotify
+ * Returns: { id, name, artists, albumType, totalTracks, releaseDate, label, genres }
+ */
+async function fetchSpotifyAlbum(albumId) {
+  if (!albumId) {
+    throw new Error('Inget album-ID angivet');
+  }
+  
+  let token;
+  try {
+    token = await getBackendSpotifyToken();
+  } catch (error) {
+    throw new Error(`Kunde inte hämta Spotify-token: ${error.message}`);
+  }
+  
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/albums/${albumId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Album hittades inte');
+      }
+      if (response.status === 401) {
+        throw new Error('Spotify-autentisering misslyckades');
+      }
+      throw new Error(`Spotify API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    return {
+      id: data.id,
+      name: data.name,
+      artists: data.artists.map(a => a.name),
+      albumArtist: data.artists[0]?.name || 'Unknown',
+      albumType: data.album_type,
+      totalTracks: data.total_tracks,
+      releaseDate: data.release_date,
+      releaseYear: parseInt(data.release_date.split('-')[0]),
+      label: data.label || null,
+      genres: data.genres || [],
+      popularity: data.popularity || 0
+    };
+    
+  } catch (error) {
+    console.error('Failed to fetch album:', error);
+    
+    if (error.message.includes('Spotify') || error.message.includes('Album')) {
+      throw error;
+    }
+    
+    throw new Error(`Kunde inte ladda album: ${error.message}`);
+  }
+}
+
 // Export functions
 window.spotifyHelper = {
   getToken: getBackendSpotifyToken,
   fetchPlaylist: fetchSpotifyPlaylist,
+  fetchAlbum: fetchSpotifyAlbum,
   extractPlaylistId: extractPlaylistId,
   isValidUrl: isValidPlaylistUrl
 };
