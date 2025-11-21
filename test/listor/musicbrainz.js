@@ -316,6 +316,94 @@ function getEarliestRecordingForMatchingArtist(spotifyArtist, recordings) {
 }
 
 /**
+ * Find original Spotify release for a track (when compilation is detected)
+ * Searches Spotify for all versions and finds earliest studio album
+ * Returns: { found, originalYear, originalAlbum, originalReleaseDate, confidence, alternativesCount }
+ */
+async function findOriginalSpotifyRelease(artist, title, currentAlbumId) {
+  if (!artist || !title) {
+    return { found: false, reason: 'Missing artist or title' };
+  }
+  
+  try {
+    // 1. Search Spotify for all versions
+    const allTracks = await window.spotifyHelper.searchSpotifyTrack(artist, title);
+    
+    if (allTracks.length === 0) {
+      return { found: false, reason: 'No tracks found on Spotify' };
+    }
+    
+    // 2. Normalize artist for comparison
+    const baseArtist = normalizeArtist(artist);
+    
+    // 3. Filter to SAME base artist
+    const matchingArtist = allTracks.filter(track => {
+      const trackBaseArtist = normalizeArtist(track.artist);
+      const similarity = stringSimilarity(baseArtist, trackBaseArtist);
+      return similarity >= 0.9; // 90% similarity threshold
+    });
+    
+    if (matchingArtist.length === 0) {
+      return { found: false, reason: 'No matching artist found' };
+    }
+    
+    // 4. Filter to studio albums only
+    const studioAlbums = matchingArtist.filter(track => {
+      // Skip the current compilation album
+      if (track.albumId === currentAlbumId) return false;
+      
+      // Only studio albums (not single or compilation)
+      if (track.albumType !== 'album') return false;
+      
+      // Filter out live/remix in TITLE
+      if (/live|remix|acoustic|demo|radio edit/i.test(track.title)) return false;
+      
+      // Filter out live/remix/remaster in ALBUM
+      if (/live|remix|remaster|deluxe|anniversary|greatest|best of/i.test(track.album)) return false;
+      
+      return true;
+    });
+    
+    if (studioAlbums.length === 0) {
+      return { found: false, reason: 'No studio album found on Spotify' };
+    }
+    
+    // 5. Sort by release date (oldest first)
+    studioAlbums.sort((a, b) => {
+      const dateA = new Date(a.releaseDate);
+      const dateB = new Date(b.releaseDate);
+      return dateA - dateB;
+    });
+    
+    // 6. Take earliest
+    const original = studioAlbums[0];
+    
+    // Calculate confidence
+    let confidence;
+    if (studioAlbums.length >= 3) {
+      confidence = 'high';
+    } else if (studioAlbums.length >= 1) {
+      confidence = 'medium';
+    } else {
+      confidence = 'none';
+    }
+    
+    return {
+      found: true,
+      originalYear: original.releaseYear,
+      originalAlbum: original.album,
+      originalReleaseDate: original.releaseDate,
+      confidence: confidence,
+      alternativesCount: studioAlbums.length
+    };
+    
+  } catch (error) {
+    console.error('Spotify original search failed:', error);
+    return { found: false, reason: error.message };
+  }
+}
+
+/**
  * Validate single track against MusicBrainz
  * Tries ISRC first, then falls back to artist+title search
  */
@@ -325,6 +413,11 @@ async function validateTrack(track, onProgress) {
     
     // Album data (to be fetched)
     albumData: null,
+    
+    // Spotify original data (for compilations)
+    spotifyOriginalYear: null,
+    spotifyOriginalAlbum: null,
+    spotifyOriginalData: null,
     
     // MusicBrainz data
     mbYear: null,
@@ -368,6 +461,30 @@ async function validateTrack(track, onProgress) {
     }
   }
   
+  // === NEW: Search for Spotify original if compilation detected ===
+  if (result.albumData && result.albumData.albumType === 'compilation') {
+    if (onProgress) onProgress(`Söker efter original album på Spotify...`);
+    
+    try {
+      const spotifyOriginal = await findOriginalSpotifyRelease(
+        track.artist,
+        track.title,
+        track.albumId
+      );
+      
+      if (spotifyOriginal.found) {
+        result.spotifyOriginalYear = spotifyOriginal.originalYear;
+        result.spotifyOriginalAlbum = spotifyOriginal.originalAlbum;
+        result.spotifyOriginalData = spotifyOriginal;
+        
+        console.log(`✅ Found Spotify original: ${spotifyOriginal.originalAlbum} (${spotifyOriginal.originalYear})`);
+      }
+    } catch (error) {
+      console.warn(`Spotify original search failed:`, error.message);
+      // Continue without Spotify original
+    }
+  }
+  
   // 3. Try ISRC in MusicBrainz (most accurate)
   if (track.isrc) {
     if (onProgress) onProgress(`Checking ISRC: ${track.isrc}...`);
@@ -393,7 +510,7 @@ async function validateTrack(track, onProgress) {
   // 4. Fallback: search MusicBrainz by artist + title
   if (onProgress) onProgress(`Searching MusicBrainz: ${track.artist} - ${track.title}...`);
   
-  const searchResult = await searchByArtistTitle(track.artist, track.title);
+  const searchResult = await searchByArtistTitle(track.artist, title);
   
   if (searchResult.found) {
     // Store best match data
@@ -501,5 +618,6 @@ window.musicBrainz = {
   normalizeArtist,
   normalizeForSearch,
   stringSimilarity,
-  getEarliestRecordingForMatchingArtist
+  getEarliestRecordingForMatchingArtist,
+  findOriginalSpotifyRelease
 };

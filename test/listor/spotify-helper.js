@@ -236,11 +236,85 @@ async function fetchSpotifyAlbum(albumId) {
   }
 }
 
+/**
+ * Search Spotify for all versions of a track
+ * Used to find original releases when we detect compilations
+ * Returns: Array of tracks with album info
+ */
+async function searchSpotifyTrack(artist, title) {
+  if (!artist || !title) {
+    return [];
+  }
+  
+  let token;
+  try {
+    token = await getBackendSpotifyToken();
+  } catch (error) {
+    throw new Error(`Kunde inte hämta Spotify-token: ${error.message}`);
+  }
+  
+  try {
+    // Build search query
+    const query = `artist:${artist} track:${title}`;
+    
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(query)}&limit=20`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Spotify-autentisering misslyckades');
+      }
+      throw new Error(`Spotify API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.tracks || !data.tracks.items) {
+      return [];
+    }
+    
+    // Extract track information
+    const tracks = data.tracks.items
+      .filter(item => item && item.id) // Skip null tracks
+      .map(item => {
+        return {
+          spotifyId: item.id,
+          title: item.name,
+          artist: item.artists[0]?.name || 'Unknown',
+          allArtists: item.artists.map(a => a.name).join(', '),
+          album: item.album.name,
+          albumId: item.album.id,
+          albumType: item.album.album_type, // 'album', 'single', 'compilation'
+          releaseDate: item.album.release_date,
+          releaseYear: parseInt(item.album.release_date.split('-')[0])
+        };
+      });
+    
+    return tracks;
+    
+  } catch (error) {
+    console.error('Failed to search Spotify track:', error);
+    
+    if (error.message.includes('Spotify')) {
+      throw error;
+    }
+    
+    throw new Error(`Spotify track search misslyckades: ${error.message}`);
+  }
+}
+
 // Export functions
 window.spotifyHelper = {
   getToken: getBackendSpotifyToken,
   fetchPlaylist: fetchSpotifyPlaylist,
   fetchAlbum: fetchSpotifyAlbum,
+  searchSpotifyTrack: searchSpotifyTrack,
   extractPlaylistId: extractPlaylistId,
   isValidUrl: isValidPlaylistUrl
 };

@@ -359,6 +359,16 @@ function renderTrackRow(track) {
     </option>`);
     years.add(track.spotifyYear);
     
+    // Add Spotify Original year if available (compilation search result)
+    if (track.spotifyOriginalYear && !years.has(track.spotifyOriginalYear)) {
+      const selected = track.validation?.bestYear === track.spotifyOriginalYear ? 'selected' : '';
+      
+      options.push(`<option value="${track.spotifyOriginalYear}" ${selected}>
+        ${track.spotifyOriginalYear} (Spotify Original: ${track.spotifyOriginalAlbum})
+      </option>`);
+      years.add(track.spotifyOriginalYear);
+    }
+    
     // Add validation bestYear if available and different
     if (track.validation && track.validation.bestYear && !years.has(track.validation.bestYear)) {
       const sourcesText = track.validation.sources
@@ -409,6 +419,19 @@ function renderTrackRow(track) {
   
   // Flags display with sources info
   let flagsHtml = '';
+  
+  // Show Spotify original info if found (for compilations)
+  if (track.spotifyOriginalData && track.spotifyOriginalData.found) {
+    flagsHtml += `
+      <div class="spotify-original-info">
+        <strong>🎯 Spotify Original:</strong> 
+        ${track.spotifyOriginalAlbum} (${track.spotifyOriginalYear})
+        <br>
+        <small>Funnen från ${track.spotifyOriginalData.alternativesCount} alternativ 
+        (${track.spotifyOriginalData.confidence} confidence)</small>
+      </div>
+    `;
+  }
   
   // Show validation sources first
   if (track.validation && track.validation.sources.length > 0) {

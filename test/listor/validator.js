@@ -16,15 +16,50 @@ function detectCompilationAlbum(track) {
   
   // 2. Album name patterns
   const compilationKeywords = [
+    // Very strong indicators (40 points)
     { regex: /greatest\s*hits/i, points: 40, name: 'Greatest Hits' },
     { regex: /best\s*of/i, points: 40, name: 'Best Of' },
+    { regex: /the\s+very\s+best/i, points: 40, name: 'The Very Best' },
+    { regex: /complete\s+collection/i, points: 40, name: 'Complete Collection' },
+    { regex: /#1'?s\b/i, points: 40, name: 'Number Ones' },
+    { regex: /number\s+ones/i, points: 40, name: 'Number Ones' },
+    
+    // Strong indicators (35 points)
     { regex: /anthology/i, points: 35, name: 'Anthology' },
-    { regex: /collection/i, points: 30, name: 'Collection' },
+    { regex: /the\s+definitive/i, points: 35, name: 'The Definitive' },
+    { regex: /retrospective/i, points: 35, name: 'Retrospective' },
+    { regex: /millennium\s+collection/i, points: 35, name: 'Millennium Collection' },
+    
+    // Medium indicators (30 points)
+    { regex: /\bcollection\b/i, points: 30, name: 'Collection' },
     { regex: /\bessential\b/i, points: 30, name: 'Essential' },
-    { regex: /\bgold\b/i, points: 25, name: 'Gold Edition' },
     { regex: /\bultimate\b/i, points: 30, name: 'Ultimate' },
+    { regex: /\bsingles\b/i, points: 30, name: 'Singles Collection' },
+    { regex: /all\s+the\s+hits/i, points: 30, name: 'All The Hits' },
+    { regex: /collected/i, points: 30, name: 'Collected' },
+    { regex: /selected/i, points: 30, name: 'Selected' },
+    { regex: /complete\s+works/i, points: 30, name: 'Complete Works' },
+    
+    // Moderate indicators (25 points)
+    { regex: /\bgold\b/i, points: 25, name: 'Gold Edition' },
+    { regex: /\bicon\b/i, points: 25, name: 'Icon' },
+    { regex: /\bhits\b/i, points: 25, name: 'Hits compilation' },
+    { regex: /top\s+hits/i, points: 25, name: 'Top Hits' },
+    { regex: /all\s+time\s+greatest/i, points: 25, name: 'All Time Greatest' },
+    { regex: /the\s+story/i, points: 25, name: 'The Story' },
+    { regex: /box\s+set/i, points: 25, name: 'Box Set' },
+    
+    // Weak indicators (20 points)
     { regex: /\bclassic/i, points: 20, name: 'Classics' },
-    { regex: /\bhits\b/i, points: 25, name: 'Hits compilation' }
+    { regex: /\bplaylist\b/i, points: 20, name: 'Playlist compilation' },
+    { regex: /millennium\s+edition/i, points: 20, name: 'Millennium Edition' },
+    
+    // Decade indicators (15 points)
+    { regex: /\b(60|70|80|90)s?\s+(hits|collection|classics)/i, points: 15, name: 'Decade compilation' },
+    { regex: /\b(sixties|seventies|eighties|nineties)\s+(hits|collection)/i, points: 15, name: 'Decade compilation' },
+    
+    // Year range indicators (15 points)
+    { regex: /\b(19|20)\d{2}\s*-\s*(19|20)\d{2}/i, points: 15, name: 'Year range compilation' }
   ];
   
   for (const keyword of compilationKeywords) {
@@ -57,12 +92,15 @@ function detectCompilationAlbum(track) {
     const albumData = track.albumData;
     
     // Many tracks = likely compilation
-    if (albumData.totalTracks > 25) {
-      score += 20;
+    if (albumData.totalTracks > 30) {
+      score += 25;
       reasons.push(`Many tracks (${albumData.totalTracks})`);
     } else if (albumData.totalTracks > 20) {
-      score += 10;
+      score += 15;
       reasons.push(`Many tracks (${albumData.totalTracks})`);
+    } else if (albumData.totalTracks > 15) {
+      score += 8;
+      reasons.push(`Relatively many tracks (${albumData.totalTracks})`);
     }
     
     // Album artist vs track artist
@@ -79,11 +117,31 @@ function detectCompilationAlbum(track) {
     
     // Compilation labels
     const compilationLabels = [
+      // Major compilation labels
       /rhino/i,
+      /rhino entertainment/i,
       /legacy/i,
+      /legacy recordings/i,
+      /sony legacy/i,
+      /columbia legacy/i,
       /universal compilation/i,
       /sony compilation/i,
-      /warner compilation/i
+      /warner compilation/i,
+      /warner strategic/i,
+      /capitol catalogue/i,
+      /emi gold/i,
+      /mercury/i,
+      /umc\b/i,  // Universal Music Catalogue
+      /sony music cg/i,
+      /geffen/i,
+      /parlophone/i,
+      /atlantic/i,
+      /epic legacy/i,
+      /rca legacy/i,
+      /arista/i,
+      /repertoire/i,
+      /catalog/i,
+      /catalogue/i
     ];
     
     if (albumData.label) {
@@ -122,6 +180,11 @@ function crossValidateYear(track) {
   // Collect all year sources
   if (track.spotifyYear) {
     sources.push({ name: 'Spotify', year: track.spotifyYear, weight: 1 });
+  }
+  
+  // Spotify Original (highest weight - Spotify's own data for original album)
+  if (track.spotifyOriginalYear) {
+    sources.push({ name: 'Spotify Original', year: track.spotifyOriginalYear, weight: 3 });
   }
   
   if (track.lastFmYear) {
