@@ -510,7 +510,7 @@ async function validateTrack(track, onProgress) {
   // 4. Fallback: search MusicBrainz by artist + title
   if (onProgress) onProgress(`Searching MusicBrainz: ${track.artist} - ${track.title}...`);
   
-  const searchResult = await searchByArtistTitle(track.artist, title);
+  const searchResult = await searchByArtistTitle(track.artist, track.title);
   
   if (searchResult.found) {
     // Store best match data

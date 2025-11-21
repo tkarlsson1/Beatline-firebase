@@ -94,7 +94,7 @@ async function fetchSpotifyPlaylist(playlistUrl) {
   try {
     // Fetch playlist details (first 100 tracks)
     const response = await fetch(
-      `https://api.spotify.com/v1/playlists/${playlistId}?fields=name,description,owner.display_name,tracks.items(track(id,name,artists,album,external_ids,preview_url,duration_ms)),tracks.next,tracks.total`,
+      `https://api.spotify.com/v1/playlists/${playlistId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -122,9 +122,12 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     let allTrackItems = [...data.tracks.items];
     let nextUrl = data.tracks.next;
     
+    console.log(`First page loaded: ${allTrackItems.length} tracks`);
+    console.log(`Next URL exists: ${nextUrl ? 'YES' : 'NO'}`);
+    
     // Fetch remaining pages if playlist has more than 100 tracks
     while (nextUrl) {
-      console.log(`Fetching more tracks... (${allTrackItems.length} loaded so far)`);
+      console.log(`Fetching next page... (${allTrackItems.length} tracks loaded so far)`);
       
       const nextResponse = await fetch(nextUrl, {
         headers: {
@@ -133,13 +136,15 @@ async function fetchSpotifyPlaylist(playlistUrl) {
       });
       
       if (!nextResponse.ok) {
-        console.warn('Failed to fetch next page, stopping pagination');
+        console.warn(`Failed to fetch next page (status: ${nextResponse.status}), stopping pagination`);
         break;
       }
       
       const nextData = await nextResponse.json();
       allTrackItems = allTrackItems.concat(nextData.items);
       nextUrl = nextData.next;
+      
+      console.log(`Page loaded: now ${allTrackItems.length} tracks total, next URL: ${nextUrl ? 'YES' : 'NO'}`);
     }
     
     // Extract track information from all items
