@@ -92,9 +92,9 @@ async function fetchSpotifyPlaylist(playlistUrl) {
   }
   
   try {
-    // Fetch playlist details
+    // Fetch playlist details (first 100 tracks)
     const response = await fetch(
-      `https://api.spotify.com/v1/playlists/${playlistId}`,
+      `https://api.spotify.com/v1/playlists/${playlistId}?fields=name,description,owner.display_name,tracks.items(track(id,name,artists,album,external_ids,preview_url,duration_ms)),tracks.next,tracks.total`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -118,8 +118,32 @@ async function fetchSpotifyPlaylist(playlistUrl) {
       throw new Error('Spellistan har ingen data');
     }
     
-    // Extract track information
-    const tracks = data.tracks.items
+    // Collect all track items (handle pagination)
+    let allTrackItems = [...data.tracks.items];
+    let nextUrl = data.tracks.next;
+    
+    // Fetch remaining pages if playlist has more than 100 tracks
+    while (nextUrl) {
+      console.log(`Fetching more tracks... (${allTrackItems.length} loaded so far)`);
+      
+      const nextResponse = await fetch(nextUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!nextResponse.ok) {
+        console.warn('Failed to fetch next page, stopping pagination');
+        break;
+      }
+      
+      const nextData = await nextResponse.json();
+      allTrackItems = allTrackItems.concat(nextData.items);
+      nextUrl = nextData.next;
+    }
+    
+    // Extract track information from all items
+    const tracks = allTrackItems
       .filter(item => item.track && item.track.id) // Skip null tracks
       .map(item => {
         const track = item.track;
