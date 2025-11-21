@@ -488,6 +488,13 @@ function calculatePlaylistStats(tracks) {
       'Last.fm': 0,
       'MusicBrainz': 0,
       'Custom': 0
+    },
+    confidenceAccuracy: {
+      'very_high': { total: 0, correct: 0 },
+      'high': { total: 0, correct: 0 },
+      'medium': { total: 0, correct: 0 },
+      'low': { total: 0, correct: 0 },
+      'none': { total: 0, correct: 0 }
     }
   };
   
@@ -506,6 +513,21 @@ function calculatePlaylistStats(tracks) {
       // Count source accuracy (only for verified tracks)
       if (track.chosenSource) {
         stats.sourceAccuracy[track.chosenSource]++;
+      }
+      
+      // Count confidence accuracy (only for verified tracks)
+      if (track.validation && track.validation.confidence) {
+        const confidence = track.validation.confidence;
+        const recommendedYear = track.recommendedYear;
+        const verifiedYear = track.verifiedYear;
+        
+        // Increment total for this confidence level
+        stats.confidenceAccuracy[confidence].total++;
+        
+        // Check if the recommendation was correct
+        if (recommendedYear && verifiedYear && recommendedYear === verifiedYear) {
+          stats.confidenceAccuracy[confidence].correct++;
+        }
       }
     }
     

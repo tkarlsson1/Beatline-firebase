@@ -236,7 +236,8 @@ function renderSourceAccuracyPanel(stats) {
     { name: 'Custom', icon: '✏️', color: '#FFA500' }
   ];
   
-  const rows = sources
+  // Current playlist stats
+  const currentRows = sources
     .filter(source => stats.sourceAccuracy[source.name] > 0)
     .map(source => {
       const count = stats.sourceAccuracy[source.name];
@@ -260,13 +261,107 @@ function renderSourceAccuracyPanel(stats) {
     })
     .join('');
   
+  // Placeholder for global stats (will be loaded async)
+  const globalSection = `
+    <div class="source-stats-section" id="globalStatsSection">
+      <div class="loading-stats">⏳ Laddar global statistik från Firebase...</div>
+    </div>
+  `;
+  
+  // Render confidence accuracy for current playlist
+  const currentConfidenceHtml = renderConfidenceAccuracy(
+    stats.confidenceAccuracy,
+    `Confidence-träffsäkerhet (${total} verifierade)`,
+    false
+  );
+  
+  // Load global stats asynchronously and update DOM
+  if (window.statsManager) {
+    window.statsManager.getGlobalStats().then(globalStats => {
+      const globalStatsElement = document.getElementById('globalStatsSection');
+      if (globalStatsElement && globalStats && globalStats.totalVerified > 0) {
+        const globalRows = sources
+          .filter(source => globalStats.sourceAccuracy[source.name] > 0)
+          .map(source => {
+            const count = globalStats.sourceAccuracy[source.name];
+            const percentage = Math.round((count / globalStats.totalVerified) * 100);
+            const barWidth = percentage;
+            
+            return `
+              <div class="source-stat-row">
+                <div class="source-stat-label">
+                  <span class="source-icon">${source.icon}</span>
+                  <span class="source-name">${source.name}</span>
+                </div>
+                <div class="source-stat-bar-container">
+                  <div class="source-stat-bar" style="width: ${barWidth}%; background-color: ${source.color}"></div>
+                </div>
+                <div class="source-stat-value">
+                  ${count} <span class="source-percentage">(${percentage}%)</span>
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+        
+        // Render global confidence accuracy
+        const globalConfidenceHtml = renderConfidenceAccuracy(
+          globalStats.confidenceAccuracy,
+          `Global confidence-träffsäkerhet (${globalStats.totalVerified} låtar)`,
+          true
+        );
+        
+        globalStatsElement.innerHTML = `
+          <h4>🌍 Global statistik (${globalStats.totalPlaylists} spellistor, ${globalStats.totalVerified} låtar)</h4>
+          <div class="source-stats">
+            ${globalRows}
+          </div>
+          ${globalConfidenceHtml}
+          <div class="global-stats-actions">
+            <button class="btn-secondary btn-small" onclick="exportGlobalStats()">
+              📊 Exportera global statistik
+            </button>
+            <button class="btn-secondary btn-small btn-danger" onclick="resetGlobalStats()">
+              🗑️ Nollställ statistik
+            </button>
+          </div>
+        `;
+      } else if (globalStatsElement) {
+        // No global stats yet
+        globalStatsElement.innerHTML = `
+          <div class="no-global-stats">
+            <p>Ingen global statistik ännu. Exportera denna spellista för att börja samla statistik!</p>
+          </div>
+        `;
+      }
+    }).catch(error => {
+      console.error('Failed to load global stats:', error);
+      const globalStatsElement = document.getElementById('globalStatsSection');
+      if (globalStatsElement) {
+        globalStatsElement.innerHTML = `
+          <div class="error-stats">
+            ⚠️ Kunde inte ladda global statistik från Firebase
+          </div>
+        `;
+      }
+    });
+  }
+  
   return `
     <div class="source-accuracy-panel">
-      <h3>📊 Källstatistik (${total} verifierade)</h3>
-      <p class="source-accuracy-description">Visar vilken källa du valde för varje godkänd låt</p>
-      <div class="source-stats">
-        ${rows}
+      <h3>📊 Källstatistik</h3>
+      
+      <div class="source-stats-section">
+        <h4>📋 Denna spellista (${total} verifierade)</h4>
+        <p class="source-accuracy-description">Visar vilken källa du valde för varje godkänd låt</p>
+        <div class="source-stats">
+          ${currentRows}
+        </div>
       </div>
+      
+      ${currentConfidenceHtml}
+      
+      ${globalSection}
     </div>
   `;
 }
@@ -846,9 +941,60 @@ function renderSourceStatsForExport(stats) {
 }
 
 /**
+ * Render confidence accuracy section
+ */
+function renderConfidenceAccuracy(confidenceData, title, isGlobal = false) {
+  if (!confidenceData) return '';
+  
+  const confidenceLevels = [
+    { key: 'very_high', label: 'Very High', icon: '🟢', color: '#28a745' },
+    { key: 'high', label: 'High', icon: '🟡', color: '#ffc107' },
+    { key: 'medium', label: 'Medium', icon: '🟠', color: '#fd7e14' },
+    { key: 'low', label: 'Low', icon: '🔴', color: '#dc3545' },
+    { key: 'none', label: 'None', icon: '⚫', color: '#6c757d' }
+  ];
+  
+  const rows = confidenceLevels
+    .filter(level => confidenceData[level.key] && confidenceData[level.key].total > 0)
+    .map(level => {
+      const data = confidenceData[level.key];
+      const accuracy = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+      const barWidth = accuracy;
+      
+      return `
+        <div class="confidence-stat-row">
+          <div class="confidence-stat-label">
+            <span class="confidence-icon">${level.icon}</span>
+            <span class="confidence-name">${level.label}</span>
+          </div>
+          <div class="confidence-stat-bar-container">
+            <div class="confidence-stat-bar" style="width: ${barWidth}%; background-color: ${level.color}"></div>
+          </div>
+          <div class="confidence-stat-value">
+            ${data.correct}/${data.total} <span class="confidence-percentage">(${accuracy}%)</span>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+  
+  if (!rows) return '';
+  
+  return `
+    <div class="confidence-accuracy-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="confidence-description">Visar hur ofta varje confidence-nivå hade rätt rekommendation</p>
+      <div class="confidence-stats">
+        ${rows}
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Export to JSON
  */
-function exportJSON() {
+async function exportJSON() {
   const playlistData = window.validator.prepareForExport(
     currentState.playlist.name,
     currentState.playlist.spotifyUrl || '',
@@ -857,8 +1003,21 @@ function exportJSON() {
   
   window.validator.exportToJSON(playlistData);
   
-  showNotification('✅ JSON-fil nedladdad', 'success');
+  // Update global statistics
+  if (window.statsManager) {
+    await window.statsManager.updateGlobalStats(
+      currentState.stats,
+      currentState.tracks.filter(t => t.verified)
+    );
+  }
+  
+  showNotification('✅ JSON-fil nedladdad och statistik uppdaterad', 'success');
   closeExportModal();
+  
+  // Re-render to show updated global stats
+  setTimeout(() => {
+    renderReviewPhase();
+  }, 500);
 }
 
 /**
@@ -874,8 +1033,21 @@ async function exportFirebase() {
     
     const playlistId = await window.validator.saveToFirebase(playlistData);
     
+    // Update global statistics
+    if (window.statsManager) {
+      await window.statsManager.updateGlobalStats(
+        currentState.stats,
+        currentState.tracks.filter(t => t.verified)
+      );
+    }
+    
     showNotification(`✅ Spellista sparad till Firebase: ${playlistId}`, 'success');
     closeExportModal();
+    
+    // Re-render to show updated global stats
+    setTimeout(() => {
+      renderReviewPhase();
+    }, 500);
     
   } catch (error) {
     showError(`Misslyckades att spara till Firebase: ${error.message}`);
@@ -889,6 +1061,29 @@ function closeExportModal() {
   const modal = document.querySelector('.modal');
   if (modal) {
     modal.remove();
+  }
+}
+
+/**
+ * Export global statistics
+ */
+async function exportGlobalStats() {
+  if (window.statsManager) {
+    await window.statsManager.exportGlobalStatsToJSON();
+    showNotification('✅ Global statistik exporterad', 'success');
+  }
+}
+
+/**
+ * Reset global statistics
+ */
+async function resetGlobalStats() {
+  if (window.statsManager) {
+    const success = await window.statsManager.resetGlobalStats();
+    if (success) {
+      showNotification('✅ Global statistik nollställd', 'success');
+      renderReviewPhase();
+    }
   }
 }
 
@@ -940,5 +1135,7 @@ window.handleExport = handleExport;
 window.exportJSON = exportJSON;
 window.exportFirebase = exportFirebase;
 window.closeExportModal = closeExportModal;
+window.exportGlobalStats = exportGlobalStats;
+window.resetGlobalStats = resetGlobalStats;
 window.showNotification = showNotification;
 window.showError = showError;
