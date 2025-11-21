@@ -144,7 +144,7 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     
     // Extract track information from all items
     const tracks = allTrackItems
-      .filter(item => item.track && item.track.id) // Skip null tracks
+      .filter(item => item && item.track && item.track.id) // Skip null items and tracks
       .map(item => {
         const track = item.track;
         
