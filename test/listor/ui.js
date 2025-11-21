@@ -532,7 +532,30 @@ function handleYearChange(spotifyId, value) {
   if (value === 'custom') {
     const newYear = prompt('Ange korrekt årtal:');
     if (newYear && !isNaN(newYear)) {
-      updateTrackYearValue(spotifyId, parseInt(newYear));
+      const year = parseInt(newYear);
+      updateTrackYearValue(spotifyId, year);
+      
+      // Update dropdown to show the custom year
+      const select = document.getElementById(`year-${spotifyId}`);
+      if (select) {
+        // Check if this year already exists as an option
+        const existingOption = Array.from(select.options).find(opt => 
+          parseInt(opt.value) === year
+        );
+        
+        if (existingOption) {
+          // Just select the existing option
+          select.value = year;
+        } else {
+          // Add new option for custom year (before "custom" option)
+          const customOption = select.querySelector('option[value="custom"]');
+          const newOption = document.createElement('option');
+          newOption.value = year;
+          newOption.textContent = `${year} (Anpassat)`;
+          newOption.selected = true;
+          select.insertBefore(newOption, customOption);
+        }
+      }
     } else {
       // Reset select to previous value
       const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
@@ -564,9 +587,14 @@ function approveTrack(spotifyId) {
   const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
   if (!track) return;
   
-  // Get year from select/display
+  // Get year from select/display or from track's verifiedYear
   const yearElement = document.getElementById(`year-${spotifyId}`);
-  const year = yearElement ? parseInt(yearElement.value) : track.recommendedYear;
+  let year = yearElement ? parseInt(yearElement.value) : null;
+  
+  // Fallback to verifiedYear if dropdown value is invalid
+  if (!year || isNaN(year)) {
+    year = track.verifiedYear || track.recommendedYear;
+  }
   
   // Update track
   currentState.tracks = window.validator.updateTrackYear(
