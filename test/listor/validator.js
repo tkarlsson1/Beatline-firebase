@@ -481,7 +481,14 @@ function calculatePlaylistStats(tracks) {
     withMBMatch: 0,
     withISRC: 0,
     avgYearDiff: 0,
-    flagTypes: {}
+    flagTypes: {},
+    sourceAccuracy: {
+      'Spotify': 0,
+      'Spotify Original': 0,
+      'Last.fm': 0,
+      'MusicBrainz': 0,
+      'Custom': 0
+    }
   };
   
   let yearDiffSum = 0;
@@ -493,7 +500,15 @@ function calculatePlaylistStats(tracks) {
     else if (track.status === 'yellow') stats.yellow++;
     else if (track.status === 'red') stats.red++;
     
-    if (track.verified) stats.verified++;
+    if (track.verified) {
+      stats.verified++;
+      
+      // Count source accuracy (only for verified tracks)
+      if (track.chosenSource) {
+        stats.sourceAccuracy[track.chosenSource]++;
+      }
+    }
+    
     if (track.needsReview) stats.needsReview++;
     if (track.mbYear) stats.withMBMatch++;
     if (track.isrc) stats.withISRC++;
@@ -602,6 +617,7 @@ function autoApproveGreenTracks(tracks) {
  */
 function prepareForExport(playlistName, playlistUrl, tracks) {
   const verifiedTracks = tracks.filter(t => t.verified);
+  const stats = calculatePlaylistStats(tracks);
   
   return {
     name: playlistName,
@@ -620,7 +636,8 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
     _metadata: {
       originalTrackCount: tracks.length,
       removedTracks: tracks.length - verifiedTracks.length,
-      validationStats: calculatePlaylistStats(tracks)
+      validationStats: stats,
+      sourceAccuracy: stats.sourceAccuracy
     }
   };
 }

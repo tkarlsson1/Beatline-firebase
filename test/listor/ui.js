@@ -222,6 +222,56 @@ async function startValidation(tracks) {
 }
 
 /**
+ * Render source accuracy panel
+ */
+function renderSourceAccuracyPanel(stats) {
+  const total = stats.verified;
+  if (total === 0) return '';
+  
+  const sources = [
+    { name: 'Spotify Original', icon: '🎯', color: '#1DB954' },
+    { name: 'MusicBrainz', icon: '🎵', color: '#BA478F' },
+    { name: 'Last.fm', icon: '🔴', color: '#D51007' },
+    { name: 'Spotify', icon: '🟢', color: '#1DB954' },
+    { name: 'Custom', icon: '✏️', color: '#FFA500' }
+  ];
+  
+  const rows = sources
+    .filter(source => stats.sourceAccuracy[source.name] > 0)
+    .map(source => {
+      const count = stats.sourceAccuracy[source.name];
+      const percentage = Math.round((count / total) * 100);
+      const barWidth = percentage;
+      
+      return `
+        <div class="source-stat-row">
+          <div class="source-stat-label">
+            <span class="source-icon">${source.icon}</span>
+            <span class="source-name">${source.name}</span>
+          </div>
+          <div class="source-stat-bar-container">
+            <div class="source-stat-bar" style="width: ${barWidth}%; background-color: ${source.color}"></div>
+          </div>
+          <div class="source-stat-value">
+            ${count} <span class="source-percentage">(${percentage}%)</span>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+  
+  return `
+    <div class="source-accuracy-panel">
+      <h3>📊 Källstatistik (${total} verifierade)</h3>
+      <p class="source-accuracy-description">Visar vilken källa du valde för varje godkänd låt</p>
+      <div class="source-stats">
+        ${rows}
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Phase 4: Review phase with table
  */
 function renderReviewPhase() {
@@ -255,6 +305,8 @@ function renderReviewPhase() {
           <div class="stat-label">✓ Verifierade</div>
         </div>
       </div>
+      
+      ${stats.verified > 0 ? renderSourceAccuracyPanel(stats) : ''}
       
       <div class="controls-panel">
         <div class="filter-controls">
@@ -596,6 +648,25 @@ function approveTrack(spotifyId) {
     year = track.verifiedYear || track.recommendedYear;
   }
   
+  // Identify which source was chosen
+  let chosenSource = 'Unknown';
+  if (year === track.spotifyYear) {
+    chosenSource = 'Spotify';
+  } else if (track.spotifyOriginalYear && year === track.spotifyOriginalYear) {
+    chosenSource = 'Spotify Original';
+  } else if (track.lastFmYear && year === track.lastFmYear) {
+    chosenSource = 'Last.fm';
+  } else if (track.earliestRecordingYear && year === track.earliestRecordingYear) {
+    chosenSource = 'MusicBrainz';
+  } else if (track.mbYear && year === track.mbYear) {
+    chosenSource = 'MusicBrainz';
+  } else {
+    chosenSource = 'Custom';
+  }
+  
+  // Save chosen source
+  track.chosenSource = chosenSource;
+  
   // Update track
   currentState.tracks = window.validator.updateTrackYear(
     currentState.tracks,
@@ -635,6 +706,28 @@ function removeTrackFromList(spotifyId) {
  * Auto-approve all green tracks
  */
 function autoApproveGreen() {
+  currentState.tracks.forEach(track => {
+    if (track.status === 'green' && !track.verified) {
+      // Identify which source matches the recommended year
+      const year = track.recommendedYear;
+      let chosenSource = 'Unknown';
+      
+      if (year === track.spotifyYear) {
+        chosenSource = 'Spotify';
+      } else if (track.spotifyOriginalYear && year === track.spotifyOriginalYear) {
+        chosenSource = 'Spotify Original';
+      } else if (track.lastFmYear && year === track.lastFmYear) {
+        chosenSource = 'Last.fm';
+      } else if (track.earliestRecordingYear && year === track.earliestRecordingYear) {
+        chosenSource = 'MusicBrainz';
+      } else if (track.mbYear && year === track.mbYear) {
+        chosenSource = 'MusicBrainz';
+      }
+      
+      track.chosenSource = chosenSource;
+    }
+  });
+  
   currentState.tracks = window.validator.autoApproveGreenTracks(currentState.tracks);
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
   
@@ -688,12 +781,17 @@ function handleExport() {
  * Render export modal
  */
 function renderExportModal() {
+  const stats = currentState.stats;
+  const sourceStatsHtml = renderSourceStatsForExport(stats);
+  
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
     <div class="modal-content">
       <h2>Exportera Verifierad Spellista</h2>
       <p>${currentState.tracks.length} verifierade låtar redo för export</p>
+      
+      ${sourceStatsHtml}
       
       <div class="export-options">
         <button class="btn-primary btn-large" onclick="exportJSON()">
@@ -711,6 +809,40 @@ function renderExportModal() {
   `;
   
   document.body.appendChild(modal);
+}
+
+/**
+ * Render source stats summary for export modal
+ */
+function renderSourceStatsForExport(stats) {
+  const total = stats.verified;
+  if (total === 0) return '';
+  
+  const sources = [
+    { name: 'Spotify Original', icon: '🎯' },
+    { name: 'MusicBrainz', icon: '🎵' },
+    { name: 'Last.fm', icon: '🔴' },
+    { name: 'Spotify', icon: '🟢' },
+    { name: 'Custom', icon: '✏️' }
+  ];
+  
+  const stats_list = sources
+    .filter(source => stats.sourceAccuracy[source.name] > 0)
+    .map(source => {
+      const count = stats.sourceAccuracy[source.name];
+      const percentage = Math.round((count / total) * 100);
+      return `<li>${source.icon} <strong>${source.name}:</strong> ${count} (${percentage}%)</li>`;
+    })
+    .join('');
+  
+  return `
+    <div class="export-source-stats">
+      <h3>📊 Källstatistik</h3>
+      <ul>
+        ${stats_list}
+      </ul>
+    </div>
+  `;
 }
 
 /**
