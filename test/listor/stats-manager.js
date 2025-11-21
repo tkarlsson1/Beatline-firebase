@@ -4,6 +4,35 @@
 const FIREBASE_STATS_PATH = 'validatorGlobalStats';
 
 /**
+ * Map display source names to Firebase-safe keys
+ * Firebase doesn't allow dots or certain characters in keys
+ */
+function mapSourceToFirebaseKey(sourceName) {
+  const mapping = {
+    'Spotify Original': 'SpotifyOriginal',
+    'Last.fm': 'LastFm',
+    'Spotify': 'Spotify',
+    'MusicBrainz': 'MusicBrainz',
+    'Custom': 'Custom'
+  };
+  return mapping[sourceName] || sourceName;
+}
+
+/**
+ * Map Firebase keys back to display names
+ */
+function mapFirebaseKeyToSource(firebaseKey) {
+  const mapping = {
+    'SpotifyOriginal': 'Spotify Original',
+    'LastFm': 'Last.fm',
+    'Spotify': 'Spotify',
+    'MusicBrainz': 'MusicBrainz',
+    'Custom': 'Custom'
+  };
+  return mapping[firebaseKey] || firebaseKey;
+}
+
+/**
  * Get global statistics from Firebase
  */
 async function getGlobalStats() {
@@ -23,8 +52,8 @@ async function getGlobalStats() {
     if (!stats.sourceAccuracy) {
       stats.sourceAccuracy = {
         'Spotify': 0,
-        'Spotify Original': 0,
-        'Last.fm': 0,
+        'SpotifyOriginal': 0,
+        'LastFm': 0,
         'MusicBrainz': 0,
         'Custom': 0
       };
@@ -58,8 +87,8 @@ function createEmptyGlobalStats() {
     totalVerified: 0,
     sourceAccuracy: {
       'Spotify': 0,
-      'Spotify Original': 0,
-      'Last.fm': 0,
+      'SpotifyOriginal': 0,  // No spaces for Firebase
+      'LastFm': 0,  // No dots for Firebase
       'MusicBrainz': 0,
       'Custom': 0
     },
@@ -92,10 +121,11 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
     globalStats.totalTracks += playlistStats.total;
     globalStats.totalVerified += playlistStats.verified;
     
-    // Add source accuracy counts
+    // Add source accuracy counts (map display names to Firebase keys)
     Object.keys(playlistStats.sourceAccuracy).forEach(source => {
-      if (globalStats.sourceAccuracy[source] !== undefined) {
-        globalStats.sourceAccuracy[source] += playlistStats.sourceAccuracy[source];
+      const firebaseKey = mapSourceToFirebaseKey(source);
+      if (globalStats.sourceAccuracy[firebaseKey] !== undefined) {
+        globalStats.sourceAccuracy[firebaseKey] += playlistStats.sourceAccuracy[source];
       }
     });
     

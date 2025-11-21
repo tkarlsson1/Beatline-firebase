@@ -315,13 +315,18 @@ function analyzeAndFlagTracks(tracks) {
     }
     
     // 4. Modified version in title
+    // Skip flag if all sources agree on the same year (then it doesn't matter)
     const modifiedRegex = /remix|remaster|rerecord|live|version|edit|mix\)/i;
     if (modifiedRegex.test(track.title)) {
-      flags.push({
-        type: 'modified_version',
-        severity: 'warning',
-        message: 'Remix/remaster/live-version i titel'
-      });
+      // Only flag if sources disagree or we don't have validation data
+      if (!validation.sourcesAgree) {
+        flags.push({
+          type: 'modified_version',
+          severity: 'warning',
+          message: 'Remix/remaster/live-version i titel'
+        });
+      }
+      // If all sources agree, we trust the consensus and don't flag
     }
     
     // 5. CRITICAL: Compilation + Multiple sources agree on older year
@@ -484,8 +489,8 @@ function calculatePlaylistStats(tracks) {
     flagTypes: {},
     sourceAccuracy: {
       'Spotify': 0,
-      'Spotify Original': 0,
-      'Last.fm': 0,
+      'Spotify Original': 0,  // Display name (for UI)
+      'Last.fm': 0,  // Display name (for UI)
       'MusicBrainz': 0,
       'Custom': 0
     },

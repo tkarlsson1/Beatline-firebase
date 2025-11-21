@@ -280,21 +280,38 @@ function renderSourceAccuracyPanel(stats) {
     window.statsManager.getGlobalStats().then(globalStats => {
       const globalStatsElement = document.getElementById('globalStatsSection');
       if (globalStatsElement && globalStats && globalStats.totalVerified > 0) {
+        // Map Firebase keys to display names for rendering
+        const firebaseKeyMap = {
+          'SpotifyOriginal': 'Spotify Original',
+          'LastFm': 'Last.fm',
+          'Spotify': 'Spotify',
+          'MusicBrainz': 'MusicBrainz',
+          'Custom': 'Custom'
+        };
+        
         const globalRows = sources
-          .filter(source => globalStats.sourceAccuracy[source.name] > 0)
           .map(source => {
-            const count = globalStats.sourceAccuracy[source.name];
+            // Try both display name and Firebase key
+            const displayName = source.name;
+            const firebaseKey = Object.keys(firebaseKeyMap).find(k => firebaseKeyMap[k] === displayName);
+            const count = globalStats.sourceAccuracy[firebaseKey] || globalStats.sourceAccuracy[displayName] || 0;
+            
+            return { source, count };
+          })
+          .filter(item => item.count > 0)
+          .map(item => {
+            const count = item.count;
             const percentage = Math.round((count / globalStats.totalVerified) * 100);
             const barWidth = percentage;
             
             return `
               <div class="source-stat-row">
                 <div class="source-stat-label">
-                  <span class="source-icon">${source.icon}</span>
-                  <span class="source-name">${source.name}</span>
+                  <span class="source-icon">${item.source.icon}</span>
+                  <span class="source-name">${item.source.name}</span>
                 </div>
                 <div class="source-stat-bar-container">
-                  <div class="source-stat-bar" style="width: ${barWidth}%; background-color: ${source.color}"></div>
+                  <div class="source-stat-bar" style="width: ${barWidth}%; background-color: ${item.source.color}"></div>
                 </div>
                 <div class="source-stat-value">
                   ${count} <span class="source-percentage">(${percentage}%)</span>
