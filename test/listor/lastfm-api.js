@@ -3,7 +3,7 @@
 // Rate limit: Reasonable (no hard limit documented, be respectful)
 
 const LASTFM_API_BASE = 'https://ws.audioscrobbler.com/2.0/';
-const LASTFM_API_KEY = '43693fee6c6975e380cc1b94ae4bc7f9'; // Free public key
+const LASTFM_API_KEY = '885ed9b24b2b5adc196f32b6854fedb4'; // Notestream API key
 
 // Rate limiting
 let lastFmRequestTime = 0;
@@ -36,7 +36,10 @@ async function rateLimitedLastFmFetch(url) {
     
     if (!response.ok) {
       if (response.status === 403) {
-        throw new Error('Last.fm API limit nådd');
+        throw new Error('Last.fm API-nyckel ogiltig eller nått limit. Skaffa egen nyckel på last.fm/api');
+      }
+      if (response.status === 429) {
+        throw new Error('Last.fm rate limit nådd');
       }
       throw new Error(`Last.fm API error: ${response.status}`);
     }

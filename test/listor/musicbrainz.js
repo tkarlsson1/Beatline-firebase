@@ -354,15 +354,18 @@ async function validateTrack(track, onProgress) {
   // 2. Try Last.fm first (fast and often accurate for modern tracks)
   if (onProgress) onProgress(`Checking Last.fm...`);
   
-  try {
-    const lastFmData = await window.lastFm.getTrackInfo(track.artist, track.title);
-    if (lastFmData.found) {
-      result.lastFmYear = lastFmData.year;
-      result.lastFmData = lastFmData;
+  if (window.lastFm) {
+    try {
+      const lastFmData = await window.lastFm.getTrackInfo(track.artist, track.title);
+      if (lastFmData.found) {
+        result.lastFmYear = lastFmData.year;
+        result.lastFmData = lastFmData;
+      }
+    } catch (error) {
+      // Silently fail - Last.fm is optional
+      console.warn(`Last.fm lookup failed (skipping):`, error.message);
+      // Continue without Last.fm data
     }
-  } catch (error) {
-    console.warn(`Last.fm lookup failed:`, error);
-    // Continue without Last.fm data
   }
   
   // 3. Try ISRC in MusicBrainz (most accurate)
