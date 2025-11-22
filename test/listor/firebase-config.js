@@ -85,7 +85,8 @@ const validatorFirebase = {
       throw new Error('Firebase inte initialiserad');
     }
     const ref = validatorDb.ref(path);
-    return ref.once('value');
+    const snapshot = await ref.once('value');
+    return snapshot.val();  // Return actual data, not DataSnapshot
   },
   
   update: async (path, updates) => {
