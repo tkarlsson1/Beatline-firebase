@@ -678,6 +678,56 @@ function validateReadyForExport(tracks) {
   };
 }
 
+/**
+ * Prepare playlist data in game format (key-based object)
+ * Format: { "spotifyId": { artist, title, year } }
+ */
+function prepareForGameFormat(playlistName, tracks) {
+  const verifiedTracks = tracks.filter(t => t.verified);
+  
+  if (verifiedTracks.length === 0) {
+    throw new Error('Inga verifierade låtar att exportera');
+  }
+  
+  // Convert to game format (Spotify ID as key)
+  const songs = {};
+  verifiedTracks.forEach(track => {
+    songs[track.spotifyId] = {
+      artist: track.artist,
+      title: track.title,
+      year: String(track.verifiedYear)  // Game expects string
+    };
+  });
+  
+  return {
+    playlistName: playlistName,
+    songs: songs,
+    totalTracks: verifiedTracks.length
+  };
+}
+
+/**
+ * Export playlist in game format (for manual copying to live database)
+ */
+function exportGameFormatJSON(playlistName, tracks) {
+  const gameData = prepareForGameFormat(playlistName, tracks);
+  
+  // Create downloadable JSON (only the songs object)
+  const blob = new Blob([JSON.stringify(gameData.songs, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${playlistName.replace(/[^a-z0-9]/gi, '_')}_game_format.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  console.log(`✅ Game format JSON exported: ${gameData.totalTracks} tracks`);
+}
+
 // Export functions
 window.validator = {
   analyzeAndFlagTracks,
@@ -690,5 +740,7 @@ window.validator = {
   prepareForExport,
   exportToJSON,
   saveToFirebase,
-  validateReadyForExport
+  validateReadyForExport,
+  prepareForGameFormat,
+  exportGameFormatJSON
 };

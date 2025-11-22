@@ -912,6 +912,9 @@ function renderExportModal() {
         <button class="btn-primary btn-large" onclick="exportFirebase()">
           🔥 Spara till Firebase
         </button>
+        <button class="btn-secondary btn-large" onclick="exportGameFormat()">
+          🎮 Spelformat (manuell kopiering)
+        </button>
       </div>
       
       <button class="btn-secondary" onclick="closeExportModal()">
@@ -1072,6 +1075,24 @@ async function exportFirebase() {
 }
 
 /**
+ * Export in game format (for manual copying to live database)
+ */
+function exportGameFormat() {
+  try {
+    window.validator.exportGameFormatJSON(
+      currentState.playlist.name,
+      currentState.tracks
+    );
+    
+    showNotification('✅ Spelformat-JSON nedladdad - kopiera manuellt till standardLists/', 'success');
+    closeExportModal();
+    
+  } catch (error) {
+    showError(`Misslyckades att exportera spelformat: ${error.message}`);
+  }
+}
+
+/**
  * Close export modal
  */
 function closeExportModal() {
@@ -1151,6 +1172,7 @@ window.playPreview = playPreview;
 window.handleExport = handleExport;
 window.exportJSON = exportJSON;
 window.exportFirebase = exportFirebase;
+window.exportGameFormat = exportGameFormat;
 window.closeExportModal = closeExportModal;
 window.exportGlobalStats = exportGlobalStats;
 window.resetGlobalStats = resetGlobalStats;
