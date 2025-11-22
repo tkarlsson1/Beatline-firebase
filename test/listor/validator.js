@@ -269,219 +269,136 @@ function crossValidateYear(track) {
 function analyzeAndFlagTracks(tracks) {
   return tracks.map(track => {
     const flags = [];
+    let status = 'green'; // Start optimistic
     
-    // 1. Detect if album is compilation
-    const compilationAnalysis = detectCompilationAlbum(track);
-    track.compilationAnalysis = compilationAnalysis;
+    // Get compilation detection
+    const compilationResult = detectCompilationAlbum(track);
+    track.compilationDetection = compilationResult;
     
-    if (compilationAnalysis.isCompilation) {
-      flags.push({
-        type: 'compilation_detected',
-        severity: 'info',
-        message: `Samlingsalbum detekterat (${compilationAnalysis.confidence} confidence): ${compilationAnalysis.reasons.join(', ')}`
-      });
-    }
-    
-    // 2. Cross-validate year from all sources
+    // Get year cross-validation
     const validation = crossValidateYear(track);
     track.validation = validation;
+    track.recommendedYear = validation.bestYear;
     
-    // Get earliest recording year from SAME artist
-    const earliestYear = track.earliestRecordingYear;
-    const hasEarliestData = earliestYear !== null && earliestYear !== undefined;
-    
-    // 3. Multiple artists (potential modern version/feature)
-    if (track.allArtists.includes('feat.') || 
-        track.allArtists.includes('ft.') ||
-        track.allArtists.includes('&') ||
-        track.allArtists.includes(',') ||
-        track.allArtists.includes(' x ')) {
-      
-      if (hasEarliestData) {
-        // Same base artist but with features
-        flags.push({
-          type: 'multiple_artists',
-          severity: 'info',
-          message: 'Flera artister listade'
-        });
-      } else {
-        // Different base artist - expected for features
-        flags.push({
-          type: 'feature_collaboration',
-          severity: 'info',
-          message: 'Feature/collaboration - använder nytt årtal (korrekt)'
-        });
-      }
-    }
-    
-    // 4. Modified version in title
-    // Skip flag if all sources agree on the same year (then it doesn't matter)
-    const modifiedRegex = /remix|remaster|rerecord|live|version|edit|mix\)/i;
-    if (modifiedRegex.test(track.title)) {
-      // Only flag if sources disagree or we don't have validation data
-      if (!validation.sourcesAgree) {
-        flags.push({
-          type: 'modified_version',
-          severity: 'warning',
-          message: 'Remix/remaster/live-version i titel'
-        });
-      }
-      // If all sources agree, we trust the consensus and don't flag
-    }
-    
-    // 5. CRITICAL: Compilation + Multiple sources agree on older year
-    if (compilationAnalysis.isCompilation && 
-        validation.bestYear < track.spotifyYear) {
-      
-      const diff = track.spotifyYear - validation.bestYear;
-      
-      if (validation.confidence === 'very_high' && diff > 2) {
-        // Multiple sources strongly agree - this is almost certainly wrong
-        flags.push({
-          type: 'compilation_wrong_year_confirmed',
-          severity: 'error',
-          message: `Samlingsalbum med fel årtal: Spotify ${track.spotifyYear}, men ${validation.sources.map(s => s.name).join(' + ')} säger ${validation.bestYear} (${diff} år skillnad)`
-        });
-      } else if (validation.confidence === 'high' && diff > 2) {
-        flags.push({
-          type: 'compilation_wrong_year_likely',
-          severity: 'error',
-          message: `Troligt fel årtal: Spotify ${track.spotifyYear}, källor föreslår ${validation.bestYear} (${diff} år skillnad)`
-        });
-      } else if (diff > 2) {
-        flags.push({
-          type: 'compilation_year_mismatch',
-          severity: 'warning',
-          message: `Årtalsskillnad: Spotify ${track.spotifyYear} vs föreslaget ${validation.bestYear} (${diff} år)`
-        });
-      }
-    }
-    
-    // 6. Year mismatch even without compilation
-    else if (!compilationAnalysis.isCompilation && 
-             validation.bestYear && 
-             validation.bestYear < track.spotifyYear) {
-      
-      const diff = track.spotifyYear - validation.bestYear;
-      
-      if (validation.confidence === 'very_high' && diff > 5) {
-        flags.push({
-          type: 'year_mismatch_confirmed',
-          severity: 'error',
-          message: `Stora skillnader mellan källor: Spotify ${track.spotifyYear}, konsensus ${validation.bestYear} (${diff} år)`
-        });
-      } else if (diff > 5) {
-        flags.push({
-          type: 'year_mismatch_potential',
-          severity: 'warning',
-          message: `Potentiell avvikelse: Spotify ${track.spotifyYear} vs ${validation.bestYear} (${diff} år)`
-        });
-      }
-    }
-    
-    // 7. Sources disagree significantly
-    if (!validation.sourcesAgree && validation.sources.length >= 2) {
-      const years = Object.keys(validation.votes);
-      if (Math.max(...years) - Math.min(...years) > 5) {
-        flags.push({
-          type: 'sources_disagree',
-          severity: 'warning',
-          message: `Källor är oense: ${validation.sources.map(s => `${s.name}(${s.year})`).join(', ')}`
-        });
-      }
-    }
-    
-    // 8. No external validation (only Spotify data)
-    if (validation.sources.length === 1 && validation.sources[0].name === 'Spotify') {
+    // 1. Compilation detected
+    if (compilationResult.isCompilation) {
       flags.push({
-        type: 'no_external_validation',
-        severity: 'info',
-        message: 'Ingen extern validering (ej funnen i MusicBrainz/Last.fm)'
+        type: 'compilation',
+        level: 'info',
+        message: `Compilation album detected (${compilationResult.confidence} confidence)`,
+        details: compilationResult.reasons.join('; ')
+      });
+      
+      // If sources agree on an earlier year than Spotify, that's good
+      if (validation.sourcesAgree && validation.bestYear < track.spotifyYear) {
+        flags.push({
+          type: 'compilation_resolved',
+          level: 'info',
+          message: `All sources agree on ${validation.bestYear} (earlier than Spotify ${track.spotifyYear})`
+        });
+        status = 'green';
+      } else if (!validation.sourcesAgree) {
+        // Sources disagree - needs review
+        status = 'yellow';
+        flags.push({
+          type: 'year_conflict',
+          level: 'warning',
+          message: `Sources disagree: ${Object.keys(validation.votes).join(', ')}`
+        });
+      }
+    }
+    
+    // 2. Multiple artists (featuring)
+    if (track.artist.includes('feat.') || track.artist.includes('&')) {
+      flags.push({
+        type: 'multiple_artists',
+        level: 'info',
+        message: 'Multiple artists detected in track'
       });
     }
     
-    // 9. High confidence correct
-    if (validation.confidence === 'very_high' && 
-        validation.bestYear === track.spotifyYear) {
+    // 3. Remix/Remaster - ONLY flag if sources disagree
+    const titleLower = track.title.toLowerCase();
+    const isRemixOrRemaster = titleLower.includes('remix') || 
+                              titleLower.includes('remaster') ||
+                              titleLower.includes('live') ||
+                              titleLower.includes('acoustic') ||
+                              titleLower.includes('demo');
+    
+    if (isRemixOrRemaster && !validation.sourcesAgree) {
       flags.push({
-        type: 'validated_correct',
-        severity: 'info',
-        message: `Verifierat korrekt av ${validation.sources.length} källor`
+        type: 'remix_remaster',
+        level: 'warning',
+        message: 'Remix/remaster/live version with conflicting years',
+        details: `Sources: ${validation.sources.map(s => `${s.name}: ${s.year}`).join(', ')}`
       });
-    }
-    
-    // Determine overall status based on flags
-    let status = 'green'; // OK to use
-    
-    // Red: Confirmed wrong year
-    if (flags.some(f => 
-      f.type === 'compilation_wrong_year_confirmed' || 
-      f.type === 'compilation_wrong_year_likely' ||
-      f.type === 'year_mismatch_confirmed'
-    )) {
-      status = 'red';
-    }
-    // Yellow: Potential issues
-    else if (flags.some(f => 
-      f.type === 'compilation_year_mismatch' ||
-      f.type === 'year_mismatch_potential' ||
-      f.type === 'sources_disagree' ||
-      f.type === 'modified_version'
-    )) {
       status = 'yellow';
     }
     
-    // Determine recommended year
-    // Use validation bestYear if confidence is high and it differs from Spotify
-    let recommendedYear = track.spotifyYear;
-    
-    if (validation.confidence === 'very_high' && validation.bestYear !== track.spotifyYear) {
-      recommendedYear = validation.bestYear;
-    } else if (validation.confidence === 'high' && 
-               compilationAnalysis.isCompilation &&
-               validation.bestYear < track.spotifyYear) {
-      recommendedYear = validation.bestYear;
-    } else if (validation.bestYear && 
-               validation.bestYear < track.spotifyYear &&
-               track.spotifyYear - validation.bestYear > 5) {
-      recommendedYear = validation.bestYear;
+    // 4. Year conflict without compilation
+    if (!compilationResult.isCompilation && !validation.sourcesAgree) {
+      flags.push({
+        type: 'year_conflict',
+        level: 'warning',
+        message: 'Year conflict between sources',
+        details: `Sources: ${validation.sources.map(s => `${s.name}: ${s.year}`).join(', ')}`
+      });
+      status = 'yellow';
     }
     
-    // Auto-fix determination
-    // We can auto-fix if:
-    // 1. Very high confidence
-    // 2. Multiple sources agree
-    // 3. Compilation detected
-    // 4. Significant year difference
-    const canAutoFix = 
-      validation.confidence === 'very_high' &&
-      validation.sourcesAgree &&
-      compilationAnalysis.isCompilation &&
-      Math.abs(validation.bestYear - track.spotifyYear) > 2;
+    // 5. Large year difference
+    const yearDiff = Math.abs(track.spotifyYear - validation.bestYear);
+    if (yearDiff >= 5) {
+      flags.push({
+        type: 'large_year_diff',
+        level: 'warning',
+        message: `Large year difference: ${yearDiff} years`,
+        details: `Spotify: ${track.spotifyYear}, Recommended: ${validation.bestYear}`
+      });
+      status = 'yellow';
+    }
+    
+    // 6. No external validation
+    if (!track.earliestRecordingYear && !track.lastFmYear && !track.spotifyOriginalYear) {
+      flags.push({
+        type: 'no_validation',
+        level: 'info',
+        message: 'No external year validation available',
+        details: 'Only Spotify data available'
+      });
+      // Don't change status - could still be green
+    }
+    
+    // 7. CRITICAL: Compilation with major disagreement
+    if (compilationResult.isCompilation && yearDiff >= 10) {
+      flags.push({
+        type: 'critical_compilation',
+        level: 'error',
+        message: 'Compilation with large year discrepancy',
+        details: `Spotify shows ${track.spotifyYear}, but sources suggest ${validation.bestYear}`
+      });
+      status = 'red';
+    }
     
     return {
       ...track,
-      flags,
-      status,
-      recommendedYear,
-      canAutoFix,
-      verifiedYear: null,
-      verified: false,
+      flags: flags,
+      status: status,
       needsReview: status !== 'green'
     };
   });
 }
 
 /**
- * Calculate statistics for analyzed playlist
+ * Calculate playlist statistics
  */
 function calculatePlaylistStats(tracks) {
   const stats = {
     total: tracks.length,
+    verified: 0,
     green: 0,
     yellow: 0,
     red: 0,
-    verified: 0,
     needsReview: 0,
     withMBMatch: 0,
     withISRC: 0,
@@ -489,8 +406,8 @@ function calculatePlaylistStats(tracks) {
     flagTypes: {},
     sourceAccuracy: {
       'Spotify': 0,
-      'Spotify Original': 0,  // Display name (for UI)
-      'Last.fm': 0,  // Display name (for UI)
+      'Spotify Original': 0,
+      'Last.fm': 0,
       'MusicBrainz': 0,
       'Custom': 0
     },
@@ -646,6 +563,21 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
   const verifiedTracks = tracks.filter(t => t.verified);
   const stats = calculatePlaylistStats(tracks);
   
+  // Map display names to Firebase-safe keys
+  const firebaseSafeSourceAccuracy = {
+    'Spotify': stats.sourceAccuracy['Spotify'] || 0,
+    'SpotifyOriginal': stats.sourceAccuracy['Spotify Original'] || 0,
+    'LastFm': stats.sourceAccuracy['Last.fm'] || 0,
+    'MusicBrainz': stats.sourceAccuracy['MusicBrainz'] || 0,
+    'Custom': stats.sourceAccuracy['Custom'] || 0
+  };
+  
+  // Create Firebase-safe stats object
+  const firebaseSafeStats = {
+    ...stats,
+    sourceAccuracy: firebaseSafeSourceAccuracy
+  };
+  
   return {
     name: playlistName,
     spotifyUrl: playlistUrl,
@@ -663,8 +595,8 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
     _metadata: {
       originalTrackCount: tracks.length,
       removedTracks: tracks.length - verifiedTracks.length,
-      validationStats: stats,
-      sourceAccuracy: stats.sourceAccuracy
+      validationStats: firebaseSafeStats,
+      sourceAccuracy: firebaseSafeSourceAccuracy
     }
   };
 }
