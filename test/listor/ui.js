@@ -1,4 +1,5 @@
 // UI Module - Handles all rendering and user interactions
+// Version 2.0 - Extended statistics display
 
 // Current state
 let currentState = {
@@ -222,7 +223,182 @@ async function startValidation(tracks) {
 }
 
 /**
- * Render source accuracy panel
+ * Render extended source stats panel (NEW)
+ */
+function renderExtendedSourceStats(sourceStats, title, isGlobal = false) {
+  if (!sourceStats) return '';
+  
+  const sources = [
+    { key: 'Spotify', name: 'Spotify', icon: '🟢', color: '#1DB954' },
+    { key: 'SpotifyOriginal', name: 'Spotify Original', icon: '🎯', color: '#1ed760' },
+    { key: 'MusicBrainz', name: 'MusicBrainz', icon: '🎵', color: '#BA478F' },
+    { key: 'LastFm', name: 'Last.fm', icon: '🔴', color: '#D51007' }
+  ];
+  
+  const rows = sources
+    .filter(source => sourceStats[source.key] && sourceStats[source.key].hadData > 0)
+    .map(source => {
+      const s = sourceStats[source.key];
+      const total = s.hadData + s.noData;
+      const coverage = total > 0 ? Math.round((s.hadData / total) * 100) : 0;
+      const accuracy = s.hadData > 0 ? Math.round((s.agreedWithFinal / s.hadData) * 100) : 0;
+      const selectionRate = s.hadData > 0 ? Math.round((s.selectedAsWinner / s.hadData) * 100) : 0;
+      
+      return `
+        <div class="extended-source-row">
+          <div class="extended-source-label">
+            <span class="source-icon">${source.icon}</span>
+            <span class="source-name">${source.name}</span>
+          </div>
+          <div class="extended-source-metrics">
+            <div class="metric">
+              <span class="metric-value">${coverage}%</span>
+              <span class="metric-label">Täckning</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">${accuracy}%</span>
+              <span class="metric-label">Träffsäkerhet</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">${selectionRate}%</span>
+              <span class="metric-label">Valdes</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value ${s.avgDeviation > 2 ? 'metric-warning' : ''}">${s.avgDeviation || 0}</span>
+              <span class="metric-label">Avg avvikelse</span>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+  
+  if (!rows) return '';
+  
+  return `
+    <div class="extended-stats-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Täckning = hade data, Träffsäkerhet = stämde med verifierat år</p>
+      <div class="extended-source-stats">
+        ${rows}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render conflict stats panel (NEW)
+ */
+function renderConflictStats(conflicts, title, isGlobal = false) {
+  if (!conflicts || conflicts.totalWithMultipleSources === 0) return '';
+  
+  const total = conflicts.totalWithMultipleSources;
+  const agreementRate = Math.round((conflicts.allAgreed / total) * 100);
+  const majorityRate = Math.round((conflicts.twoVsOne / total) * 100);
+  const splitRate = Math.round((conflicts.threeWaySplit / total) * 100);
+  
+  return `
+    <div class="conflict-stats-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Hur ofta källorna var eniga (${total} låtar med flera källor)</p>
+      <div class="conflict-metrics">
+        <div class="conflict-metric">
+          <div class="conflict-bar-container">
+            <div class="conflict-bar conflict-agreed" style="width: ${agreementRate}%"></div>
+          </div>
+          <div class="conflict-label">
+            <span class="conflict-icon">✅</span>
+            <span>Alla eniga</span>
+            <span class="conflict-value">${conflicts.allAgreed} (${agreementRate}%)</span>
+          </div>
+        </div>
+        <div class="conflict-metric">
+          <div class="conflict-bar-container">
+            <div class="conflict-bar conflict-majority" style="width: ${majorityRate}%"></div>
+          </div>
+          <div class="conflict-label">
+            <span class="conflict-icon">⚖️</span>
+            <span>2 mot 1</span>
+            <span class="conflict-value">${conflicts.twoVsOne} (${majorityRate}%)</span>
+          </div>
+        </div>
+        <div class="conflict-metric">
+          <div class="conflict-bar-container">
+            <div class="conflict-bar conflict-split" style="width: ${splitRate}%"></div>
+          </div>
+          <div class="conflict-label">
+            <span class="conflict-icon">❌</span>
+            <span>Total oenighet</span>
+            <span class="conflict-value">${conflicts.threeWaySplit} (${splitRate}%)</span>
+          </div>
+        </div>
+        <div class="conflict-avg-spread">
+          <span>Genomsnittlig årsspridning vid oenighet:</span>
+          <strong>${conflicts.avgYearSpread || 0} år</strong>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render compilation stats panel (NEW)
+ */
+function renderCompilationStats(compilationStats, title, isGlobal = false) {
+  if (!compilationStats || compilationStats.triggered === 0) return '';
+  
+  const triggered = compilationStats.triggered;
+  const changeRate = Math.round((compilationStats.changedYear / triggered) * 100);
+  const keepRate = Math.round((compilationStats.keptOriginal / triggered) * 100);
+  
+  // Confidence breakdown
+  const confidenceBreakdown = Object.entries(compilationStats.byConfidence || {})
+    .filter(([_, count]) => count > 0)
+    .map(([level, count]) => {
+      const percentage = Math.round((count / triggered) * 100);
+      const icon = {
+        'very_high': '🟢',
+        'high': '🟡',
+        'medium': '🟠',
+        'low': '🔴',
+        'none': '⚫'
+      }[level] || '⚫';
+      return `<span class="comp-confidence">${icon} ${level.replace('_', ' ')}: ${count} (${percentage}%)</span>`;
+    })
+    .join('');
+  
+  return `
+    <div class="compilation-stats-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Hur ofta compilation-detection triggades och ledde till ändring</p>
+      <div class="compilation-metrics">
+        <div class="compilation-summary">
+          <div class="comp-stat">
+            <span class="comp-value">${triggered}</span>
+            <span class="comp-label">Totalt triggade</span>
+          </div>
+          <div class="comp-stat">
+            <span class="comp-value comp-changed">${compilationStats.changedYear}</span>
+            <span class="comp-label">Ändrade år (${changeRate}%)</span>
+          </div>
+          <div class="comp-stat">
+            <span class="comp-value comp-kept">${compilationStats.keptOriginal}</span>
+            <span class="comp-label">Behöll original (${keepRate}%)</span>
+          </div>
+        </div>
+        ${confidenceBreakdown ? `
+          <div class="compilation-confidence-breakdown">
+            <span class="breakdown-label">Fördelning per confidence:</span>
+            ${confidenceBreakdown}
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render source accuracy panel (UPDATED with new sections)
  */
 function renderSourceAccuracyPanel(stats) {
   const total = stats.verified;
@@ -236,7 +412,7 @@ function renderSourceAccuracyPanel(stats) {
     { name: 'Custom', icon: '✏️', color: '#FFA500' }
   ];
   
-  // Current playlist stats
+  // Current playlist stats - source selection (original)
   const currentRows = sources
     .filter(source => stats.sourceAccuracy[source.name] > 0)
     .map(source => {
@@ -272,6 +448,27 @@ function renderSourceAccuracyPanel(stats) {
   const currentConfidenceHtml = renderConfidenceAccuracy(
     stats.confidenceAccuracy,
     `Confidence-träffsäkerhet (${total} verifierade)`,
+    false
+  );
+  
+  // NEW: Render extended source stats for current playlist
+  const extendedSourceHtml = renderExtendedSourceStats(
+    stats.sourceStats,
+    `Källbeteende (${stats.total} låtar)`,
+    false
+  );
+  
+  // NEW: Render conflict stats for current playlist
+  const conflictHtml = renderConflictStats(
+    stats.conflicts,
+    `Källkonflikter`,
+    false
+  );
+  
+  // NEW: Render compilation stats for current playlist
+  const compilationHtml = renderCompilationStats(
+    stats.compilationStats,
+    `Compilation-detection`,
     false
   );
   
@@ -328,12 +525,37 @@ function renderSourceAccuracyPanel(stats) {
           true
         );
         
+        // NEW: Render global extended source stats
+        const globalExtendedSourceHtml = renderExtendedSourceStats(
+          globalStats.sourceStats,
+          `Globalt källbeteende (${globalStats.totalTracks} låtar)`,
+          true
+        );
+        
+        // NEW: Render global conflict stats
+        const globalConflictHtml = renderConflictStats(
+          globalStats.conflicts,
+          `Globala källkonflikter`,
+          true
+        );
+        
+        // NEW: Render global compilation stats
+        const globalCompilationHtml = renderCompilationStats(
+          globalStats.compilationStats,
+          `Global compilation-detection`,
+          true
+        );
+        
         globalStatsElement.innerHTML = `
           <h4>🌍 Global statistik (${globalStats.totalPlaylists} spellistor, ${globalStats.totalVerified} låtar)</h4>
+          <p class="stats-description">Vilken källa valdes för verifierade låtar</p>
           <div class="source-stats">
             ${globalRows}
           </div>
           ${globalConfidenceHtml}
+          ${globalExtendedSourceHtml}
+          ${globalConflictHtml}
+          ${globalCompilationHtml}
           <div class="global-stats-actions">
             <button class="btn-secondary btn-small" onclick="exportGlobalStats()">
               📊 Exportera global statistik
@@ -377,6 +599,12 @@ function renderSourceAccuracyPanel(stats) {
       </div>
       
       ${currentConfidenceHtml}
+      
+      ${extendedSourceHtml}
+      
+      ${conflictHtml}
+      
+      ${compilationHtml}
       
       ${globalSection}
     </div>
@@ -749,50 +977,49 @@ function updateTrackYearValue(spotifyId, year) {
  */
 function approveTrack(spotifyId) {
   const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
-  if (!track) return;
   
-  // Get year from select/display or from track's verifiedYear
-  const yearElement = document.getElementById(`year-${spotifyId}`);
-  let year = yearElement ? parseInt(yearElement.value) : null;
-  
-  // Fallback to verifiedYear if dropdown value is invalid
-  if (!year || isNaN(year)) {
-    year = track.verifiedYear || track.recommendedYear;
+  if (!track) {
+    console.error('Track not found:', spotifyId);
+    return;
   }
   
-  // Identify which source was chosen
-  let chosenSource = 'Unknown';
-  if (year === track.spotifyYear) {
-    chosenSource = 'Spotify';
-  } else if (track.spotifyOriginalYear && year === track.spotifyOriginalYear) {
-    chosenSource = 'Spotify Original';
-  } else if (track.lastFmYear && year === track.lastFmYear) {
-    chosenSource = 'Last.fm';
-  } else if (track.earliestRecordingYear && year === track.earliestRecordingYear) {
-    chosenSource = 'MusicBrainz';
-  } else if (track.mbYear && year === track.mbYear) {
-    chosenSource = 'MusicBrainz';
-  } else {
-    chosenSource = 'Custom';
-  }
+  // Get selected year from dropdown (or use recommendedYear for green tracks)
+  let selectedYear = track.recommendedYear;
+  let chosenSource = 'Spotify'; // Default
   
-  // Save chosen source
-  track.chosenSource = chosenSource;
+  const select = document.getElementById(`year-${spotifyId}`);
+  if (select) {
+    selectedYear = parseInt(select.value);
+    
+    // Determine which source was chosen
+    const selectedOption = select.options[select.selectedIndex];
+    const optionText = selectedOption.textContent;
+    
+    if (optionText.includes('Spotify Original')) {
+      chosenSource = 'Spotify Original';
+    } else if (optionText.includes('MusicBrainz')) {
+      chosenSource = 'MusicBrainz';
+    } else if (optionText.includes('Last.fm')) {
+      chosenSource = 'Last.fm';
+    } else if (optionText.includes('Anpassat')) {
+      chosenSource = 'Custom';
+    } else if (optionText.includes('Spotify')) {
+      chosenSource = 'Spotify';
+    }
+  }
   
   // Update track
-  currentState.tracks = window.validator.updateTrackYear(
-    currentState.tracks,
-    spotifyId,
-    year
-  );
+  track.verifiedYear = selectedYear;
+  track.verified = true;
+  track.chosenSource = chosenSource;
   
-  // Update stats
+  // Recalculate stats
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
   
   // Re-render
   renderReviewPhase();
   
-  showNotification('✅ Låt godkänd', 'success');
+  showNotification(`✓ ${track.artist} - ${track.title} godkänd (${selectedYear})`, 'success');
 }
 
 /**
@@ -800,70 +1027,90 @@ function approveTrack(spotifyId) {
  */
 function removeTrackFromList(spotifyId) {
   const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
-  if (!track) return;
   
-  if (!confirm(`Ta bort "${track.title}" från spellistan?`)) {
+  if (!track) {
+    console.error('Track not found:', spotifyId);
     return;
   }
   
+  if (!confirm(`Ta bort "${track.title}" från listan?`)) {
+    return;
+  }
+  
+  // Remove track
   currentState.tracks = window.validator.removeTrack(currentState.tracks, spotifyId);
+  
+  // Recalculate stats
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
   
+  // Re-render
   renderReviewPhase();
   
-  showNotification('🗑️ Låt borttagen', 'info');
+  showNotification(`✗ ${track.artist} - ${track.title} borttagen`, 'warning');
 }
 
 /**
  * Auto-approve all green tracks
  */
 function autoApproveGreen() {
+  const greenTracks = currentState.tracks.filter(t => t.status === 'green' && !t.verified);
+  
+  if (greenTracks.length === 0) {
+    showNotification('Inga gröna låtar att godkänna', 'info');
+    return;
+  }
+  
+  // Auto-approve
+  currentState.tracks = window.validator.autoApproveGreenTracks(currentState.tracks);
+  
+  // Set chosenSource based on recommendedYear source
   currentState.tracks.forEach(track => {
-    if (track.status === 'green' && !track.verified) {
-      // Identify which source matches the recommended year
-      const year = track.recommendedYear;
-      let chosenSource = 'Unknown';
-      
-      if (year === track.spotifyYear) {
-        chosenSource = 'Spotify';
-      } else if (track.spotifyOriginalYear && year === track.spotifyOriginalYear) {
-        chosenSource = 'Spotify Original';
-      } else if (track.lastFmYear && year === track.lastFmYear) {
-        chosenSource = 'Last.fm';
-      } else if (track.earliestRecordingYear && year === track.earliestRecordingYear) {
-        chosenSource = 'MusicBrainz';
-      } else if (track.mbYear && year === track.mbYear) {
-        chosenSource = 'MusicBrainz';
+    if (track.verified && !track.chosenSource) {
+      // Determine source based on which year was recommended
+      if (track.validation && track.validation.bestYear) {
+        const matchingSources = track.validation.sources.filter(
+          s => s.year === track.verifiedYear
+        );
+        
+        if (matchingSources.length > 0) {
+          // Pick first matching source (highest weight)
+          track.chosenSource = matchingSources[0].name;
+        } else {
+          track.chosenSource = 'Spotify';
+        }
+      } else {
+        track.chosenSource = 'Spotify';
       }
-      
-      track.chosenSource = chosenSource;
     }
   });
   
-  currentState.tracks = window.validator.autoApproveGreenTracks(currentState.tracks);
+  // Recalculate stats
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
   
+  // Re-render
   renderReviewPhase();
   
-  showNotification('✅ Alla gröna låtar godkända', 'success');
+  showNotification(`✓ ${greenTracks.length} gröna låtar auto-godkända`, 'success');
 }
 
 /**
- * Play preview
+ * Play audio preview
  */
 function playPreview(spotifyId, previewUrl) {
-  // Stop current audio if playing
+  // Stop any currently playing audio
   if (currentState.currentAudio) {
     currentState.currentAudio.pause();
     currentState.currentAudio = null;
   }
   
-  // Play new audio
+  // Play new preview
   const audio = new Audio(previewUrl);
-  audio.volume = 0.5;
-  audio.play();
-  
   currentState.currentAudio = audio;
+  
+  audio.play().catch(err => {
+    console.error('Failed to play preview:', err);
+    showError('Kunde inte spela förhandslyssning');
+  });
   
   // Auto-stop after 30 seconds
   setTimeout(() => {
@@ -875,9 +1122,10 @@ function playPreview(spotifyId, previewUrl) {
 }
 
 /**
- * Handle export
+ * Handle export button
  */
 function handleExport() {
+  // Check if all tracks are verified
   const validation = window.validator.validateReadyForExport(currentState.tracks);
   
   if (!validation.ready) {
@@ -886,15 +1134,15 @@ function handleExport() {
   }
   
   // Show export modal
-  renderExportModal();
+  showExportModal();
 }
 
 /**
- * Render export modal
+ * Show export modal
  */
-function renderExportModal() {
-  const stats = currentState.stats;
-  const sourceStatsHtml = renderSourceStatsForExport(stats);
+function showExportModal() {
+  // Create source stats summary
+  const sourceStatsHtml = renderSourceStatsForExport(currentState.stats);
   
   const modal = document.createElement('div');
   modal.className = 'modal';

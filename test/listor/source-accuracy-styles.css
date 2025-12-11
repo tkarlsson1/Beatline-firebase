@@ -1,4 +1,6 @@
 /* Source Accuracy Panel Styles */
+/* Version 2.0 - Extended statistics styling */
+
 .source-accuracy-panel {
   background: white;
   border-radius: 8px;
@@ -32,7 +34,8 @@
   font-weight: 600;
 }
 
-.source-accuracy-description {
+.source-accuracy-description,
+.stats-description {
   margin: 0 0 16px 0;
   color: #666;
   font-size: 14px;
@@ -122,6 +125,242 @@
   background: #c82333;
 }
 
+/* ===== NEW: Extended Source Stats ===== */
+.extended-stats-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.extended-stats-section h4 {
+  margin: 0 0 8px 0;
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.extended-source-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.extended-source-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #6366f1;
+}
+
+.extended-source-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.extended-source-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.metric-value.metric-warning {
+  color: #fd7e14;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== NEW: Conflict Stats ===== */
+.conflict-stats-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.conflict-stats-section h4 {
+  margin: 0 0 8px 0;
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.conflict-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.conflict-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conflict-bar-container {
+  height: 20px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.conflict-bar {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.conflict-bar.conflict-agreed {
+  background: linear-gradient(90deg, #28a745, #34ce57);
+}
+
+.conflict-bar.conflict-majority {
+  background: linear-gradient(90deg, #ffc107, #ffda6a);
+}
+
+.conflict-bar.conflict-split {
+  background: linear-gradient(90deg, #dc3545, #f1aeb5);
+}
+
+.conflict-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.conflict-icon {
+  font-size: 16px;
+}
+
+.conflict-value {
+  margin-left: auto;
+  font-weight: 600;
+  color: #333;
+}
+
+.conflict-avg-spread {
+  margin-top: 8px;
+  padding: 12px;
+  background: #e7f3ff;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #004085;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conflict-avg-spread strong {
+  font-size: 18px;
+}
+
+/* ===== NEW: Compilation Stats ===== */
+.compilation-stats-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.compilation-stats-section h4 {
+  margin: 0 0 8px 0;
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.compilation-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compilation-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-around;
+}
+
+.comp-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 24px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+.comp-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+.comp-value.comp-changed {
+  color: #28a745;
+}
+
+.comp-value.comp-kept {
+  color: #6c757d;
+}
+
+.comp-label {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.compilation-confidence-breakdown {
+  padding: 12px;
+  background: #fff3cd;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.breakdown-label {
+  font-size: 13px;
+  color: #856404;
+  margin-right: 8px;
+}
+
+.comp-confidence {
+  font-size: 13px;
+  color: #333;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .source-stat-row {
@@ -135,6 +374,33 @@
   
   .source-icon {
     font-size: 16px;
+  }
+  
+  .extended-source-metrics {
+    justify-content: space-between;
+  }
+  
+  .metric {
+    min-width: 60px;
+  }
+  
+  .metric-value {
+    font-size: 16px;
+  }
+  
+  .compilation-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .comp-stat {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+  
+  .comp-value {
+    font-size: 20px;
   }
 }
 
@@ -274,4 +540,22 @@
   font-weight: normal;
   color: #666;
   font-size: 13px;
+}
+
+/* Spotify Original Info in track rows */
+.spotify-original-info {
+  background: #e8f5e9;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  border-left: 3px solid #1DB954;
+}
+
+.spotify-original-info strong {
+  color: #1DB954;
+}
+
+.spotify-original-info small {
+  color: #666;
 }
