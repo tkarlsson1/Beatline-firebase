@@ -1,12 +1,10 @@
 // Global Statistics Manager
-// Tracks source accuracy across multiple playlists using Firebase
-// Version 2.0 - Extended statistics for source behavior, conflicts, and compilation detection
+// Version 3.0 - Extended statistics for ML training data
 
 const FIREBASE_STATS_PATH = 'validatorGlobalStats';
 
 /**
  * Map display source names to Firebase-safe keys
- * Firebase doesn't allow dots or certain characters in keys
  */
 function mapSourceToFirebaseKey(sourceName) {
   const mapping = {
@@ -34,65 +32,7 @@ function mapFirebaseKeyToSource(firebaseKey) {
 }
 
 /**
- * Get global statistics from Firebase
- */
-async function getGlobalStats() {
-  if (!window.validatorFirebase) {
-    console.warn('Firebase not initialized');
-    return createEmptyGlobalStats();
-  }
-  
-  try {
-    const stats = await window.validatorFirebase.get(FIREBASE_STATS_PATH);
-    
-    if (!stats) {
-      return createEmptyGlobalStats();
-    }
-    
-    // Ensure all sources exist (for backwards compatibility)
-    if (!stats.sourceAccuracy) {
-      stats.sourceAccuracy = {
-        'Spotify': 0,
-        'SpotifyOriginal': 0,
-        'LastFm': 0,
-        'MusicBrainz': 0,
-        'Custom': 0
-      };
-    }
-    
-    // Ensure confidenceAccuracy exists (for backwards compatibility)
-    if (!stats.confidenceAccuracy) {
-      stats.confidenceAccuracy = {
-        'very_high': { total: 0, correct: 0 },
-        'high': { total: 0, correct: 0 },
-        'medium': { total: 0, correct: 0 },
-        'low': { total: 0, correct: 0 },
-        'none': { total: 0, correct: 0 }
-      };
-    }
-    
-    // Ensure NEW stats exist (for backwards compatibility)
-    if (!stats.sourceStats) {
-      stats.sourceStats = createEmptySourceStats();
-    }
-    
-    if (!stats.conflicts) {
-      stats.conflicts = createEmptyConflictStats();
-    }
-    
-    if (!stats.compilationStats) {
-      stats.compilationStats = createEmptyCompilationStats();
-    }
-    
-    return stats;
-  } catch (error) {
-    console.error('Failed to load global stats from Firebase:', error);
-    return createEmptyGlobalStats();
-  }
-}
-
-/**
- * Create empty source stats object
+ * Create empty source stats
  */
 function createEmptySourceStats() {
   return {
@@ -104,7 +44,7 @@ function createEmptySourceStats() {
 }
 
 /**
- * Create empty conflict stats object
+ * Create empty conflict stats
  */
 function createEmptyConflictStats() {
   return {
@@ -117,7 +57,7 @@ function createEmptyConflictStats() {
 }
 
 /**
- * Create empty compilation stats object
+ * Create empty compilation stats
  */
 function createEmptyCompilationStats() {
   return {
@@ -131,6 +71,92 @@ function createEmptyCompilationStats() {
       'low': 0,
       'none': 0
     }
+  };
+}
+
+/**
+ * Create empty year choice stats (NEW)
+ */
+function createEmptyYearChoiceStats() {
+  return {
+    choseOldest: 0,
+    choseNewer: 0,
+    totalWithChoice: 0,
+    avgYearDiffWhenNewer: 0,
+    newerBySource: {
+      'Spotify': 0,
+      'SpotifyOriginal': 0,
+      'MusicBrainz': 0,
+      'LastFm': 0,
+      'Custom': 0
+    }
+  };
+}
+
+/**
+ * Create empty recommendation accuracy stats (NEW)
+ */
+function createEmptyRecommendationAccuracy() {
+  return {
+    byMatchMethod: {
+      isrc: { correct: 0, total: 0 },
+      search: { correct: 0, total: 0 },
+      none: { correct: 0, total: 0 }
+    },
+    byAlbumType: {
+      album: { correct: 0, total: 0 },
+      single: { correct: 0, total: 0 },
+      compilation: { correct: 0, total: 0 },
+      unknown: { correct: 0, total: 0 }
+    },
+    bySourceCount: {
+      one: { correct: 0, total: 0 },
+      two: { correct: 0, total: 0 },
+      three: { correct: 0, total: 0 },
+      four: { correct: 0, total: 0 }
+    },
+    byDecade: {
+      '1950s': { correct: 0, total: 0 },
+      '1960s': { correct: 0, total: 0 },
+      '1970s': { correct: 0, total: 0 },
+      '1980s': { correct: 0, total: 0 },
+      '1990s': { correct: 0, total: 0 },
+      '2000s': { correct: 0, total: 0 },
+      '2010s': { correct: 0, total: 0 },
+      '2020s': { correct: 0, total: 0 },
+      'unknown': { correct: 0, total: 0 }
+    }
+  };
+}
+
+/**
+ * Create empty override stats (NEW)
+ */
+function createEmptyOverrideStats() {
+  return {
+    keptDefault: 0,
+    changedSelection: 0,
+    overrideReasons: {
+      olderYear: 0,
+      newerYear: 0,
+      customYear: 0
+    }
+  };
+}
+
+/**
+ * Create empty flag accuracy stats (NEW)
+ */
+function createEmptyFlagAccuracy() {
+  return {
+    compilation: { correct: 0, total: 0 },
+    compilation_resolved: { correct: 0, total: 0 },
+    year_conflict: { correct: 0, total: 0 },
+    multiple_artists: { correct: 0, total: 0 },
+    remix_remaster: { correct: 0, total: 0 },
+    large_year_diff: { correct: 0, total: 0 },
+    no_validation: { correct: 0, total: 0 },
+    critical_compilation: { correct: 0, total: 0 }
   };
 }
 
@@ -156,15 +182,62 @@ function createEmptyGlobalStats() {
       'low': { total: 0, correct: 0 },
       'none': { total: 0, correct: 0 }
     },
-    // NEW: Extended source statistics
     sourceStats: createEmptySourceStats(),
-    // NEW: Conflict statistics
     conflicts: createEmptyConflictStats(),
-    // NEW: Compilation detection statistics
     compilationStats: createEmptyCompilationStats(),
+    // NEW fas 2
+    yearChoiceStats: createEmptyYearChoiceStats(),
+    recommendationAccuracy: createEmptyRecommendationAccuracy(),
+    overrideStats: createEmptyOverrideStats(),
+    flagAccuracy: createEmptyFlagAccuracy(),
     firstUsed: new Date().toISOString(),
     lastUpdated: new Date().toISOString()
   };
+}
+
+/**
+ * Get global statistics from Firebase
+ */
+async function getGlobalStats() {
+  if (!window.validatorFirebase) {
+    console.warn('Firebase not initialized');
+    return createEmptyGlobalStats();
+  }
+  
+  try {
+    const stats = await window.validatorFirebase.get(FIREBASE_STATS_PATH);
+    
+    if (!stats) {
+      return createEmptyGlobalStats();
+    }
+    
+    // Ensure backwards compatibility
+    if (!stats.sourceAccuracy) {
+      stats.sourceAccuracy = { 'Spotify': 0, 'SpotifyOriginal': 0, 'LastFm': 0, 'MusicBrainz': 0, 'Custom': 0 };
+    }
+    if (!stats.confidenceAccuracy) {
+      stats.confidenceAccuracy = {
+        'very_high': { total: 0, correct: 0 },
+        'high': { total: 0, correct: 0 },
+        'medium': { total: 0, correct: 0 },
+        'low': { total: 0, correct: 0 },
+        'none': { total: 0, correct: 0 }
+      };
+    }
+    if (!stats.sourceStats) stats.sourceStats = createEmptySourceStats();
+    if (!stats.conflicts) stats.conflicts = createEmptyConflictStats();
+    if (!stats.compilationStats) stats.compilationStats = createEmptyCompilationStats();
+    // NEW fas 2
+    if (!stats.yearChoiceStats) stats.yearChoiceStats = createEmptyYearChoiceStats();
+    if (!stats.recommendationAccuracy) stats.recommendationAccuracy = createEmptyRecommendationAccuracy();
+    if (!stats.overrideStats) stats.overrideStats = createEmptyOverrideStats();
+    if (!stats.flagAccuracy) stats.flagAccuracy = createEmptyFlagAccuracy();
+    
+    return stats;
+  } catch (error) {
+    console.error('Failed to load global stats from Firebase:', error);
+    return createEmptyGlobalStats();
+  }
 }
 
 /**
@@ -184,7 +257,7 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
     globalStats.totalTracks += playlistStats.total;
     globalStats.totalVerified += playlistStats.verified;
     
-    // Add source accuracy counts (map display names to Firebase keys)
+    // Add source accuracy counts
     Object.keys(playlistStats.sourceAccuracy).forEach(source => {
       const firebaseKey = mapSourceToFirebaseKey(source);
       if (globalStats.sourceAccuracy[firebaseKey] !== undefined) {
@@ -202,27 +275,26 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
       });
     }
     
-    // === NEW: Add extended source stats ===
+    // === SOURCE STATS ===
     if (playlistStats.sourceStats) {
       Object.keys(playlistStats.sourceStats).forEach(source => {
         if (globalStats.sourceStats[source]) {
-          const playlistSource = playlistStats.sourceStats[source];
-          const globalSource = globalStats.sourceStats[source];
+          const ps = playlistStats.sourceStats[source];
+          const gs = globalStats.sourceStats[source];
           
-          globalSource.hadData += playlistSource.hadData || 0;
-          globalSource.noData += playlistSource.noData || 0;
-          globalSource.selectedAsWinner += playlistSource.selectedAsWinner || 0;
-          globalSource.agreedWithFinal += playlistSource.agreedWithFinal || 0;
+          gs.hadData += ps.hadData || 0;
+          gs.noData += ps.noData || 0;
+          gs.selectedAsWinner += ps.selectedAsWinner || 0;
+          gs.agreedWithFinal += ps.agreedWithFinal || 0;
           
           // Weighted average for avgDeviation
-          if (playlistSource.avgDeviation && playlistSource.hadData > 0) {
-            const oldWeight = globalSource.hadData - playlistSource.hadData;
-            const newWeight = playlistSource.hadData;
+          if (ps.avgDeviation && ps.hadData > 0) {
+            const oldWeight = gs.hadData - ps.hadData;
+            const newWeight = ps.hadData;
             const totalWeight = oldWeight + newWeight;
-            
             if (totalWeight > 0) {
-              globalSource.avgDeviation = Math.round(
-                ((globalSource.avgDeviation * oldWeight) + (playlistSource.avgDeviation * newWeight)) / totalWeight * 10
+              gs.avgDeviation = Math.round(
+                ((gs.avgDeviation * oldWeight) + (ps.avgDeviation * newWeight)) / totalWeight * 10
               ) / 10;
             }
           }
@@ -230,7 +302,7 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
       });
     }
     
-    // === NEW: Add conflict stats ===
+    // === CONFLICT STATS ===
     if (playlistStats.conflicts) {
       const pc = playlistStats.conflicts;
       const gc = globalStats.conflicts;
@@ -239,7 +311,6 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
       gc.twoVsOne += pc.twoVsOne || 0;
       gc.threeWaySplit += pc.threeWaySplit || 0;
       
-      // Weighted average for avgYearSpread
       const oldTotal = gc.totalWithMultipleSources;
       const newTotal = pc.totalWithMultipleSources || 0;
       const combinedTotal = oldTotal + newTotal;
@@ -249,11 +320,10 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
           ((gc.avgYearSpread * oldTotal) + (pc.avgYearSpread * newTotal)) / combinedTotal * 10
         ) / 10;
       }
-      
       gc.totalWithMultipleSources = combinedTotal;
     }
     
-    // === NEW: Add compilation stats ===
+    // === COMPILATION STATS ===
     if (playlistStats.compilationStats) {
       const pcs = playlistStats.compilationStats;
       const gcs = globalStats.compilationStats;
@@ -269,6 +339,110 @@ async function updateGlobalStats(playlistStats, verifiedTracks) {
           }
         });
       }
+    }
+    
+    // === YEAR CHOICE STATS (NEW) ===
+    if (playlistStats.yearChoiceStats) {
+      const pyc = playlistStats.yearChoiceStats;
+      const gyc = globalStats.yearChoiceStats;
+      
+      gyc.choseOldest += pyc.choseOldest || 0;
+      gyc.choseNewer += pyc.choseNewer || 0;
+      
+      const oldChoiceTotal = gyc.totalWithChoice;
+      const newChoiceTotal = pyc.totalWithChoice || 0;
+      gyc.totalWithChoice = oldChoiceTotal + newChoiceTotal;
+      
+      // Weighted average for avgYearDiffWhenNewer
+      if (pyc.avgYearDiffWhenNewer && pyc.choseNewer > 0) {
+        const oldNewerCount = gyc.choseNewer - pyc.choseNewer;
+        const newNewerCount = pyc.choseNewer;
+        if (oldNewerCount + newNewerCount > 0) {
+          gyc.avgYearDiffWhenNewer = Math.round(
+            ((gyc.avgYearDiffWhenNewer * oldNewerCount) + (pyc.avgYearDiffWhenNewer * newNewerCount)) / 
+            (oldNewerCount + newNewerCount) * 10
+          ) / 10;
+        }
+      }
+      
+      if (pyc.newerBySource) {
+        Object.keys(pyc.newerBySource).forEach(source => {
+          if (gyc.newerBySource[source] !== undefined) {
+            gyc.newerBySource[source] += pyc.newerBySource[source] || 0;
+          }
+        });
+      }
+    }
+    
+    // === RECOMMENDATION ACCURACY (NEW) ===
+    if (playlistStats.recommendationAccuracy) {
+      const pra = playlistStats.recommendationAccuracy;
+      const gra = globalStats.recommendationAccuracy;
+      
+      // By match method
+      if (pra.byMatchMethod) {
+        Object.keys(pra.byMatchMethod).forEach(method => {
+          if (gra.byMatchMethod[method]) {
+            gra.byMatchMethod[method].correct += pra.byMatchMethod[method].correct || 0;
+            gra.byMatchMethod[method].total += pra.byMatchMethod[method].total || 0;
+          }
+        });
+      }
+      
+      // By album type
+      if (pra.byAlbumType) {
+        Object.keys(pra.byAlbumType).forEach(type => {
+          if (gra.byAlbumType[type]) {
+            gra.byAlbumType[type].correct += pra.byAlbumType[type].correct || 0;
+            gra.byAlbumType[type].total += pra.byAlbumType[type].total || 0;
+          }
+        });
+      }
+      
+      // By source count
+      if (pra.bySourceCount) {
+        Object.keys(pra.bySourceCount).forEach(count => {
+          if (gra.bySourceCount[count]) {
+            gra.bySourceCount[count].correct += pra.bySourceCount[count].correct || 0;
+            gra.bySourceCount[count].total += pra.bySourceCount[count].total || 0;
+          }
+        });
+      }
+      
+      // By decade
+      if (pra.byDecade) {
+        Object.keys(pra.byDecade).forEach(decade => {
+          if (gra.byDecade[decade]) {
+            gra.byDecade[decade].correct += pra.byDecade[decade].correct || 0;
+            gra.byDecade[decade].total += pra.byDecade[decade].total || 0;
+          }
+        });
+      }
+    }
+    
+    // === OVERRIDE STATS (NEW) ===
+    if (playlistStats.overrideStats) {
+      const pos = playlistStats.overrideStats;
+      const gos = globalStats.overrideStats;
+      
+      gos.keptDefault += pos.keptDefault || 0;
+      gos.changedSelection += pos.changedSelection || 0;
+      
+      if (pos.overrideReasons) {
+        gos.overrideReasons.olderYear += pos.overrideReasons.olderYear || 0;
+        gos.overrideReasons.newerYear += pos.overrideReasons.newerYear || 0;
+        gos.overrideReasons.customYear += pos.overrideReasons.customYear || 0;
+      }
+    }
+    
+    // === FLAG ACCURACY (NEW) ===
+    if (playlistStats.flagAccuracy) {
+      Object.keys(playlistStats.flagAccuracy).forEach(flagType => {
+        if (globalStats.flagAccuracy[flagType]) {
+          globalStats.flagAccuracy[flagType].correct += playlistStats.flagAccuracy[flagType].correct || 0;
+          globalStats.flagAccuracy[flagType].total += playlistStats.flagAccuracy[flagType].total || 0;
+        }
+      });
     }
     
     globalStats.lastUpdated = new Date().toISOString();
@@ -293,9 +467,7 @@ async function resetGlobalStats() {
     'Detta raderar statistik från alla tidigare verifierade spellistor för ALLA användare.'
   );
   
-  if (!confirmed) {
-    return false;
-  }
+  if (!confirmed) return false;
   
   if (!window.validatorFirebase) {
     console.warn('Firebase not initialized');
@@ -342,11 +514,8 @@ function getExtendedSourceStats(sourceStats) {
     
     extended[source] = {
       ...s,
-      // Coverage: how often does this source have data?
       coverage: total > 0 ? Math.round((s.hadData / total) * 100) : 0,
-      // Accuracy: when selected, how often did it agree with final?
       accuracy: s.hadData > 0 ? Math.round((s.agreedWithFinal / s.hadData) * 100) : 0,
-      // Selection rate: how often is this source chosen as winner?
       selectionRate: s.hadData > 0 ? Math.round((s.selectedAsWinner / s.hadData) * 100) : 0
     };
   });
@@ -362,11 +531,8 @@ function getConflictStats(conflicts) {
   
   return {
     ...conflicts,
-    // Agreement rate: how often do all sources agree?
     agreementRate: total > 0 ? Math.round((conflicts.allAgreed / total) * 100) : 0,
-    // Majority rate: how often is there a 2-vs-1 split?
     majorityRate: total > 0 ? Math.round((conflicts.twoVsOne / total) * 100) : 0,
-    // Total disagreement rate
     totalDisagreementRate: total > 0 ? Math.round((conflicts.threeWaySplit / total) * 100) : 0
   };
 }
@@ -379,11 +545,74 @@ function getCompilationStats(compilationStats) {
   
   return {
     ...compilationStats,
-    // How often does compilation detection lead to year change?
     changeRate: triggered > 0 ? Math.round((compilationStats.changedYear / triggered) * 100) : 0,
-    // How often is original kept despite compilation detection?
     keepRate: triggered > 0 ? Math.round((compilationStats.keptOriginal / triggered) * 100) : 0
   };
+}
+
+/**
+ * Get year choice statistics with calculated metrics (NEW)
+ */
+function getYearChoiceStats(yearChoiceStats) {
+  const total = yearChoiceStats.totalWithChoice;
+  
+  return {
+    ...yearChoiceStats,
+    oldestRate: total > 0 ? Math.round((yearChoiceStats.choseOldest / total) * 100) : 0,
+    newerRate: total > 0 ? Math.round((yearChoiceStats.choseNewer / total) * 100) : 0
+  };
+}
+
+/**
+ * Get recommendation accuracy with calculated percentages (NEW)
+ */
+function getRecommendationAccuracyStats(recommendationAccuracy) {
+  const calcAccuracy = (obj) => {
+    const result = {};
+    Object.keys(obj).forEach(key => {
+      const item = obj[key];
+      result[key] = {
+        ...item,
+        accuracy: item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0
+      };
+    });
+    return result;
+  };
+  
+  return {
+    byMatchMethod: calcAccuracy(recommendationAccuracy.byMatchMethod),
+    byAlbumType: calcAccuracy(recommendationAccuracy.byAlbumType),
+    bySourceCount: calcAccuracy(recommendationAccuracy.bySourceCount),
+    byDecade: calcAccuracy(recommendationAccuracy.byDecade)
+  };
+}
+
+/**
+ * Get override statistics with calculated metrics (NEW)
+ */
+function getOverrideStats(overrideStats) {
+  const total = overrideStats.keptDefault + overrideStats.changedSelection;
+  
+  return {
+    ...overrideStats,
+    defaultRate: total > 0 ? Math.round((overrideStats.keptDefault / total) * 100) : 0,
+    overrideRate: total > 0 ? Math.round((overrideStats.changedSelection / total) * 100) : 0
+  };
+}
+
+/**
+ * Get flag accuracy with calculated percentages (NEW)
+ */
+function getFlagAccuracyStats(flagAccuracy) {
+  const result = {};
+  Object.keys(flagAccuracy).forEach(flagType => {
+    const item = flagAccuracy[flagType];
+    result[flagType] = {
+      ...item,
+      accuracy: item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0
+    };
+  });
+  return result;
 }
 
 /**
@@ -398,13 +627,15 @@ async function exportGlobalStatsToJSON() {
     _calculated: {
       sourceStatsExtended: getExtendedSourceStats(stats.sourceStats),
       conflictStats: getConflictStats(stats.conflicts),
-      compilationStats: getCompilationStats(stats.compilationStats)
+      compilationStats: getCompilationStats(stats.compilationStats),
+      yearChoiceStats: getYearChoiceStats(stats.yearChoiceStats),
+      recommendationAccuracy: getRecommendationAccuracyStats(stats.recommendationAccuracy),
+      overrideStats: getOverrideStats(stats.overrideStats),
+      flagAccuracy: getFlagAccuracyStats(stats.flagAccuracy)
     }
   };
   
-  const blob = new Blob([JSON.stringify(enrichedStats, null, 2)], {
-    type: 'application/json'
-  });
+  const blob = new Blob([JSON.stringify(enrichedStats, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -424,6 +655,10 @@ async function generateStatsSummary() {
   const extendedSource = getExtendedSourceStats(stats.sourceStats);
   const conflictStats = getConflictStats(stats.conflicts);
   const compStats = getCompilationStats(stats.compilationStats);
+  const yearChoice = getYearChoiceStats(stats.yearChoiceStats);
+  const recAccuracy = getRecommendationAccuracyStats(stats.recommendationAccuracy);
+  const overrideS = getOverrideStats(stats.overrideStats);
+  const flagAcc = getFlagAccuracyStats(stats.flagAccuracy);
   
   return {
     overview: {
@@ -442,6 +677,10 @@ async function generateStatsSummary() {
     },
     conflicts: conflictStats,
     compilations: compStats,
+    yearChoice: yearChoice,
+    recommendationAccuracy: recAccuracy,
+    overrides: overrideS,
+    flagAccuracy: flagAcc,
     confidence: {
       veryHigh: calculateConfidenceAccuracy(stats.confidenceAccuracy.very_high),
       high: calculateConfidenceAccuracy(stats.confidenceAccuracy.high),
@@ -491,6 +730,10 @@ window.statsManager = {
   getExtendedSourceStats,
   getConflictStats,
   getCompilationStats,
+  getYearChoiceStats,
+  getRecommendationAccuracyStats,
+  getOverrideStats,
+  getFlagAccuracyStats,
   exportGlobalStatsToJSON,
   generateStatsSummary
 };

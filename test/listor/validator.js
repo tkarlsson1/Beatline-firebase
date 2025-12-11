@@ -1,4 +1,5 @@
 // Validator - Core logic for analyzing and flagging tracks
+// Version 3.0 - Extended statistics for ML training data
 
 /**
  * Analyze album for compilation indicators
@@ -117,7 +118,6 @@ function detectCompilationAlbum(track) {
     
     // Compilation labels
     const compilationLabels = [
-      // Major compilation labels
       /rhino/i,
       /rhino entertainment/i,
       /legacy/i,
@@ -131,7 +131,7 @@ function detectCompilationAlbum(track) {
       /capitol catalogue/i,
       /emi gold/i,
       /mercury/i,
-      /umc\b/i,  // Universal Music Catalogue
+      /umc\b/i,
       /sony music cg/i,
       /geffen/i,
       /parlophone/i,
@@ -236,20 +236,20 @@ function crossValidateYear(track) {
   // Determine confidence
   let confidence;
   if (sourcesAgree && sources.length >= 2) {
-    confidence = 'very_high'; // All sources agree
+    confidence = 'very_high';
   } else if (majorityAgree && bestCount >= 2) {
-    confidence = 'high'; // Majority agrees
+    confidence = 'high';
   } else if (sources.length >= 2) {
-    confidence = 'medium'; // Multiple sources but disagree
+    confidence = 'medium';
   } else {
-    confidence = 'low'; // Only one source
+    confidence = 'low';
   }
   
   // Special case: If MB and Last.fm agree but differ from Spotify
   const mbYear = track.earliestRecordingYear;
   const lfmYear = track.lastFmYear;
   if (mbYear && lfmYear && mbYear === lfmYear && mbYear !== track.spotifyYear) {
-    confidence = 'very_high'; // Two independent sources agree
+    confidence = 'very_high';
     bestYear = mbYear;
   }
   
@@ -269,7 +269,7 @@ function crossValidateYear(track) {
 function analyzeAndFlagTracks(tracks) {
   return tracks.map(track => {
     const flags = [];
-    let status = 'green'; // Start optimistic
+    let status = 'green';
     
     // Get compilation detection
     const compilationResult = detectCompilationAlbum(track);
@@ -280,6 +280,18 @@ function analyzeAndFlagTracks(tracks) {
     track.validation = validation;
     track.recommendedYear = validation.bestYear;
     
+    // Store the default/recommended selection for override tracking
+    track.defaultSelectedYear = validation.bestYear;
+    
+    // Calculate oldest available year for yearChoice tracking
+    const availableYears = [];
+    if (track.spotifyYear) availableYears.push(track.spotifyYear);
+    if (track.spotifyOriginalYear) availableYears.push(track.spotifyOriginalYear);
+    if (track.earliestRecordingYear) availableYears.push(track.earliestRecordingYear);
+    if (track.lastFmYear) availableYears.push(track.lastFmYear);
+    track.oldestAvailableYear = availableYears.length > 0 ? Math.min(...availableYears) : null;
+    track.availableYearsCount = new Set(availableYears).size;
+    
     // 1. Compilation detected
     if (compilationResult.isCompilation) {
       flags.push({
@@ -289,7 +301,6 @@ function analyzeAndFlagTracks(tracks) {
         details: compilationResult.reasons.join('; ')
       });
       
-      // If sources agree on an earlier year than Spotify, that's good
       if (validation.sourcesAgree && validation.bestYear < track.spotifyYear) {
         flags.push({
           type: 'compilation_resolved',
@@ -298,7 +309,6 @@ function analyzeAndFlagTracks(tracks) {
         });
         status = 'green';
       } else if (!validation.sourcesAgree) {
-        // Sources disagree - needs review
         status = 'yellow';
         flags.push({
           type: 'year_conflict',
@@ -317,7 +327,7 @@ function analyzeAndFlagTracks(tracks) {
       });
     }
     
-    // 3. Remix/Remaster - ONLY flag if sources disagree
+    // 3. Remix/Remaster
     const titleLower = track.title.toLowerCase();
     const isRemixOrRemaster = titleLower.includes('remix') || 
                               titleLower.includes('remaster') ||
@@ -366,7 +376,6 @@ function analyzeAndFlagTracks(tracks) {
         message: 'No external year validation available',
         details: 'Only Spotify data available'
       });
-      // Don't change status - could still be green
     }
     
     // 7. CRITICAL: Compilation with major disagreement
@@ -390,8 +399,16 @@ function analyzeAndFlagTracks(tracks) {
 }
 
 /**
- * Calculate playlist statistics
- * Now includes extended stats for source behavior, conflicts, and compilation detection
+ * Get decade string from year
+ */
+function getDecadeFromYear(year) {
+  if (!year || year < 1900) return 'unknown';
+  const decade = Math.floor(year / 10) * 10;
+  return `${decade}s`;
+}
+
+/**
+ * Calculate playlist statistics - Extended for ML training
  */
 function calculatePlaylistStats(tracks) {
   const stats = {
@@ -406,7 +423,7 @@ function calculatePlaylistStats(tracks) {
     avgYearDiff: 0,
     flagTypes: {},
     
-    // Original source accuracy (which source was chosen as winner)
+    // Original source accuracy
     sourceAccuracy: {
       'Spotify': 0,
       'Spotify Original': 0,
@@ -424,7 +441,7 @@ function calculatePlaylistStats(tracks) {
       'none': { total: 0, correct: 0 }
     },
     
-    // NEW: Extended source statistics
+    // Extended source statistics (fas 1)
     sourceStats: {
       'Spotify': { hadData: 0, noData: 0, selectedAsWinner: 0, agreedWithFinal: 0, deviations: [] },
       'SpotifyOriginal': { hadData: 0, noData: 0, selectedAsWinner: 0, agreedWithFinal: 0, deviations: [] },
@@ -432,7 +449,7 @@ function calculatePlaylistStats(tracks) {
       'MusicBrainz': { hadData: 0, noData: 0, selectedAsWinner: 0, agreedWithFinal: 0, deviations: [] }
     },
     
-    // NEW: Conflict statistics
+    // Conflict statistics (fas 1)
     conflicts: {
       allAgreed: 0,
       twoVsOne: 0,
@@ -442,7 +459,7 @@ function calculatePlaylistStats(tracks) {
       avgYearSpread: 0
     },
     
-    // NEW: Compilation detection statistics
+    // Compilation detection statistics (fas 1)
     compilationStats: {
       triggered: 0,
       changedYear: 0,
@@ -454,6 +471,77 @@ function calculatePlaylistStats(tracks) {
         'low': 0,
         'none': 0
       }
+    },
+    
+    // Year choice statistics (fas 2)
+    yearChoiceStats: {
+      choseOldest: 0,
+      choseNewer: 0,
+      totalWithChoice: 0,
+      yearDiffSumWhenNewer: 0,
+      avgYearDiffWhenNewer: 0,
+      newerBySource: {
+        'Spotify': 0,
+        'SpotifyOriginal': 0,
+        'MusicBrainz': 0,
+        'LastFm': 0,
+        'Custom': 0
+      }
+    },
+    
+    // Recommendation accuracy per scenario (fas 2)
+    recommendationAccuracy: {
+      byMatchMethod: {
+        isrc: { correct: 0, total: 0 },
+        search: { correct: 0, total: 0 },
+        none: { correct: 0, total: 0 }
+      },
+      byAlbumType: {
+        album: { correct: 0, total: 0 },
+        single: { correct: 0, total: 0 },
+        compilation: { correct: 0, total: 0 },
+        unknown: { correct: 0, total: 0 }
+      },
+      bySourceCount: {
+        one: { correct: 0, total: 0 },
+        two: { correct: 0, total: 0 },
+        three: { correct: 0, total: 0 },
+        four: { correct: 0, total: 0 }
+      },
+      byDecade: {
+        '1950s': { correct: 0, total: 0 },
+        '1960s': { correct: 0, total: 0 },
+        '1970s': { correct: 0, total: 0 },
+        '1980s': { correct: 0, total: 0 },
+        '1990s': { correct: 0, total: 0 },
+        '2000s': { correct: 0, total: 0 },
+        '2010s': { correct: 0, total: 0 },
+        '2020s': { correct: 0, total: 0 },
+        'unknown': { correct: 0, total: 0 }
+      }
+    },
+    
+    // Override statistics (fas 2)
+    overrideStats: {
+      keptDefault: 0,
+      changedSelection: 0,
+      overrideReasons: {
+        olderYear: 0,
+        newerYear: 0,
+        customYear: 0
+      }
+    },
+    
+    // Flag accuracy correlation (fas 2)
+    flagAccuracy: {
+      compilation: { correct: 0, total: 0 },
+      compilation_resolved: { correct: 0, total: 0 },
+      year_conflict: { correct: 0, total: 0 },
+      multiple_artists: { correct: 0, total: 0 },
+      remix_remaster: { correct: 0, total: 0 },
+      large_year_diff: { correct: 0, total: 0 },
+      no_validation: { correct: 0, total: 0 },
+      critical_compilation: { correct: 0, total: 0 }
     }
   };
   
@@ -466,31 +554,25 @@ function calculatePlaylistStats(tracks) {
     else if (track.status === 'yellow') stats.yellow++;
     else if (track.status === 'red') stats.red++;
     
-    // === EXTENDED SOURCE STATS ===
-    // Check each source for data availability
-    
-    // Spotify (always has data via spotifyYear)
+    // === SOURCE STATS ===
     if (track.spotifyYear) {
       stats.sourceStats['Spotify'].hadData++;
     } else {
       stats.sourceStats['Spotify'].noData++;
     }
     
-    // Spotify Original
     if (track.spotifyOriginalYear) {
       stats.sourceStats['SpotifyOriginal'].hadData++;
     } else {
       stats.sourceStats['SpotifyOriginal'].noData++;
     }
     
-    // Last.fm
     if (track.lastFmYear) {
       stats.sourceStats['LastFm'].hadData++;
     } else {
       stats.sourceStats['LastFm'].noData++;
     }
     
-    // MusicBrainz
     if (track.earliestRecordingYear) {
       stats.sourceStats['MusicBrainz'].hadData++;
     } else {
@@ -508,7 +590,6 @@ function calculatePlaylistStats(tracks) {
         if (uniqueYears === 1) {
           stats.conflicts.allAgreed++;
         } else if (uniqueYears === 2 && sourceCount >= 3) {
-          // Check if it's 2-vs-1
           const voteCounts = Object.values(track.validation.votes).map(v => v.count);
           if (voteCounts.includes(2) && voteCounts.includes(1)) {
             stats.conflicts.twoVsOne++;
@@ -517,7 +598,6 @@ function calculatePlaylistStats(tracks) {
           stats.conflicts.threeWaySplit++;
         }
         
-        // Calculate year spread
         const years = Object.keys(track.validation.votes).map(y => parseInt(y));
         if (years.length >= 2) {
           const spread = Math.max(...years) - Math.min(...years);
@@ -531,7 +611,6 @@ function calculatePlaylistStats(tracks) {
       stats.compilationStats.triggered++;
       stats.compilationStats.byConfidence[track.compilationDetection.confidence]++;
       
-      // Did we change the year?
       if (track.recommendedYear && track.spotifyYear) {
         if (track.recommendedYear !== track.spotifyYear) {
           stats.compilationStats.changedYear++;
@@ -546,28 +625,24 @@ function calculatePlaylistStats(tracks) {
       stats.verified++;
       
       const finalYear = track.verifiedYear;
+      const recommendedYear = track.recommendedYear;
+      const wasCorrect = finalYear === recommendedYear;
       
-      // Count source accuracy (which source was chosen - original logic)
+      // Source accuracy
       if (track.chosenSource) {
         stats.sourceAccuracy[track.chosenSource]++;
       }
       
-      // Count confidence accuracy (original logic)
+      // Confidence accuracy
       if (track.validation && track.validation.confidence) {
         const confidence = track.validation.confidence;
-        const recommendedYear = track.recommendedYear;
-        const verifiedYear = track.verifiedYear;
-        
         stats.confidenceAccuracy[confidence].total++;
-        
-        if (recommendedYear && verifiedYear && recommendedYear === verifiedYear) {
+        if (wasCorrect) {
           stats.confidenceAccuracy[confidence].correct++;
         }
       }
       
-      // === NEW: Track which sources agreed with final verified year ===
-      
-      // Spotify
+      // Source agreement tracking
       if (track.spotifyYear) {
         if (track.spotifyYear === finalYear) {
           stats.sourceStats['Spotify'].agreedWithFinal++;
@@ -576,7 +651,6 @@ function calculatePlaylistStats(tracks) {
         }
       }
       
-      // Spotify Original
       if (track.spotifyOriginalYear) {
         if (track.spotifyOriginalYear === finalYear) {
           stats.sourceStats['SpotifyOriginal'].agreedWithFinal++;
@@ -585,7 +659,6 @@ function calculatePlaylistStats(tracks) {
         }
       }
       
-      // Last.fm
       if (track.lastFmYear) {
         if (track.lastFmYear === finalYear) {
           stats.sourceStats['LastFm'].agreedWithFinal++;
@@ -594,7 +667,6 @@ function calculatePlaylistStats(tracks) {
         }
       }
       
-      // MusicBrainz
       if (track.earliestRecordingYear) {
         if (track.earliestRecordingYear === finalYear) {
           stats.sourceStats['MusicBrainz'].agreedWithFinal++;
@@ -603,12 +675,98 @@ function calculatePlaylistStats(tracks) {
         }
       }
       
-      // Track which source was selected as winner (based on chosenSource)
       if (track.chosenSource) {
         const sourceKey = mapSourceNameToKey(track.chosenSource);
         if (stats.sourceStats[sourceKey]) {
           stats.sourceStats[sourceKey].selectedAsWinner++;
         }
+      }
+      
+      // === YEAR CHOICE STATS ===
+      if (track.oldestAvailableYear && track.availableYearsCount > 1) {
+        stats.yearChoiceStats.totalWithChoice++;
+        
+        if (finalYear === track.oldestAvailableYear) {
+          stats.yearChoiceStats.choseOldest++;
+        } else if (finalYear > track.oldestAvailableYear) {
+          stats.yearChoiceStats.choseNewer++;
+          stats.yearChoiceStats.yearDiffSumWhenNewer += (finalYear - track.oldestAvailableYear);
+          
+          if (track.chosenSource) {
+            const sourceKey = mapSourceNameToKey(track.chosenSource);
+            if (stats.yearChoiceStats.newerBySource[sourceKey] !== undefined) {
+              stats.yearChoiceStats.newerBySource[sourceKey]++;
+            }
+          }
+        }
+      }
+      
+      // === RECOMMENDATION ACCURACY ===
+      
+      // By match method
+      const matchMethod = track.matchMethod || 'none';
+      if (stats.recommendationAccuracy.byMatchMethod[matchMethod]) {
+        stats.recommendationAccuracy.byMatchMethod[matchMethod].total++;
+        if (wasCorrect) {
+          stats.recommendationAccuracy.byMatchMethod[matchMethod].correct++;
+        }
+      }
+      
+      // By album type
+      const albumType = track.albumType || 'unknown';
+      if (stats.recommendationAccuracy.byAlbumType[albumType]) {
+        stats.recommendationAccuracy.byAlbumType[albumType].total++;
+        if (wasCorrect) {
+          stats.recommendationAccuracy.byAlbumType[albumType].correct++;
+        }
+      }
+      
+      // By source count
+      const sourceCount = track.validation?.sources?.length || 1;
+      const sourceCountKey = ['one', 'two', 'three', 'four'][Math.min(sourceCount, 4) - 1];
+      if (stats.recommendationAccuracy.bySourceCount[sourceCountKey]) {
+        stats.recommendationAccuracy.bySourceCount[sourceCountKey].total++;
+        if (wasCorrect) {
+          stats.recommendationAccuracy.bySourceCount[sourceCountKey].correct++;
+        }
+      }
+      
+      // By decade
+      const decade = getDecadeFromYear(finalYear);
+      if (stats.recommendationAccuracy.byDecade[decade]) {
+        stats.recommendationAccuracy.byDecade[decade].total++;
+        if (wasCorrect) {
+          stats.recommendationAccuracy.byDecade[decade].correct++;
+        }
+      }
+      
+      // === OVERRIDE STATS ===
+      if (track.defaultSelectedYear) {
+        if (finalYear === track.defaultSelectedYear) {
+          stats.overrideStats.keptDefault++;
+        } else {
+          stats.overrideStats.changedSelection++;
+          
+          if (track.chosenSource === 'Custom') {
+            stats.overrideStats.overrideReasons.customYear++;
+          } else if (finalYear < track.defaultSelectedYear) {
+            stats.overrideStats.overrideReasons.olderYear++;
+          } else {
+            stats.overrideStats.overrideReasons.newerYear++;
+          }
+        }
+      }
+      
+      // === FLAG ACCURACY ===
+      if (track.flags && track.flags.length > 0) {
+        track.flags.forEach(flag => {
+          if (stats.flagAccuracy[flag.type]) {
+            stats.flagAccuracy[flag.type].total++;
+            if (wasCorrect) {
+              stats.flagAccuracy[flag.type].correct++;
+            }
+          }
+        });
       }
     }
     
@@ -616,13 +774,11 @@ function calculatePlaylistStats(tracks) {
     if (track.mbYear) stats.withMBMatch++;
     if (track.isrc) stats.withISRC++;
     
-    // Calculate year diff
     if (track.mbYear) {
       yearDiffSum += Math.abs(track.spotifyYear - track.mbYear);
       yearDiffCount++;
     }
     
-    // Count flag types
     track.flags.forEach(flag => {
       if (!stats.flagTypes[flag.type]) {
         stats.flagTypes[flag.type] = 0;
@@ -642,7 +798,6 @@ function calculatePlaylistStats(tracks) {
     ) / 10;
   }
   
-  // Calculate average deviations for each source
   Object.keys(stats.sourceStats).forEach(source => {
     const deviations = stats.sourceStats[source].deviations;
     if (deviations.length > 0) {
@@ -651,11 +806,16 @@ function calculatePlaylistStats(tracks) {
     } else {
       stats.sourceStats[source].avgDeviation = 0;
     }
-    // Remove raw deviations array to save space in Firebase
     delete stats.sourceStats[source].deviations;
   });
   
-  // Remove intermediate sum
+  if (stats.yearChoiceStats.choseNewer > 0) {
+    stats.yearChoiceStats.avgYearDiffWhenNewer = Math.round(
+      (stats.yearChoiceStats.yearDiffSumWhenNewer / stats.yearChoiceStats.choseNewer) * 10
+    ) / 10;
+  }
+  delete stats.yearChoiceStats.yearDiffSumWhenNewer;
+  
   delete stats.conflicts.yearSpreadSum;
   
   return stats;
@@ -676,21 +836,18 @@ function mapSourceNameToKey(sourceName) {
 }
 
 /**
- * Sort tracks for display (red first, then yellow, then green)
+ * Sort tracks for display
  */
 function sortTracksByStatus(tracks) {
   const order = { red: 0, yellow: 1, green: 2 };
   
   return [...tracks].sort((a, b) => {
-    // First by status
     const statusDiff = order[a.status] - order[b.status];
     if (statusDiff !== 0) return statusDiff;
     
-    // Then by number of flags (more flags first)
     const flagDiff = b.flags.length - a.flags.length;
     if (flagDiff !== 0) return flagDiff;
     
-    // Then by year difference (larger diff first)
     const aYearDiff = a.mbYear ? Math.abs(a.spotifyYear - a.mbYear) : 0;
     const bYearDiff = b.mbYear ? Math.abs(b.spotifyYear - b.mbYear) : 0;
     return bYearDiff - aYearDiff;
@@ -701,14 +858,8 @@ function sortTracksByStatus(tracks) {
  * Filter tracks by status
  */
 function filterTracksByStatus(tracks, statusFilter) {
-  if (statusFilter === 'all') {
-    return tracks;
-  }
-  
-  if (statusFilter === 'flagged') {
-    return tracks.filter(t => t.status !== 'green');
-  }
-  
+  if (statusFilter === 'all') return tracks;
+  if (statusFilter === 'flagged') return tracks.filter(t => t.status !== 'green');
   return tracks.filter(t => t.status === statusFilter);
 }
 
@@ -720,8 +871,6 @@ function updateTrackYear(tracks, spotifyId, newYear) {
   if (track) {
     track.verifiedYear = parseInt(newYear);
     track.verified = true;
-    
-    // If manually verified, mark as green
     if (track.status === 'red' || track.status === 'yellow') {
       track.status = 'green';
     }
@@ -759,7 +908,6 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
   const verifiedTracks = tracks.filter(t => t.verified);
   const stats = calculatePlaylistStats(tracks);
   
-  // Map display names to Firebase-safe keys
   const firebaseSafeSourceAccuracy = {
     'Spotify': stats.sourceAccuracy['Spotify'] || 0,
     'SpotifyOriginal': stats.sourceAccuracy['Spotify Original'] || 0,
@@ -768,7 +916,6 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
     'Custom': stats.sourceAccuracy['Custom'] || 0
   };
   
-  // Create Firebase-safe stats object
   const firebaseSafeStats = {
     ...stats,
     sourceAccuracy: firebaseSafeSourceAccuracy
@@ -787,7 +934,6 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
       artist: track.artist,
       year: track.verifiedYear
     })),
-    // Metadata for reference
     _metadata: {
       originalTrackCount: tracks.length,
       removedTracks: tracks.length - verifiedTracks.length,
@@ -801,9 +947,7 @@ function prepareForExport(playlistName, playlistUrl, tracks) {
  * Export to JSON file
  */
 function exportToJSON(playlistData) {
-  const blob = new Blob([JSON.stringify(playlistData, null, 2)], {
-    type: 'application/json'
-  });
+  const blob = new Blob([JSON.stringify(playlistData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -827,29 +971,18 @@ async function saveToFirebase(playlistData) {
   }
   
   try {
-    // Generate unique ID
     const playlistId = 'playlist_' + Date.now();
-    
-    // Save to verifiedPlaylists
-    await window.validatorFirebase.set(
-      `verifiedPlaylists/${playlistId}`,
-      playlistData
-    );
-    
+    await window.validatorFirebase.set(`verifiedPlaylists/${playlistId}`, playlistData);
     console.log(`✅ Playlist saved to Firebase: ${playlistId}`);
     return playlistId;
-    
   } catch (error) {
     console.error('Failed to save to Firebase:', error);
-    
-    // Better error messages
     if (error.code === 'PERMISSION_DENIED') {
       throw new Error('Firebase-behörighet nekad. Kontrollera security rules.');
     }
     if (error.message.includes('network')) {
       throw new Error('Nätverksfel: Kunde inte spara till Firebase.');
     }
-    
     throw new Error(`Firebase-fel: ${error.message}`);
   }
 }
@@ -859,7 +992,6 @@ async function saveToFirebase(playlistData) {
  */
 function validateReadyForExport(tracks) {
   const unverified = tracks.filter(t => !t.verified);
-  
   if (unverified.length > 0) {
     return {
       ready: false,
@@ -867,51 +999,36 @@ function validateReadyForExport(tracks) {
       unverifiedTracks: unverified
     };
   }
-  
-  return {
-    ready: true,
-    message: 'Alla låtar är verifierade och redo för export'
-  };
+  return { ready: true, message: 'Alla låtar är verifierade och redo för export' };
 }
 
 /**
- * Prepare playlist data in game format (key-based object)
- * Format: { "spotifyId": { artist, title, year } }
+ * Prepare playlist data in game format
  */
 function prepareForGameFormat(playlistName, tracks) {
   const verifiedTracks = tracks.filter(t => t.verified);
-  
   if (verifiedTracks.length === 0) {
     throw new Error('Inga verifierade låtar att exportera');
   }
   
-  // Convert to game format (Spotify ID as key)
   const songs = {};
   verifiedTracks.forEach(track => {
     songs[track.spotifyId] = {
       artist: track.artist,
       title: track.title,
-      year: String(track.verifiedYear)  // Game expects string
+      year: String(track.verifiedYear)
     };
   });
   
-  return {
-    playlistName: playlistName,
-    songs: songs,
-    totalTracks: verifiedTracks.length
-  };
+  return { playlistName, songs, totalTracks: verifiedTracks.length };
 }
 
 /**
- * Export playlist in game format (for manual copying to live database)
+ * Export playlist in game format
  */
 function exportGameFormatJSON(playlistName, tracks) {
   const gameData = prepareForGameFormat(playlistName, tracks);
-  
-  // Create downloadable JSON (only the songs object)
-  const blob = new Blob([JSON.stringify(gameData.songs, null, 2)], {
-    type: 'application/json'
-  });
+  const blob = new Blob([JSON.stringify(gameData.songs, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -920,7 +1037,6 @@ function exportGameFormatJSON(playlistName, tracks) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  
   console.log(`✅ Game format JSON exported: ${gameData.totalTracks} tracks`);
 }
 

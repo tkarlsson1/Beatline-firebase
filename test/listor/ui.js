@@ -1,12 +1,12 @@
 // UI Module - Handles all rendering and user interactions
-// Version 2.0 - Extended statistics display
+// Version 3.0 - Extended statistics display for ML training
 
 // Current state
 let currentState = {
-  phase: 'input', // 'input', 'loading', 'validating', 'review', 'exporting'
+  phase: 'input',
   playlist: null,
   tracks: [],
-  filter: 'all', // 'all', 'red', 'yellow', 'green', 'flagged'
+  filter: 'all',
   stats: null,
   currentAudio: null
 };
@@ -23,7 +23,6 @@ function initUI() {
  * Setup global event listeners
  */
 function setupEventListeners() {
-  // Handle Enter key in URL input
   document.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && currentState.phase === 'input') {
       const input = document.getElementById('playlistUrl');
@@ -48,15 +47,8 @@ function renderInputPhase() {
       
       <div class="input-form">
         <label for="playlistUrl">Spotify Playlist URL:</label>
-        <input 
-          type="text" 
-          id="playlistUrl" 
-          placeholder="https://open.spotify.com/playlist/..."
-          autofocus
-        />
-        <button id="analyzeBtn" class="btn-primary">
-          Analysera Spellista
-        </button>
+        <input type="text" id="playlistUrl" placeholder="https://open.spotify.com/playlist/..." autofocus />
+        <button id="analyzeBtn" class="btn-primary">Analysera Spellista</button>
       </div>
       
       <div class="help-text">
@@ -71,7 +63,6 @@ function renderInputPhase() {
     </div>
   `;
   
-  // Attach event listener
   document.getElementById('analyzeBtn').onclick = handleAnalyzeClick;
 }
 
@@ -92,21 +83,15 @@ async function handleAnalyzeClick() {
     return;
   }
   
-  // Start loading
   currentState.phase = 'loading';
   renderLoadingPhase('Hämtar spellista från Spotify...');
   
   try {
-    // Fetch playlist
     const playlist = await window.spotifyHelper.fetchPlaylist(url);
     currentState.playlist = playlist;
-    
     showNotification(`✅ Laddade ${playlist.totalTracks} låtar från "${playlist.name}"`, 'success');
-    
-    // Start validation
     currentState.phase = 'validating';
     await startValidation(playlist.tracks);
-    
   } catch (error) {
     console.error('Failed to load playlist:', error);
     showError(`Misslyckades att ladda spellista: ${error.message}`);
@@ -171,59 +156,224 @@ async function startValidation(tracks) {
   renderValidatingPhase();
   
   try {
-    // Validate all tracks via MusicBrainz
-    const validatedTracks = await window.musicBrainz.validatePlaylist(
-      tracks,
-      updateProgress,
-      null
-    );
+    const validatedTracks = await window.musicBrainz.validatePlaylist(tracks, updateProgress, null);
     
-    // Check if validation had too many errors
     const errorCount = validatedTracks.filter(t => t.matchMethod === 'error').length;
     if (errorCount > tracks.length * 0.5) {
-      throw new Error(`För många valideringsfel (${errorCount}/${tracks.length}). MusicBrainz kan vara nere eller otillgänglig.`);
+      throw new Error(`För många valideringsfel (${errorCount}/${tracks.length}). MusicBrainz kan vara nere.`);
     }
     
-    // Analyze and flag tracks
     const analyzedTracks = window.validator.analyzeAndFlagTracks(validatedTracks);
-    
-    // Sort by status (red first)
     currentState.tracks = window.validator.sortTracksByStatus(analyzedTracks);
     currentState.stats = window.validator.calculatePlaylistStats(analyzedTracks);
     
-    // Show warning if there were errors
     if (errorCount > 0) {
       showNotification(`⚠️ ${errorCount} låtar kunde inte valideras mot MusicBrainz`, 'warning');
     }
     
-    // Move to review phase
     currentState.phase = 'review';
     renderReviewPhase();
-    
   } catch (error) {
     console.error('Validation failed:', error);
-    
-    // User-friendly error messages
     let errorMessage = error.message;
-    
     if (error.message.includes('rate limit')) {
       errorMessage = 'MusicBrainz rate limit nådd. Vänta 1 minut och försök igen.';
     } else if (error.message.includes('network') || error.message.includes('Nätverksfel')) {
       errorMessage = 'Nätverksfel: Kontrollera din internetanslutning och försök igen.';
-    } else if (error.message.includes('För många valideringsfel')) {
-      errorMessage = error.message + ' Försök igen om en stund.';
     }
-    
     showError(errorMessage);
-    
-    // Return to input phase
     currentState.phase = 'input';
     renderInputPhase();
   }
 }
 
 /**
- * Render extended source stats panel (NEW)
+ * Render year choice stats (NEW)
+ */
+function renderYearChoiceStats(yearChoiceStats, title, isGlobal = false) {
+  if (!yearChoiceStats || yearChoiceStats.totalWithChoice === 0) return '';
+  
+  const total = yearChoiceStats.totalWithChoice;
+  const oldestRate = Math.round((yearChoiceStats.choseOldest / total) * 100);
+  const newerRate = Math.round((yearChoiceStats.choseNewer / total) * 100);
+  
+  return `
+    <div class="year-choice-stats-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Hur ofta valdes äldsta tillgängliga år vs ett nyare år?</p>
+      <div class="year-choice-metrics">
+        <div class="year-choice-bars">
+          <div class="year-choice-bar-row">
+            <span class="yc-label">🕰️ Äldsta året</span>
+            <div class="yc-bar-container">
+              <div class="yc-bar yc-oldest" style="width: ${oldestRate}%"></div>
+            </div>
+            <span class="yc-value">${yearChoiceStats.choseOldest} (${oldestRate}%)</span>
+          </div>
+          <div class="year-choice-bar-row">
+            <span class="yc-label">📅 Nyare år</span>
+            <div class="yc-bar-container">
+              <div class="yc-bar yc-newer" style="width: ${newerRate}%"></div>
+            </div>
+            <span class="yc-value">${yearChoiceStats.choseNewer} (${newerRate}%)</span>
+          </div>
+        </div>
+        ${yearChoiceStats.choseNewer > 0 ? `
+          <div class="yc-avg-diff">
+            <span>Snittskillnad när nyare valdes:</span>
+            <strong>${yearChoiceStats.avgYearDiffWhenNewer || 0} år</strong>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render recommendation accuracy stats (NEW)
+ */
+function renderRecommendationAccuracy(recommendationAccuracy, title, isGlobal = false) {
+  if (!recommendationAccuracy) return '';
+  
+  // Find categories with data
+  const hasData = (obj) => Object.values(obj).some(v => v.total > 0);
+  
+  if (!hasData(recommendationAccuracy.byMatchMethod) && 
+      !hasData(recommendationAccuracy.byAlbumType) &&
+      !hasData(recommendationAccuracy.byDecade)) {
+    return '';
+  }
+  
+  const renderCategory = (data, categoryTitle) => {
+    const items = Object.entries(data)
+      .filter(([_, v]) => v.total > 0)
+      .map(([key, v]) => {
+        const accuracy = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0;
+        return `
+          <div class="rec-acc-row">
+            <span class="rec-acc-label">${key}</span>
+            <div class="rec-acc-bar-container">
+              <div class="rec-acc-bar" style="width: ${accuracy}%; background: ${accuracy >= 90 ? '#28a745' : accuracy >= 70 ? '#ffc107' : '#dc3545'}"></div>
+            </div>
+            <span class="rec-acc-value">${v.correct}/${v.total} (${accuracy}%)</span>
+          </div>
+        `;
+      })
+      .join('');
+    
+    if (!items) return '';
+    return `
+      <div class="rec-acc-category">
+        <h5>${categoryTitle}</h5>
+        ${items}
+      </div>
+    `;
+  };
+  
+  return `
+    <div class="recommendation-accuracy-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Hur ofta var rekommendationen rätt per scenario?</p>
+      <div class="rec-acc-grid">
+        ${renderCategory(recommendationAccuracy.byMatchMethod, 'Per matchmetod')}
+        ${renderCategory(recommendationAccuracy.byAlbumType, 'Per albumtyp')}
+        ${renderCategory(recommendationAccuracy.bySourceCount, 'Per antal källor')}
+        ${renderCategory(recommendationAccuracy.byDecade, 'Per årtionde')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render override stats (NEW)
+ */
+function renderOverrideStats(overrideStats, title, isGlobal = false) {
+  if (!overrideStats) return '';
+  
+  const total = overrideStats.keptDefault + overrideStats.changedSelection;
+  if (total === 0) return '';
+  
+  const defaultRate = Math.round((overrideStats.keptDefault / total) * 100);
+  const overrideRate = Math.round((overrideStats.changedSelection / total) * 100);
+  
+  return `
+    <div class="override-stats-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Hur ofta behövdes manuell korrigering?</p>
+      <div class="override-metrics">
+        <div class="override-summary">
+          <div class="override-stat">
+            <span class="override-value override-kept">${defaultRate}%</span>
+            <span class="override-label">Behöll default (${overrideStats.keptDefault})</span>
+          </div>
+          <div class="override-stat">
+            <span class="override-value override-changed">${overrideRate}%</span>
+            <span class="override-label">Ändrade (${overrideStats.changedSelection})</span>
+          </div>
+        </div>
+        ${overrideStats.changedSelection > 0 ? `
+          <div class="override-reasons">
+            <span class="reasons-title">När ändring gjordes:</span>
+            <div class="reasons-list">
+              <span>🕰️ Äldre år: ${overrideStats.overrideReasons.olderYear}</span>
+              <span>📅 Nyare år: ${overrideStats.overrideReasons.newerYear}</span>
+              <span>✏️ Manuellt: ${overrideStats.overrideReasons.customYear}</span>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render flag accuracy stats (NEW)
+ */
+function renderFlagAccuracy(flagAccuracy, title, isGlobal = false) {
+  if (!flagAccuracy) return '';
+  
+  const items = Object.entries(flagAccuracy)
+    .filter(([_, v]) => v.total > 0)
+    .map(([flagType, v]) => {
+      const accuracy = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0;
+      const icon = {
+        'compilation': '📀',
+        'compilation_resolved': '✅',
+        'year_conflict': '⚠️',
+        'multiple_artists': '👥',
+        'remix_remaster': '🔄',
+        'large_year_diff': '📊',
+        'no_validation': '❓',
+        'critical_compilation': '🔴'
+      }[flagType] || '🏷️';
+      
+      return { flagType, icon, accuracy, correct: v.correct, total: v.total };
+    })
+    .sort((a, b) => a.accuracy - b.accuracy); // Worst accuracy first
+  
+  if (items.length === 0) return '';
+  
+  return `
+    <div class="flag-accuracy-section">
+      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
+      <p class="stats-description">Rekommendationens träffsäkerhet per flaggtyp (låg = problem)</p>
+      <div class="flag-accuracy-list">
+        ${items.map(item => `
+          <div class="flag-acc-row">
+            <span class="flag-acc-label">${item.icon} ${item.flagType.replace(/_/g, ' ')}</span>
+            <div class="flag-acc-bar-container">
+              <div class="flag-acc-bar" style="width: ${item.accuracy}%; background: ${item.accuracy >= 90 ? '#28a745' : item.accuracy >= 70 ? '#ffc107' : '#dc3545'}"></div>
+            </div>
+            <span class="flag-acc-value">${item.correct}/${item.total} (${item.accuracy}%)</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render extended source stats panel
  */
 function renderExtendedSourceStats(sourceStats, title, isGlobal = false) {
   if (!sourceStats) return '';
@@ -279,15 +429,13 @@ function renderExtendedSourceStats(sourceStats, title, isGlobal = false) {
     <div class="extended-stats-section">
       <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
       <p class="stats-description">Täckning = hade data, Träffsäkerhet = stämde med verifierat år</p>
-      <div class="extended-source-stats">
-        ${rows}
-      </div>
+      <div class="extended-source-stats">${rows}</div>
     </div>
   `;
 }
 
 /**
- * Render conflict stats panel (NEW)
+ * Render conflict stats panel
  */
 function renderConflictStats(conflicts, title, isGlobal = false) {
   if (!conflicts || conflicts.totalWithMultipleSources === 0) return '';
@@ -342,7 +490,7 @@ function renderConflictStats(conflicts, title, isGlobal = false) {
 }
 
 /**
- * Render compilation stats panel (NEW)
+ * Render compilation stats panel
  */
 function renderCompilationStats(compilationStats, title, isGlobal = false) {
   if (!compilationStats || compilationStats.triggered === 0) return '';
@@ -351,18 +499,11 @@ function renderCompilationStats(compilationStats, title, isGlobal = false) {
   const changeRate = Math.round((compilationStats.changedYear / triggered) * 100);
   const keepRate = Math.round((compilationStats.keptOriginal / triggered) * 100);
   
-  // Confidence breakdown
   const confidenceBreakdown = Object.entries(compilationStats.byConfidence || {})
     .filter(([_, count]) => count > 0)
     .map(([level, count]) => {
       const percentage = Math.round((count / triggered) * 100);
-      const icon = {
-        'very_high': '🟢',
-        'high': '🟡',
-        'medium': '🟠',
-        'low': '🔴',
-        'none': '⚫'
-      }[level] || '⚫';
+      const icon = { 'very_high': '🟢', 'high': '🟡', 'medium': '🟠', 'low': '🔴', 'none': '⚫' }[level] || '⚫';
       return `<span class="comp-confidence">${icon} ${level.replace('_', ' ')}: ${count} (${percentage}%)</span>`;
     })
     .join('');
@@ -398,7 +539,7 @@ function renderCompilationStats(compilationStats, title, isGlobal = false) {
 }
 
 /**
- * Render source accuracy panel (UPDATED with new sections)
+ * Render source accuracy panel (main panel)
  */
 function renderSourceAccuracyPanel(stats) {
   const total = stats.verified;
@@ -412,14 +553,11 @@ function renderSourceAccuracyPanel(stats) {
     { name: 'Custom', icon: '✏️', color: '#FFA500' }
   ];
   
-  // Current playlist stats - source selection (original)
   const currentRows = sources
     .filter(source => stats.sourceAccuracy[source.name] > 0)
     .map(source => {
       const count = stats.sourceAccuracy[source.name];
       const percentage = Math.round((count / total) * 100);
-      const barWidth = percentage;
-      
       return `
         <div class="source-stat-row">
           <div class="source-stat-label">
@@ -427,80 +565,47 @@ function renderSourceAccuracyPanel(stats) {
             <span class="source-name">${source.name}</span>
           </div>
           <div class="source-stat-bar-container">
-            <div class="source-stat-bar" style="width: ${barWidth}%; background-color: ${source.color}"></div>
+            <div class="source-stat-bar" style="width: ${percentage}%; background-color: ${source.color}"></div>
           </div>
-          <div class="source-stat-value">
-            ${count} <span class="source-percentage">(${percentage}%)</span>
-          </div>
+          <div class="source-stat-value">${count} <span class="source-percentage">(${percentage}%)</span></div>
         </div>
       `;
     })
     .join('');
   
-  // Placeholder for global stats (will be loaded async)
-  const globalSection = `
-    <div class="source-stats-section" id="globalStatsSection">
-      <div class="loading-stats">⏳ Laddar global statistik från Firebase...</div>
-    </div>
-  `;
+  const globalSection = `<div class="source-stats-section" id="globalStatsSection">
+    <div class="loading-stats">⏳ Laddar global statistik från Firebase...</div>
+  </div>`;
   
-  // Render confidence accuracy for current playlist
-  const currentConfidenceHtml = renderConfidenceAccuracy(
-    stats.confidenceAccuracy,
-    `Confidence-träffsäkerhet (${total} verifierade)`,
-    false
-  );
+  const currentConfidenceHtml = renderConfidenceAccuracy(stats.confidenceAccuracy, `Confidence-träffsäkerhet (${total} verifierade)`, false);
+  const extendedSourceHtml = renderExtendedSourceStats(stats.sourceStats, `Källbeteende (${stats.total} låtar)`, false);
+  const conflictHtml = renderConflictStats(stats.conflicts, `Källkonflikter`, false);
+  const compilationHtml = renderCompilationStats(stats.compilationStats, `Compilation-detection`, false);
+  const yearChoiceHtml = renderYearChoiceStats(stats.yearChoiceStats, `Årtalsval`, false);
+  const recAccHtml = renderRecommendationAccuracy(stats.recommendationAccuracy, `Rekommendationsträffsäkerhet`, false);
+  const overrideHtml = renderOverrideStats(stats.overrideStats, `Override-statistik`, false);
+  const flagAccHtml = renderFlagAccuracy(stats.flagAccuracy, `Flagg-korrelation`, false);
   
-  // NEW: Render extended source stats for current playlist
-  const extendedSourceHtml = renderExtendedSourceStats(
-    stats.sourceStats,
-    `Källbeteende (${stats.total} låtar)`,
-    false
-  );
-  
-  // NEW: Render conflict stats for current playlist
-  const conflictHtml = renderConflictStats(
-    stats.conflicts,
-    `Källkonflikter`,
-    false
-  );
-  
-  // NEW: Render compilation stats for current playlist
-  const compilationHtml = renderCompilationStats(
-    stats.compilationStats,
-    `Compilation-detection`,
-    false
-  );
-  
-  // Load global stats asynchronously and update DOM
+  // Load global stats asynchronously
   if (window.statsManager) {
     window.statsManager.getGlobalStats().then(globalStats => {
       const globalStatsElement = document.getElementById('globalStatsSection');
       if (globalStatsElement && globalStats && globalStats.totalVerified > 0) {
-        // Map Firebase keys to display names for rendering
         const firebaseKeyMap = {
-          'SpotifyOriginal': 'Spotify Original',
-          'LastFm': 'Last.fm',
-          'Spotify': 'Spotify',
-          'MusicBrainz': 'MusicBrainz',
-          'Custom': 'Custom'
+          'SpotifyOriginal': 'Spotify Original', 'LastFm': 'Last.fm',
+          'Spotify': 'Spotify', 'MusicBrainz': 'MusicBrainz', 'Custom': 'Custom'
         };
         
         const globalRows = sources
           .map(source => {
-            // Try both display name and Firebase key
             const displayName = source.name;
             const firebaseKey = Object.keys(firebaseKeyMap).find(k => firebaseKeyMap[k] === displayName);
             const count = globalStats.sourceAccuracy[firebaseKey] || globalStats.sourceAccuracy[displayName] || 0;
-            
             return { source, count };
           })
           .filter(item => item.count > 0)
           .map(item => {
-            const count = item.count;
-            const percentage = Math.round((count / globalStats.totalVerified) * 100);
-            const barWidth = percentage;
-            
+            const percentage = Math.round((item.count / globalStats.totalVerified) * 100);
             return `
               <div class="source-stat-row">
                 <div class="source-stat-label">
@@ -508,104 +613,66 @@ function renderSourceAccuracyPanel(stats) {
                   <span class="source-name">${item.source.name}</span>
                 </div>
                 <div class="source-stat-bar-container">
-                  <div class="source-stat-bar" style="width: ${barWidth}%; background-color: ${item.source.color}"></div>
+                  <div class="source-stat-bar" style="width: ${percentage}%; background-color: ${item.source.color}"></div>
                 </div>
-                <div class="source-stat-value">
-                  ${count} <span class="source-percentage">(${percentage}%)</span>
-                </div>
+                <div class="source-stat-value">${item.count} <span class="source-percentage">(${percentage}%)</span></div>
               </div>
             `;
           })
           .join('');
         
-        // Render global confidence accuracy
-        const globalConfidenceHtml = renderConfidenceAccuracy(
-          globalStats.confidenceAccuracy,
-          `Global confidence-träffsäkerhet (${globalStats.totalVerified} låtar)`,
-          true
-        );
-        
-        // NEW: Render global extended source stats
-        const globalExtendedSourceHtml = renderExtendedSourceStats(
-          globalStats.sourceStats,
-          `Globalt källbeteende (${globalStats.totalTracks} låtar)`,
-          true
-        );
-        
-        // NEW: Render global conflict stats
-        const globalConflictHtml = renderConflictStats(
-          globalStats.conflicts,
-          `Globala källkonflikter`,
-          true
-        );
-        
-        // NEW: Render global compilation stats
-        const globalCompilationHtml = renderCompilationStats(
-          globalStats.compilationStats,
-          `Global compilation-detection`,
-          true
-        );
+        const globalConfidenceHtml = renderConfidenceAccuracy(globalStats.confidenceAccuracy, `Global confidence-träffsäkerhet (${globalStats.totalVerified} låtar)`, true);
+        const globalExtendedSourceHtml = renderExtendedSourceStats(globalStats.sourceStats, `Globalt källbeteende (${globalStats.totalTracks} låtar)`, true);
+        const globalConflictHtml = renderConflictStats(globalStats.conflicts, `Globala källkonflikter`, true);
+        const globalCompilationHtml = renderCompilationStats(globalStats.compilationStats, `Global compilation-detection`, true);
+        const globalYearChoiceHtml = renderYearChoiceStats(globalStats.yearChoiceStats, `Globalt årtalsval`, true);
+        const globalRecAccHtml = renderRecommendationAccuracy(globalStats.recommendationAccuracy, `Global rekommendationsträffsäkerhet`, true);
+        const globalOverrideHtml = renderOverrideStats(globalStats.overrideStats, `Global override-statistik`, true);
+        const globalFlagAccHtml = renderFlagAccuracy(globalStats.flagAccuracy, `Global flagg-korrelation`, true);
         
         globalStatsElement.innerHTML = `
           <h4>🌍 Global statistik (${globalStats.totalPlaylists} spellistor, ${globalStats.totalVerified} låtar)</h4>
           <p class="stats-description">Vilken källa valdes för verifierade låtar</p>
-          <div class="source-stats">
-            ${globalRows}
-          </div>
+          <div class="source-stats">${globalRows}</div>
           ${globalConfidenceHtml}
           ${globalExtendedSourceHtml}
           ${globalConflictHtml}
           ${globalCompilationHtml}
+          ${globalYearChoiceHtml}
+          ${globalRecAccHtml}
+          ${globalOverrideHtml}
+          ${globalFlagAccHtml}
           <div class="global-stats-actions">
-            <button class="btn-secondary btn-small" onclick="exportGlobalStats()">
-              📊 Exportera global statistik
-            </button>
-            <button class="btn-secondary btn-small btn-danger" onclick="resetGlobalStats()">
-              🗑️ Nollställ statistik
-            </button>
+            <button class="btn-secondary btn-small" onclick="exportGlobalStats()">📊 Exportera global statistik</button>
+            <button class="btn-secondary btn-small btn-danger" onclick="resetGlobalStats()">🗑️ Nollställ statistik</button>
           </div>
         `;
       } else if (globalStatsElement) {
-        // No global stats yet
-        globalStatsElement.innerHTML = `
-          <div class="no-global-stats">
-            <p>Ingen global statistik ännu. Exportera denna spellista för att börja samla statistik!</p>
-          </div>
-        `;
+        globalStatsElement.innerHTML = `<div class="no-global-stats"><p>Ingen global statistik ännu. Exportera för att börja samla!</p></div>`;
       }
     }).catch(error => {
       console.error('Failed to load global stats:', error);
-      const globalStatsElement = document.getElementById('globalStatsSection');
-      if (globalStatsElement) {
-        globalStatsElement.innerHTML = `
-          <div class="error-stats">
-            ⚠️ Kunde inte ladda global statistik från Firebase
-          </div>
-        `;
-      }
+      const el = document.getElementById('globalStatsSection');
+      if (el) el.innerHTML = `<div class="error-stats">⚠️ Kunde inte ladda global statistik</div>`;
     });
   }
   
   return `
     <div class="source-accuracy-panel">
       <h3>📊 Källstatistik</h3>
-      
       <div class="source-stats-section">
         <h4>📋 Denna spellista (${total} verifierade)</h4>
         <p class="source-accuracy-description">Visar vilken källa du valde för varje godkänd låt</p>
-        <div class="source-stats">
-          ${currentRows}
-        </div>
+        <div class="source-stats">${currentRows}</div>
       </div>
-      
       ${currentConfidenceHtml}
-      
       ${extendedSourceHtml}
-      
       ${conflictHtml}
-      
       ${compilationHtml}
-      
+      ${yearChoiceHtml}
+      ${recAccHtml}
+      ${overrideHtml}
+      ${flagAccHtml}
       ${globalSection}
     </div>
   `;
@@ -616,7 +683,6 @@ function renderSourceAccuracyPanel(stats) {
  */
 function renderReviewPhase() {
   const container = document.getElementById('app');
-  
   const stats = currentState.stats;
   const playlist = currentState.playlist;
   
@@ -628,22 +694,10 @@ function renderReviewPhase() {
       </div>
       
       <div class="stats-panel">
-        <div class="stat-item stat-green">
-          <div class="stat-value">${stats.green}</div>
-          <div class="stat-label">✅ Inga problem</div>
-        </div>
-        <div class="stat-item stat-yellow">
-          <div class="stat-value">${stats.yellow}</div>
-          <div class="stat-label">⚠️ Bör granskas</div>
-        </div>
-        <div class="stat-item stat-red">
-          <div class="stat-value">${stats.red}</div>
-          <div class="stat-label">❌ Måste granskas</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">${stats.verified}</div>
-          <div class="stat-label">✓ Verifierade</div>
-        </div>
+        <div class="stat-item stat-green"><div class="stat-value">${stats.green}</div><div class="stat-label">✅ Inga problem</div></div>
+        <div class="stat-item stat-yellow"><div class="stat-value">${stats.yellow}</div><div class="stat-label">⚠️ Bör granskas</div></div>
+        <div class="stat-item stat-red"><div class="stat-value">${stats.red}</div><div class="stat-label">❌ Måste granskas</div></div>
+        <div class="stat-item"><div class="stat-value">${stats.verified}</div><div class="stat-label">✓ Verifierade</div></div>
       </div>
       
       ${stats.verified > 0 ? renderSourceAccuracyPanel(stats) : ''}
@@ -651,47 +705,22 @@ function renderReviewPhase() {
       <div class="controls-panel">
         <div class="filter-controls">
           <label>Visa:</label>
-          <button class="btn-filter ${currentState.filter === 'all' ? 'active' : ''}" 
-                  onclick="setFilter('all')">
-            Alla (${stats.total})
-          </button>
-          <button class="btn-filter ${currentState.filter === 'flagged' ? 'active' : ''}" 
-                  onclick="setFilter('flagged')">
-            Flaggade (${stats.yellow + stats.red})
-          </button>
-          <button class="btn-filter ${currentState.filter === 'red' ? 'active' : ''}" 
-                  onclick="setFilter('red')">
-            Röda (${stats.red})
-          </button>
+          <button class="btn-filter ${currentState.filter === 'all' ? 'active' : ''}" onclick="setFilter('all')">Alla (${stats.total})</button>
+          <button class="btn-filter ${currentState.filter === 'flagged' ? 'active' : ''}" onclick="setFilter('flagged')">Flaggade (${stats.yellow + stats.red})</button>
+          <button class="btn-filter ${currentState.filter === 'red' ? 'active' : ''}" onclick="setFilter('red')">Röda (${stats.red})</button>
         </div>
-        
         <div class="action-controls">
-          <button class="btn-secondary" onclick="autoApproveGreen()">
-            Auto-godkänn gröna (${stats.green - stats.verified})
-          </button>
-          <button class="btn-primary" onclick="handleExport()" ${stats.verified === stats.total ? '' : 'disabled'}>
-            Exportera (${stats.verified}/${stats.total})
-          </button>
+          <button class="btn-secondary" onclick="autoApproveGreen()">Auto-godkänn gröna (${stats.green - stats.verified})</button>
+          <button class="btn-primary" onclick="handleExport()" ${stats.verified === stats.total ? '' : 'disabled'}>Exportera (${stats.verified}/${stats.total})</button>
         </div>
       </div>
       
       <div class="tracks-table-container">
         <table class="tracks-table" id="tracksTable">
           <thead>
-            <tr>
-              <th>Status</th>
-              <th>Titel</th>
-              <th>Artist</th>
-              <th>Spotify År</th>
-              <th>Original År</th>
-              <th>Verifierat År</th>
-              <th>Flaggor</th>
-              <th>Åtgärder</th>
-            </tr>
+            <tr><th>Status</th><th>Titel</th><th>Artist</th><th>Spotify År</th><th>Original År</th><th>Verifierat År</th><th>Flaggor</th><th>Åtgärder</th></tr>
           </thead>
-          <tbody id="tracksTableBody">
-            <!-- Populated by renderTracksTable() -->
-          </tbody>
+          <tbody id="tracksTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -707,19 +736,10 @@ function renderTracksTable() {
   const tbody = document.getElementById('tracksTableBody');
   if (!tbody) return;
   
-  const filteredTracks = window.validator.filterTracksByStatus(
-    currentState.tracks,
-    currentState.filter
-  );
+  const filteredTracks = window.validator.filterTracksByStatus(currentState.tracks, currentState.filter);
   
   if (filteredTracks.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" class="no-tracks">
-          Inga låtar matchar filtret
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = `<tr><td colspan="8" class="no-tracks">Inga låtar matchar filtret</td></tr>`;
     return;
   }
   
@@ -730,167 +750,74 @@ function renderTracksTable() {
  * Render single track row
  */
 function renderTrackRow(track) {
-  const statusIcon = {
-    red: '❌',
-    yellow: '⚠️',
-    green: '✅'
-  }[track.status];
-  
+  const statusIcon = { red: '❌', yellow: '⚠️', green: '✅' }[track.status];
   const statusClass = `track-${track.status}`;
   
-  // Year input/select
   let yearControl;
   if (track.status === 'red' || track.status === 'yellow') {
-    // Dropdown for tracks that need review
     const options = [];
     const years = new Set();
     
-    // Add Spotify year option
-    options.push(`<option value="${track.spotifyYear}">
-      ${track.spotifyYear} (Spotify)
-    </option>`);
+    options.push(`<option value="${track.spotifyYear}">${track.spotifyYear} (Spotify)</option>`);
     years.add(track.spotifyYear);
     
-    // Add Spotify Original year if available (compilation search result)
     if (track.spotifyOriginalYear && !years.has(track.spotifyOriginalYear)) {
       const selected = track.validation?.bestYear === track.spotifyOriginalYear ? 'selected' : '';
-      
-      options.push(`<option value="${track.spotifyOriginalYear}" ${selected}>
-        ${track.spotifyOriginalYear} (Spotify Original: ${track.spotifyOriginalAlbum})
-      </option>`);
+      options.push(`<option value="${track.spotifyOriginalYear}" ${selected}>${track.spotifyOriginalYear} (Spotify Original: ${track.spotifyOriginalAlbum})</option>`);
       years.add(track.spotifyOriginalYear);
     }
     
-    // Add validation bestYear if available and different
     if (track.validation && track.validation.bestYear && !years.has(track.validation.bestYear)) {
-      const sourcesText = track.validation.sources
-        .filter(s => s.year === track.validation.bestYear)
-        .map(s => s.name)
-        .join('+');
-      
-      const selected = track.validation.confidence === 'very_high' || 
-                       track.validation.confidence === 'high' ? 'selected' : '';
-      
-      options.push(`<option value="${track.validation.bestYear}" ${selected}>
-        ${track.validation.bestYear} (${sourcesText} - ${track.validation.confidence})
-      </option>`);
+      const sourcesText = track.validation.sources.filter(s => s.year === track.validation.bestYear).map(s => s.name).join('+');
+      const selected = track.validation.confidence === 'very_high' || track.validation.confidence === 'high' ? 'selected' : '';
+      options.push(`<option value="${track.validation.bestYear}" ${selected}>${track.validation.bestYear} (${sourcesText} - ${track.validation.confidence})</option>`);
       years.add(track.validation.bestYear);
     }
     
-    // Add earliestRecordingYear if different from above
     if (track.earliestRecordingYear && !years.has(track.earliestRecordingYear)) {
-      options.push(`<option value="${track.earliestRecordingYear}">
-        ${track.earliestRecordingYear} (MusicBrainz äldsta)
-      </option>`);
+      options.push(`<option value="${track.earliestRecordingYear}">${track.earliestRecordingYear} (MusicBrainz äldsta)</option>`);
       years.add(track.earliestRecordingYear);
     }
     
-    // Add Last.fm year if different
     if (track.lastFmYear && !years.has(track.lastFmYear)) {
-      options.push(`<option value="${track.lastFmYear}">
-        ${track.lastFmYear} (Last.fm)
-      </option>`);
+      options.push(`<option value="${track.lastFmYear}">${track.lastFmYear} (Last.fm)</option>`);
       years.add(track.lastFmYear);
     }
     
-    // Custom input option
     options.push(`<option value="custom">Anpassat...</option>`);
     
-    yearControl = `
-      <select id="year-${track.spotifyId}" 
-              onchange="handleYearChange('${track.spotifyId}', this.value)"
-              class="year-select">
-        ${options.join('')}
-      </select>
-    `;
+    yearControl = `<select id="year-${track.spotifyId}" onchange="handleYearChange('${track.spotifyId}', this.value)" class="year-select">${options.join('')}</select>`;
   } else {
-    // Display only for green tracks
     const year = track.verifiedYear || track.recommendedYear;
     yearControl = `<span class="year-display">${year}</span>`;
   }
   
-  // Flags display with sources info
   let flagsHtml = '';
   
-  // Show Spotify original info if found (for compilations)
   if (track.spotifyOriginalData && track.spotifyOriginalData.found) {
-    flagsHtml += `
-      <div class="spotify-original-info">
-        <strong>🎯 Spotify Original:</strong> 
-        ${track.spotifyOriginalAlbum} (${track.spotifyOriginalYear})
-        <br>
-        <small>Funnen från ${track.spotifyOriginalData.alternativesCount} alternativ 
-        (${track.spotifyOriginalData.confidence} confidence)</small>
-      </div>
-    `;
+    flagsHtml += `<div class="spotify-original-info"><strong>🎯 Spotify Original:</strong> ${track.spotifyOriginalAlbum} (${track.spotifyOriginalYear})<br><small>Funnen från ${track.spotifyOriginalData.alternativesCount} alternativ (${track.spotifyOriginalData.confidence} confidence)</small></div>`;
   }
   
-  // Show validation sources first
   if (track.validation && track.validation.sources.length > 0) {
-    const sourcesText = track.validation.sources
-      .map(s => `${s.name}: ${s.year}`)
-      .join(', ');
-    
-    flagsHtml += `
-      <div class="validation-sources">
-        <strong>Källor:</strong> ${sourcesText}
-        <br>
-        <strong>Confidence:</strong> 
-        <span class="confidence-${track.validation.confidence}">
-          ${track.validation.confidence.replace('_', ' ')}
-        </span>
-      </div>
-    `;
+    const sourcesText = track.validation.sources.map(s => `${s.name}: ${s.year}`).join(', ');
+    flagsHtml += `<div class="validation-sources"><strong>Källor:</strong> ${sourcesText}<br><strong>Confidence:</strong> <span class="confidence-${track.validation.confidence}">${track.validation.confidence.replace('_', ' ')}</span></div>`;
   }
   
-  // Show compilation analysis
   if (track.compilationAnalysis && track.compilationAnalysis.isCompilation) {
-    flagsHtml += `
-      <div class="compilation-info">
-        <strong>Samlingsalbum:</strong> ${track.compilationAnalysis.confidence}
-        <br>
-        <small>${track.compilationAnalysis.reasons.slice(0, 2).join(', ')}</small>
-      </div>
-    `;
+    flagsHtml += `<div class="compilation-info"><strong>Samlingsalbum:</strong> ${track.compilationAnalysis.confidence}<br><small>${track.compilationAnalysis.reasons.slice(0, 2).join(', ')}</small></div>`;
   }
   
-  // Show flags
   if (track.flags.length > 0) {
-    flagsHtml += `
-      <ul class="flags-list">
-        ${track.flags.map(flag => `
-          <li class="flag flag-${flag.severity}">
-            ${flag.message}
-          </li>
-        `).join('')}
-      </ul>
-    `;
+    flagsHtml += `<ul class="flags-list">${track.flags.map(flag => `<li class="flag flag-${flag.severity}">${flag.message}</li>`).join('')}</ul>`;
   }
   
-  if (!flagsHtml) {
-    flagsHtml = '<span class="no-flags">-</span>';
-  }
+  if (!flagsHtml) flagsHtml = '<span class="no-flags">-</span>';
   
-  // Action buttons
-  const actions = track.verified ? `
-    <span class="verified-badge">✓ Verifierad</span>
-  ` : `
-    <button class="btn-action btn-approve" 
-            onclick="approveTrack('${track.spotifyId}')">
-      ✓ Godkänn
-    </button>
-    <button class="btn-action btn-remove" 
-            onclick="removeTrackFromList('${track.spotifyId}')">
-      ✗ Ta bort
-    </button>
-  `;
+  const actions = track.verified 
+    ? `<span class="verified-badge">✓ Verifierad</span>`
+    : `<button class="btn-action btn-approve" onclick="approveTrack('${track.spotifyId}')">✓ Godkänn</button><button class="btn-action btn-remove" onclick="removeTrackFromList('${track.spotifyId}')">✗ Ta bort</button>`;
   
-  const previewBtn = track.previewUrl ? `
-    <button class="btn-action btn-preview" 
-            onclick="playPreview('${track.spotifyId}', '${escapeHtml(track.previewUrl)}')">
-      🎵
-    </button>
-  ` : '';
+  const previewBtn = track.previewUrl ? `<button class="btn-action btn-preview" onclick="playPreview('${track.spotifyId}', '${escapeHtml(track.previewUrl)}')">🎵</button>` : '';
   
   return `
     <tr class="${statusClass}" data-track-id="${track.spotifyId}">
@@ -901,45 +828,25 @@ function renderTrackRow(track) {
       <td class="year-cell">${track.earliestRecordingYear || '-'}</td>
       <td class="year-cell">${yearControl}</td>
       <td class="flags-cell">${flagsHtml}</td>
-      <td class="actions-cell">
-        ${actions}
-        ${previewBtn}
-      </td>
+      <td class="actions-cell">${actions}${previewBtn}</td>
     </tr>
   `;
 }
 
-/**
- * Set filter
- */
-function setFilter(filter) {
-  currentState.filter = filter;
-  renderReviewPhase();
-}
+function setFilter(filter) { currentState.filter = filter; renderReviewPhase(); }
 
-/**
- * Handle year change in dropdown
- */
 function handleYearChange(spotifyId, value) {
   if (value === 'custom') {
     const newYear = prompt('Ange korrekt årtal:');
     if (newYear && !isNaN(newYear)) {
       const year = parseInt(newYear);
       updateTrackYearValue(spotifyId, year);
-      
-      // Update dropdown to show the custom year
       const select = document.getElementById(`year-${spotifyId}`);
       if (select) {
-        // Check if this year already exists as an option
-        const existingOption = Array.from(select.options).find(opt => 
-          parseInt(opt.value) === year
-        );
-        
+        const existingOption = Array.from(select.options).find(opt => parseInt(opt.value) === year);
         if (existingOption) {
-          // Just select the existing option
           select.value = year;
         } else {
-          // Add new option for custom year (before "custom" option)
           const customOption = select.querySelector('option[value="custom"]');
           const newOption = document.createElement('option');
           newOption.value = year;
@@ -949,467 +856,200 @@ function handleYearChange(spotifyId, value) {
         }
       }
     } else {
-      // Reset select to previous value
       const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
       const select = document.getElementById(`year-${spotifyId}`);
-      if (select && track) {
-        select.value = track.verifiedYear || track.recommendedYear;
-      }
+      if (select && track) select.value = track.verifiedYear || track.recommendedYear;
     }
   } else {
     updateTrackYearValue(spotifyId, parseInt(value));
   }
 }
 
-/**
- * Update track year value
- */
 function updateTrackYearValue(spotifyId, year) {
   const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
-  if (track) {
-    track.verifiedYear = year;
-    // Don't auto-verify, wait for approve button
-  }
+  if (track) track.verifiedYear = year;
 }
 
-/**
- * Approve track
- */
 function approveTrack(spotifyId) {
   const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
+  if (!track) return;
   
-  if (!track) {
-    console.error('Track not found:', spotifyId);
-    return;
-  }
-  
-  // Get selected year from dropdown (or use recommendedYear for green tracks)
   let selectedYear = track.recommendedYear;
-  let chosenSource = 'Spotify'; // Default
+  let chosenSource = 'Spotify';
   
   const select = document.getElementById(`year-${spotifyId}`);
   if (select) {
     selectedYear = parseInt(select.value);
-    
-    // Determine which source was chosen
-    const selectedOption = select.options[select.selectedIndex];
-    const optionText = selectedOption.textContent;
-    
-    if (optionText.includes('Spotify Original')) {
-      chosenSource = 'Spotify Original';
-    } else if (optionText.includes('MusicBrainz')) {
-      chosenSource = 'MusicBrainz';
-    } else if (optionText.includes('Last.fm')) {
-      chosenSource = 'Last.fm';
-    } else if (optionText.includes('Anpassat')) {
-      chosenSource = 'Custom';
-    } else if (optionText.includes('Spotify')) {
-      chosenSource = 'Spotify';
-    }
+    const optionText = select.options[select.selectedIndex].textContent;
+    if (optionText.includes('Spotify Original')) chosenSource = 'Spotify Original';
+    else if (optionText.includes('MusicBrainz')) chosenSource = 'MusicBrainz';
+    else if (optionText.includes('Last.fm')) chosenSource = 'Last.fm';
+    else if (optionText.includes('Anpassat')) chosenSource = 'Custom';
+    else if (optionText.includes('Spotify')) chosenSource = 'Spotify';
   }
   
-  // Update track
   track.verifiedYear = selectedYear;
   track.verified = true;
   track.chosenSource = chosenSource;
   
-  // Recalculate stats
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
-  
-  // Re-render
   renderReviewPhase();
-  
   showNotification(`✓ ${track.artist} - ${track.title} godkänd (${selectedYear})`, 'success');
 }
 
-/**
- * Remove track from list
- */
 function removeTrackFromList(spotifyId) {
   const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
+  if (!track || !confirm(`Ta bort "${track.title}" från listan?`)) return;
   
-  if (!track) {
-    console.error('Track not found:', spotifyId);
-    return;
-  }
-  
-  if (!confirm(`Ta bort "${track.title}" från listan?`)) {
-    return;
-  }
-  
-  // Remove track
   currentState.tracks = window.validator.removeTrack(currentState.tracks, spotifyId);
-  
-  // Recalculate stats
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
-  
-  // Re-render
   renderReviewPhase();
-  
   showNotification(`✗ ${track.artist} - ${track.title} borttagen`, 'warning');
 }
 
-/**
- * Auto-approve all green tracks
- */
 function autoApproveGreen() {
   const greenTracks = currentState.tracks.filter(t => t.status === 'green' && !t.verified);
+  if (greenTracks.length === 0) { showNotification('Inga gröna låtar att godkänna', 'info'); return; }
   
-  if (greenTracks.length === 0) {
-    showNotification('Inga gröna låtar att godkänna', 'info');
-    return;
-  }
-  
-  // Auto-approve
   currentState.tracks = window.validator.autoApproveGreenTracks(currentState.tracks);
   
-  // Set chosenSource based on recommendedYear source
   currentState.tracks.forEach(track => {
     if (track.verified && !track.chosenSource) {
-      // Determine source based on which year was recommended
       if (track.validation && track.validation.bestYear) {
-        const matchingSources = track.validation.sources.filter(
-          s => s.year === track.verifiedYear
-        );
-        
-        if (matchingSources.length > 0) {
-          // Pick first matching source (highest weight)
-          track.chosenSource = matchingSources[0].name;
-        } else {
-          track.chosenSource = 'Spotify';
-        }
+        const matchingSources = track.validation.sources.filter(s => s.year === track.verifiedYear);
+        track.chosenSource = matchingSources.length > 0 ? matchingSources[0].name : 'Spotify';
       } else {
         track.chosenSource = 'Spotify';
       }
     }
   });
   
-  // Recalculate stats
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
-  
-  // Re-render
   renderReviewPhase();
-  
   showNotification(`✓ ${greenTracks.length} gröna låtar auto-godkända`, 'success');
 }
 
-/**
- * Play audio preview
- */
 function playPreview(spotifyId, previewUrl) {
-  // Stop any currently playing audio
-  if (currentState.currentAudio) {
-    currentState.currentAudio.pause();
-    currentState.currentAudio = null;
-  }
-  
-  // Play new preview
+  if (currentState.currentAudio) { currentState.currentAudio.pause(); currentState.currentAudio = null; }
   const audio = new Audio(previewUrl);
   currentState.currentAudio = audio;
-  
-  audio.play().catch(err => {
-    console.error('Failed to play preview:', err);
-    showError('Kunde inte spela förhandslyssning');
-  });
-  
-  // Auto-stop after 30 seconds
-  setTimeout(() => {
-    if (currentState.currentAudio === audio) {
-      audio.pause();
-      currentState.currentAudio = null;
-    }
-  }, 30000);
+  audio.play().catch(err => { console.error('Failed to play:', err); showError('Kunde inte spela förhandslyssning'); });
+  setTimeout(() => { if (currentState.currentAudio === audio) { audio.pause(); currentState.currentAudio = null; } }, 30000);
 }
 
-/**
- * Handle export button
- */
 function handleExport() {
-  // Check if all tracks are verified
   const validation = window.validator.validateReadyForExport(currentState.tracks);
-  
-  if (!validation.ready) {
-    showError(validation.message);
-    return;
-  }
-  
-  // Show export modal
+  if (!validation.ready) { showError(validation.message); return; }
   showExportModal();
 }
 
-/**
- * Show export modal
- */
 function showExportModal() {
-  // Create source stats summary
   const sourceStatsHtml = renderSourceStatsForExport(currentState.stats);
-  
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.innerHTML = `
     <div class="modal-content">
       <h2>Exportera Verifierad Spellista</h2>
       <p>${currentState.tracks.length} verifierade låtar redo för export</p>
-      
       ${sourceStatsHtml}
-      
       <div class="export-options">
-        <button class="btn-primary btn-large" onclick="exportJSON()">
-          📄 Ladda ner JSON-fil
-        </button>
-        <button class="btn-primary btn-large" onclick="exportFirebase()">
-          🔥 Spara till Firebase
-        </button>
-        <button class="btn-secondary btn-large" onclick="exportGameFormat()">
-          🎮 Spelformat (manuell kopiering)
-        </button>
+        <button class="btn-primary btn-large" onclick="exportJSON()">📄 Ladda ner JSON-fil</button>
+        <button class="btn-primary btn-large" onclick="exportFirebase()">🔥 Spara till Firebase</button>
+        <button class="btn-secondary btn-large" onclick="exportGameFormat()">🎮 Spelformat (manuell kopiering)</button>
       </div>
-      
-      <button class="btn-secondary" onclick="closeExportModal()">
-        Avbryt
-      </button>
+      <button class="btn-secondary" onclick="closeExportModal()">Avbryt</button>
     </div>
   `;
-  
   document.body.appendChild(modal);
 }
 
-/**
- * Render source stats summary for export modal
- */
 function renderSourceStatsForExport(stats) {
   const total = stats.verified;
   if (total === 0) return '';
-  
   const sources = [
-    { name: 'Spotify Original', icon: '🎯' },
-    { name: 'MusicBrainz', icon: '🎵' },
-    { name: 'Last.fm', icon: '🔴' },
-    { name: 'Spotify', icon: '🟢' },
-    { name: 'Custom', icon: '✏️' }
+    { name: 'Spotify Original', icon: '🎯' }, { name: 'MusicBrainz', icon: '🎵' },
+    { name: 'Last.fm', icon: '🔴' }, { name: 'Spotify', icon: '🟢' }, { name: 'Custom', icon: '✏️' }
   ];
-  
-  const stats_list = sources
-    .filter(source => stats.sourceAccuracy[source.name] > 0)
-    .map(source => {
-      const count = stats.sourceAccuracy[source.name];
-      const percentage = Math.round((count / total) * 100);
-      return `<li>${source.icon} <strong>${source.name}:</strong> ${count} (${percentage}%)</li>`;
-    })
+  const list = sources.filter(s => stats.sourceAccuracy[s.name] > 0)
+    .map(s => `<li>${s.icon} <strong>${s.name}:</strong> ${stats.sourceAccuracy[s.name]} (${Math.round((stats.sourceAccuracy[s.name] / total) * 100)}%)</li>`)
     .join('');
-  
-  return `
-    <div class="export-source-stats">
-      <h3>📊 Källstatistik</h3>
-      <ul>
-        ${stats_list}
-      </ul>
-    </div>
-  `;
+  return `<div class="export-source-stats"><h3>📊 Källstatistik</h3><ul>${list}</ul></div>`;
 }
 
-/**
- * Render confidence accuracy section
- */
 function renderConfidenceAccuracy(confidenceData, title, isGlobal = false) {
   if (!confidenceData) return '';
-  
-  const confidenceLevels = [
+  const levels = [
     { key: 'very_high', label: 'Very High', icon: '🟢', color: '#28a745' },
     { key: 'high', label: 'High', icon: '🟡', color: '#ffc107' },
     { key: 'medium', label: 'Medium', icon: '🟠', color: '#fd7e14' },
     { key: 'low', label: 'Low', icon: '🔴', color: '#dc3545' },
     { key: 'none', label: 'None', icon: '⚫', color: '#6c757d' }
   ];
-  
-  const rows = confidenceLevels
-    .filter(level => confidenceData[level.key] && confidenceData[level.key].total > 0)
-    .map(level => {
-      const data = confidenceData[level.key];
-      const accuracy = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
-      const barWidth = accuracy;
-      
-      return `
-        <div class="confidence-stat-row">
-          <div class="confidence-stat-label">
-            <span class="confidence-icon">${level.icon}</span>
-            <span class="confidence-name">${level.label}</span>
-          </div>
-          <div class="confidence-stat-bar-container">
-            <div class="confidence-stat-bar" style="width: ${barWidth}%; background-color: ${level.color}"></div>
-          </div>
-          <div class="confidence-stat-value">
-            ${data.correct}/${data.total} <span class="confidence-percentage">(${accuracy}%)</span>
-          </div>
-        </div>
-      `;
-    })
-    .join('');
-  
+  const rows = levels.filter(l => confidenceData[l.key] && confidenceData[l.key].total > 0)
+    .map(l => {
+      const d = confidenceData[l.key];
+      const acc = d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0;
+      return `<div class="confidence-stat-row"><div class="confidence-stat-label"><span class="confidence-icon">${l.icon}</span><span class="confidence-name">${l.label}</span></div><div class="confidence-stat-bar-container"><div class="confidence-stat-bar" style="width: ${acc}%; background-color: ${l.color}"></div></div><div class="confidence-stat-value">${d.correct}/${d.total} <span class="confidence-percentage">(${acc}%)</span></div></div>`;
+    }).join('');
   if (!rows) return '';
-  
-  return `
-    <div class="confidence-accuracy-section">
-      <h4>${isGlobal ? '🌍' : '📋'} ${title}</h4>
-      <p class="confidence-description">Visar hur ofta varje confidence-nivå hade rätt rekommendation</p>
-      <div class="confidence-stats">
-        ${rows}
-      </div>
-    </div>
-  `;
+  return `<div class="confidence-accuracy-section"><h4>${isGlobal ? '🌍' : '📋'} ${title}</h4><p class="confidence-description">Visar hur ofta varje confidence-nivå hade rätt rekommendation</p><div class="confidence-stats">${rows}</div></div>`;
 }
 
-/**
- * Export to JSON
- */
 async function exportJSON() {
-  const playlistData = window.validator.prepareForExport(
-    currentState.playlist.name,
-    currentState.playlist.spotifyUrl || '',
-    currentState.tracks
-  );
-  
+  const playlistData = window.validator.prepareForExport(currentState.playlist.name, currentState.playlist.spotifyUrl || '', currentState.tracks);
   window.validator.exportToJSON(playlistData);
-  
-  // Update global statistics
-  if (window.statsManager) {
-    await window.statsManager.updateGlobalStats(
-      currentState.stats,
-      currentState.tracks.filter(t => t.verified)
-    );
-  }
-  
+  if (window.statsManager) await window.statsManager.updateGlobalStats(currentState.stats, currentState.tracks.filter(t => t.verified));
   showNotification('✅ JSON-fil nedladdad och statistik uppdaterad', 'success');
   closeExportModal();
-  
-  // Re-render to show updated global stats
-  setTimeout(() => {
-    renderReviewPhase();
-  }, 500);
+  setTimeout(() => renderReviewPhase(), 500);
 }
 
-/**
- * Export to Firebase
- */
 async function exportFirebase() {
   try {
-    const playlistData = window.validator.prepareForExport(
-      currentState.playlist.name,
-      currentState.playlist.spotifyUrl || '',
-      currentState.tracks
-    );
-    
+    const playlistData = window.validator.prepareForExport(currentState.playlist.name, currentState.playlist.spotifyUrl || '', currentState.tracks);
     const playlistId = await window.validator.saveToFirebase(playlistData);
-    
-    // Update global statistics
-    if (window.statsManager) {
-      await window.statsManager.updateGlobalStats(
-        currentState.stats,
-        currentState.tracks.filter(t => t.verified)
-      );
-    }
-    
+    if (window.statsManager) await window.statsManager.updateGlobalStats(currentState.stats, currentState.tracks.filter(t => t.verified));
     showNotification(`✅ Spellista sparad till Firebase: ${playlistId}`, 'success');
     closeExportModal();
-    
-    // Re-render to show updated global stats
-    setTimeout(() => {
-      renderReviewPhase();
-    }, 500);
-    
-  } catch (error) {
-    showError(`Misslyckades att spara till Firebase: ${error.message}`);
-  }
+    setTimeout(() => renderReviewPhase(), 500);
+  } catch (error) { showError(`Misslyckades att spara till Firebase: ${error.message}`); }
 }
 
-/**
- * Export in game format (for manual copying to live database)
- */
 function exportGameFormat() {
   try {
-    window.validator.exportGameFormatJSON(
-      currentState.playlist.name,
-      currentState.tracks
-    );
-    
-    showNotification('✅ Spelformat-JSON nedladdad - kopiera manuellt till standardLists/', 'success');
+    window.validator.exportGameFormatJSON(currentState.playlist.name, currentState.tracks);
+    showNotification('✅ Spelformat-JSON nedladdad', 'success');
     closeExportModal();
-    
-  } catch (error) {
-    showError(`Misslyckades att exportera spelformat: ${error.message}`);
-  }
+  } catch (error) { showError(`Misslyckades att exportera: ${error.message}`); }
 }
 
-/**
- * Close export modal
- */
-function closeExportModal() {
-  const modal = document.querySelector('.modal');
-  if (modal) {
-    modal.remove();
-  }
-}
+function closeExportModal() { const modal = document.querySelector('.modal'); if (modal) modal.remove(); }
 
-/**
- * Export global statistics
- */
 async function exportGlobalStats() {
-  if (window.statsManager) {
-    await window.statsManager.exportGlobalStatsToJSON();
-    showNotification('✅ Global statistik exporterad', 'success');
-  }
+  if (window.statsManager) { await window.statsManager.exportGlobalStatsToJSON(); showNotification('✅ Global statistik exporterad', 'success'); }
 }
 
-/**
- * Reset global statistics
- */
 async function resetGlobalStats() {
   if (window.statsManager) {
     const success = await window.statsManager.resetGlobalStats();
-    if (success) {
-      showNotification('✅ Global statistik nollställd', 'success');
-      renderReviewPhase();
-    }
+    if (success) { showNotification('✅ Global statistik nollställd', 'success'); renderReviewPhase(); }
   }
 }
 
-/**
- * Show notification
- */
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.textContent = message;
-  
   document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-  
-  setTimeout(() => {
-    notification.classList.remove('show');
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
+  setTimeout(() => notification.classList.add('show'), 10);
+  setTimeout(() => { notification.classList.remove('show'); setTimeout(() => notification.remove(), 300); }, 3000);
 }
 
-/**
- * Show error notification
- */
-function showError(message) {
-  showNotification(message, 'error');
-}
+function showError(message) { showNotification(message, 'error'); }
 
-/**
- * Escape HTML
- */
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
+function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
-// Export functions to window
+// Export functions
 window.initUI = initUI;
 window.setFilter = setFilter;
 window.handleYearChange = handleYearChange;
