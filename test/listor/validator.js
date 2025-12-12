@@ -187,9 +187,10 @@ function crossValidateYear(track) {
     sources.push({ name: 'Spotify Original', year: track.spotifyOriginalYear, weight: 3 });
   }
   
-  if (track.lastFmYear) {
-    sources.push({ name: 'Last.fm', year: track.lastFmYear, weight: 2 });
-  }
+  // DISABLED: Last.fm ger ofta remaster-år istället för original
+  // if (track.lastFmYear) {
+  //   sources.push({ name: 'Last.fm', year: track.lastFmYear, weight: 2 });
+  // }
   
   if (track.earliestRecordingYear) {
     sources.push({ name: 'MusicBrainz', year: track.earliestRecordingYear, weight: 2 });
