@@ -369,6 +369,36 @@ function analyzeAndFlagTracks(tracks) {
       status = 'yellow';
     }
     
+    // 5b. ONE YEAR DIFFERENCE (special case)
+    const oneYearDiff = yearDiff === 1;
+    if (oneYearDiff && track.earliestRecordingYear) {
+      // Check if Spotify Original can resolve this
+      const hasSpotifyOriginal = track.spotifyOriginalYear && 
+                                 Math.abs(track.spotifyOriginalYear - track.earliestRecordingYear) === 0;
+      
+      if (hasSpotifyOriginal) {
+        // Spotify Original resolves it - trust that
+        flags.push({
+          type: 'one_year_diff_resolved',
+          level: 'info',
+          message: `1 year difference resolved by Spotify Original (${track.spotifyOriginalYear})`
+        });
+      } else {
+        // Not resolved - flag for manual review
+        flags.push({
+          type: 'one_year_diff',
+          level: 'info',
+          message: `1 year difference between sources`,
+          details: `Spotify: ${track.spotifyYear}, MusicBrainz: ${track.earliestRecordingYear}`
+        });
+        // Don't change status - often both are valid (single vs album)
+      }
+      
+      // Store metadata for ML training
+      track.oneYearDifference = true;
+      track.oneYearDifferenceResolved = hasSpotifyOriginal;
+    }
+    
     // 6. No external validation
     if (!track.earliestRecordingYear && !track.lastFmYear && !track.spotifyOriginalYear) {
       flags.push({
@@ -390,6 +420,9 @@ function analyzeAndFlagTracks(tracks) {
       status = 'red';
     }
     
+    // 8. AUTO-APPROVE CANDIDATE (visuell grön markering baserat på statistik)
+    track.autoApproveCandidate = shouldAutoApprove(track, validation, compilationResult, yearDiff);
+    
     return {
       ...track,
       flags: flags,
@@ -397,6 +430,64 @@ function analyzeAndFlagTracks(tracks) {
       needsReview: status !== 'green'
     };
   });
+}
+
+/**
+ * Determine if track should be auto-approve candidate (green flag)
+ * Based on statistical analysis showing which patterns have >95% accuracy
+ */
+function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
+  // BLOCKERS: Never green-flag these (poor accuracy in stats)
+  
+  // Multiple artists = 0% accuracy
+  if (track.artist.includes('feat.') || track.artist.includes('&')) {
+    return false;
+  }
+  
+  // Large year diff = 46% accuracy
+  if (yearDiff >= 5) {
+    return false;
+  }
+  
+  // Medium confidence = 38.5% accuracy
+  if (validation.confidence === 'medium') {
+    return false;
+  }
+  
+  // Compilation with year diff > 3 = risky
+  if (compilationResult.isCompilation && yearDiff > 3) {
+    return false;
+  }
+  
+  // GREEN FLAG CRITERIA (based on >93% accuracy):
+  
+  // Very high confidence = 100% accuracy (140/140)
+  if (validation.confidence === 'very_high') {
+    return true;
+  }
+  
+  // Low confidence (1 source only) = 100% accuracy (34/34)
+  // Especially for modern tracks with no_validation flag
+  if (validation.confidence === 'low' && validation.sources.length === 1) {
+    return true;
+  }
+  
+  // High confidence + single = 97% accuracy (62/64)
+  if (validation.confidence === 'high' && track.albumType === 'single') {
+    return true;
+  }
+  
+  // High confidence + modern (2000+) = 94% accuracy
+  if (validation.confidence === 'high' && track.spotifyYear >= 2000) {
+    return true;
+  }
+  
+  // High confidence + only 1 source = 100% accuracy pattern
+  if (validation.confidence === 'high' && validation.sources.length === 1) {
+    return true;
+  }
+  
+  return false;
 }
 
 /**

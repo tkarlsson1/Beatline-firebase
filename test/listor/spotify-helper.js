@@ -153,6 +153,12 @@ async function fetchSpotifyPlaylist(playlistUrl) {
       .map(item => {
         const track = item.track;
         
+        // Determine release date precision
+        const releaseDate = track.album.release_date;
+        let releaseDatePrecision = 'year';
+        if (releaseDate && releaseDate.length === 10) releaseDatePrecision = 'day';
+        else if (releaseDate && releaseDate.length === 7) releaseDatePrecision = 'month';
+        
         return {
           spotifyId: track.id,
           title: track.name,
@@ -163,9 +169,17 @@ async function fetchSpotifyPlaylist(playlistUrl) {
           albumType: track.album.album_type, // 'album', 'single', 'compilation'
           spotifyYear: parseInt(track.album.release_date.split('-')[0]),
           releaseDate: track.album.release_date,
+          releaseDatePrecision: releaseDatePrecision,
           isrc: track.external_ids?.isrc || null,
           previewUrl: track.preview_url,
-          duration: track.duration_ms
+          duration: track.duration_ms,
+          
+          // Nivå 1: Extra ML data
+          trackPopularity: track.popularity || 0,
+          explicit: track.explicit || false,
+          availableMarkets: track.available_markets?.length || 0,
+          artistId: track.artists[0]?.id || null,
+          artistName: track.artists[0]?.name || 'Unknown'
         };
       });
     

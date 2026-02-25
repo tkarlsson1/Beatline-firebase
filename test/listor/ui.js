@@ -710,7 +710,7 @@ function renderReviewPhase() {
           <button class="btn-filter ${currentState.filter === 'red' ? 'active' : ''}" onclick="setFilter('red')">Röda (${stats.red})</button>
         </div>
         <div class="action-controls">
-          <button class="btn-secondary" onclick="autoApproveGreen()">Auto-godkänn gröna (${stats.green - stats.verified})</button>
+          <button class="btn-secondary" onclick="autoApproveGreen()">Godkänn alla gröna (${currentState.tracks.filter(t => t.autoApproveCandidate && !t.verified).length})</button>
           <button class="btn-primary" onclick="handleExport()" ${stats.verified === stats.total ? '' : 'disabled'}>Exportera (${stats.verified}/${stats.total})</button>
         </div>
       </div>
@@ -819,8 +819,11 @@ function renderTrackRow(track) {
   
   const previewBtn = track.previewUrl ? `<button class="btn-action btn-preview" onclick="playPreview('${track.spotifyId}', '${escapeHtml(track.previewUrl)}')">🎵</button>` : '';
   
+  // Google search button (always show)
+  const googleBtn = `<button class="btn-action btn-google" onclick="googleSearch('${escapeHtml(track.artist)}', '${escapeHtml(track.title)}')" title="Sök på Google">🔍</button>`;
+  
   return `
-    <tr class="${statusClass}" data-track-id="${track.spotifyId}">
+    <tr class="${statusClass}${track.autoApproveCandidate ? ' auto-approve-candidate' : ''}" data-track-id="${track.spotifyId}">
       <td class="status-cell">${statusIcon}</td>
       <td class="title-cell">${escapeHtml(track.title)}</td>
       <td class="artist-cell">${escapeHtml(track.allArtists)}</td>
@@ -828,7 +831,7 @@ function renderTrackRow(track) {
       <td class="year-cell">${track.earliestRecordingYear || '-'}</td>
       <td class="year-cell">${yearControl}</td>
       <td class="flags-cell">${flagsHtml}</td>
-      <td class="actions-cell">${actions}${previewBtn}</td>
+      <td class="actions-cell">${actions}${previewBtn}${googleBtn}</td>
     </tr>
   `;
 }
@@ -908,25 +911,35 @@ function removeTrackFromList(spotifyId) {
 }
 
 function autoApproveGreen() {
-  const greenTracks = currentState.tracks.filter(t => t.status === 'green' && !t.verified);
-  if (greenTracks.length === 0) { showNotification('Inga gröna låtar att godkänna', 'info'); return; }
+  const greenTracks = currentState.tracks.filter(t => t.autoApproveCandidate && !t.verified);
+  if (greenTracks.length === 0) { showNotification('Inga grönflaggade låtar att godkänna', 'info'); return; }
   
-  currentState.tracks = window.validator.autoApproveGreenTracks(currentState.tracks);
+  if (!confirm(`Godkänn ${greenTracks.length} grönflaggade låtar?\n\nDessa har >93% sannolikhet att vara korrekta baserat på statistik.`)) {
+    return;
+  }
   
-  currentState.tracks.forEach(track => {
-    if (track.verified && !track.chosenSource) {
-      if (track.validation && track.validation.bestYear) {
-        const matchingSources = track.validation.sources.filter(s => s.year === track.verifiedYear);
-        track.chosenSource = matchingSources.length > 0 ? matchingSources[0].name : 'Spotify';
-      } else {
-        track.chosenSource = 'Spotify';
-      }
+  // Approve all green-flagged tracks
+  greenTracks.forEach(track => {
+    track.verified = true;
+    track.verifiedYear = track.recommendedYear;
+    
+    // Set chosen source
+    if (track.validation && track.validation.bestYear) {
+      const matchingSources = track.validation.sources.filter(s => s.year === track.verifiedYear);
+      track.chosenSource = matchingSources.length > 0 ? matchingSources[0].name : 'Spotify';
+    } else {
+      track.chosenSource = 'Spotify';
     }
   });
   
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
   renderReviewPhase();
-  showNotification(`✓ ${greenTracks.length} gröna låtar auto-godkända`, 'success');
+  showNotification(`✓ ${greenTracks.length} grönflaggade låtar godkända`, 'success');
+}
+
+function googleSearch(artist, title) {
+  const query = encodeURIComponent(`${artist} ${title}`);
+  window.open(`https://www.google.com/search?q=${query}`, '_blank');
 }
 
 function playPreview(spotifyId, previewUrl) {

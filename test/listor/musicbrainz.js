@@ -522,6 +522,10 @@ async function validateTrack(track, onProgress) {
     result.confidence = searchResult.confidence;
     result.mbData = bestMatch;
     
+    // Nivå 1: Spara similarity score och antal alternativ
+    result.mbSimilarityScore = bestMatch.similarityScore;
+    result.mbAlternativeCount = searchResult.recordings.length;
+    
     // Find earliest recording from SAME base artist
     const earliestData = getEarliestRecordingForMatchingArtist(
       track.artist,

@@ -357,6 +357,16 @@ button {
   background: var(--color-primary-dark);
 }
 
+.btn-google {
+  background: #4285f4;
+  color: white;
+  font-size: 1rem;
+}
+
+.btn-google:hover {
+  background: #357ae8;
+}
+
 /* ===== TRACKS TABLE ===== */
 .tracks-table-container {
   background: var(--color-surface);
@@ -406,6 +416,21 @@ button {
 
 .track-green {
   border-left: 4px solid var(--color-success);
+}
+
+/* Auto-approve candidate (grön flagg baserat på statistik) */
+.auto-approve-candidate {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-left: 4px solid var(--color-success) !important;
+}
+
+.auto-approve-candidate:hover {
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+
+.auto-approve-candidate .status-cell {
+  color: var(--color-success);
+  font-weight: 600;
 }
 
 .status-cell {
