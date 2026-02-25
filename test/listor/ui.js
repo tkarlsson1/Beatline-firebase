@@ -969,7 +969,8 @@ function showExportModal() {
       <div class="export-options">
         <button class="btn-primary btn-large" onclick="exportJSON()">📄 Ladda ner JSON-fil</button>
         <button class="btn-primary btn-large" onclick="exportFirebase()">🔥 Spara till Firebase</button>
-        <button class="btn-secondary btn-large" onclick="exportGameFormat()">🎮 Spelformat (manuell kopiering)</button>
+        <button class="btn-primary btn-large" onclick="exportGameFormat()">🎮 Spelformat (manuell kopiering)</button>
+        <button class="btn-primary btn-large" onclick="syncToLive()">📤 Synka till spelet</button>
       </div>
       <button class="btn-secondary" onclick="closeExportModal()">Avbryt</button>
     </div>
@@ -1037,6 +1038,17 @@ function exportGameFormat() {
   } catch (error) { showError(`Misslyckades att exportera: ${error.message}`); }
 }
 
+async function syncToLive() {
+  try {
+    showNotification('📤 Synkar verifierade låtar till spelet...', 'info');
+    const result = await window.validator.syncVerifiedToLive();
+    showNotification(`✅ ${result.trackCount} låtar synkade till spelet från ${result.playlistCount} spellistor`, 'success');
+    closeExportModal();
+  } catch (error) { 
+    showError(`Misslyckades att synka: ${error.message}`); 
+  }
+}
+
 function closeExportModal() { const modal = document.querySelector('.modal'); if (modal) modal.remove(); }
 
 async function exportGlobalStats() {
@@ -1071,10 +1083,12 @@ window.approveTrack = approveTrack;
 window.removeTrackFromList = removeTrackFromList;
 window.autoApproveGreen = autoApproveGreen;
 window.playPreview = playPreview;
+window.googleSearch = googleSearch;
 window.handleExport = handleExport;
 window.exportJSON = exportJSON;
 window.exportFirebase = exportFirebase;
 window.exportGameFormat = exportGameFormat;
+window.syncToLive = syncToLive;
 window.closeExportModal = closeExportModal;
 window.exportGlobalStats = exportGlobalStats;
 window.resetGlobalStats = resetGlobalStats;

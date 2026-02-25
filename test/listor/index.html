@@ -31,12 +31,19 @@
     window.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 Initializing Playlist Validator...');
       
-      // Init Firebase
-      const db = window.initValidatorFirebase();
-      if (!db) {
-        console.error('❌ Failed to initialize Firebase');
+      // Init Validator Firebase
+      const validatorDb = window.initValidatorFirebase();
+      if (!validatorDb) {
+        console.error('❌ Failed to initialize Validator Firebase');
         alert('Firebase-anslutning misslyckades. Kontrollera konsolen.');
         return;
+      }
+      
+      // Init Live Firebase
+      const liveDb = window.initLiveFirebase();
+      if (!liveDb) {
+        console.error('❌ Failed to initialize Live Firebase');
+        alert('Live Firebase-anslutning misslyckades. Sync kommer inte fungera.');
       }
       
       // Init UI

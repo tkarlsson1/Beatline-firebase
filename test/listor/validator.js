@@ -1132,6 +1132,75 @@ function exportGameFormatJSON(playlistName, tracks) {
   console.log(`✅ Game format JSON exported: ${gameData.totalTracks} tracks`);
 }
 
+/**
+ * Sync verified tracks to live game database
+ * Reads all verified playlists and creates verifiedTracks/{spotifyId} in live DB
+ */
+async function syncVerifiedToLive() {
+  if (!window.validatorFirebase || !window.liveFirebase) {
+    throw new Error('Firebase inte initialiserad');
+  }
+  
+  try {
+    console.log('📤 Syncing verified tracks to live database...');
+    
+    // Get all verified playlists from validator DB
+    const playlists = await window.validatorFirebase.get('verifiedPlaylists');
+    
+    if (!playlists) {
+      throw new Error('Inga verifierade spellistor hittades');
+    }
+    
+    // Collect all unique tracks
+    const verifiedTracks = {};
+    let playlistCount = 0;
+    let trackCount = 0;
+    
+    Object.values(playlists).forEach(playlist => {
+      if (!playlist.songs) return;
+      
+      playlistCount++;
+      
+      playlist.songs.forEach(song => {
+        if (!song.spotifyId) return;
+        
+        // Only add if not already exists or if this is newer
+        if (!verifiedTracks[song.spotifyId]) {
+          verifiedTracks[song.spotifyId] = {
+            artist: song.artist,
+            title: song.title,
+            year: String(song.year),
+            verifiedBy: playlist.verifiedBy || 'admin',
+            verifiedAt: playlist.verifiedAt || new Date().toISOString()
+          };
+          trackCount++;
+        }
+      });
+    });
+    
+    if (trackCount === 0) {
+      throw new Error('Inga låtar att synka');
+    }
+    
+    console.log(`📊 Found ${trackCount} unique tracks from ${playlistCount} playlists`);
+    
+    // Write to live database
+    await window.liveFirebase.set('verifiedTracks', verifiedTracks);
+    
+    console.log(`✅ Synced ${trackCount} tracks to live database`);
+    
+    return {
+      success: true,
+      trackCount: trackCount,
+      playlistCount: playlistCount
+    };
+    
+  } catch (error) {
+    console.error('Failed to sync to live database:', error);
+    throw new Error(`Sync misslyckades: ${error.message}`);
+  }
+}
+
 // Export functions
 window.validator = {
   analyzeAndFlagTracks,
@@ -1146,5 +1215,6 @@ window.validator = {
   saveToFirebase,
   validateReadyForExport,
   prepareForGameFormat,
-  exportGameFormatJSON
+  exportGameFormatJSON,
+  syncVerifiedToLive
 };
