@@ -754,7 +754,8 @@ function renderTrackRow(track) {
   const statusClass = `track-${track.status}`;
   
   let yearControl;
-  if (track.status === 'red' || track.status === 'yellow') {
+  // Visa dropdown för alla overifierade låtar (även grönflaggade)
+  if (!track.verified) {
     const options = [];
     const years = new Set();
     
