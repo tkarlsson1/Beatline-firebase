@@ -1005,8 +1005,21 @@
           const snapshot = await window.firebaseGet(standardRef);
           if (snapshot.exists()) {
             const songs = snapshot.val();
+            
+            // Load all verifiedTracks at once for better performance
+            const verifiedTracksRef = window.firebaseRef(window.firebaseDb, 'verifiedTracks');
+            const verifiedSnapshot = await window.firebaseGet(verifiedTracksRef);
+            const verifiedTracks = verifiedSnapshot.exists() ? verifiedSnapshot.val() : {};
+            
             Object.entries(songs).forEach(([spotifyId, song]) => {
-              const year = parseInt(song.customYear || song.year);
+              // Priority: verifiedTracks > customYear > original year
+              let year;
+              if (verifiedTracks[spotifyId] && verifiedTracks[spotifyId].year) {
+                year = parseInt(verifiedTracks[spotifyId].year);
+                console.log(`[Lobby] Using verified year for ${song.title}: ${year}`);
+              } else {
+                year = parseInt(song.customYear || song.year);
+              }
               
               // Filter by year range
               if (year >= yearRange.min && year <= yearRange.max) {
