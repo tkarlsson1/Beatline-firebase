@@ -801,7 +801,7 @@ function renderTrackRow(track) {
     yearControl = `<select id="year-${track.spotifyId}" onchange="handleYearChange('${track.spotifyId}', this.value)" class="year-select">${options.join('')}</select>`;
   } else {
     const year = track.verifiedYear || track.recommendedYear;
-    yearControl = `<span class="year-display">${year}</span>`;
+    yearControl = `<span class="year-display">${year}</span> <button class="btn-action btn-edit" onclick="editVerifiedTrack('${track.spotifyId}')" title="Redigera">✏️</button>`;
   }
   
   let flagsHtml = '';
@@ -910,6 +910,15 @@ function approveTrack(spotifyId) {
   currentState.stats = window.validator.calculatePlaylistStats(currentState.tracks);
   renderReviewPhase();
   showNotification(`✓ ${track.artist} - ${track.title} godkänd (${selectedYear})`, 'success');
+}
+
+function editVerifiedTrack(spotifyId) {
+  const track = currentState.tracks.find(t => t.spotifyId === spotifyId);
+  if (!track) return;
+  
+  track.verified = false;
+  renderReviewPhase();
+  showNotification(`✏️ ${track.artist} - ${track.title} kan nu redigeras`, 'info');
 }
 
 function removeTrackFromList(spotifyId) {
@@ -1091,6 +1100,7 @@ window.initUI = initUI;
 window.setFilter = setFilter;
 window.handleYearChange = handleYearChange;
 window.approveTrack = approveTrack;
+window.editVerifiedTrack = editVerifiedTrack;
 window.removeTrackFromList = removeTrackFromList;
 window.autoApproveGreen = autoApproveGreen;
 window.playPreview = playPreview;

@@ -367,6 +367,18 @@ button {
   background: #357ae8;
 }
 
+.btn-edit {
+  background: var(--color-warning);
+  color: white;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.4rem;
+  margin-left: 0.3rem;
+}
+
+.btn-edit:hover {
+  background: #d97706;
+}
+
 /* ===== TRACKS TABLE ===== */
 .tracks-table-container {
   background: var(--color-surface);
