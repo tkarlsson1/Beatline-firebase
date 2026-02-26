@@ -31,6 +31,17 @@ function setupEventListeners() {
       }
     }
   });
+  
+  // Event delegation for Google search buttons
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-google')) {
+      const artist = e.target.getAttribute('data-artist');
+      const title = e.target.getAttribute('data-title');
+      if (artist && title) {
+        googleSearch(artist, title);
+      }
+    }
+  });
 }
 
 /**
@@ -820,8 +831,8 @@ function renderTrackRow(track) {
   
   const previewBtn = track.previewUrl ? `<button class="btn-action btn-preview" onclick="playPreview('${track.spotifyId}', '${escapeHtml(track.previewUrl)}')">🎵</button>` : '';
   
-  // Google search button (always show)
-  const googleBtn = `<button class="btn-action btn-google" onclick="googleSearch('${escapeHtml(track.artist)}', '${escapeHtml(track.title)}')" title="Sök på Google">🔍</button>`;
+  // Google search button (always show) - uses data attributes to avoid escaping issues
+  const googleBtn = `<button class="btn-action btn-google" data-artist="${escapeHtml(track.artist)}" data-title="${escapeHtml(track.title)}" title="Sök på Google">🔍</button>`;
   
   return `
     <tr class="${statusClass}${track.autoApproveCandidate ? ' auto-approve-candidate' : ''}" data-track-id="${track.spotifyId}">
