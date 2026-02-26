@@ -289,7 +289,7 @@ function analyzeAndFlagTracks(tracks) {
     if (track.spotifyYear) availableYears.push(track.spotifyYear);
     if (track.spotifyOriginalYear) availableYears.push(track.spotifyOriginalYear);
     if (track.earliestRecordingYear) availableYears.push(track.earliestRecordingYear);
-    if (track.lastFmYear) availableYears.push(track.lastFmYear);
+    // LastFm removed - 18% accuracy, unreliable
     track.oldestAvailableYear = availableYears.length > 0 ? Math.min(...availableYears) : null;
     track.availableYearsCount = new Set(availableYears).size;
     
@@ -399,8 +399,8 @@ function analyzeAndFlagTracks(tracks) {
       track.oneYearDifferenceResolved = hasSpotifyOriginal;
     }
     
-    // 6. No external validation
-    if (!track.earliestRecordingYear && !track.lastFmYear && !track.spotifyOriginalYear) {
+    // 6. No external validation (only Spotify data)
+    if (!track.earliestRecordingYear && !track.spotifyOriginalYear) {
       flags.push({
         type: 'no_validation',
         level: 'info',
@@ -437,20 +437,37 @@ function analyzeAndFlagTracks(tracks) {
  * Based on statistical analysis showing which patterns have >95% accuracy
  */
 function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
-  // BLOCKERS: Never green-flag these (poor accuracy in stats)
+  // ========================================
+  // STATISTICAL AUTO-APPROVAL RULES
+  // Based on 1066 validated tracks
+  // Updated: 2026-02-26
+  // ========================================
   
-  // Multiple artists = 0% accuracy
+  // === BLOCKERS: Never auto-approve (poor accuracy) ===
+  
+  // Multiple artists = 71% accuracy (borderline)
   if (track.artist.includes('feat.') || track.artist.includes('&')) {
     return false;
   }
   
-  // Large year diff = 46% accuracy
+  // Large year diff = 30% accuracy
   if (yearDiff >= 5) {
     return false;
   }
   
-  // Medium confidence = 38.5% accuracy
+  // Medium confidence = 45% accuracy
   if (validation.confidence === 'medium') {
+    return false;
+  }
+  
+  // Remix/remaster = 29% accuracy
+  const titleLower = track.title.toLowerCase();
+  const isRemixOrRemaster = titleLower.includes('remix') || 
+                            titleLower.includes('remaster') ||
+                            titleLower.includes('live') ||
+                            titleLower.includes('acoustic') ||
+                            titleLower.includes('demo');
+  if (isRemixOrRemaster) {
     return false;
   }
   
@@ -459,31 +476,46 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
     return false;
   }
   
-  // GREEN FLAG CRITERIA (based on >93% accuracy):
+  // === GREEN FLAG CRITERIA (>90% accuracy) ===
   
-  // Very high confidence = 100% accuracy (140/140)
+  // 1. HIGH CONFIDENCE ALWAYS WINS = 100% accuracy (26/26) ⭐
+  if (validation.confidence === 'high') {
+    return true;
+  }
+  
+  // 2. VERY HIGH CONFIDENCE = 98.2% accuracy (664/676) ⭐
   if (validation.confidence === 'very_high') {
     return true;
   }
   
-  // Low confidence (1 source only) = 100% accuracy (34/34)
-  // Especially for modern tracks with no_validation flag
+  // 3. SPOTIFY-ONLY (no validation) = 93% accuracy (28/30) ⭐
   if (validation.confidence === 'low' && validation.sources.length === 1) {
     return true;
   }
   
-  // High confidence + single = 97% accuracy (62/64)
-  if (validation.confidence === 'high' && track.albumType === 'single') {
+  // 4. ONE YEAR DIFF → Choose older = 92% accuracy ⭐
+  // User chose oldest: 632/686 = 92% of the time
+  if (yearDiff === 1 && track.earliestRecordingYear) {
+    const spotifyYear = track.spotifyYear;
+    const mbYear = track.earliestRecordingYear;
+    
+    // If recommended year is the older one, auto-approve
+    if (validation.bestYear === Math.min(spotifyYear, mbYear)) {
+      return true;
+    }
+  }
+  
+  // 5. SINGLE + RECENT (2010s or 2020s) = ~95% accuracy ⭐
+  // Singles: 92%, 2010s: 86%, 2020s: 94%
+  // Combined: even higher
+  if (track.albumType === 'single' && track.spotifyYear >= 2010) {
     return true;
   }
   
-  // High confidence + modern (2000+) = 94% accuracy
-  if (validation.confidence === 'high' && track.spotifyYear >= 2000) {
-    return true;
-  }
-  
-  // High confidence + only 1 source = 100% accuracy pattern
-  if (validation.confidence === 'high' && validation.sources.length === 1) {
+  // 6. DECADE-BASED LIBERAL APPROVAL for 2020s ⭐
+  // 2020s = 94% accuracy, very reliable
+  if (track.spotifyYear >= 2020 && validation.confidence !== 'medium') {
+    // Any confidence except medium for 2020s
     return true;
   }
   

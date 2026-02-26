@@ -392,8 +392,8 @@ function renderExtendedSourceStats(sourceStats, title, isGlobal = false) {
   const sources = [
     { key: 'Spotify', name: 'Spotify', icon: '🟢', color: '#1DB954' },
     { key: 'SpotifyOriginal', name: 'Spotify Original', icon: '🎯', color: '#1ed760' },
-    { key: 'MusicBrainz', name: 'MusicBrainz', icon: '🎵', color: '#BA478F' },
-    { key: 'LastFm', name: 'Last.fm', icon: '🔴', color: '#D51007' }
+    { key: 'MusicBrainz', name: 'MusicBrainz', icon: '🎵', color: '#BA478F' }
+    // LastFm removed - unreliable (18% accuracy)
   ];
   
   const rows = sources
@@ -559,9 +559,9 @@ function renderSourceAccuracyPanel(stats) {
   const sources = [
     { name: 'Spotify Original', icon: '🎯', color: '#1DB954' },
     { name: 'MusicBrainz', icon: '🎵', color: '#BA478F' },
-    { name: 'Last.fm', icon: '🔴', color: '#D51007' },
     { name: 'Spotify', icon: '🟢', color: '#1DB954' },
     { name: 'Custom', icon: '✏️', color: '#FFA500' }
+    // LastFm removed - unreliable
   ];
   
   const currentRows = sources
@@ -603,8 +603,9 @@ function renderSourceAccuracyPanel(stats) {
       const globalStatsElement = document.getElementById('globalStatsSection');
       if (globalStatsElement && globalStats && globalStats.totalVerified > 0) {
         const firebaseKeyMap = {
-          'SpotifyOriginal': 'Spotify Original', 'LastFm': 'Last.fm',
+          'SpotifyOriginal': 'Spotify Original',
           'Spotify': 'Spotify', 'MusicBrainz': 'MusicBrainz', 'Custom': 'Custom'
+          // LastFm removed
         };
         
         const globalRows = sources
@@ -791,10 +792,7 @@ function renderTrackRow(track) {
       years.add(track.earliestRecordingYear);
     }
     
-    if (track.lastFmYear && !years.has(track.lastFmYear)) {
-      options.push(`<option value="${track.lastFmYear}">${track.lastFmYear} (Last.fm)</option>`);
-      years.add(track.lastFmYear);
-    }
+    // LastFm removed - unreliable (18% accuracy)
     
     options.push(`<option value="custom">Anpassat...</option>`);
     
@@ -898,9 +896,9 @@ function approveTrack(spotifyId) {
     const optionText = select.options[select.selectedIndex].textContent;
     if (optionText.includes('Spotify Original')) chosenSource = 'Spotify Original';
     else if (optionText.includes('MusicBrainz')) chosenSource = 'MusicBrainz';
-    else if (optionText.includes('Last.fm')) chosenSource = 'Last.fm';
     else if (optionText.includes('Anpassat')) chosenSource = 'Custom';
     else if (optionText.includes('Spotify')) chosenSource = 'Spotify';
+    // LastFm removed
   }
   
   track.verifiedYear = selectedYear;
@@ -1003,7 +1001,8 @@ function renderSourceStatsForExport(stats) {
   if (total === 0) return '';
   const sources = [
     { name: 'Spotify Original', icon: '🎯' }, { name: 'MusicBrainz', icon: '🎵' },
-    { name: 'Last.fm', icon: '🔴' }, { name: 'Spotify', icon: '🟢' }, { name: 'Custom', icon: '✏️' }
+    { name: 'Spotify', icon: '🟢' }, { name: 'Custom', icon: '✏️' }
+    // LastFm removed
   ];
   const list = sources.filter(s => stats.sourceAccuracy[s.name] > 0)
     .map(s => `<li>${s.icon} <strong>${s.name}:</strong> ${stats.sourceAccuracy[s.name]} (${Math.round((stats.sourceAccuracy[s.name] / total) * 100)}%)</li>`)
