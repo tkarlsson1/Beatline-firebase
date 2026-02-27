@@ -205,6 +205,27 @@ function crossValidateYear(track) {
     };
   }
   
+  // ========================================
+  // SPECIAL RULE: ONE YEAR DIFFERENCE
+  // Always choose OLDER year (92% accuracy)
+  // ========================================
+  const spotifySource = sources.find(s => s.name === 'Spotify');
+  const mbSource = sources.find(s => s.name === 'MusicBrainz');
+  
+  if (spotifySource && mbSource && Math.abs(spotifySource.year - mbSource.year) === 1) {
+    const olderYear = Math.min(spotifySource.year, mbSource.year);
+    console.log(`[Validator] One-year-diff detected: Spotify ${spotifySource.year} vs MB ${mbSource.year} → choosing ${olderYear}`);
+    
+    return {
+      bestYear: olderYear,
+      confidence: 'high', // High confidence for this rule
+      sourcesAgree: false,
+      majorityAgree: true,
+      sources: sources,
+      oneYearDiffApplied: true
+    };
+  }
+  
   // Count votes (weighted)
   const yearVotes = {};
   sources.forEach(source => {
@@ -471,8 +492,9 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
     return false;
   }
   
-  // Compilation with year diff > 3 = risky
-  if (compilationResult.isCompilation && yearDiff > 3) {
+  // Compilation with large year diff = risky (changed from >3 to ≥5)
+  // Compilation alone: 77% accuracy, but with large diff much worse
+  if (compilationResult.isCompilation && yearDiff >= 5) {
     return false;
   }
   
@@ -493,26 +515,14 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
     return true;
   }
   
-  // 4. ONE YEAR DIFF → Choose older = 92% accuracy ⭐
-  // User chose oldest: 632/686 = 92% of the time
-  if (yearDiff === 1 && track.earliestRecordingYear) {
-    const spotifyYear = track.spotifyYear;
-    const mbYear = track.earliestRecordingYear;
-    
-    // If recommended year is the older one, auto-approve
-    if (validation.bestYear === Math.min(spotifyYear, mbYear)) {
-      return true;
-    }
-  }
-  
-  // 5. SINGLE + RECENT (2010s or 2020s) = ~95% accuracy ⭐
+  // 4. SINGLE + RECENT (2010s or 2020s) = ~95% accuracy ⭐
   // Singles: 92%, 2010s: 86%, 2020s: 94%
   // Combined: even higher
   if (track.albumType === 'single' && track.spotifyYear >= 2010) {
     return true;
   }
   
-  // 6. DECADE-BASED LIBERAL APPROVAL for 2020s ⭐
+  // 5. DECADE-BASED LIBERAL APPROVAL for 2020s ⭐
   // 2020s = 94% accuracy, very reliable
   if (track.spotifyYear >= 2020 && validation.confidence !== 'medium') {
     // Any confidence except medium for 2020s
