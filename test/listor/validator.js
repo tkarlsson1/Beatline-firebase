@@ -216,12 +216,22 @@ function crossValidateYear(track) {
     const olderYear = Math.min(spotifySource.year, mbSource.year);
     console.log(`[Validator] One-year-diff detected: Spotify ${spotifySource.year} vs MB ${mbSource.year} → choosing ${olderYear}`);
     
+    // Create votes object for the older year
+    const votes = {
+      [olderYear]: {
+        count: 2,
+        weight: 3,
+        sources: ['Spotify', 'MusicBrainz']
+      }
+    };
+    
     return {
       bestYear: olderYear,
       confidence: 'high', // High confidence for this rule
       sourcesAgree: false,
       majorityAgree: true,
       sources: sources,
+      votes: votes, // Add votes to prevent crashes
       oneYearDiffApplied: true
     };
   }
@@ -348,7 +358,7 @@ function analyzeAndFlagTracks(tracks) {
         flags.push({
           type: 'year_conflict',
           level: 'warning',
-          message: `Sources disagree: ${Object.keys(validation.votes).join(', ')}`
+          message: `Sources disagree: ${validation.votes ? Object.keys(validation.votes).join(', ') : 'N/A'}`
         });
       }
     }
