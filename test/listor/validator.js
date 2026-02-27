@@ -484,25 +484,11 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
   // ========================================
   // STATISTICAL AUTO-APPROVAL RULES
   // Based on 1466 validated tracks
-  // Updated: 2026-02-27
+  // Updated: 2026-02-27 (CRITICAL FIX: confidence order)
   // ========================================
   
-  // === BLOCKERS: Never auto-approve (poor accuracy) ===
-  
-  // Multiple artists removed as blocker - high/very_high confidence overrides it
-  // Multiple artists: 76% accuracy alone, but with high confidence: 98%+
-  
-  // Large year diff = 41% accuracy
-  if (yearDiff >= 5) {
-    return false;
-  }
-  
-  // Medium confidence = 46% accuracy (200/438)
-  if (validation.confidence === 'medium') {
-    return false;
-  }
-  
-  // Remix/remaster = 33% accuracy
+  // === CRITICAL: Remix/Remaster blocker FIRST ===
+  // These are too unreliable (33% accuracy), even with high confidence
   const titleLower = track.title.toLowerCase();
   const isRemixOrRemaster = titleLower.includes('remix') || 
                             titleLower.includes('remaster') ||
@@ -510,18 +496,13 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
                             titleLower.includes('acoustic') ||
                             titleLower.includes('demo');
   if (isRemixOrRemaster) {
-    return false;
+    return false; // 33% accuracy - always block
   }
   
-  // Compilation with large year diff = risky (more liberal: ≥7 instead of ≥5)
-  // Compilation alone: 81% accuracy, can be more liberal
-  if (compilationResult.isCompilation && yearDiff >= 7) {
-    return false;
-  }
-  
-  // === GREEN FLAG CRITERIA (>90% accuracy) ===
+  // === HIGH-CONFIDENCE RULES (>95% accuracy) - MUST COME BEFORE OTHER BLOCKERS ===
   
   // 1. HIGH CONFIDENCE ALWAYS WINS = 98% accuracy (90/92) ⭐
+  // Overrides large_year_diff, compilation, etc.
   if (validation.confidence === 'high') {
     return true;
   }
@@ -531,26 +512,45 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
     return true;
   }
   
+  // === BLOCKERS: Never auto-approve (poor accuracy) ===
+  
+  // Medium confidence = 46% accuracy (200/438)
+  if (validation.confidence === 'medium') {
+    return false;
+  }
+  
+  // Large year diff = 41% accuracy
+  if (yearDiff >= 5) {
+    return false;
+  }
+  
+  // Multiple artists removed as blocker - high/very_high confidence overrides it
+  
+  // Compilation with large year diff = risky
+  if (compilationResult.isCompilation && yearDiff >= 7) {
+    return false;
+  }
+  
+  // === OTHER GREEN FLAG CRITERIA (>90% accuracy) ===
+  
   // 3. SPOTIFY-ONLY (no validation) = 95% accuracy (42/44) ⭐
   if (validation.confidence === 'low' && validation.sources.length === 1) {
     return true;
   }
   
   // 4. SINGLE + 2000s or later = 90% accuracy ⭐
-  // Singles: 90%, 2000s: 82%, 2010s: 86%, 2020s: 94%
-  // Changed from 2010s to 2000s to capture more singles
   if (track.albumType === 'single' && track.spotifyYear >= 2000) {
     return true;
   }
   
   // 5. DECADE-BASED LIBERAL APPROVAL ⭐
-  // 2020s = 94% accuracy - very reliable
+  // 2020s = 94% accuracy
   if (track.spotifyYear >= 2020 && validation.confidence !== 'medium') {
     return true;
   }
   
-  // 6. 1990s-2000s DECADE RULE (NEW!) ⭐
-  // 1990s: 82%, 2000s: 82% - solid for non-medium confidence
+  // 6. 1990s-2000s DECADE RULE ⭐
+  // 1990s: 82%, 2000s: 82%
   if (track.spotifyYear >= 1990 && track.spotifyYear < 2010 && 
       validation.confidence !== 'medium') {
     return true;
