@@ -290,6 +290,19 @@ function crossValidateYear(track) {
  */
 function analyzeAndFlagTracks(tracks) {
   return tracks.map(track => {
+    // ========================================
+    // SKIP VALIDATION FOR PRE-VERIFIED TRACKS
+    // These were already validated in a previous session
+    // ========================================
+    if (track.previouslyVerified) {
+      return {
+        ...track,
+        status: 'green',
+        flags: [],
+        autoApproveCandidate: false // Already verified, no need to auto-approve
+      };
+    }
+    
     const flags = [];
     let status = 'green';
     
