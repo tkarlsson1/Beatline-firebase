@@ -489,10 +489,8 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
   
   // === BLOCKERS: Never auto-approve (poor accuracy) ===
   
-  // Multiple artists = 71% accuracy (borderline)
-  if (track.artist.includes('feat.') || track.artist.includes('&')) {
-    return false;
-  }
+  // Multiple artists removed as blocker - high/very_high confidence overrides it
+  // Multiple artists: 71% accuracy alone, but with high confidence: 100%
   
   // Large year diff = 30% accuracy
   if (yearDiff >= 5) {
