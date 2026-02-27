@@ -187,6 +187,47 @@ async function fetchSpotifyPlaylist(playlistUrl) {
       throw new Error('Spellistan är tom eller innehåller inga giltiga låtar');
     }
     
+    // ========================================
+    // CHECK AGAINST VERIFIED TRACKS
+    // Auto-mark previously validated tracks
+    // ========================================
+    try {
+      console.log('🔍 Checking for previously verified tracks...');
+      
+      // Check if liveFirebase is available
+      if (window.liveFirebase) {
+        const verifiedData = await window.liveFirebase.get('verifiedTracks');
+        
+        if (verifiedData) {
+          let previouslyVerifiedCount = 0;
+          
+          tracks.forEach(track => {
+            if (verifiedData[track.spotifyId]) {
+              const verifiedYear = parseInt(verifiedData[track.spotifyId].year);
+              track.verified = true;
+              track.verifiedYear = verifiedYear;
+              track.previouslyVerified = true; // Mark as pre-verified
+              track.recommendedYear = verifiedYear; // Also set as recommended
+              previouslyVerifiedCount++;
+              
+              console.log(`✓ Pre-verified: ${track.artist} - ${track.title} (${verifiedYear})`);
+            }
+          });
+          
+          if (previouslyVerifiedCount > 0) {
+            console.log(`✅ Found ${previouslyVerifiedCount} previously verified tracks!`);
+          } else {
+            console.log('ℹ️ No previously verified tracks found');
+          }
+        }
+      } else {
+        console.warn('⚠️ Live Firebase not available, skipping verified tracks check');
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not check verified tracks:', error);
+      // Non-critical error, continue without pre-verification
+    }
+    
     console.log(`✅ Loaded playlist: ${data.name} (${tracks.length} tracks)`);
     
     return {

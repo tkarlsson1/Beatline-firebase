@@ -224,6 +224,10 @@ body {
 .stat-green { border-color: var(--color-success); }
 .stat-yellow { border-color: var(--color-warning); }
 .stat-red { border-color: var(--color-error); }
+.stat-pre-verified { 
+  border-color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+}
 
 .stat-value {
   font-size: 2rem;
@@ -377,6 +381,18 @@ button {
 
 .btn-edit:hover {
   background: #d97706;
+}
+
+.pre-verified-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
 }
 
 /* ===== TRACKS TABLE ===== */

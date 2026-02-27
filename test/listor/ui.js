@@ -710,6 +710,9 @@ function renderReviewPhase() {
         <div class="stat-item stat-yellow"><div class="stat-value">${stats.yellow}</div><div class="stat-label">⚠️ Bör granskas</div></div>
         <div class="stat-item stat-red"><div class="stat-value">${stats.red}</div><div class="stat-label">❌ Måste granskas</div></div>
         <div class="stat-item"><div class="stat-value">${stats.verified}</div><div class="stat-label">✓ Verifierade</div></div>
+        ${currentState.tracks.filter(t => t.previouslyVerified).length > 0 ? 
+          `<div class="stat-item stat-pre-verified"><div class="stat-value">${currentState.tracks.filter(t => t.previouslyVerified).length}</div><div class="stat-label">🎯 Förgodkända</div></div>` 
+          : ''}
       </div>
       
       ${stats.verified > 0 ? renderSourceAccuracyPanel(stats) : ''}
@@ -799,7 +802,8 @@ function renderTrackRow(track) {
     yearControl = `<select id="year-${track.spotifyId}" onchange="handleYearChange('${track.spotifyId}', this.value)" class="year-select">${options.join('')}</select>`;
   } else {
     const year = track.verifiedYear || track.recommendedYear;
-    yearControl = `<span class="year-display">${year}</span> <button class="btn-action btn-edit" onclick="editVerifiedTrack('${track.spotifyId}')" title="Redigera">✏️</button>`;
+    const preVerifiedBadge = track.previouslyVerified ? '<span class="pre-verified-badge" title="Tidigare validerad">✓ Förgodkänd</span> ' : '';
+    yearControl = `${preVerifiedBadge}<span class="year-display">${year}</span> <button class="btn-action btn-edit" onclick="editVerifiedTrack('${track.spotifyId}')" title="Redigera">✏️</button>`;
   }
   
   let flagsHtml = '';
