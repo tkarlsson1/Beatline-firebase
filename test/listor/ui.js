@@ -726,6 +726,7 @@ function renderReviewPhase() {
         </div>
         <div class="action-controls">
           <button class="btn-secondary" onclick="autoApproveGreen()">Godkänn alla gröna (${currentState.tracks.filter(t => t.autoApproveCandidate && !t.verified).length})</button>
+          <button class="btn-secondary" onclick="exportDebugStats()">📊 Debug Export</button>
           <button class="btn-primary" onclick="handleExport()" ${stats.verified === stats.total ? '' : 'disabled'}>Exportera (${stats.verified}/${stats.total})</button>
         </div>
       </div>
@@ -973,6 +974,99 @@ function playPreview(spotifyId, previewUrl) {
   setTimeout(() => { if (currentState.currentAudio === audio) { audio.pause(); currentState.currentAudio = null; } }, 30000);
 }
 
+function exportDebugStats() {
+  const tracks = currentState.tracks;
+  
+  // Analyze why tracks are yellow/red
+  const yellowTracks = tracks.filter(t => t.status === 'yellow' && !t.verified);
+  const redTracks = tracks.filter(t => t.status === 'red' && !t.verified);
+  const greenTracks = tracks.filter(t => t.status === 'green' || t.autoApproveCandidate);
+  
+  // Count flags
+  const flagCounts = {};
+  const confidenceCounts = { green: {}, yellow: {}, red: {} };
+  const decadeCounts = { green: {}, yellow: {}, red: {} };
+  
+  [yellowTracks, redTracks].forEach((trackList, idx) => {
+    const status = idx === 0 ? 'yellow' : 'red';
+    trackList.forEach(track => {
+      // Count flags
+      if (track.flags) {
+        track.flags.forEach(flag => {
+          const key = flag.type;
+          flagCounts[key] = (flagCounts[key] || 0) + 1;
+        });
+      }
+      
+      // Count confidence
+      const conf = track.validation?.confidence || 'none';
+      confidenceCounts[status][conf] = (confidenceCounts[status][conf] || 0) + 1;
+      
+      // Count decade
+      const decade = Math.floor(track.spotifyYear / 10) * 10;
+      decadeCounts[status][decade] = (decadeCounts[status][decade] || 0) + 1;
+    });
+  });
+  
+  greenTracks.forEach(track => {
+    const conf = track.validation?.confidence || 'none';
+    confidenceCounts.green[conf] = (confidenceCounts.green[conf] || 0) + 1;
+    const decade = Math.floor(track.spotifyYear / 10) * 10;
+    decadeCounts.green[decade] = (decadeCounts.green[decade] || 0) + 1;
+  });
+  
+  // Build report
+  const report = {
+    summary: {
+      total: tracks.length,
+      green: greenTracks.length,
+      yellow: yellowTracks.length,
+      red: redTracks.length,
+      preVerified: tracks.filter(t => t.previouslyVerified).length
+    },
+    flagBreakdown: Object.entries(flagCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([flag, count]) => ({ flag, count, percentage: Math.round(count / (yellowTracks.length + redTracks.length) * 100) })),
+    confidenceBreakdown: {
+      green: confidenceCounts.green,
+      yellow: confidenceCounts.yellow,
+      red: confidenceCounts.red
+    },
+    decadeBreakdown: {
+      green: decadeCounts.green,
+      yellow: decadeCounts.yellow,
+      red: decadeCounts.red
+    },
+    yellowExamples: yellowTracks.slice(0, 20).map(t => ({
+      title: t.title,
+      artist: t.artist,
+      year: t.spotifyYear,
+      confidence: t.validation?.confidence,
+      flags: t.flags?.map(f => f.type) || [],
+      recommendedYear: t.recommendedYear
+    })),
+    redExamples: redTracks.slice(0, 10).map(t => ({
+      title: t.title,
+      artist: t.artist,
+      year: t.spotifyYear,
+      confidence: t.validation?.confidence,
+      flags: t.flags?.map(f => f.type) || [],
+      recommendedYear: t.recommendedYear
+    }))
+  };
+  
+  // Download JSON
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `debug_stats_${currentState.playlistName || 'playlist'}_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showNotification('📊 Debug stats exported!', 'success');
+}
+
 function handleExport() {
   const validation = window.validator.validateReadyForExport(currentState.tracks);
   if (!validation.ready) { showError(validation.message); return; }
@@ -1108,6 +1202,7 @@ window.removeTrackFromList = removeTrackFromList;
 window.autoApproveGreen = autoApproveGreen;
 window.playPreview = playPreview;
 window.googleSearch = googleSearch;
+window.exportDebugStats = exportDebugStats;
 window.handleExport = handleExport;
 window.exportJSON = exportJSON;
 window.exportFirebase = exportFirebase;
