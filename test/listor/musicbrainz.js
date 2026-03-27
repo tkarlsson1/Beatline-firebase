@@ -405,7 +405,10 @@ async function findOriginalSpotifyRelease(artist, title, currentAlbumId) {
 
 /**
  * Validate single track against MusicBrainz
- * Tries ISRC first, then falls back to artist+title search
+ * Always runs BOTH ISRC and artist+title search to find the true earliest year.
+ * ISRC identifies the specific recording (e.g. a 2010 remaster) but misses the
+ * original 1972 release. The artist+title search finds all recordings and picks
+ * the earliest, giving us the correct original year.
  */
 async function validateTrack(track, onProgress) {
   const result = {
@@ -461,7 +464,7 @@ async function validateTrack(track, onProgress) {
     }
   }
   
-  // === NEW: Search for Spotify original if compilation detected ===
+  // === Search for Spotify original if compilation detected ===
   if (result.albumData && result.albumData.albumType === 'compilation') {
     if (onProgress) onProgress(`Söker efter original album på Spotify...`);
     
@@ -485,60 +488,90 @@ async function validateTrack(track, onProgress) {
     }
   }
   
-  // 3. Try ISRC in MusicBrainz (most accurate)
+  // 3. Try ISRC in MusicBrainz
+  // NOTE: We do NOT return early here. ISRC identifies the specific recording
+  // (e.g. a 2010 remaster) but misses the original 1972 release. We store the
+  // ISRC result and then always run the artist+title search to find the true
+  // earliest year across all recordings.
+  let isrcYear = null;
+  
   if (track.isrc) {
     if (onProgress) onProgress(`Checking ISRC: ${track.isrc}...`);
     
     const isrcResult = await searchByISRC(track.isrc);
     
     if (isrcResult.found) {
-      result.mbYear = isrcResult.firstReleaseDate ? 
+      isrcYear = isrcResult.firstReleaseDate ? 
         parseInt(isrcResult.firstReleaseDate.split('-')[0]) : null;
+      
+      // Store ISRC data as primary MB reference
+      result.mbYear = isrcYear;
       result.mbFirstReleaseDate = isrcResult.firstReleaseDate;
       result.mbRecordingId = isrcResult.recordingId;
       result.matchMethod = 'isrc';
       result.confidence = 'high';
       result.mbData = isrcResult;
       
-      // For ISRC match, the recording year IS the earliest for this specific recording
-      result.earliestRecordingYear = result.mbYear;
-      
-      return result;
+      console.log(`[MB] ISRC match: ${track.artist} - ${track.title} → ${isrcYear}`);
     }
   }
   
-  // 4. Fallback: search MusicBrainz by artist + title
+  // 4. Always run artist+title search to find the true earliest recording
+  // This catches cases where ISRC points to a remaster/compilation recording
+  // but the original release is much older.
   if (onProgress) onProgress(`Searching MusicBrainz: ${track.artist} - ${track.title}...`);
   
   const searchResult = await searchByArtistTitle(track.artist, track.title);
   
   if (searchResult.found) {
-    // Store best match data
     const bestMatch = searchResult.bestMatch;
-    result.mbYear = bestMatch.year;
-    result.mbFirstReleaseDate = bestMatch.firstReleaseDate;
-    result.mbRecordingId = bestMatch.recordingId;
-    result.matchMethod = 'search';
-    result.confidence = searchResult.confidence;
-    result.mbData = bestMatch;
     
     // Nivå 1: Spara similarity score och antal alternativ
     result.mbSimilarityScore = bestMatch.similarityScore;
     result.mbAlternativeCount = searchResult.recordings.length;
     
-    // Find earliest recording from SAME base artist
+    // Find earliest recording from SAME base artist across ALL results
     const earliestData = getEarliestRecordingForMatchingArtist(
       track.artist,
       searchResult.recordings
     );
     
-    if (earliestData) {
-      result.earliestRecordingYear = earliestData.earliestYear;
-      result.earliestRecordingData = earliestData; // For debugging
+    const searchEarliestYear = earliestData ? earliestData.earliestYear : bestMatch.year;
+    
+    if (result.matchMethod === 'isrc' && isrcYear !== null) {
+      // We had an ISRC match — combine both results
+      // Take the MINIMUM year: this is the true original release
+      const combinedEarliest = searchEarliestYear !== null
+        ? Math.min(isrcYear, searchEarliestYear)
+        : isrcYear;
+      
+      result.earliestRecordingYear = combinedEarliest;
+      result.earliestRecordingData = earliestData;
+      result.matchMethod = 'isrc+search';
+      
+      // If search found a significantly earlier year, log it
+      if (searchEarliestYear !== null && searchEarliestYear < isrcYear - 1) {
+        console.log(`[MB] Earlier year found via search: ISRC=${isrcYear}, search=${searchEarliestYear} → using ${combinedEarliest} for ${track.artist} - ${track.title}`);
+      }
     } else {
-      // No matching artist found - might be feature/remix
-      result.earliestRecordingYear = null;
+      // No ISRC match — use search results as primary
+      result.mbYear = bestMatch.year;
+      result.mbFirstReleaseDate = bestMatch.firstReleaseDate;
+      result.mbRecordingId = bestMatch.recordingId;
+      result.matchMethod = 'search';
+      result.confidence = searchResult.confidence;
+      result.mbData = bestMatch;
+      
+      if (earliestData) {
+        result.earliestRecordingYear = earliestData.earliestYear;
+        result.earliestRecordingData = earliestData;
+      } else {
+        result.earliestRecordingYear = null;
+      }
     }
+  } else if (result.matchMethod === 'isrc' && isrcYear !== null) {
+    // ISRC matched but artist+title search found nothing — use ISRC year as-is
+    result.earliestRecordingYear = isrcYear;
   }
   
   return result;
