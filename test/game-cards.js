@@ -1135,9 +1135,37 @@ function validateChallenge() {
       
       console.log('[Game] Simulated timeline for validation:', Object.keys(simulatedTimeline).length, 'cards');
       
+      // ============================================
+      // BUGFIX v5: Position reference frame mismatch
+      // ============================================
+      // challengingCard.position was calculated by the challenging team's client against
+      // the FULL active timeline (which still contained the active team's now-wrong card).
+      // simulatedTimeline excludes that card, so positions to the right of the removed
+      // card are off-by-one in this reference frame.
+      //
+      // Without this adjustment: a correct challenge can be validated against the wrong
+      // pair of neighbors, causing both teams to be marked wrong even when the challenger
+      // placed the card in the correct gap.
+      //
+      // Rule: if active card was to the LEFT of challenger's drop point, shift down by 1.
+      // If active card was at the same slot or to the right, no shift needed.
+      const activeCardOriginalPosition = activeCard.position;
+      let adjustedChallengingPosition = challengingCard.position;
+      if (activeCardOriginalPosition < challengingCard.position) {
+        adjustedChallengingPosition = challengingCard.position - 1;
+        console.log('[Game] 🔧 Adjusting challenging position:', challengingCard.position, '→', adjustedChallengingPosition, '(active card at pos', activeCardOriginalPosition, 'was to the left)');
+      } else {
+        console.log('[Game] No position adjustment needed (active at pos', activeCardOriginalPosition, ', challenging at pos', challengingCard.position, ')');
+      }
+      
+      const adjustedChallengingCard = {
+        ...challengingCard,
+        position: adjustedChallengingPosition
+      };
+      
       // BUGFIX: Assign to challengingCorrect (declared in larger scope) instead of declaring locally
       challengingCorrect = isCardPlacementCorrectInTimeline(
-        challengingCard, 
+        adjustedChallengingCard, 
         simulatedTimeline
       );
       
