@@ -117,41 +117,20 @@
       "bestYear": 1978,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2018,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1978,
-          "weight": 5
+          "year": 2018
         },
         {
           "name": "MusicBrainz",
-          "year": 1978,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1978": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1978
         },
-        "2018": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1978
         }
-      }
+      ]
     },
     "recommendedYear": 1978,
     "defaultSelectedYear": 1978,
@@ -160,36 +139,14 @@
     "autoApproveCandidate": true,
     "flags": [
       {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Compilation label: Columbia/Legacy"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1978, 2018"
-      },
-      {
         "type": "multiple_artists",
         "level": "info",
         "message": "Multiple artists detected in track"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 40 years",
-        "details": "Spotify: 2018, Recommended: 1978"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2018, but sources suggest 1978"
       }
     ],
-    "status": "red",
-    "needsReview": true
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2u96akbqgCRtkjfLMYrgZo",
@@ -300,88 +257,32 @@
     },
     "validation": {
       "bestYear": 1982,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2013,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1982,
-          "weight": 5
+          "year": 2013
         },
         {
           "name": "MusicBrainz",
-          "year": 1985,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1982": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1985
         },
-        "1985": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        },
-        "2013": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1982
         }
-      }
+      ]
     },
     "recommendedYear": 1982,
     "defaultSelectedYear": 1982,
     "oldestAvailableYear": 1982,
     "availableYearsCount": 3,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Greatest Hits\"; Re-release: \"Special Edition\"; Many tracks (50); Compilation label: Virgin Catalogue"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1982, 1985, 2013"
-      },
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2013, iTunes: 1982, MusicBrainz: 1985"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 31 years",
-        "details": "Spotify: 2013, Recommended: 1982"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2013, but sources suggest 1982"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0aym2LBJBk9DAYuHHutrIl",
@@ -499,88 +400,32 @@
     },
     "validation": {
       "bestYear": 1968,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2000,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1968,
-          "weight": 5
+          "year": 2000
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1968": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 2015
         },
-        "2000": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "2015": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1968
         }
-      }
+      ]
     },
     "recommendedYear": 1968,
     "defaultSelectedYear": 1968,
     "oldestAvailableYear": 1968,
     "availableYearsCount": 3,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Re-release: \"Remastered\"; Many tracks (27); Compilation label: UMC (Universal Music Catalogue)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1968, 2000, 2015"
-      },
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2000, iTunes: 1968, MusicBrainz: 2015"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 32 years",
-        "details": "Spotify: 2000, Recommended: 1968"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2000, but sources suggest 1968"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4pbG9SUmWIvsROVLF0zF9s",
@@ -700,88 +545,32 @@
     },
     "validation": {
       "bestYear": 1963,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2000,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1963,
-          "weight": 5
+          "year": 2000
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1963": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 2015
         },
-        "2000": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "2015": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1963
         }
-      }
+      ]
     },
     "recommendedYear": 1963,
     "defaultSelectedYear": 1963,
     "oldestAvailableYear": 1963,
     "availableYearsCount": 3,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Re-release: \"Remastered\"; Many tracks (27); Compilation label: UMC (Universal Music Catalogue)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1963, 2000, 2015"
-      },
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2000, iTunes: 1963, MusicBrainz: 2015"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 37 years",
-        "details": "Spotify: 2000, Recommended: 1963"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2000, but sources suggest 1963"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "78ZqE2tjAxbqEGGlvGnQfT",
@@ -943,80 +732,34 @@
       "bestYear": 1967,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
+          "year": 2019
         },
         {
           "name": "Spotify Original",
-          "year": 2019,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1967,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 1967,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1967": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1967
         },
-        "2019": {
-          "count": 2,
-          "weight": 4,
-          "sources": [
-            "Spotify",
-            "Spotify Original"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1967
         }
-      }
+      ]
     },
     "recommendedYear": 1967,
     "defaultSelectedYear": 1967,
     "oldestAvailableYear": 1967,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Hits compilation\""
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1967, 2019"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 52 years",
-        "details": "Spotify: 2019, Recommended: 1967"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2019, but sources suggest 1967"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2g2GkH3vZHk4lWzBjgQ6nY",
@@ -1234,74 +977,30 @@
       "bestYear": 1960,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2000,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1960,
-          "weight": 5
+          "year": 2000
         },
         {
           "name": "MusicBrainz",
-          "year": 1960,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1960": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1960
         },
-        "2000": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1960
         }
-      }
+      ]
     },
     "recommendedYear": 1960,
     "defaultSelectedYear": 1960,
     "oldestAvailableYear": 1960,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Many tracks (96)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1960, 2000"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 40 years",
-        "details": "Spotify: 2000, Recommended: 1960"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2000, but sources suggest 1960"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4mn2kNTqiGLwaUR8JdhJ1l",
@@ -1526,94 +1225,36 @@
     },
     "validation": {
       "bestYear": 1963,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2003,
-          "weight": 1
+          "year": 2003
         },
         {
           "name": "Spotify Original",
-          "year": 1995,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1963,
-          "weight": 5
+          "year": 1995
         },
         {
           "name": "MusicBrainz",
-          "year": 1964,
-          "weight": 2
+          "year": 1964
+        },
+        {
+          "name": "iTunes",
+          "year": 1963
         }
-      ],
-      "votes": {
-        "1963": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "1964": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        },
-        "1995": {
-          "count": 1,
-          "weight": 3,
-          "sources": [
-            "Spotify Original"
-          ]
-        },
-        "2003": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1963,
     "defaultSelectedYear": 1963,
     "oldestAvailableYear": 1963,
     "availableYearsCount": 4,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Singles Collection\"; Relatively many tracks (20); Compilation label: Parlophone UK"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1963, 1964, 1995, 2003"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 40 years",
-        "details": "Spotify: 2003, Recommended: 1963"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2003, but sources suggest 1963"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3iSws76HjaU7k49EqJVTfF",
@@ -1837,94 +1478,36 @@
     },
     "validation": {
       "bestYear": 1963,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2007,
-          "weight": 1
+          "year": 2007
         },
         {
           "name": "Spotify Original",
-          "year": 1968,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1963,
-          "weight": 5
+          "year": 1968
         },
         {
           "name": "MusicBrainz",
-          "year": 1969,
-          "weight": 2
+          "year": 1969
+        },
+        {
+          "name": "iTunes",
+          "year": 1963
         }
-      ],
-      "votes": {
-        "1963": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "1968": {
-          "count": 1,
-          "weight": 3,
-          "sources": [
-            "Spotify Original"
-          ]
-        },
-        "1969": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        },
-        "2007": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1963,
     "defaultSelectedYear": 1963,
     "oldestAvailableYear": 1963,
     "availableYearsCount": 4,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Best Of\"; Relatively many tracks (16)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1963, 1968, 1969, 2007"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 44 years",
-        "details": "Spotify: 2007, Recommended: 1963"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2007, but sources suggest 1963"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1h2xVEoJORqrg71HocgqXd",
@@ -2045,74 +1628,30 @@
       "bestYear": 1972,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2002,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1972,
-          "weight": 5
+          "year": 2002
         },
         {
           "name": "MusicBrainz",
-          "year": 1972,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1972": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1972
         },
-        "2002": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1972
         }
-      }
+      ]
     },
     "recommendedYear": 1972,
     "defaultSelectedYear": 1972,
     "oldestAvailableYear": 1972,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"The Definitive\"; Many tracks (21)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1972, 2002"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 30 years",
-        "details": "Spotify: 2002, Recommended: 1972"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2002, but sources suggest 1972"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7ePFDzrnLt3Ynqgy2UFWri",
@@ -2341,80 +1880,34 @@
       "bestYear": 1975,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2003,
-          "weight": 1
+          "year": 2003
         },
         {
           "name": "Spotify Original",
-          "year": 1975,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1975,
-          "weight": 5
+          "year": 1975
         },
         {
           "name": "MusicBrainz",
-          "year": 1975,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1975": {
-          "count": 3,
-          "weight": 10,
-          "sources": [
-            "Spotify Original",
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1975
         },
-        "2003": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1975
         }
-      }
+      ]
     },
     "recommendedYear": 1975,
     "defaultSelectedYear": 1975,
     "oldestAvailableYear": 1975,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Best Of\"; Relatively many tracks (20); Album artist differs from track artist; Compilation label: Rhino"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1975, 2003"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 28 years",
-        "details": "Spotify: 2003, Recommended: 1975"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2003, but sources suggest 1975"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5ChkMS8OtdzJeqyybCc9R5",
@@ -2633,74 +2126,30 @@
       "bestYear": 1982,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2008,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1982,
-          "weight": 5
+          "year": 2008
         },
         {
           "name": "MusicBrainz",
-          "year": 1982,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1982": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1982
         },
-        "2008": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1982
         }
-      }
+      ]
     },
     "recommendedYear": 1982,
     "defaultSelectedYear": 1982,
     "oldestAvailableYear": 1982,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Re-release: \"Deluxe Edition\"; Many tracks (30); Compilation label: Epic/Legacy"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1982, 2008"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 26 years",
-        "details": "Spotify: 2008, Recommended: 1982"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2008, but sources suggest 1982"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1OOtq8tRnDM8kG2gqUPjAj",
@@ -2919,74 +2368,30 @@
       "bestYear": 1982,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2008,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1982,
-          "weight": 5
+          "year": 2008
         },
         {
           "name": "MusicBrainz",
-          "year": 1982,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1982": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1982
         },
-        "2008": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1982
         }
-      }
+      ]
     },
     "recommendedYear": 1982,
     "defaultSelectedYear": 1982,
     "oldestAvailableYear": 1982,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Re-release: \"Deluxe Edition\"; Many tracks (30); Compilation label: Epic/Legacy"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1982, 2008"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 26 years",
-        "details": "Spotify: 2008, Recommended: 1982"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2008, but sources suggest 1982"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0rwmxAht1fk7QuSiCmIhGV",
@@ -3131,82 +2536,32 @@
     },
     "validation": {
       "bestYear": 1977,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1993,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1977,
-          "weight": 5
+          "year": 1993
         },
         {
           "name": "MusicBrainz",
-          "year": 1978,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1977": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1978
         },
-        "1978": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        },
-        "1993": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1977
         }
-      }
+      ]
     },
     "recommendedYear": 1977,
     "defaultSelectedYear": 1977,
     "oldestAvailableYear": 1977,
     "availableYearsCount": 3,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Hits compilation\"; Album artist differs from track artist"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1977, 1978, 1993"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 16 years",
-        "details": "Spotify: 1993, Recommended: 1977"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 1993, but sources suggest 1977"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4jDmJ51x1o9NZB5Nxxc7gY",
@@ -3432,80 +2787,34 @@
       "bestYear": 1984,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1998,
-          "weight": 1
+          "year": 1998
         },
         {
           "name": "Spotify Original",
-          "year": 1984,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1984
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1984": {
-          "count": 3,
-          "weight": 10,
-          "sources": [
-            "Spotify Original",
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1984
         },
-        "1998": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      }
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
     "oldestAvailableYear": 1984,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Best Of\"; Many tracks (29)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1984, 1998"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 14 years",
-        "details": "Spotify: 1998, Recommended: 1984"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 1998, but sources suggest 1984"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3FCto7hnn1shUyZL42YgfO",
@@ -3731,80 +3040,34 @@
       "bestYear": 1973,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2001,
-          "weight": 1
+          "year": 2001
         },
         {
           "name": "Spotify Original",
-          "year": 1973,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1973,
-          "weight": 5
+          "year": 1973
         },
         {
           "name": "MusicBrainz",
-          "year": 1973,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1973": {
-          "count": 3,
-          "weight": 10,
-          "sources": [
-            "Spotify Original",
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1973
         },
-        "2001": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1973
         }
-      }
+      ]
     },
     "recommendedYear": 1973,
     "defaultSelectedYear": 1973,
     "oldestAvailableYear": 1973,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Essential\"; Many tracks (36)"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1973, 2001"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 28 years",
-        "details": "Spotify: 2001, Recommended: 1973"
-      },
-      {
-        "type": "critical_compilation",
-        "level": "error",
-        "message": "Compilation with large year discrepancy",
-        "details": "Spotify shows 2001, but sources suggest 1973"
-      }
-    ],
-    "status": "red",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0yRbkTprsL0rYr4UId0Ryi",
@@ -4023,83 +3286,40 @@
       ]
     },
     "validation": {
-      "bestYear": 2016,
+      "bestYear": 1989,
       "confidence": "medium",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2011,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2011
         },
         {
           "name": "MusicBrainz",
-          "year": 1989,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1989": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+          "year": 1989
         },
-        "2011": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "2016": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      }
+      ]
     },
-    "recommendedYear": 2016,
-    "defaultSelectedYear": 2016,
+    "recommendedYear": 1989,
+    "defaultSelectedYear": 1989,
     "oldestAvailableYear": 1989,
     "availableYearsCount": 3,
     "autoApproveCandidate": false,
     "flags": [
       {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Year range compilation\"; Re-release: \"Remastered\"; Many tracks (66); Album artist differs from track artist"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1989, 2011, 2016"
-      },
-      {
         "type": "remix_remaster",
         "level": "warning",
         "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2011, iTunes: 2016, MusicBrainz: 1989"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 5 years",
-        "details": "Spotify: 2011, Recommended: 2016"
+        "details": "Sources: Spotify: 2011, MusicBrainz: 1989, iTunes: 2016"
       }
     ],
     "status": "yellow",
-    "needsReview": true
+    "needsReview": true,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2EqlS6tkEnglzr7tkKAAYD",
@@ -4218,76 +3438,32 @@
     },
     "validation": {
       "bestYear": 1963,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1969,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1963,
-          "weight": 5
+          "year": 1969
         },
         {
           "name": "MusicBrainz",
-          "year": 1969,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1963": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1969
         },
-        "1969": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1963
         }
-      }
+      ]
     },
     "recommendedYear": 1963,
     "defaultSelectedYear": 1963,
     "oldestAvailableYear": 1963,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Re-release: \"Remastered\"; Relatively many tracks (17); Compilation label: EMI Catalogue"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1963, 1969"
-      },
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 1969, iTunes: 1963, MusicBrainz: 1969"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 6 years",
-        "details": "Spotify: 1969, Recommended: 1963"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7dblNGnRXEBrVJunazs2U5",
@@ -4511,88 +3687,36 @@
     },
     "validation": {
       "bestYear": 1958,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1964,
-          "weight": 1
+          "year": 1964
         },
         {
           "name": "Spotify Original",
-          "year": 1957,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1958,
-          "weight": 5
+          "year": 1957
         },
         {
           "name": "MusicBrainz",
-          "year": 1989,
-          "weight": 2
+          "year": 1989
+        },
+        {
+          "name": "iTunes",
+          "year": 1958
         }
-      ],
-      "votes": {
-        "1957": {
-          "count": 1,
-          "weight": 3,
-          "sources": [
-            "Spotify Original"
-          ]
-        },
-        "1958": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "1964": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "1989": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1958,
     "defaultSelectedYear": 1958,
     "oldestAvailableYear": 1957,
     "availableYearsCount": 4,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Best Of\"; Compilation label: Rhino/Warner Records"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1957, 1958, 1964, 1989"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 6 years",
-        "details": "Spotify: 1964, Recommended: 1958"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "39shmbIHICJ2Wxnk1fPSdz",
@@ -4708,72 +3832,33 @@
       ]
     },
     "validation": {
-      "bestYear": 2022,
-      "confidence": "very_high",
+      "bestYear": 1982,
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1982,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1982,
-          "weight": 5
+          "year": 1982
         },
         {
           "name": "MusicBrainz",
-          "year": 2022,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1982": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 2022
         },
-        "2022": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1982
         }
-      }
+      ]
     },
-    "recommendedYear": 2022,
-    "defaultSelectedYear": 2022,
+    "recommendedYear": 1982,
+    "defaultSelectedYear": 1982,
     "oldestAvailableYear": 1982,
     "availableYearsCount": 2,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 1982, iTunes: 1982, MusicBrainz: 2022"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1982, iTunes: 1982, MusicBrainz: 2022"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 40 years",
-        "details": "Spotify: 1982, Recommended: 2022"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3QHONiXGMGU3z68mQInncF",
@@ -4902,74 +3987,34 @@
       "bestYear": 1997,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2004,
-          "weight": 1
+          "year": 2004
         },
         {
           "name": "Spotify Original",
-          "year": 1997,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1997,
-          "weight": 5
+          "year": 1997
         },
         {
           "name": "MusicBrainz",
-          "year": 1997,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1997": {
-          "count": 3,
-          "weight": 10,
-          "sources": [
-            "Spotify Original",
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1997
         },
-        "2004": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1997
         }
-      }
+      ]
     },
     "recommendedYear": 1997,
     "defaultSelectedYear": 1997,
     "oldestAvailableYear": 1997,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album name: \"Hits compilation\"; Re-release: \"Anniversary Edition\"; Album artist differs from track artist"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1997, 2004"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 7 years",
-        "details": "Spotify: 2004, Recommended: 1997"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3mRM4NM8iO7UBqrSigCQFH",
@@ -5095,68 +4140,30 @@
       "bestYear": 1977,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1979,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1977,
-          "weight": 5
+          "year": 1979
         },
         {
           "name": "MusicBrainz",
-          "year": 1977,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1977": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1977
         },
-        "1979": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1977
         }
-      }
+      ]
     },
     "recommendedYear": 1977,
     "defaultSelectedYear": 1977,
     "oldestAvailableYear": 1977,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Many tracks (27); Compilation label: Bee Gees Catalog"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1977, 1979"
-      },
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 1979, iTunes: 1977, MusicBrainz: 1977"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4gphxUgq0JSFv2BCLhNDiE",
@@ -5380,40 +4387,24 @@
       "bestYear": 1957,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1958,
-          "weight": 1
+          "year": 1958
         },
         {
           "name": "Spotify Original",
-          "year": 2017,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1957,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 1957,
-          "weight": 2
+          "year": 1957
+        },
+        {
+          "name": "iTunes",
+          "year": 1957
         }
-      ],
-      "votes": {
-        "1957": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 1957,
     "defaultSelectedYear": 1957,
@@ -5422,27 +4413,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": false,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Spotify album type: compilation"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1957"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1958, MusicBrainz: 1957"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "07GvNcU1WdyZJq3XxP0kZa",
@@ -5561,35 +4535,20 @@
       "bestYear": 1976,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1977,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1976,
-          "weight": 5
+          "year": 1977
         },
         {
           "name": "MusicBrainz",
-          "year": 1976,
-          "weight": 2
+          "year": 1976
+        },
+        {
+          "name": "iTunes",
+          "year": 1976
         }
-      ],
-      "votes": {
-        "1976": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 1976,
     "defaultSelectedYear": 1976,
@@ -5597,29 +4556,11 @@
     "availableYearsCount": 2,
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 1977, iTunes: 1976, MusicBrainz: 1976"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1977, iTunes: 1976, MusicBrainz: 1976"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1977, MusicBrainz: 1976"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6Mj11T9OcscOX6mNZLKvPm",
@@ -5727,65 +4668,28 @@
     },
     "validation": {
       "bestYear": 1976,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2025,
-          "weight": 1
+          "year": 2025
         },
         {
           "name": "iTunes",
-          "year": 1976,
-          "weight": 5
+          "year": 1976
         }
-      ],
-      "votes": {
-        "1976": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2025": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1976,
     "defaultSelectedYear": 1976,
     "oldestAvailableYear": 1976,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2025, iTunes: 1976"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 49 years",
-        "details": "Spotify: 2025, Recommended: 1976"
-      },
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3brsTldqf5v4jK2nA7o9oG",
@@ -5893,65 +4797,28 @@
     },
     "validation": {
       "bestYear": 2018,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2025,
-          "weight": 1
+          "year": 2025
         },
         {
           "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2018
         }
-      ],
-      "votes": {
-        "2018": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2025": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
     "oldestAvailableYear": 2018,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2025, iTunes: 2018"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 7 years",
-        "details": "Spotify: 2025, Recommended: 2018"
-      },
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1uRKT2LRANv4baowBWHfDS",
@@ -6072,41 +4939,20 @@
       "bestYear": 1955,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1955,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1955,
-          "weight": 5
+          "year": 1955
         },
         {
           "name": "MusicBrainz",
-          "year": 2021,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1955": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 2021
         },
-        "2021": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1955
         }
-      }
+      ]
     },
     "recommendedYear": 1955,
     "defaultSelectedYear": 1955,
@@ -6118,16 +4964,11 @@
         "type": "multiple_artists",
         "level": "info",
         "message": "Multiple artists detected in track"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1955, iTunes: 1955, MusicBrainz: 2021"
       }
     ],
-    "status": "yellow",
-    "needsReview": true
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "64Ny7djQ6rNJspquof2KoX",
@@ -6349,82 +5190,36 @@
     },
     "validation": {
       "bestYear": 1956,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1958,
-          "weight": 1
+          "year": 1958
         },
         {
           "name": "Spotify Original",
-          "year": 2026,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1956,
-          "weight": 5
+          "year": 2026
         },
         {
           "name": "MusicBrainz",
-          "year": 1977,
-          "weight": 2
+          "year": 1977
+        },
+        {
+          "name": "iTunes",
+          "year": 1956
         }
-      ],
-      "votes": {
-        "1956": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "1958": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "1977": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        },
-        "2026": {
-          "count": 1,
-          "weight": 3,
-          "sources": [
-            "Spotify Original"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1956,
     "defaultSelectedYear": 1956,
     "oldestAvailableYear": 1956,
     "availableYearsCount": 4,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Spotify album type: compilation"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1956, 1958, 1977, 2026"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2aEeghgUcnu75tzcolFMfs",
@@ -6541,49 +5336,22 @@
     },
     "validation": {
       "bestYear": 1958,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1959,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1958,
-          "weight": 5
+          "year": 1959
         },
         {
           "name": "MusicBrainz",
-          "year": 2018,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1958": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 2018
         },
-        "1959": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "2018": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1958
         }
-      }
+      ]
     },
     "recommendedYear": 1958,
     "defaultSelectedYear": 1958,
@@ -6592,22 +5360,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1959, iTunes: 1958, MusicBrainz: 2018"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1959, MusicBrainz: 2018"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1qCQTy0fTXerET4x8VHyr9",
@@ -6822,49 +5578,22 @@
     },
     "validation": {
       "bestYear": 1967,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1968,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1967,
-          "weight": 5
+          "year": 1968
         },
         {
           "name": "MusicBrainz",
-          "year": 1991,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1967": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1991
         },
-        "1968": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "1991": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1967
         }
-      }
+      ]
     },
     "recommendedYear": 1967,
     "defaultSelectedYear": 1967,
@@ -6873,22 +5602,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1968, iTunes: 1967, MusicBrainz: 1991"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1968, MusicBrainz: 1991"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "48i055G1OT5KxGGftwFxWy",
@@ -7110,83 +5827,37 @@
       ]
     },
     "validation": {
-      "bestYear": 1964,
-      "confidence": "medium",
+      "bestYear": 1962,
+      "confidence": "low",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1962,
-          "weight": 1
+          "year": 1962
         },
         {
           "name": "Spotify Original",
-          "year": 1989,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1964,
-          "weight": 5
+          "year": 1989
         },
         {
           "name": "MusicBrainz",
-          "year": 1997,
-          "weight": 2
+          "year": 1997
+        },
+        {
+          "name": "iTunes",
+          "year": 1964
         }
-      ],
-      "votes": {
-        "1962": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "1964": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "1989": {
-          "count": 1,
-          "weight": 3,
-          "sources": [
-            "Spotify Original"
-          ]
-        },
-        "1997": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
-    "recommendedYear": 1964,
-    "defaultSelectedYear": 1964,
+    "recommendedYear": 1962,
+    "defaultSelectedYear": 1962,
     "oldestAvailableYear": 1962,
     "availableYearsCount": 4,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Compilation label: Monument/Orbison Records/Legacy"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1962, 1964, 1989, 1997"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2QbSGkb3TgghEHpjKCsznm",
@@ -7401,63 +6072,30 @@
       "bestYear": 1961,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1994,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1961,
-          "weight": 5
+          "year": 1994
         },
         {
           "name": "MusicBrainz",
-          "year": 1961,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1961": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1961
         },
-        "1994": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1961
         }
-      }
+      ]
     },
     "recommendedYear": 1961,
     "defaultSelectedYear": 1961,
     "oldestAvailableYear": 1961,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1994, iTunes: 1961, MusicBrainz: 1961"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 33 years",
-        "details": "Spotify: 1994, Recommended: 1961"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "745H5CctFr12Mo7cqa1BMH",
@@ -7670,49 +6308,22 @@
     },
     "validation": {
       "bestYear": 1964,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1965,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1964,
-          "weight": 5
+          "year": 1965
         },
         {
           "name": "MusicBrainz",
-          "year": 1993,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1964": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1993
         },
-        "1965": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        },
-        "1993": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1964
         }
-      }
+      ]
     },
     "recommendedYear": 1964,
     "defaultSelectedYear": 1964,
@@ -7721,22 +6332,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1965, iTunes: 1964, MusicBrainz: 1993"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1965, MusicBrainz: 1993"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2KH16WveTQWT6KOG9Rg6e2",
@@ -7961,77 +6560,37 @@
       ]
     },
     "validation": {
-      "bestYear": 1982,
+      "bestYear": 1981,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1985,
-          "weight": 1
+          "year": 1985
         },
         {
           "name": "Spotify Original",
-          "year": 1982,
-          "weight": 3
-        },
-        {
-          "name": "iTunes",
-          "year": 1981,
-          "weight": 5
+          "year": 1982
         },
         {
           "name": "MusicBrainz",
-          "year": 1982,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1981": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1982
         },
-        "1982": {
-          "count": 2,
-          "weight": 5,
-          "sources": [
-            "Spotify Original",
-            "MusicBrainz"
-          ]
-        },
-        "1985": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1981
         }
-      }
+      ]
     },
-    "recommendedYear": 1982,
-    "defaultSelectedYear": 1982,
+    "recommendedYear": 1981,
+    "defaultSelectedYear": 1981,
     "oldestAvailableYear": 1981,
     "availableYearsCount": 3,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Album artist differs from track artist; Compilation label: Volcano/Legacy"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 1981, 1982, 1985"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7rPzEczIS574IgPaiPieS3",
@@ -8151,63 +6710,30 @@
       "bestYear": 1979,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1979,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1979,
-          "weight": 5
+          "year": 1979
         },
         {
           "name": "MusicBrainz",
-          "year": 1981,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1979": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 1981
         },
-        "1981": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1979
         }
-      }
+      ]
     },
     "recommendedYear": 1979,
     "defaultSelectedYear": 1979,
     "oldestAvailableYear": 1979,
     "availableYearsCount": 2,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 1979, iTunes: 1979, MusicBrainz: 1981"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1979, iTunes: 1979, MusicBrainz: 1981"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2WfaOiMkCvy7F5fcp2zZ8L",
@@ -8326,35 +6852,20 @@
       "bestYear": 1984,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1985,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1985
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      ],
-      "votes": {
-        "1984": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
@@ -8363,22 +6874,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1985, iTunes: 1984, MusicBrainz: 1984"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1985, MusicBrainz: 1984"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "63xdwScd1Ai1GigAwQxE8y",
@@ -8530,35 +7029,20 @@
       "bestYear": 1971,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1972,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1971,
-          "weight": 5
+          "year": 1972
         },
         {
           "name": "MusicBrainz",
-          "year": 1971,
-          "weight": 2
+          "year": 1971
+        },
+        {
+          "name": "iTunes",
+          "year": 1971
         }
-      ],
-      "votes": {
-        "1971": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 1971,
     "defaultSelectedYear": 1971,
@@ -8567,22 +7051,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1972, iTunes: 1971, MusicBrainz: 1971"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1972, MusicBrainz: 1971"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2QfiRTz5Yc8DdShCxG1tB2",
@@ -8796,62 +7268,35 @@
       ]
     },
     "validation": {
-      "bestYear": 1958,
+      "bestYear": 1955,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1959,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1955,
-          "weight": 5
+          "year": 1959
         },
         {
           "name": "MusicBrainz",
-          "year": 1958,
-          "weight": 2
+          "year": 1958
+        },
+        {
+          "name": "iTunes",
+          "year": 1955
         }
-      ],
-      "votes": {
-        "1958": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
-    "recommendedYear": 1958,
-    "defaultSelectedYear": 1958,
+    "recommendedYear": 1955,
+    "defaultSelectedYear": 1955,
     "oldestAvailableYear": 1955,
     "availableYearsCount": 3,
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1959, iTunes: 1955, MusicBrainz: 1958"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1959, MusicBrainz: 1958"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7iN1s7xHE4ifF5povM6A48",
@@ -8986,65 +7431,32 @@
     },
     "validation": {
       "bestYear": 1968,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1970,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1968,
-          "weight": 5
+          "year": 1970
         },
         {
           "name": "MusicBrainz",
-          "year": 1970,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1968": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1970
         },
-        "1970": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1968
         }
-      }
+      ]
     },
     "recommendedYear": 1968,
     "defaultSelectedYear": 1968,
     "oldestAvailableYear": 1968,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 1970, iTunes: 1968, MusicBrainz: 1970"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1970, iTunes: 1968, MusicBrainz: 1970"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "46eu3SBuFCXWsPT39Yg3tJ",
@@ -9178,65 +7590,32 @@
     },
     "validation": {
       "bestYear": 1966,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1979,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1966,
-          "weight": 5
+          "year": 1979
         },
         {
           "name": "MusicBrainz",
-          "year": 1979,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1966": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1979
         },
-        "1979": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1966
         }
-      }
+      ]
     },
     "recommendedYear": 1966,
     "defaultSelectedYear": 1966,
     "oldestAvailableYear": 1966,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1979, iTunes: 1966, MusicBrainz: 1979"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 13 years",
-        "details": "Spotify: 1979, Recommended: 1966"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "65w3jvXSOiZsscghg9MHb6",
@@ -9344,59 +7723,28 @@
     },
     "validation": {
       "bestYear": 2025,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
+          "year": 2026
         },
         {
           "name": "iTunes",
-          "year": 2025,
-          "weight": 5
+          "year": 2025
         }
-      ],
-      "votes": {
-        "2025": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2026": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2025,
     "defaultSelectedYear": 2025,
     "oldestAvailableYear": 2025,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2026, iTunes: 2025"
-      },
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5g5s4CFpbIoq2pMA4ZlXe1",
@@ -9504,59 +7852,28 @@
     },
     "validation": {
       "bestYear": 2025,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
+          "year": 2026
         },
         {
           "name": "iTunes",
-          "year": 2025,
-          "weight": 5
+          "year": 2025
         }
-      ],
-      "votes": {
-        "2025": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2026": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2025,
     "defaultSelectedYear": 2025,
     "oldestAvailableYear": 2025,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2026, iTunes: 2025"
-      },
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4eGHlplaq1ME8oetnTuFFf",
@@ -9673,43 +7990,22 @@
     },
     "validation": {
       "bestYear": 1964,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1967,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1964,
-          "weight": 5
+          "year": 1967
         },
         {
           "name": "MusicBrainz",
-          "year": 1967,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1964": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1967
         },
-        "1967": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1964
         }
-      }
+      ]
     },
     "recommendedYear": 1964,
     "defaultSelectedYear": 1964,
@@ -9721,16 +8017,11 @@
         "type": "multiple_artists",
         "level": "info",
         "message": "Multiple artists detected in track"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1967, iTunes: 1964, MusicBrainz: 1967"
       }
     ],
-    "status": "yellow",
-    "needsReview": true
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4BP3uh0hFLFRb5cjsgLqDh",
@@ -9945,43 +8236,22 @@
     },
     "validation": {
       "bestYear": 1968,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1969,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1968,
-          "weight": 5
+          "year": 1969
         },
         {
           "name": "MusicBrainz",
-          "year": 1969,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1968": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1969
         },
-        "1969": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1968
         }
-      }
+      ]
     },
     "recommendedYear": 1968,
     "defaultSelectedYear": 1968,
@@ -9990,22 +8260,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1969, iTunes: 1968, MusicBrainz: 1969"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 1969, MusicBrainz: 1969"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5LxvwujISqiB8vpRYv887S",
@@ -10220,57 +8478,30 @@
       "bestYear": 1969,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1969,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1969,
-          "weight": 5
+          "year": 1969
         },
         {
           "name": "MusicBrainz",
-          "year": 1989,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1969": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 1989
         },
-        "1989": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1969
         }
-      }
+      ]
     },
     "recommendedYear": 1969,
     "defaultSelectedYear": 1969,
     "oldestAvailableYear": 1969,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1969, iTunes: 1969, MusicBrainz: 1989"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4y1LsJpmMti1PfRQV9AWWe",
@@ -10485,51 +8716,30 @@
       "bestYear": 1983,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1983,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1983,
-          "weight": 5
+          "year": 1983
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1983
         }
-      ],
-      "votes": {
-        "1983": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 1983,
     "defaultSelectedYear": 1983,
     "oldestAvailableYear": 1983,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1983, iTunes: 1983, MusicBrainz: 1984"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2ZNTPtYmAhN9vCwnAgqKn1",
@@ -10649,57 +8859,30 @@
       "bestYear": 1959,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1959,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1959,
-          "weight": 5
+          "year": 1959
         },
         {
           "name": "MusicBrainz",
-          "year": 1987,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1959": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 1987
         },
-        "1987": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1959
         }
-      }
+      ]
     },
     "recommendedYear": 1959,
     "defaultSelectedYear": 1959,
     "oldestAvailableYear": 1959,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1959, iTunes: 1959, MusicBrainz: 1987"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7lQWRAjyhTpCWFC0jmclT4",
@@ -10860,57 +9043,30 @@
       "bestYear": 1995,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1995,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1995,
-          "weight": 5
+          "year": 1995
         },
         {
           "name": "MusicBrainz",
-          "year": 2010,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1995": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 2010
         },
-        "2010": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1995
         }
-      }
+      ]
     },
     "recommendedYear": 1995,
     "defaultSelectedYear": 1995,
     "oldestAvailableYear": 1995,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1995, iTunes: 1995, MusicBrainz: 2010"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "62AuGbAkt8Ox2IrFFb8GKV",
@@ -11127,57 +9283,30 @@
       "bestYear": 1969,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1969,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1969,
-          "weight": 5
+          "year": 1969
         },
         {
           "name": "MusicBrainz",
-          "year": 1974,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1969": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 1974
         },
-        "1974": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1969
         }
-      }
+      ]
     },
     "recommendedYear": 1969,
     "defaultSelectedYear": 1969,
     "oldestAvailableYear": 1969,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1969, iTunes: 1969, MusicBrainz: 1974"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3zBhihYUHBmGd2bcQIobrF",
@@ -11286,57 +9415,30 @@
       "bestYear": 1964,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1968,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1964,
-          "weight": 5
+          "year": 1968
         },
         {
           "name": "MusicBrainz",
-          "year": 1964,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1964": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 1964
         },
-        "1968": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1964
         }
-      }
+      ]
     },
     "recommendedYear": 1964,
     "defaultSelectedYear": 1964,
     "oldestAvailableYear": 1964,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1968, iTunes: 1964, MusicBrainz: 1964"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7Ar4G7Ci11gpt6sfH9Cgz5",
@@ -11551,57 +9653,30 @@
       "bestYear": 1972,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1972,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1972,
-          "weight": 5
+          "year": 1972
         },
         {
           "name": "MusicBrainz",
-          "year": 1976,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1972": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 1976
         },
-        "1976": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1972
         }
-      }
+      ]
     },
     "recommendedYear": 1972,
     "defaultSelectedYear": 1972,
     "oldestAvailableYear": 1972,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1972, iTunes: 1972, MusicBrainz: 1976"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3nvuPQTw2zuFAVuLsC9IYQ",
@@ -11718,57 +9793,30 @@
       "bestYear": 1990,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1990,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1990,
-          "weight": 5
+          "year": 1990
         },
         {
           "name": "MusicBrainz",
-          "year": 1993,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1990": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 1993
         },
-        "1993": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1990
         }
-      }
+      ]
     },
     "recommendedYear": 1990,
     "defaultSelectedYear": 1990,
     "oldestAvailableYear": 1990,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1990, iTunes: 1990, MusicBrainz: 1993"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5b7OgznPJJr1vHNYGyvxau",
@@ -11985,60 +10033,33 @@
       ]
     },
     "validation": {
-      "bestYear": 1964,
-      "confidence": "high",
+      "bestYear": 1962,
+      "confidence": "low",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1962,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1964,
-          "weight": 5
+          "year": 1962
         },
         {
           "name": "MusicBrainz",
-          "year": 1964,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1962": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+          "year": 1964
         },
-        "1964": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1964
         }
-      }
+      ]
     },
-    "recommendedYear": 1964,
-    "defaultSelectedYear": 1964,
+    "recommendedYear": 1962,
+    "defaultSelectedYear": 1962,
     "oldestAvailableYear": 1962,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1962, iTunes: 1964, MusicBrainz: 1964"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3SdTKo2uVsxFblQjpScoHy",
@@ -12253,59 +10274,32 @@
     },
     "validation": {
       "bestYear": 1960,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1962,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1960,
-          "weight": 5
+          "year": 1962
         },
         {
           "name": "MusicBrainz",
-          "year": 1962,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "1960": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 1962
         },
-        "1962": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 1960
         }
-      }
+      ]
     },
     "recommendedYear": 1960,
     "defaultSelectedYear": 1960,
     "oldestAvailableYear": 1960,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 1962, iTunes: 1960, MusicBrainz: 1962"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2PzU4IB8Dr6mxV3lHuaG34",
@@ -12447,53 +10441,32 @@
     },
     "validation": {
       "bestYear": 1965,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1965,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1965,
-          "weight": 5
+          "year": 1965
         },
         {
           "name": "MusicBrainz",
-          "year": 1965,
-          "weight": 2
+          "year": 1965
+        },
+        {
+          "name": "iTunes",
+          "year": 1965
         }
-      ],
-      "votes": {
-        "1965": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1965,
     "defaultSelectedYear": 1965,
     "oldestAvailableYear": 1965,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Spotify album type: compilation"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1f3yAtsJtY87CTmM8RLnxf",
@@ -12710,53 +10683,32 @@
     },
     "validation": {
       "bestYear": 1991,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1991,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1991,
-          "weight": 5
+          "year": 1991
         },
         {
           "name": "MusicBrainz",
-          "year": 1991,
-          "weight": 2
+          "year": 1991
+        },
+        {
+          "name": "iTunes",
+          "year": 1991
         }
-      ],
-      "votes": {
-        "1991": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1991,
     "defaultSelectedYear": 1991,
     "oldestAvailableYear": 1991,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Re-release: \"Deluxe Edition\"; Many tracks (40); Compilation label: Geffen"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "23YjAY4tuIpUt4kvMkS75a",
@@ -12864,47 +10816,28 @@
     },
     "validation": {
       "bestYear": 2024,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2024,
-          "weight": 1
+          "year": 2024
         },
         {
           "name": "iTunes",
-          "year": 2024,
-          "weight": 5
+          "year": 2024
         }
-      ],
-      "votes": {
-        "2024": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2024,
     "defaultSelectedYear": 2024,
     "oldestAvailableYear": 2024,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0rm1fpsBkNgbEki3bX3uGa",
@@ -13012,47 +10945,28 @@
     },
     "validation": {
       "bestYear": 2023,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2023,
-          "weight": 1
+          "year": 2023
         },
         {
           "name": "iTunes",
-          "year": 2023,
-          "weight": 5
+          "year": 2023
         }
-      ],
-      "votes": {
-        "2023": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2023,
     "defaultSelectedYear": 2023,
     "oldestAvailableYear": 2023,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2gJcteiJRbwiRslepp4wVC",
@@ -13160,47 +11074,28 @@
     },
     "validation": {
       "bestYear": 2026,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
+          "year": 2026
         },
         {
           "name": "iTunes",
-          "year": 2026,
-          "weight": 5
+          "year": 2026
         }
-      ],
-      "votes": {
-        "2026": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2026,
     "defaultSelectedYear": 2026,
     "oldestAvailableYear": 2026,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6l8EbYRtQMgKOyc1gcDHF9",
@@ -13315,37 +11210,22 @@
     },
     "validation": {
       "bestYear": 1970,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1970,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1970,
-          "weight": 5
+          "year": 1970
         },
         {
           "name": "MusicBrainz",
-          "year": 1970,
-          "weight": 2
+          "year": 1970
+        },
+        {
+          "name": "iTunes",
+          "year": 1970
         }
-      ],
-      "votes": {
-        "1970": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1970,
     "defaultSelectedYear": 1970,
@@ -13360,7 +11240,8 @@
       }
     ],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "79L1z6Dw9r4snd4VrUUtiN",
@@ -13468,47 +11349,28 @@
     },
     "validation": {
       "bestYear": 2026,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
+          "year": 2026
         },
         {
           "name": "iTunes",
-          "year": 2026,
-          "weight": 5
+          "year": 2026
         }
-      ],
-      "votes": {
-        "2026": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2026,
     "defaultSelectedYear": 2026,
     "oldestAvailableYear": 2026,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3hO07GgUjuUPM5IqRrxO3R",
@@ -13616,47 +11478,28 @@
     },
     "validation": {
       "bestYear": 2019,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
+          "year": 2019
         },
         {
           "name": "iTunes",
-          "year": 2019,
-          "weight": 5
+          "year": 2019
         }
-      ],
-      "votes": {
-        "2019": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2019,
     "defaultSelectedYear": 2019,
     "oldestAvailableYear": 2019,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1vNA7IqGz03PZFC1E3vBNs",
@@ -13764,47 +11607,28 @@
     },
     "validation": {
       "bestYear": 2025,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2025,
-          "weight": 1
+          "year": 2025
         },
         {
           "name": "iTunes",
-          "year": 2025,
-          "weight": 5
+          "year": 2025
         }
-      ],
-      "votes": {
-        "2025": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2025,
     "defaultSelectedYear": 2025,
     "oldestAvailableYear": 2025,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7zgUlE6YdYnDfj1DtdcKFQ",
@@ -13912,47 +11736,28 @@
     },
     "validation": {
       "bestYear": 2022,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2022,
-          "weight": 1
+          "year": 2022
         },
         {
           "name": "iTunes",
-          "year": 2022,
-          "weight": 5
+          "year": 2022
         }
-      ],
-      "votes": {
-        "2022": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2022,
     "defaultSelectedYear": 2022,
     "oldestAvailableYear": 2022,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2zMJN9JvDlvGP4jB03l1Bz",
@@ -14167,37 +11972,22 @@
     },
     "validation": {
       "bestYear": 1979,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1979,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1979,
-          "weight": 5
+          "year": 1979
         },
         {
           "name": "MusicBrainz",
-          "year": 1979,
-          "weight": 2
+          "year": 1979
+        },
+        {
+          "name": "iTunes",
+          "year": 1979
         }
-      ],
-      "votes": {
-        "1979": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1979,
     "defaultSelectedYear": 1979,
@@ -14206,7 +11996,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1QEEqeFIZktqIpPI4jSVSF",
@@ -14417,7 +12208,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1976,
+      "confidence": "high",
+      "sourcesAgree": false,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1976
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1990
+        },
+        {
+          "name": "iTunes",
+          "year": 1976
+        }
+      ]
+    },
+    "defaultSelectedYear": 1976,
+    "needsReview": false
   },
   {
     "spotifyId": "4RvWPyQ5RL0ao9LPZeSouE",
@@ -14635,7 +12447,32 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1985,
+      "confidence": "high",
+      "sourcesAgree": false,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1985
+        },
+        {
+          "name": "Spotify Original",
+          "year": 1985
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1988
+        },
+        {
+          "name": "iTunes",
+          "year": 1985
+        }
+      ]
+    },
+    "defaultSelectedYear": 1985,
+    "needsReview": false
   },
   {
     "spotifyId": "31AOj9sFz2gM0O3hMARRBx",
@@ -14851,37 +12688,22 @@
     },
     "validation": {
       "bestYear": 1991,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1991,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1991,
-          "weight": 5
+          "year": 1991
         },
         {
           "name": "MusicBrainz",
-          "year": 1991,
-          "weight": 2
+          "year": 1991
+        },
+        {
+          "name": "iTunes",
+          "year": 1991
         }
-      ],
-      "votes": {
-        "1991": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1991,
     "defaultSelectedYear": 1991,
@@ -14890,7 +12712,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7HW5WIw7ZgZORCzUxv5gW5",
@@ -14914,7 +12737,7 @@
     "verified": true,
     "verifiedYear": 1976,
     "previouslyVerified": true,
-    "recommendedYear": 1976,
+    "recommendedYear": 1975,
     "albumData": {
       "id": "4ObsEU7mIXbo2n9A31yfds",
       "name": "Rock Of The Westies",
@@ -15004,7 +12827,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1975,
+      "confidence": "high",
+      "sourcesAgree": false,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1975
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1976
+        },
+        {
+          "name": "iTunes",
+          "year": 1975
+        }
+      ]
+    },
+    "defaultSelectedYear": 1975,
+    "needsReview": false
   },
   {
     "spotifyId": "40riOy7x9W7GXjyGp4pjAv",
@@ -15122,46 +12966,32 @@
     },
     "validation": {
       "bestYear": 1976,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1976,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1976,
-          "weight": 5
+          "year": 1976
         },
         {
           "name": "MusicBrainz",
-          "year": 1976,
-          "weight": 2
+          "year": 1976
+        },
+        {
+          "name": "iTunes",
+          "year": 1976
         }
-      ],
-      "votes": {
-        "1976": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1976,
     "defaultSelectedYear": 1976,
     "oldestAvailableYear": 1976,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4u7EnebtmKWzUH433cf5Qv",
@@ -15300,7 +13130,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1975,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1975
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1975
+        },
+        {
+          "name": "iTunes",
+          "year": 1975
+        }
+      ]
+    },
+    "defaultSelectedYear": 1975,
+    "needsReview": false
   },
   {
     "spotifyId": "2374M0fQpWi3dLnB54qaLX",
@@ -15511,7 +13362,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1982,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1982
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1982
+        },
+        {
+          "name": "iTunes",
+          "year": 1982
+        }
+      ]
+    },
+    "defaultSelectedYear": 1982,
+    "needsReview": false
   },
   {
     "spotifyId": "1JSTJqkT5qHq8MDJnJbRE1",
@@ -15729,37 +13601,22 @@
     },
     "validation": {
       "bestYear": 1983,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1983,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1983,
-          "weight": 5
+          "year": 1983
         },
         {
           "name": "MusicBrainz",
-          "year": 1983,
-          "weight": 2
+          "year": 1983
+        },
+        {
+          "name": "iTunes",
+          "year": 1983
         }
-      ],
-      "votes": {
-        "1983": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1983,
     "defaultSelectedYear": 1983,
@@ -15768,7 +13625,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7pKfPomDEeI4TPT6EOYjn9",
@@ -15887,46 +13745,32 @@
     },
     "validation": {
       "bestYear": 1971,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1971,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1971,
-          "weight": 5
+          "year": 1971
         },
         {
           "name": "MusicBrainz",
-          "year": 1971,
-          "weight": 2
+          "year": 1971
+        },
+        {
+          "name": "iTunes",
+          "year": 1971
         }
-      ],
-      "votes": {
-        "1971": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1971,
     "defaultSelectedYear": 1971,
     "oldestAvailableYear": 1971,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "07q0QVgO56EorrSGHC48y3",
@@ -16139,37 +13983,22 @@
     },
     "validation": {
       "bestYear": 1979,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1979,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1979,
-          "weight": 5
+          "year": 1979
         },
         {
           "name": "MusicBrainz",
-          "year": 1979,
-          "weight": 2
+          "year": 1979
+        },
+        {
+          "name": "iTunes",
+          "year": 1979
         }
-      ],
-      "votes": {
-        "1979": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1979,
     "defaultSelectedYear": 1979,
@@ -16178,7 +14007,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0hCB0YR03f6AmQaHbwWDe8",
@@ -16296,46 +14126,32 @@
     },
     "validation": {
       "bestYear": 1969,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1969,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1969,
-          "weight": 5
+          "year": 1969
         },
         {
           "name": "MusicBrainz",
-          "year": 1969,
-          "weight": 2
+          "year": 1969
+        },
+        {
+          "name": "iTunes",
+          "year": 1969
         }
-      ],
-      "votes": {
-        "1969": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1969,
     "defaultSelectedYear": 1969,
     "oldestAvailableYear": 1969,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3d9DChrdc6BOeFsbrZ3Is0",
@@ -16551,37 +14367,22 @@
     },
     "validation": {
       "bestYear": 1991,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1991,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1991,
-          "weight": 5
+          "year": 1991
         },
         {
           "name": "MusicBrainz",
-          "year": 1991,
-          "weight": 2
+          "year": 1991
+        },
+        {
+          "name": "iTunes",
+          "year": 1991
         }
-      ],
-      "votes": {
-        "1991": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1991,
     "defaultSelectedYear": 1991,
@@ -16590,7 +14391,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7o2CTH4ctstm8TNelqjb51",
@@ -16803,37 +14605,22 @@
     },
     "validation": {
       "bestYear": 1987,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1987,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1987,
-          "weight": 5
+          "year": 1987
         },
         {
           "name": "MusicBrainz",
-          "year": 1987,
-          "weight": 2
+          "year": 1987
+        },
+        {
+          "name": "iTunes",
+          "year": 1987
         }
-      ],
-      "votes": {
-        "1987": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1987,
     "defaultSelectedYear": 1987,
@@ -16842,7 +14629,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4eHbdreAnSOrDDsFfc4Fpm",
@@ -17057,37 +14845,22 @@
     },
     "validation": {
       "bestYear": 1992,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1992,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1992,
-          "weight": 5
+          "year": 1992
         },
         {
           "name": "MusicBrainz",
-          "year": 1992,
-          "weight": 2
+          "year": 1992
+        },
+        {
+          "name": "iTunes",
+          "year": 1992
         }
-      ],
-      "votes": {
-        "1992": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1992,
     "defaultSelectedYear": 1992,
@@ -17096,7 +14869,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2M9ro2krNb7nr7HSprkEgo",
@@ -17307,7 +15081,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1988,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1988
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1988
+        },
+        {
+          "name": "iTunes",
+          "year": 1988
+        }
+      ]
+    },
+    "defaultSelectedYear": 1988,
+    "needsReview": false
   },
   {
     "spotifyId": "54X78diSLoUDI3joC2bjMz",
@@ -17522,37 +15317,22 @@
     },
     "validation": {
       "bestYear": 1984,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1984,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1984
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      ],
-      "votes": {
-        "1984": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
@@ -17561,7 +15341,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7tqhbajSfrz2F7E1Z75ASX",
@@ -17679,37 +15460,22 @@
     },
     "validation": {
       "bestYear": 1967,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1967,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1967,
-          "weight": 5
+          "year": 1967
         },
         {
           "name": "MusicBrainz",
-          "year": 1967,
-          "weight": 2
+          "year": 1967
+        },
+        {
+          "name": "iTunes",
+          "year": 1967
         }
-      ],
-      "votes": {
-        "1967": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1967,
     "defaultSelectedYear": 1967,
@@ -17718,7 +15484,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7s25THrKz86DM225dOYwnr",
@@ -17933,37 +15700,22 @@
     },
     "validation": {
       "bestYear": 1967,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1967,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1967,
-          "weight": 5
+          "year": 1967
         },
         {
           "name": "MusicBrainz",
-          "year": 1967,
-          "weight": 2
+          "year": 1967
+        },
+        {
+          "name": "iTunes",
+          "year": 1967
         }
-      ],
-      "votes": {
-        "1967": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1967,
     "defaultSelectedYear": 1967,
@@ -17972,7 +15724,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0dJFoXdKvpc3A8aLN9GgV4",
@@ -18105,37 +15858,22 @@
     },
     "validation": {
       "bestYear": 2026,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2026,
-          "weight": 5
+          "year": 2026
         },
         {
           "name": "MusicBrainz",
-          "year": 2026,
-          "weight": 2
+          "year": 2026
+        },
+        {
+          "name": "iTunes",
+          "year": 2026
         }
-      ],
-      "votes": {
-        "2026": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2026,
     "defaultSelectedYear": 2026,
@@ -18144,7 +15882,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6dGnYIeXmHdcikdzNNDMm2",
@@ -18257,7 +15996,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1969,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1969
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1969
+        },
+        {
+          "name": "iTunes",
+          "year": 1969
+        }
+      ]
+    },
+    "defaultSelectedYear": 1969,
+    "needsReview": false
   },
   {
     "spotifyId": "5CQ30WqJwcep0pYcV4AMNc",
@@ -18376,46 +16136,32 @@
     },
     "validation": {
       "bestYear": 1971,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1971,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1971,
-          "weight": 5
+          "year": 1971
         },
         {
           "name": "MusicBrainz",
-          "year": 1971,
-          "weight": 2
+          "year": 1971
+        },
+        {
+          "name": "iTunes",
+          "year": 1971
         }
-      ],
-      "votes": {
-        "1971": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1971,
     "defaultSelectedYear": 1971,
     "oldestAvailableYear": 1971,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4bHsxqR3GMrXTxEPLuK5ue",
@@ -18556,37 +16302,22 @@
     },
     "validation": {
       "bestYear": 1981,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1981,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1981,
-          "weight": 5
+          "year": 1981
         },
         {
           "name": "MusicBrainz",
-          "year": 1981,
-          "weight": 2
+          "year": 1981
+        },
+        {
+          "name": "iTunes",
+          "year": 1981
         }
-      ],
-      "votes": {
-        "1981": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1981,
     "defaultSelectedYear": 1981,
@@ -18595,7 +16326,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "37Tmv4NnfQeb0ZgUC4fOJj",
@@ -18808,37 +16540,22 @@
     },
     "validation": {
       "bestYear": 1978,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1978,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1978,
-          "weight": 5
+          "year": 1978
         },
         {
           "name": "MusicBrainz",
-          "year": 1978,
-          "weight": 2
+          "year": 1978
+        },
+        {
+          "name": "iTunes",
+          "year": 1978
         }
-      ],
-      "votes": {
-        "1978": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1978,
     "defaultSelectedYear": 1978,
@@ -18847,7 +16564,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1OauriCWa9WfGzT8RcYe7q",
@@ -18980,37 +16698,22 @@
     },
     "validation": {
       "bestYear": 2026,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2026,
-          "weight": 5
+          "year": 2026
         },
         {
           "name": "MusicBrainz",
-          "year": 2026,
-          "weight": 2
+          "year": 2026
+        },
+        {
+          "name": "iTunes",
+          "year": 2026
         }
-      ],
-      "votes": {
-        "2026": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2026,
     "defaultSelectedYear": 2026,
@@ -19019,7 +16722,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1ZPlNanZsJSPK5h9YZZFbZ",
@@ -19232,37 +16936,22 @@
     },
     "validation": {
       "bestYear": 1984,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1984,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1984
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      ],
-      "votes": {
-        "1984": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
@@ -19271,7 +16960,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "18AXbzPzBS8Y3AkgSxzJPb",
@@ -19384,7 +17074,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1981,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1981
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1981
+        },
+        {
+          "name": "iTunes",
+          "year": 1981
+        }
+      ]
+    },
+    "defaultSelectedYear": 1981,
+    "needsReview": false
   },
   {
     "spotifyId": "37ZJ0p5Jm13JPevGcx4SkF",
@@ -19595,7 +17306,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1986,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1986
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1986
+        },
+        {
+          "name": "iTunes",
+          "year": 1986
+        }
+      ]
+    },
+    "defaultSelectedYear": 1986,
+    "needsReview": false
   },
   {
     "spotifyId": "2zYzyRzz6pRmhPzyfMEC8s",
@@ -19713,37 +17445,22 @@
     },
     "validation": {
       "bestYear": 1979,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1979,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1979,
-          "weight": 5
+          "year": 1979
         },
         {
           "name": "MusicBrainz",
-          "year": 1979,
-          "weight": 2
+          "year": 1979
+        },
+        {
+          "name": "iTunes",
+          "year": 1979
         }
-      ],
-      "votes": {
-        "1979": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1979,
     "defaultSelectedYear": 1979,
@@ -19752,7 +17469,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0GONea6G2XdnHWjNZd6zt3",
@@ -19776,7 +17494,7 @@
     "verified": true,
     "verifiedYear": 1984,
     "previouslyVerified": true,
-    "recommendedYear": 1984,
+    "recommendedYear": 1983,
     "albumData": {
       "id": "2o2G49EPi4lua5zgxUKhLL",
       "name": "Reckless (30th Anniversary / Deluxe Edition)",
@@ -19963,7 +17681,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1983,
+      "confidence": "high",
+      "sourcesAgree": false,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1984
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1983
+        }
+      ]
+    },
+    "defaultSelectedYear": 1983,
+    "needsReview": false
   },
   {
     "spotifyId": "0OFOf0vAz1EL18MtIPRoOo",
@@ -20096,37 +17835,22 @@
     },
     "validation": {
       "bestYear": 2025,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2025,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2025,
-          "weight": 5
+          "year": 2025
         },
         {
           "name": "MusicBrainz",
-          "year": 2025,
-          "weight": 2
+          "year": 2025
+        },
+        {
+          "name": "iTunes",
+          "year": 2025
         }
-      ],
-      "votes": {
-        "2025": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2025,
     "defaultSelectedYear": 2025,
@@ -20135,7 +17859,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1JLn8RhQzHz3qDqsChcmBl",
@@ -20269,46 +17994,32 @@
     },
     "validation": {
       "bestYear": 1984,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1984,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1984
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      ],
-      "votes": {
-        "1984": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
     "oldestAvailableYear": 1984,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1k1Bqnv2R0uJXQN4u6LKYt",
@@ -20442,37 +18153,22 @@
     },
     "validation": {
       "bestYear": 1971,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1971,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1971,
-          "weight": 5
+          "year": 1971
         },
         {
           "name": "MusicBrainz",
-          "year": 1971,
-          "weight": 2
+          "year": 1971
+        },
+        {
+          "name": "iTunes",
+          "year": 1971
         }
-      ],
-      "votes": {
-        "1971": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1971,
     "defaultSelectedYear": 1971,
@@ -20481,7 +18177,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "63T7DJ1AFDD6Bn8VzG6JE8",
@@ -20694,37 +18391,22 @@
     },
     "validation": {
       "bestYear": 1966,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1966,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1966,
-          "weight": 5
+          "year": 1966
         },
         {
           "name": "MusicBrainz",
-          "year": 1966,
-          "weight": 2
+          "year": 1966
+        },
+        {
+          "name": "iTunes",
+          "year": 1966
         }
-      ],
-      "votes": {
-        "1966": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1966,
     "defaultSelectedYear": 1966,
@@ -20733,7 +18415,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7H8zey5My6uNdD2TxeCb9F",
@@ -20848,37 +18531,22 @@
     },
     "validation": {
       "bestYear": 1995,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1995,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1995,
-          "weight": 5
+          "year": 1995
         },
         {
           "name": "MusicBrainz",
-          "year": 1995,
-          "weight": 2
+          "year": 1995
+        },
+        {
+          "name": "iTunes",
+          "year": 1995
         }
-      ],
-      "votes": {
-        "1995": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1995,
     "defaultSelectedYear": 1995,
@@ -20887,7 +18555,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2OfBnmmccqZdoO45Rdfmi2",
@@ -21019,37 +18688,22 @@
     },
     "validation": {
       "bestYear": 2026,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2026,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2026,
-          "weight": 5
+          "year": 2026
         },
         {
           "name": "MusicBrainz",
-          "year": 2026,
-          "weight": 2
+          "year": 2026
+        },
+        {
+          "name": "iTunes",
+          "year": 2026
         }
-      ],
-      "votes": {
-        "2026": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2026,
     "defaultSelectedYear": 2026,
@@ -21058,7 +18712,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0Q0IVlqMV64kNLlwjPj0Hl",
@@ -21276,37 +18931,22 @@
     },
     "validation": {
       "bestYear": 1996,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1996,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1996,
-          "weight": 5
+          "year": 1996
         },
         {
           "name": "MusicBrainz",
-          "year": 1996,
-          "weight": 2
+          "year": 1996
+        },
+        {
+          "name": "iTunes",
+          "year": 1996
         }
-      ],
-      "votes": {
-        "1996": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1996,
     "defaultSelectedYear": 1996,
@@ -21315,7 +18955,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2LawezPeJhN4AWuSB0GtAU",
@@ -21339,7 +18980,7 @@
     "verified": true,
     "verifiedYear": 1970,
     "previouslyVerified": true,
-    "recommendedYear": 1970,
+    "recommendedYear": 1968,
     "albumData": {
       "id": "372cMadhAGlNuDnc8TssqF",
       "name": "Pendulum (Expanded Edition)",
@@ -21526,7 +19167,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1968,
+      "confidence": "high",
+      "sourcesAgree": false,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1970
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1970
+        },
+        {
+          "name": "iTunes",
+          "year": 1968
+        }
+      ]
+    },
+    "defaultSelectedYear": 1968,
+    "needsReview": false
   },
   {
     "spotifyId": "2tDz0gabkgCjFE34CWvwrl",
@@ -21741,37 +19403,22 @@
     },
     "validation": {
       "bestYear": 1995,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1995,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1995,
-          "weight": 5
+          "year": 1995
         },
         {
           "name": "MusicBrainz",
-          "year": 1995,
-          "weight": 2
+          "year": 1995
+        },
+        {
+          "name": "iTunes",
+          "year": 1995
         }
-      ],
-      "votes": {
-        "1995": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1995,
     "defaultSelectedYear": 1995,
@@ -21780,7 +19427,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4rDbp1vnvEhieiccprPMdI",
@@ -21923,46 +19571,32 @@
     },
     "validation": {
       "bestYear": 1976,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1976,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1976,
-          "weight": 5
+          "year": 1976
         },
         {
           "name": "MusicBrainz",
-          "year": 1976,
-          "weight": 2
+          "year": 1976
+        },
+        {
+          "name": "iTunes",
+          "year": 1976
         }
-      ],
-      "votes": {
-        "1976": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1976,
     "defaultSelectedYear": 1976,
     "oldestAvailableYear": 1976,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7e89621JPkKaeDSTQ3avtg",
@@ -22178,37 +19812,22 @@
     },
     "validation": {
       "bestYear": 1974,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1974,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1974,
-          "weight": 5
+          "year": 1974
         },
         {
           "name": "MusicBrainz",
-          "year": 1974,
-          "weight": 2
+          "year": 1974
+        },
+        {
+          "name": "iTunes",
+          "year": 1974
         }
-      ],
-      "votes": {
-        "1974": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1974,
     "defaultSelectedYear": 1974,
@@ -22217,7 +19836,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0ikz6tENMONtK6qGkOrU3c",
@@ -22332,37 +19952,22 @@
     },
     "validation": {
       "bestYear": 1984,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1984,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1984
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      ],
-      "votes": {
-        "1984": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
@@ -22371,7 +19976,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2nwCO1PqpvyoFIvq3Vrj8N",
@@ -22584,37 +20190,22 @@
     },
     "validation": {
       "bestYear": 1966,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1966,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1966,
-          "weight": 5
+          "year": 1966
         },
         {
           "name": "MusicBrainz",
-          "year": 1966,
-          "weight": 2
+          "year": 1966
+        },
+        {
+          "name": "iTunes",
+          "year": 1966
         }
-      ],
-      "votes": {
-        "1966": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1966,
     "defaultSelectedYear": 1966,
@@ -22623,7 +20214,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0dOg1ySSI7NkpAe89Zo0b9",
@@ -22836,37 +20428,22 @@
     },
     "validation": {
       "bestYear": 1984,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1984,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1984,
-          "weight": 5
+          "year": 1984
         },
         {
           "name": "MusicBrainz",
-          "year": 1984,
-          "weight": 2
+          "year": 1984
+        },
+        {
+          "name": "iTunes",
+          "year": 1984
         }
-      ],
-      "votes": {
-        "1984": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1984,
     "defaultSelectedYear": 1984,
@@ -22875,7 +20452,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3yrSvpt2l1xhsV9Em88Pul",
@@ -23086,7 +20664,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1967,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1967
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1967
+        },
+        {
+          "name": "iTunes",
+          "year": 1967
+        }
+      ]
+    },
+    "defaultSelectedYear": 1967,
+    "needsReview": false
   },
   {
     "spotifyId": "2aoo2jlRnM3A0NyLQqMN2f",
@@ -23302,37 +20901,22 @@
     },
     "validation": {
       "bestYear": 1968,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1968,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1968,
-          "weight": 5
+          "year": 1968
         },
         {
           "name": "MusicBrainz",
-          "year": 1968,
-          "weight": 2
+          "year": 1968
+        },
+        {
+          "name": "iTunes",
+          "year": 1968
         }
-      ],
-      "votes": {
-        "1968": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1968,
     "defaultSelectedYear": 1968,
@@ -23341,7 +20925,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3YKptz29AsOlm7WAVnztBh",
@@ -23554,37 +21139,22 @@
     },
     "validation": {
       "bestYear": 1994,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1994,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1994,
-          "weight": 5
+          "year": 1994
         },
         {
           "name": "MusicBrainz",
-          "year": 1994,
-          "weight": 2
+          "year": 1994
+        },
+        {
+          "name": "iTunes",
+          "year": 1994
         }
-      ],
-      "votes": {
-        "1994": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1994,
     "defaultSelectedYear": 1994,
@@ -23593,7 +21163,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3gdewACMIVMEWVbyb8O9sY",
@@ -23804,7 +21375,28 @@
     },
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 1972,
+      "confidence": "high",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 1972
+        },
+        {
+          "name": "MusicBrainz",
+          "year": 1972
+        },
+        {
+          "name": "iTunes",
+          "year": 1972
+        }
+      ]
+    },
+    "defaultSelectedYear": 1972,
+    "needsReview": false
   },
   {
     "spotifyId": "5uvosCdMlFdTXhoazkTI5R",
@@ -24019,37 +21611,22 @@
     },
     "validation": {
       "bestYear": 1967,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1967,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1967,
-          "weight": 5
+          "year": 1967
         },
         {
           "name": "MusicBrainz",
-          "year": 1967,
-          "weight": 2
+          "year": 1967
+        },
+        {
+          "name": "iTunes",
+          "year": 1967
         }
-      ],
-      "votes": {
-        "1967": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1967,
     "defaultSelectedYear": 1967,
@@ -24058,7 +21635,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3AhXZa8sUQht0UEdBJgpGc",
@@ -24271,37 +21849,22 @@
     },
     "validation": {
       "bestYear": 1965,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 1965,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 1965,
-          "weight": 5
+          "year": 1965
         },
         {
           "name": "MusicBrainz",
-          "year": 1965,
-          "weight": 2
+          "year": 1965
+        },
+        {
+          "name": "iTunes",
+          "year": 1965
         }
-      ],
-      "votes": {
-        "1965": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1965,
     "defaultSelectedYear": 1965,
@@ -24310,6 +21873,7 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   }
 ]

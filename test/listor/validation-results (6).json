@@ -109,80 +109,35 @@
       "reasons": []
     },
     "validation": {
-      "bestYear": 2013,
-      "confidence": "medium",
+      "bestYear": 2012,
+      "confidence": "low",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2012,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2012
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2012": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+          "year": 2014
         },
-        "2013": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2014": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2013
         }
-      }
+      ]
     },
-    "recommendedYear": 2013,
-    "defaultSelectedYear": 2013,
+    "recommendedYear": 2012,
+    "defaultSelectedYear": 2012,
     "oldestAvailableYear": 2012,
     "availableYearsCount": 3,
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2012, iTunes: 2013, MusicBrainz: 2014"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2012, iTunes: 2013, MusicBrainz: 2014"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2012, MusicBrainz: 2014"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4qB9e24mvDa5rG93OnmiC8",
@@ -315,43 +270,22 @@
     },
     "validation": {
       "bestYear": 2018,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2019,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2018": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 2019
         },
-        "2019": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2018
         }
-      }
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
@@ -359,29 +293,11 @@
     "availableYearsCount": 2,
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2019, iTunes: 2018, MusicBrainz: 2019"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2018, MusicBrainz: 2019"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2019, MusicBrainz: 2019"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1X0Tr4eeBPJUfpYFaL46gw",
@@ -533,43 +449,22 @@
     },
     "validation": {
       "bestYear": 2013,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2013": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 2014
         },
-        "2014": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2013
         }
-      }
+      ]
     },
     "recommendedYear": 2013,
     "defaultSelectedYear": 2013,
@@ -577,29 +472,11 @@
     "availableYearsCount": 2,
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
-    "autoApproveCandidate": false,
-    "flags": [
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2014, iTunes: 2013, MusicBrainz: 2014"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2014, iTunes: 2013, MusicBrainz: 2014"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2014, MusicBrainz: 2014"
-      }
-    ],
-    "status": "yellow",
-    "needsReview": true
+    "autoApproveCandidate": true,
+    "flags": [],
+    "status": "green",
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3DE2xnbdTDuatFubUV0soe",
@@ -707,37 +584,18 @@
     },
     "validation": {
       "bestYear": 1978,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
+          "year": 2014
         },
         {
           "name": "iTunes",
-          "year": 1978,
-          "weight": 5
+          "year": 1978
         }
-      ],
-      "votes": {
-        "1978": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2014": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 1978,
     "defaultSelectedYear": 1978,
@@ -749,34 +607,11 @@
         "type": "multiple_artists",
         "level": "info",
         "message": "Multiple artists detected in track"
-      },
-      {
-        "type": "remix_remaster",
-        "level": "warning",
-        "message": "Remix/remaster/live version with conflicting years",
-        "details": "Sources: Spotify: 2014, iTunes: 1978"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2014, iTunes: 1978"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 36 years",
-        "details": "Spotify: 2014, Recommended: 1978"
-      },
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
       }
     ],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2YABAU1514cIE01TdU0412",
@@ -891,49 +726,22 @@
     },
     "validation": {
       "bestYear": 2019,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2024,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2019,
-          "weight": 5
+          "year": 2024
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2016": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+          "year": 2016
         },
-        "2019": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
-        },
-        "2024": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2019
         }
-      }
+      ]
     },
     "recommendedYear": 2019,
     "defaultSelectedYear": 2019,
@@ -945,22 +753,11 @@
         "type": "multiple_artists",
         "level": "info",
         "message": "Multiple artists detected in track"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2024, iTunes: 2019, MusicBrainz: 2016"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 5 years",
-        "details": "Spotify: 2024, Recommended: 2019"
       }
     ],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5AkyowvgOEPrBEr1gAuoHf",
@@ -1132,63 +929,30 @@
       "bestYear": 2013,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2013,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2013": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 2013
         },
-        "2019": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2013
         }
-      }
+      ]
     },
     "recommendedYear": 2013,
     "defaultSelectedYear": 2013,
     "oldestAvailableYear": 2013,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2013, MusicBrainz: 2013"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 6 years",
-        "details": "Spotify: 2019, Recommended: 2013"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5C4NMi4fPpdFPnMZVsyG8H",
@@ -1299,62 +1063,30 @@
       "bestYear": 2014,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2017,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2014": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 2014
         },
-        "2017": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
     "oldestAvailableYear": 2014,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Spotify album type: compilation"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 2014, 2017"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5zATs59c3mikRxLK6ODE0p",
@@ -1465,62 +1197,30 @@
       "bestYear": 2015,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2017,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 2015
         },
-        "2017": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
     "oldestAvailableYear": 2015,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (high confidence)",
-        "details": "Spotify album type: compilation"
-      },
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Sources disagree: 2015, 2017"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3sTN90bIP2cJ1783ctHykO",
@@ -1636,37 +1336,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "high",
+      "confidence": "medium",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2017,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2025,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2025
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -1675,22 +1360,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2017, iTunes: 2025, MusicBrainz: 2016"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2017, MusicBrainz: 2016"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4X5f3vT8MRuXF68pfjNte5",
@@ -1768,32 +1441,18 @@
     },
     "validation": {
       "bestYear": 2012,
-      "confidence": "high",
+      "confidence": "medium",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2013,
-          "weight": 1
+          "year": 2013
         },
         {
           "name": "MusicBrainz",
-          "year": 2012,
-          "weight": 2
+          "year": 2012
         }
-      ],
-      "votes": {
-        "2012": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2012,
     "defaultSelectedYear": 2012,
@@ -1802,22 +1461,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2013, MusicBrainz: 2012"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2013, MusicBrainz: 2012"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7hE4OC3welar34bHX4zwcH",
@@ -1951,35 +1598,20 @@
       "bestYear": 2015,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -1988,22 +1620,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2016, iTunes: 2015, MusicBrainz: 2015"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2016, MusicBrainz: 2015"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6kgQgyqTTqYS6Kzr1G4I79",
@@ -2137,35 +1757,20 @@
       "bestYear": 2015,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -2174,22 +1779,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2016, iTunes: 2015, MusicBrainz: 2015"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2016, MusicBrainz: 2015"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1Nxe6J4HuHpXjqMNhlTzpq",
@@ -2324,35 +1917,20 @@
       "bestYear": 2015,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -2361,22 +1939,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2016, iTunes: 2015, MusicBrainz: 2015"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2016, MusicBrainz: 2015"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7h84751KcHgW4LAmt1Wrs9",
@@ -2512,35 +2078,20 @@
       "bestYear": 2018,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2018,
-          "weight": 2
+          "year": 2018
+        },
+        {
+          "name": "iTunes",
+          "year": 2018
         }
-      ],
-      "votes": {
-        "2018": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
@@ -2549,22 +2100,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2018, MusicBrainz: 2018"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2019, MusicBrainz: 2018"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2Xy5x2YCvF6KlamkcY7L6C",
@@ -2736,35 +2275,20 @@
       "bestYear": 2018,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2018,
-          "weight": 2
+          "year": 2018
+        },
+        {
+          "name": "iTunes",
+          "year": 2018
         }
-      ],
-      "votes": {
-        "2018": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
@@ -2773,22 +2297,10 @@
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2018, MusicBrainz: 2018"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2019, MusicBrainz: 2018"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1Ue4B7qIKSLYetiLAhvwZ3",
@@ -2976,62 +2488,35 @@
       ]
     },
     "validation": {
-      "bestYear": 2014,
+      "bestYear": 2013,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2013
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
-    "recommendedYear": 2014,
-    "defaultSelectedYear": 2014,
+    "recommendedYear": 2013,
+    "defaultSelectedYear": 2013,
     "oldestAvailableYear": 2013,
     "availableYearsCount": 3,
     "oneYearDifference": true,
     "oneYearDifferenceResolved": null,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2015, iTunes: 2013, MusicBrainz: 2014"
-      },
-      {
-        "type": "one_year_diff",
-        "level": "info",
-        "message": "1 year difference between sources",
-        "details": "Spotify: 2015, MusicBrainz: 2014"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3Zg6kO3S4FQ0jMfTIgHzyl",
@@ -3140,31 +2625,18 @@
     },
     "validation": {
       "bestYear": 2013,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2013,
-          "weight": 1
+          "year": 2013
         },
         {
           "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2013
         }
-      ],
-      "votes": {
-        "2013": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2013,
     "defaultSelectedYear": 2013,
@@ -3176,16 +2648,11 @@
         "type": "multiple_artists",
         "level": "info",
         "message": "Multiple artists detected in track"
-      },
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
       }
     ],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3wkE1y8yv65YFY9HZV8u2j",
@@ -3257,23 +2724,12 @@
       "bestYear": 2011,
       "confidence": "low",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2011,
-          "weight": 1
+          "year": 2011
         }
-      ],
-      "votes": {
-        "2011": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2011,
     "defaultSelectedYear": 2011,
@@ -3294,7 +2750,8 @@
       }
     ],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "44EbX1Cuwpq3hdnpTHsmfO",
@@ -3507,65 +2964,32 @@
     },
     "validation": {
       "bestYear": 2000,
-      "confidence": "medium",
+      "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": false,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2000,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2000": {
-          "count": 1,
-          "weight": 5,
-          "sources": [
-            "iTunes"
-          ]
+          "year": 2015
         },
-        "2015": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2000
         }
-      }
+      ]
     },
     "recommendedYear": 2000,
     "defaultSelectedYear": 2000,
     "oldestAvailableYear": 2000,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2015, iTunes: 2000, MusicBrainz: 2015"
-      },
-      {
-        "type": "large_year_diff",
-        "level": "warning",
-        "message": "Large year difference: 15 years",
-        "details": "Spotify: 2015, Recommended: 2000"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2nHkcMeJ81Ew6iBFJsEeyr",
@@ -3674,57 +3098,30 @@
       "bestYear": 2015,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 2015
         },
-        "2019": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
     "oldestAvailableYear": 2015,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2015, MusicBrainz: 2015"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "60NcMCkg7uO0Bp5g9lubXA",
@@ -3905,57 +3302,30 @@
       "bestYear": 2016,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2016": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 2016
         },
-        "2019": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
     "oldestAvailableYear": 2016,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2016, MusicBrainz: 2016"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "31yh7QvGHnKAmka6MOR8nC",
@@ -4090,57 +3460,30 @@
       "bestYear": 2016,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2016": {
-          "count": 2,
-          "weight": 7,
-          "sources": [
-            "iTunes",
-            "MusicBrainz"
-          ]
+          "year": 2016
         },
-        "2019": {
-          "count": 1,
-          "weight": 1,
-          "sources": [
-            "Spotify"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
     "oldestAvailableYear": 2016,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2019, iTunes: 2016, MusicBrainz: 2016"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6eWsgrQLZhLqy5VfGB9iFs",
@@ -4260,57 +3603,30 @@
       "bestYear": 2014,
       "confidence": "high",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2017,
-          "weight": 2
-        }
-      ],
-      "votes": {
-        "2014": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
+          "year": 2017
         },
-        "2017": {
-          "count": 1,
-          "weight": 2,
-          "sources": [
-            "MusicBrainz"
-          ]
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
     "oldestAvailableYear": 2014,
     "availableYearsCount": 2,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2014, iTunes: 2014, MusicBrainz: 2017"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6Qi0Wls2EaolwPMPMxfe5f",
@@ -4423,53 +3739,32 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "high",
+      "confidence": "low",
       "sourcesAgree": false,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2023,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2023
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      },
-      "oneYearDiffApplied": true
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
     "oldestAvailableYear": 2014,
     "availableYearsCount": 3,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "year_conflict",
-        "level": "warning",
-        "message": "Year conflict between sources",
-        "details": "Sources: Spotify: 2014, iTunes: 2023, MusicBrainz: 2015"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "79iXIJKvBF0kI8aKZq78PB",
@@ -4584,37 +3879,22 @@
     },
     "validation": {
       "bestYear": 2018,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2018,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2018
         },
         {
           "name": "MusicBrainz",
-          "year": 2018,
-          "weight": 2
+          "year": 2018
+        },
+        {
+          "name": "iTunes",
+          "year": 2018
         }
-      ],
-      "votes": {
-        "2018": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
@@ -4629,7 +3909,8 @@
       }
     ],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7MK833vooMataUokFWkrRM",
@@ -4738,47 +4019,28 @@
     },
     "validation": {
       "bestYear": 2022,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2022,
-          "weight": 1
+          "year": 2022
         },
         {
           "name": "iTunes",
-          "year": 2022,
-          "weight": 5
+          "year": 2022
         }
-      ],
-      "votes": {
-        "2022": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2022,
     "defaultSelectedYear": 2022,
     "oldestAvailableYear": 2022,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3caTRpujL6geoM6uyeHgi7",
@@ -4886,47 +4148,28 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
+          "year": 2016
         },
         {
           "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
     "oldestAvailableYear": 2016,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "10bOy5RH28W1gHcF5u3am8",
@@ -5034,47 +4277,28 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
+          "year": 2015
         },
         {
           "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 6,
-          "sources": [
-            "Spotify",
-            "iTunes"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
     "oldestAvailableYear": 2015,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "no_validation",
-        "level": "info",
-        "message": "No external year validation available",
-        "details": "Only Spotify data available"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2ZdhylKMQC5uEMfo2MCwjF",
@@ -5221,53 +4445,32 @@
     },
     "validation": {
       "bestYear": 2010,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2010,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2010,
-          "weight": 5
+          "year": 2010
         },
         {
           "name": "MusicBrainz",
-          "year": 2010,
-          "weight": 2
+          "year": 2010
+        },
+        {
+          "name": "iTunes",
+          "year": 2010
         }
-      ],
-      "votes": {
-        "2010": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2010,
     "defaultSelectedYear": 2010,
     "oldestAvailableYear": 2010,
     "availableYearsCount": 1,
     "autoApproveCandidate": true,
-    "flags": [
-      {
-        "type": "compilation",
-        "level": "info",
-        "message": "Compilation album detected (very_high confidence)",
-        "details": "Spotify album type: compilation; Many tracks (27); Album artist differs from track artist"
-      }
-    ],
+    "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7ytR5pFWmSjzHJIeQkgog4",
@@ -5454,37 +4657,22 @@
     },
     "validation": {
       "bestYear": 2020,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2020,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2020,
-          "weight": 5
+          "year": 2020
         },
         {
           "name": "MusicBrainz",
-          "year": 2020,
-          "weight": 2
+          "year": 2020
+        },
+        {
+          "name": "iTunes",
+          "year": 2020
         }
-      ],
-      "votes": {
-        "2020": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2020,
     "defaultSelectedYear": 2020,
@@ -5493,7 +4681,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7ycWLEP1GsNjVvcjawXz3z",
@@ -5609,37 +4798,22 @@
     },
     "validation": {
       "bestYear": 2018,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2018,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2018
         },
         {
           "name": "MusicBrainz",
-          "year": 2018,
-          "weight": 2
+          "year": 2018
+        },
+        {
+          "name": "iTunes",
+          "year": 2018
         }
-      ],
-      "votes": {
-        "2018": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
@@ -5648,7 +4822,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0wHFktze2PHC5jDt3B17DC",
@@ -5837,37 +5012,22 @@
     },
     "validation": {
       "bestYear": 2022,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2022,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2022,
-          "weight": 5
+          "year": 2022
         },
         {
           "name": "MusicBrainz",
-          "year": 2022,
-          "weight": 2
+          "year": 2022
+        },
+        {
+          "name": "iTunes",
+          "year": 2022
         }
-      ],
-      "votes": {
-        "2022": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2022,
     "defaultSelectedYear": 2022,
@@ -5876,7 +5036,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3B54sVLJ402zGa6Xm4YGNe",
@@ -5903,7 +5064,20 @@
     "recommendedYear": 2017,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2017,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2017
+        }
+      ]
+    },
+    "defaultSelectedYear": 2017,
+    "needsReview": false
   },
   {
     "spotifyId": "2N3U8uTYhjX2KwGT0pf5x0",
@@ -6021,37 +5195,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -6060,7 +5219,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2aPTvyE09vUCRwVvj0I8WK",
@@ -6176,37 +5336,22 @@
     },
     "validation": {
       "bestYear": 2018,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2018,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2018,
-          "weight": 5
+          "year": 2018
         },
         {
           "name": "MusicBrainz",
-          "year": 2018,
-          "weight": 2
+          "year": 2018
+        },
+        {
+          "name": "iTunes",
+          "year": 2018
         }
-      ],
-      "votes": {
-        "2018": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2018,
     "defaultSelectedYear": 2018,
@@ -6215,7 +5360,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1zi7xx7UVEFkmKfv06H8x0",
@@ -6242,7 +5388,20 @@
     "recommendedYear": 2016,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2016,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2016
+        }
+      ]
+    },
+    "defaultSelectedYear": 2016,
+    "needsReview": false
   },
   {
     "spotifyId": "567e29TDzLwZwfDuEpGTwo",
@@ -6458,37 +5617,22 @@
     },
     "validation": {
       "bestYear": 2021,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2021,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2021,
-          "weight": 5
+          "year": 2021
         },
         {
           "name": "MusicBrainz",
-          "year": 2021,
-          "weight": 2
+          "year": 2021
+        },
+        {
+          "name": "iTunes",
+          "year": 2021
         }
-      ],
-      "votes": {
-        "2021": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2021,
     "defaultSelectedYear": 2021,
@@ -6497,7 +5641,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4jNM6l3Amnmyy1kNCLcSWL",
@@ -6702,37 +5847,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -6741,7 +5871,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0Y4mKsTiRbldLocloTolM1",
@@ -6842,31 +5973,18 @@
     },
     "validation": {
       "bestYear": 2022,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2022,
-          "weight": 1
+          "year": 2022
         },
         {
           "name": "MusicBrainz",
-          "year": 2022,
-          "weight": 2
+          "year": 2022
         }
-      ],
-      "votes": {
-        "2022": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2022,
     "defaultSelectedYear": 2022,
@@ -6875,7 +5993,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5ahvjrjn7ymaeaWKFZrsca",
@@ -6969,40 +6088,28 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
     "oldestAvailableYear": 2015,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4e792Rjo6Zz0IlWp7mIOye",
@@ -7215,37 +6322,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -7254,7 +6346,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "05ZroIPvy6d2wlQ9AIDcWp",
@@ -7459,37 +6552,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -7498,7 +6576,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1ixbwbeBi5ufN4noUKmW5a",
@@ -7525,7 +6604,20 @@
     "recommendedYear": 2007,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2007,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2007
+        }
+      ]
+    },
+    "defaultSelectedYear": 2007,
+    "needsReview": false
   },
   {
     "spotifyId": "5masKPHeAOVNgxdLebIcK7",
@@ -7549,10 +6641,23 @@
     "verified": true,
     "verifiedYear": 2015,
     "previouslyVerified": true,
-    "recommendedYear": 2015,
+    "recommendedYear": 2016,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2016,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2016
+        }
+      ]
+    },
+    "defaultSelectedYear": 2016,
+    "needsReview": false
   },
   {
     "spotifyId": "7FGho3Adev1y2hTB949PGv",
@@ -7765,37 +6870,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -7804,7 +6894,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6ZixfeFT8V0Nle1rMZAekY",
@@ -8017,37 +7108,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -8056,7 +7132,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4aB4udr3pcJuENmfDitPSZ",
@@ -8269,37 +7346,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -8308,7 +7370,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0dw5l231SLoWyUU47On23b",
@@ -8335,7 +7398,20 @@
     "recommendedYear": 2019,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2019,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2019
+        }
+      ]
+    },
+    "defaultSelectedYear": 2019,
+    "needsReview": false
   },
   {
     "spotifyId": "3XZNwaPCGK4I4c6fpqQmHF",
@@ -8467,46 +7543,32 @@
     },
     "validation": {
       "bestYear": 2017,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2017,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2017,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 2017,
-          "weight": 2
+          "year": 2017
+        },
+        {
+          "name": "iTunes",
+          "year": 2017
         }
-      ],
-      "votes": {
-        "2017": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2017,
     "defaultSelectedYear": 2017,
     "oldestAvailableYear": 2017,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7qBNJBQJJjQjYFZlP3IPhK",
@@ -8639,37 +7701,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -8678,7 +7725,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0CvTKt7jr68v4YEg9oATjX",
@@ -8892,37 +7940,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -8931,7 +7964,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0fsEFwLSJTSHSawhe864Cp",
@@ -8958,7 +7992,20 @@
     "recommendedYear": 2015,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2015,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2015
+        }
+      ]
+    },
+    "defaultSelectedYear": 2015,
+    "needsReview": false
   },
   {
     "spotifyId": "7vqUr6K2Js9Paq4kdNSOm6",
@@ -9153,37 +8200,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -9192,7 +8224,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3bnEhDlFFXeCyyYhbRszW7",
@@ -9324,46 +8357,32 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
     "oldestAvailableYear": 2015,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1RMXNaUZ8AdmANVYyNjNum",
@@ -9531,46 +8550,32 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
     "oldestAvailableYear": 2014,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "48ejmPSVdetLz58C8tkn6L",
@@ -9703,37 +8708,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -9742,7 +8732,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "5mI3j3NtPrwEikt3bRkB2A",
@@ -9956,37 +8947,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -9995,7 +8971,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7hCuhmbiPXgmptJakUnYpy",
@@ -10128,37 +9105,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -10167,7 +9129,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7p2RlyF403KmPmZm2TxKl3",
@@ -10308,37 +9271,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -10347,7 +9295,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3vRvuatWmKcHhxbv6choLR",
@@ -10479,37 +9428,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -10518,7 +9452,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "7vHshinTU8161w69EPbabY",
@@ -10545,7 +9480,20 @@
     "recommendedYear": 2015,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2015,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2015
+        }
+      ]
+    },
+    "defaultSelectedYear": 2015,
+    "needsReview": false
   },
   {
     "spotifyId": "2Nu3T6LWIAoZuLjdS2UK0z",
@@ -10678,37 +9626,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -10717,7 +9650,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2fZW7ByWe46rGih0FtP2XK",
@@ -10741,10 +9675,23 @@
     "verified": true,
     "verifiedYear": 2015,
     "previouslyVerified": true,
-    "recommendedYear": 2015,
+    "recommendedYear": 2016,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2016,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2016
+        }
+      ]
+    },
+    "defaultSelectedYear": 2016,
+    "needsReview": false
   },
   {
     "spotifyId": "4uPSmNAuHFVLcSHLKyWfny",
@@ -10883,37 +9830,22 @@
     },
     "validation": {
       "bestYear": 2023,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2023,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2023,
-          "weight": 5
+          "year": 2023
         },
         {
           "name": "MusicBrainz",
-          "year": 2023,
-          "weight": 2
+          "year": 2023
+        },
+        {
+          "name": "iTunes",
+          "year": 2023
         }
-      ],
-      "votes": {
-        "2023": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2023,
     "defaultSelectedYear": 2023,
@@ -10922,7 +9854,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1cWepLwVVDgyqxso6G4TQU",
@@ -10949,7 +9882,20 @@
     "recommendedYear": 2014,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2014,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2014
+        }
+      ]
+    },
+    "defaultSelectedYear": 2014,
+    "needsReview": false
   },
   {
     "spotifyId": "7pHA1gMuhcqg2QFHEFiQDk",
@@ -11082,37 +10028,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -11121,7 +10052,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0D2VYiRlBv43asKUgieZaM",
@@ -11298,37 +10230,22 @@
     },
     "validation": {
       "bestYear": 2013,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2013,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2013
         },
         {
           "name": "MusicBrainz",
-          "year": 2013,
-          "weight": 2
+          "year": 2013
+        },
+        {
+          "name": "iTunes",
+          "year": 2013
         }
-      ],
-      "votes": {
-        "2013": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2013,
     "defaultSelectedYear": 2013,
@@ -11337,7 +10254,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6Ki0WL4ssXMIHexYSSkAOt",
@@ -11550,37 +10468,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -11589,7 +10492,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1ynanpsKuALvzjvS0BCJxk",
@@ -11730,46 +10634,32 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
     "oldestAvailableYear": 2015,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3sP0RuLPDH9DOWa9BzMWlg",
@@ -11891,46 +10781,32 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
     "oldestAvailableYear": 2016,
     "availableYearsCount": 1,
-    "autoApproveCandidate": false,
+    "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "1FFd5yEjDOnQF6pRvyyaBC",
@@ -11957,7 +10833,20 @@
     "recommendedYear": 2015,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2015,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2015
+        }
+      ]
+    },
+    "defaultSelectedYear": 2015,
+    "needsReview": false
   },
   {
     "spotifyId": "2wGSgTmgSF3xjRrHkTc25R",
@@ -12174,37 +11063,22 @@
     },
     "validation": {
       "bestYear": 2005,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2005,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2005,
-          "weight": 5
+          "year": 2005
         },
         {
           "name": "MusicBrainz",
-          "year": 2005,
-          "weight": 2
+          "year": 2005
+        },
+        {
+          "name": "iTunes",
+          "year": 2005
         }
-      ],
-      "votes": {
-        "2005": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2005,
     "defaultSelectedYear": 2005,
@@ -12213,7 +11087,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3fx25M65m6ATiKnEIDS3HK",
@@ -12363,37 +11238,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -12402,7 +11262,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4nHlOHDt8o328IuZWF0oQQ",
@@ -12534,37 +11395,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -12573,7 +11419,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "687T2j6N8Qa6OOpEK9M6z4",
@@ -12706,37 +11553,22 @@
     },
     "validation": {
       "bestYear": 2019,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2019,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2019,
-          "weight": 5
+          "year": 2019
         },
         {
           "name": "MusicBrainz",
-          "year": 2019,
-          "weight": 2
+          "year": 2019
+        },
+        {
+          "name": "iTunes",
+          "year": 2019
         }
-      ],
-      "votes": {
-        "2019": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2019,
     "defaultSelectedYear": 2019,
@@ -12745,7 +11577,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3vIXQxRqhvYZ7JeInletmE",
@@ -12913,37 +11746,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -12952,7 +11770,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3rgTS3933lMWoPiN6CW4qY",
@@ -12979,7 +11798,20 @@
     "recommendedYear": 2020,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2020,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2020
+        }
+      ]
+    },
+    "defaultSelectedYear": 2020,
+    "needsReview": false
   },
   {
     "spotifyId": "2FiSTH0GYpIioUgjfzMIja",
@@ -13003,10 +11835,23 @@
     "verified": true,
     "verifiedYear": 2015,
     "previouslyVerified": true,
-    "recommendedYear": 2015,
+    "recommendedYear": 2016,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2016,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2016
+        }
+      ]
+    },
+    "defaultSelectedYear": 2016,
+    "needsReview": false
   },
   {
     "spotifyId": "3zz9eYWluKY5AsvtMXFL9K",
@@ -13030,10 +11875,23 @@
     "verified": true,
     "verifiedYear": 2017,
     "previouslyVerified": true,
-    "recommendedYear": 2017,
+    "recommendedYear": 2019,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2019,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2019
+        }
+      ]
+    },
+    "defaultSelectedYear": 2019,
+    "needsReview": false
   },
   {
     "spotifyId": "4qqArAiTPueDxIp7cf87h7",
@@ -13148,37 +12006,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -13187,7 +12030,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "6UqRGwjwYL0stXbaodTxwo",
@@ -13319,37 +12163,22 @@
     },
     "validation": {
       "bestYear": 2015,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2015,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2015,
-          "weight": 5
+          "year": 2015
         },
         {
           "name": "MusicBrainz",
-          "year": 2015,
-          "weight": 2
+          "year": 2015
+        },
+        {
+          "name": "iTunes",
+          "year": 2015
         }
-      ],
-      "votes": {
-        "2015": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2015,
     "defaultSelectedYear": 2015,
@@ -13358,7 +12187,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4EAdD8GSFHodqK94tnJAzt",
@@ -13501,37 +12331,22 @@
     },
     "validation": {
       "bestYear": 2017,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2017,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2017,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 2017,
-          "weight": 2
+          "year": 2017
+        },
+        {
+          "name": "iTunes",
+          "year": 2017
         }
-      ],
-      "votes": {
-        "2017": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2017,
     "defaultSelectedYear": 2017,
@@ -13540,7 +12355,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0h3Xy4V4apMraB5NuM8U7Z",
@@ -13567,7 +12383,20 @@
     "recommendedYear": 2023,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2023,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2023
+        }
+      ]
+    },
+    "defaultSelectedYear": 2023,
+    "needsReview": false
   },
   {
     "spotifyId": "68GdZAAowWDac3SkdNWOwo",
@@ -13594,7 +12423,20 @@
     "recommendedYear": 2012,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2012,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2012
+        }
+      ]
+    },
+    "defaultSelectedYear": 2012,
+    "needsReview": false
   },
   {
     "spotifyId": "3uVO0fpvKhuPCfGCAjJev0",
@@ -13621,7 +12463,20 @@
     "recommendedYear": 2011,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2011,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2011
+        }
+      ]
+    },
+    "defaultSelectedYear": 2011,
+    "needsReview": false
   },
   {
     "spotifyId": "5iLYWyAMSGqpL7NASZbR4w",
@@ -13648,7 +12503,20 @@
     "recommendedYear": 2009,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2009,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2009
+        }
+      ]
+    },
+    "defaultSelectedYear": 2009,
+    "needsReview": false
   },
   {
     "spotifyId": "3K7UdFfEr3EWURDOOYvuwq",
@@ -13675,7 +12543,20 @@
     "recommendedYear": 2012,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2012,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2012
+        }
+      ]
+    },
+    "defaultSelectedYear": 2012,
+    "needsReview": false
   },
   {
     "spotifyId": "18m3qPfrUd1MS5qukDJu0d",
@@ -13816,37 +12697,22 @@
     },
     "validation": {
       "bestYear": 2013,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2013,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2013,
-          "weight": 5
+          "year": 2013
         },
         {
           "name": "MusicBrainz",
-          "year": 2013,
-          "weight": 2
+          "year": 2013
+        },
+        {
+          "name": "iTunes",
+          "year": 2013
         }
-      ],
-      "votes": {
-        "2013": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2013,
     "defaultSelectedYear": 2013,
@@ -13855,7 +12721,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "0Gp23ds4JDUwan98IfNNL5",
@@ -13882,7 +12749,20 @@
     "recommendedYear": 2024,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2024,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2024
+        }
+      ]
+    },
+    "defaultSelectedYear": 2024,
+    "needsReview": false
   },
   {
     "spotifyId": "46jLy47W8rkf8rEX04gMKB",
@@ -13909,7 +12789,20 @@
     "recommendedYear": 2016,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2016,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2016
+        }
+      ]
+    },
+    "defaultSelectedYear": 2016,
+    "needsReview": false
   },
   {
     "spotifyId": "4ODnJrz0C3AJ4DFv8YQhJ8",
@@ -14050,37 +12943,22 @@
     },
     "validation": {
       "bestYear": 2017,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2017,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2017,
-          "weight": 5
+          "year": 2017
         },
         {
           "name": "MusicBrainz",
-          "year": 2017,
-          "weight": 2
+          "year": 2017
+        },
+        {
+          "name": "iTunes",
+          "year": 2017
         }
-      ],
-      "votes": {
-        "2017": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2017,
     "defaultSelectedYear": 2017,
@@ -14089,7 +12967,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "4eZFGTChrAaGk0l4hMXamC",
@@ -14182,31 +13061,18 @@
     },
     "validation": {
       "bestYear": 2012,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2012,
-          "weight": 1
+          "year": 2012
         },
         {
           "name": "MusicBrainz",
-          "year": 2012,
-          "weight": 2
+          "year": 2012
         }
-      ],
-      "votes": {
-        "2012": {
-          "count": 2,
-          "weight": 3,
-          "sources": [
-            "Spotify",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2012,
     "defaultSelectedYear": 2012,
@@ -14215,7 +13081,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "2Vhd5uZB4brKHmM0MNxkZo",
@@ -14383,37 +13250,22 @@
     },
     "validation": {
       "bestYear": 2016,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2016,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2016,
-          "weight": 5
+          "year": 2016
         },
         {
           "name": "MusicBrainz",
-          "year": 2016,
-          "weight": 2
+          "year": 2016
+        },
+        {
+          "name": "iTunes",
+          "year": 2016
         }
-      ],
-      "votes": {
-        "2016": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2016,
     "defaultSelectedYear": 2016,
@@ -14422,7 +13274,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "37CjFSB555Q127hJUGq7GH",
@@ -14635,37 +13488,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -14674,7 +13512,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3Z1qelLeL16u46bWyqHRw1",
@@ -14807,37 +13646,22 @@
     },
     "validation": {
       "bestYear": 2023,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2023,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2023,
-          "weight": 5
+          "year": 2023
         },
         {
           "name": "MusicBrainz",
-          "year": 2023,
-          "weight": 2
+          "year": 2023
+        },
+        {
+          "name": "iTunes",
+          "year": 2023
         }
-      ],
-      "votes": {
-        "2023": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2023,
     "defaultSelectedYear": 2023,
@@ -14846,7 +13670,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "134QG8C1qpCiFSY9B8mG2P",
@@ -15041,37 +13866,22 @@
     },
     "validation": {
       "bestYear": 2014,
-      "confidence": "very_high",
+      "confidence": "high",
       "sourcesAgree": true,
-      "majorityAgree": true,
       "sources": [
         {
           "name": "Spotify",
-          "year": 2014,
-          "weight": 1
-        },
-        {
-          "name": "iTunes",
-          "year": 2014,
-          "weight": 5
+          "year": 2014
         },
         {
           "name": "MusicBrainz",
-          "year": 2014,
-          "weight": 2
+          "year": 2014
+        },
+        {
+          "name": "iTunes",
+          "year": 2014
         }
-      ],
-      "votes": {
-        "2014": {
-          "count": 3,
-          "weight": 8,
-          "sources": [
-            "Spotify",
-            "iTunes",
-            "MusicBrainz"
-          ]
-        }
-      }
+      ]
     },
     "recommendedYear": 2014,
     "defaultSelectedYear": 2014,
@@ -15080,7 +13890,8 @@
     "autoApproveCandidate": true,
     "flags": [],
     "status": "green",
-    "needsReview": false
+    "needsReview": false,
+    "previouslyVerified": false
   },
   {
     "spotifyId": "3Eh9GdnrobKY96N1V255sV",
@@ -15107,6 +13918,19 @@
     "recommendedYear": 2019,
     "status": "green",
     "flags": [],
-    "autoApproveCandidate": false
+    "autoApproveCandidate": true,
+    "validation": {
+      "bestYear": 2019,
+      "confidence": "low",
+      "sourcesAgree": true,
+      "sources": [
+        {
+          "name": "Spotify",
+          "year": 2019
+        }
+      ]
+    },
+    "defaultSelectedYear": 2019,
+    "needsReview": false
   }
 ]

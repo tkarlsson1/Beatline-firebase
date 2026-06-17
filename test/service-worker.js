@@ -1,6 +1,6 @@
 // service-worker.js (consolidated)
 // Notestream PWA — unified cache & offline fallback
-const NS_CACHE = 'ns-appshell-v1-2025-10-27';
+const NS_CACHE = 'ns-appshell-v1-2026-06-18';
 const NS_ASSETS = [
   '/', '/index.html', '/manifest.json',
   '/offline.html',
@@ -29,19 +29,37 @@ self.addEventListener('fetch', event => {
   // HTML navigations: go network first, fall back to offline.html
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req).catch(() => caches.match('/offline.html'))
+      fetch(req).catch(async () => {
+        const offlineMatch = await caches.match('/offline.html');
+        return offlineMatch || new Response('Offline. Vänligen anslut till internet.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+      })
     );
     return;
   }
 
   // For other GETs: stale-while-revalidate
   event.respondWith((async () => {
-    const cached = await caches.match(req);
-    const network = fetch(req).then(res => {
-      const copy = res.clone();
-      caches.open(NS_CACHE).then(cache => cache.put(req, copy));
-      return res;
-    }).catch(() => cached);
-    return cached || network;
+    try {
+      const cached = await caches.match(req);
+      if (cached) {
+        // Uppdatera cachen i bakgrunden
+        fetch(req).then(res => {
+          if (res && res.ok) {
+            caches.open(NS_CACHE).then(cache => cache.put(req, res.clone()));
+          }
+        }).catch(() => {}); // Ignorera nätverksfel vid bakgrundsuppdatering
+        return cached;
+      }
+      
+      const networkRes = await fetch(req);
+      if (networkRes && networkRes.ok) {
+        const copy = networkRes.clone();
+        caches.open(NS_CACHE).then(cache => cache.put(req, copy));
+      }
+      return networkRes;
+    } catch (error) {
+      // Om nätverket är nere och resursen inte finns i cachen
+      return new Response('', { status: 503, statusText: 'Service Unavailable' });
+    }
   })());
 });

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.005</title>
+    <title>Adminpanel 0.006</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -12,7 +13,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
             authDomain: "beatlinefirebase.firebaseapp.com",
-            databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app", 
+            databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "beatlinefirebase",
             storageBucket: "beatlinefirebase.firebasestorage.app",
             messagingSenderId: "196231817325",
@@ -157,8 +158,8 @@
                             const track = playlist.songs[trackId];
                             totalChecked++;
 
-                            statusEl.innerHTML = `Validerar listan "${listName}" (${i+1}/${songIds.length}). Låt: ${track.title}`;
-                            
+                            statusEl.innerHTML = `Validerar listan "${listName}" (${i + 1}/${songIds.length}). Låt: ${track.title}`;
+
                             let oldYearStr = String(track.year);
                             let newYearStr = oldYearStr;
                             let fixedBy = null;
@@ -168,7 +169,7 @@
                                 newYearStr = verifiedTracks[trackId].year;
                                 fixedBy = "Cache";
                                 totalCacheFixes++;
-                            } 
+                            }
                             // iTunes?
                             else if (!verifiedTracks[trackId]) {
                                 if (window.fetchItunesReleaseYear) {
@@ -205,7 +206,7 @@
                                     databaseUpdates[`standardLists/${listName}/songs/${trackId}/year`] = newYearStr;
                                     console.log(`[Rättad] ${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
                                 }
-                                
+
                                 newVerifiedTracks[trackId] = {
                                     title: track.title,
                                     artist: track.artist,
@@ -248,6 +249,7 @@
     </script>
     <script src="listor/itunes-api.js"></script>
 </head>
+
 <body>
     <h2>Adminpanel – Lägg till spellistor i StandardLists</h2>
 
@@ -266,8 +268,11 @@
         <hr style="margin-top: 30px;">
         <h3>Städa Databasen (Rätta årtal)</h3>
         <p>Går igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
-        <button id="cleanDatabaseBtn" style="background-color: #d9534f; color: white; padding: 10px; border: none; cursor: pointer;">Städa Hela Databasen</button>
+        <button id="cleanDatabaseBtn"
+            style="background-color: #d9534f; color: white; padding: 10px; border: none; cursor: pointer;">Städa Hela
+            Databasen</button>
         <p id="cleanStatus" style="margin-top: 10px; font-weight: bold;"></p>
     </div>
 </body>
+
 </html>
