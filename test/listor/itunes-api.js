@@ -14,7 +14,7 @@ function normalizeArtistForSearch(artistName) {
     .split(/\sfeat\.?\s/i)[0]
     .split(/\sft\.?\s/i)[0]
     .split(/\s&\s/)[0]
-    .replace(/[^\w\s]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, '')
     .trim();
 }
 
@@ -28,7 +28,7 @@ function normalizeTitleForSearch(title) {
     .replace(/\[.*?\]/g, '')
     .replace(/feat\..*/gi, '')
     .replace(/ft\..*/gi, '')
-    .replace(/[^\w\s]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, '')
     .trim();
 }
 
