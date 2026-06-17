@@ -187,6 +187,11 @@ function crossValidateYear(track) {
     sources.push({ name: 'Spotify Original', year: track.spotifyOriginalYear, weight: 3 });
   }
   
+  // iTunes (väldigt pålitlig för original-release)
+  if (track.itunesYear) {
+    sources.push({ name: 'iTunes', year: track.itunesYear, weight: 5 });
+  }
+  
   // DISABLED: Last.fm ger ofta remaster-år istället för original
   // if (track.lastFmYear) {
   //   sources.push({ name: 'Last.fm', year: track.lastFmYear, weight: 2 });
@@ -333,6 +338,7 @@ function analyzeAndFlagTracks(tracks) {
     if (track.spotifyYear) availableYears.push(track.spotifyYear);
     if (track.spotifyOriginalYear) availableYears.push(track.spotifyOriginalYear);
     if (track.earliestRecordingYear) availableYears.push(track.earliestRecordingYear);
+    if (track.itunesYear) availableYears.push(track.itunesYear);
     // LastFm removed - 18% accuracy, unreliable
     track.oldestAvailableYear = availableYears.length > 0 ? Math.min(...availableYears) : null;
     track.availableYearsCount = new Set(availableYears).size;
@@ -487,16 +493,26 @@ function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
   // Updated: 2026-02-27 (CRITICAL FIX: confidence order)
   // ========================================
   
-  // === CRITICAL: Remix/Remaster blocker FIRST ===
-  // These are too unreliable (33% accuracy), even with high confidence
+  // === CRITICAL: Remix/Remaster blocker ===
   const titleLower = track.title.toLowerCase();
   const isRemixOrRemaster = titleLower.includes('remix') || 
                             titleLower.includes('remaster') ||
                             titleLower.includes('live') ||
                             titleLower.includes('acoustic') ||
                             titleLower.includes('demo');
-  if (isRemixOrRemaster) {
-    return false; // 33% accuracy - always block
+                            
+  // Ny iTunes-regel: Om iTunes har hittat ett år och vi har en remaster/remix, 
+  // så litar vi ändå på iTunes om det är mycket äldre (det ger oss originalåret för kompositionen).
+  const hasStrongItunesMatch = track.itunesYear && (track.spotifyYear - track.itunesYear >= 2);
+  
+  if (isRemixOrRemaster && !hasStrongItunesMatch) {
+    return false; // 33% accuracy without iTunes - always block
+  }
+  
+  // === NY ITUNES-REGEL: Lita nästan alltid på iTunes om det är äldre eller samma som Spotify ===
+  if (track.itunesYear && track.itunesYear <= track.spotifyYear) {
+    // Om iTunes bekräftar samma år eller pekar ut ett äldre originalår, är det nästan alltid rätt
+    return true;
   }
   
   // === HIGH-CONFIDENCE RULES (>95% accuracy) - MUST COME BEFORE OTHER BLOCKERS ===

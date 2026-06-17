@@ -433,7 +433,11 @@ async function validateTrack(track, onProgress) {
     
     // Last.fm data
     lastFmYear: null,
-    lastFmData: null
+    lastFmData: null,
+    
+    // iTunes data
+    itunesYear: null,
+    itunesData: null
   };
   
   // 1. Fetch full Spotify album data
@@ -461,6 +465,22 @@ async function validateTrack(track, onProgress) {
       // Silently fail - Last.fm is optional
       console.warn(`Last.fm lookup failed (skipping):`, error.message);
       // Continue without Last.fm data
+    }
+  }
+  
+  // 2.5 Try iTunes (often has very accurate original release years)
+  if (onProgress) onProgress(`Söker på iTunes...`);
+  
+  if (window.itunesApi) {
+    try {
+      const itunesData = await window.itunesApi.getTrackInfo(track.artist, track.title);
+      if (itunesData.found) {
+        result.itunesYear = itunesData.year;
+        result.itunesData = itunesData;
+        console.log(`[iTunes] Match: ${track.artist} - ${track.title} → ${itunesData.year}`);
+      }
+    } catch (error) {
+      console.warn(`iTunes lookup failed:`, error.message);
     }
   }
   
