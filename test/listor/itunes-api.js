@@ -65,13 +65,39 @@ async function getTrackInfo(artist, title) {
         return str1.includes(str2) || str2.includes(str1);
     };
 
-    // Filtrera resultaten så de hyfsat matchar artisten
+    // Filtrera resultaten så de matchar BÅDE artist OCH titel
     const matchingResults = data.results.filter(result => {
        const resultArtist = normalizeArtistForSearch(result.artistName);
-       return isMatch(cleanArtist, resultArtist);
+       const resultTitle = normalizeTitleForSearch(result.trackName);
+       const artistMatch = isMatch(cleanArtist, resultArtist);
+       const titleMatch = isMatch(cleanTitle, resultTitle);
+       return artistMatch && titleMatch;
     });
 
-    const resultsToUse = matchingResults.length > 0 ? matchingResults : data.results;
+    // Om ingen exakt match hittades, prova med bara artisten
+    // men verifiera titeln med lösare krav
+    let resultsToUse;
+    if (matchingResults.length > 0) {
+      resultsToUse = matchingResults;
+    } else {
+      // Fallback: artist match + titeln måste dela minst ett signifikant ord
+      const significantWords = cleanTitle.split(/\s+/).filter(w => w.length > 3);
+      const artistOnlyMatches = data.results.filter(result => {
+        const resultArtist = normalizeArtistForSearch(result.artistName);
+        if (!isMatch(cleanArtist, resultArtist)) return false;
+        
+        const resultTitle = normalizeTitleForSearch(result.trackName).toLowerCase();
+        // Minst ett signifikant ord från originaltiteln måste finnas
+        return significantWords.some(word => resultTitle.includes(word));
+      });
+      
+      if (artistOnlyMatches.length > 0) {
+        resultsToUse = artistOnlyMatches;
+      } else {
+        // Ingen trovärdig match alls
+        return { found: false };
+      }
+    }
 
     // Hitta det äldsta årtalet
     let earliestYear = null;

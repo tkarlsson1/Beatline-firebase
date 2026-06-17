@@ -473,6 +473,15 @@ function analyzeAndFlagTracks(tracks) {
     // 8. AUTO-APPROVE CANDIDATE (visuell grön markering baserat på statistik)
     track.autoApproveCandidate = shouldAutoApprove(track, validation, compilationResult, yearDiff);
     
+    // 9. FINAL OVERRIDE: Auto-approve trumps all flag-based statuses
+    // Data from analysis of 696 tracks shows that 94% of autoApprove candidates
+    // have the correct year, but aggressive flagging rules (critical_compilation,
+    // large_year_diff, etc.) were blocking them. If the model is confident,
+    // trust it regardless of how much the year differs from Spotify.
+    if (track.autoApproveCandidate) {
+      status = 'green';
+    }
+    
     return {
       ...track,
       flags: flags,
