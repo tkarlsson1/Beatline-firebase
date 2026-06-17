@@ -608,6 +608,23 @@ async function validatePlaylist(tracks, onProgress, onTrackComplete) {
   for (let i = 0; i < tracks.length; i++) {
     const track = tracks[i];
     
+    // Skip API calls for previously verified tracks
+    if (track.previouslyVerified) {
+      if (onProgress) {
+        onProgress({
+          current: i + 1,
+          total: tracks.length,
+          track: track,
+          message: `✓ Redan verifierad: ${track.artist} - ${track.title}`
+        });
+      }
+      results.push(track);
+      if (onTrackComplete) {
+        onTrackComplete(track, i + 1, tracks.length);
+      }
+      continue;
+    }
+    
     if (onProgress) {
       onProgress({
         current: i + 1,
