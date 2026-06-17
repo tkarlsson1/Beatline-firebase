@@ -258,3 +258,62 @@ exports.cleanupOldGames = functions.region("europe-west1").pubsub
     
     return null;
   });
+
+/**
+ * Callable: getSongYearAi
+ * Uses OpenAI to estimate the release year of a song.
+ * data: { title: string, artist: string }
+ */
+exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (data, context) => {
+  const { title, artist } = data || {};
+  if (!title || !artist) {
+    throw new functions.https.HttpsError("invalid-argument", "Title and artist are required.");
+  }
+  
+  // Try to get API key from environment variable (v2/secrets) or config (v1)
+  const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
+  
+  if (!apiKey) {
+    functions.logger.error("OpenAI API key is missing in Firebase environment!");
+    throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
+  }
+  
+  const promptText = `Vilket var det ursprungliga utgivningsåret för låten '${title}' av artisten '${artist}'? Svara enbart med ett fyrsiffrigt årtal, inga andra ord.`;
+  
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: promptText }],
+        temperature: 0.1,
+        max_tokens: 10
+      })
+    });
+    
+    if (!response.ok) {
+      functions.logger.error("OpenAI API returned an error:", response.status, await response.text());
+      throw new functions.https.HttpsError("internal", "Failed to contact AI service.");
+    }
+    
+    const aiData = await response.json();
+    const aiText = aiData.choices?.[0]?.message?.content?.trim() || "";
+    
+    // Extract a 4 digit year
+    const aiYearMatch = aiText.match(/\b(19|20)\d{2}\b/);
+    if (aiYearMatch) {
+      const aiYear = parseInt(aiYearMatch[0], 10);
+      return { year: aiYear };
+    } else {
+      functions.logger.warn(`OpenAI could not determine a valid year. Response: ${aiText}`);
+      return { year: null };
+    }
+  } catch (error) {
+    functions.logger.error("Error during OpenAI fetch:", error);
+    throw new functions.https.HttpsError("internal", "An error occurred while estimating the year.");
+  }
+});

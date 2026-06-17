@@ -12,6 +12,7 @@ import {
   signOut,
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-functions.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -28,6 +29,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+const functions = getFunctions(app, "europe-west1");
 
 // Expose Firebase to global scope
 window.app = app;
@@ -39,6 +41,8 @@ window.firebaseSet = set;
 window.firebaseUpdate = update;
 window.auth = auth;
 window.firebaseSignOut = signOut;
+window.firebaseFunctions = functions;
+window.httpsCallable = httpsCallable;
 
 // Global variables for playlist management
 window.currentPlaylistName = null;

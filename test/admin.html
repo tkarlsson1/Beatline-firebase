@@ -5,8 +5,9 @@
     <title>Adminpanel 0.005</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-functions.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
@@ -21,6 +22,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
+        const functions = getFunctions(app, "europe-west1");
 
         const ADMIN_EMAIL = "timmykarlsson@gmail.com"; // Din admin-mail!
 
@@ -109,8 +111,142 @@
                 const data = await response.json();
                 return data.access_token;
             }
+
+            // --- DATABAS-STÄDNING ---
+            document.getElementById("cleanDatabaseBtn").addEventListener("click", async () => {
+                const statusEl = document.getElementById("cleanStatus");
+                statusEl.innerHTML = "Laddar data...";
+                const btn = document.getElementById("cleanDatabaseBtn");
+                btn.disabled = true;
+
+                try {
+                    // 1. Hämta verifiedTracks
+                    statusEl.innerHTML = "Hämtar cache (verifiedTracks)...";
+                    const verifiedSnap = await get(ref(db, "verifiedTracks"));
+                    const verifiedTracks = verifiedSnap.exists() ? verifiedSnap.val() : {};
+
+                    // 2. Hämta hela standardLists
+                    statusEl.innerHTML = "Hämtar standardLists...";
+                    const listsSnap = await get(ref(db, "standardLists"));
+                    if (!listsSnap.exists()) {
+                        statusEl.innerHTML = "Hittade inga standardLists!";
+                        btn.disabled = false;
+                        return;
+                    }
+                    const standardLists = listsSnap.val();
+
+                    // Initiera callable funktion
+                    const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
+
+                    let totalChecked = 0;
+                    let totalCacheFixes = 0;
+                    let totalItunesFixes = 0;
+                    let totalAiFixes = 0;
+                    let newVerifiedTracks = {};
+                    let databaseUpdates = {}; // Patch för databasen
+
+                    // 3. Validera spellistor
+                    const playlistNames = Object.keys(standardLists);
+                    for (const listName of playlistNames) {
+                        const playlist = standardLists[listName];
+                        if (!playlist || !playlist.songs) continue;
+
+                        const songIds = Object.keys(playlist.songs);
+                        for (let i = 0; i < songIds.length; i++) {
+                            const trackId = songIds[i];
+                            const track = playlist.songs[trackId];
+                            totalChecked++;
+
+                            statusEl.innerHTML = `Validerar listan "${listName}" (${i+1}/${songIds.length}). Låt: ${track.title}`;
+                            
+                            let oldYearStr = String(track.year);
+                            let newYearStr = oldYearStr;
+                            let fixedBy = null;
+
+                            // Cache?
+                            if (verifiedTracks[trackId] && verifiedTracks[trackId].year < oldYearStr) {
+                                newYearStr = verifiedTracks[trackId].year;
+                                fixedBy = "Cache";
+                                totalCacheFixes++;
+                            } 
+                            // iTunes?
+                            else if (!verifiedTracks[trackId]) {
+                                if (window.fetchItunesReleaseYear) {
+                                    const itunesYear = await window.fetchItunesReleaseYear(track.title, track.artist);
+                                    if (itunesYear && itunesYear < oldYearStr) {
+                                        newYearStr = String(itunesYear);
+                                        fixedBy = "iTunes";
+                                        totalItunesFixes++;
+                                    }
+                                }
+
+                                // AI?
+                                if (!fixedBy) {
+                                    try {
+                                        statusEl.innerHTML = `Frågar AI om "${track.title}"...`;
+                                        const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
+                                        if (aiResult && aiResult.data && aiResult.data.year) {
+                                            const aiYear = String(aiResult.data.year);
+                                            if (aiYear < oldYearStr) {
+                                                newYearStr = aiYear;
+                                                fixedBy = "AI";
+                                                totalAiFixes++;
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.warn("AI anrop misslyckades för", track.title, e);
+                                    }
+                                }
+                            }
+
+                            // Om året ändrades eller låten var helt ny i cache
+                            if (fixedBy || !verifiedTracks[trackId]) {
+                                if (fixedBy) {
+                                    databaseUpdates[`standardLists/${listName}/songs/${trackId}/year`] = newYearStr;
+                                    console.log(`[Rättad] ${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
+                                }
+                                
+                                newVerifiedTracks[trackId] = {
+                                    title: track.title,
+                                    artist: track.artist,
+                                    year: newYearStr
+                                };
+                                verifiedTracks[trackId] = newVerifiedTracks[trackId]; // uppdatera lokalt
+                            }
+                        }
+                    }
+
+                    // 4. Skriv tillbaka
+                    statusEl.innerHTML = "Sparar ändringar i databasen...";
+                    if (Object.keys(databaseUpdates).length > 0) {
+                        await update(ref(db), databaseUpdates);
+                    }
+                    if (Object.keys(newVerifiedTracks).length > 0) {
+                        // Spara individuella verifiedTracks för att inte skriva över hela cachen
+                        const cacheUpdates = {};
+                        for (const key in newVerifiedTracks) {
+                            cacheUpdates[key] = newVerifiedTracks[key];
+                        }
+                        await update(ref(db, "verifiedTracks"), cacheUpdates);
+                    }
+
+                    statusEl.innerHTML = `<strong>Klar!</strong><br>
+                        Gick igenom: ${totalChecked} låtar.<br>
+                        Rättades via Cache: ${totalCacheFixes}<br>
+                        Rättades via iTunes: ${totalItunesFixes}<br>
+                        Rättades via AI: ${totalAiFixes}`;
+
+                } catch (error) {
+                    console.error(error);
+                    statusEl.innerHTML = `<span style="color:red">Fel: ${error.message}</span>`;
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+
         });
     </script>
+    <script src="listor/itunes-api.js"></script>
 </head>
 <body>
     <h2>Adminpanel – Lägg till spellistor i StandardLists</h2>
@@ -126,6 +262,12 @@
         <input type="text" id="standardPlaylistName" placeholder="Spellistans namn">
         <input type="text" id="standardPlaylistLink" placeholder="Klistra in Spotify-länken">
         <button id="addStandardPlaylistButton" aria-label="Lägg till standardspellista">Lägg till</button>
+
+        <hr style="margin-top: 30px;">
+        <h3>Städa Databasen (Rätta årtal)</h3>
+        <p>Går igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
+        <button id="cleanDatabaseBtn" style="background-color: #d9534f; color: white; padding: 10px; border: none; cursor: pointer;">Städa Hela Databasen</button>
+        <p id="cleanStatus" style="margin-top: 10px; font-weight: bold;"></p>
     </div>
 </body>
 </html>

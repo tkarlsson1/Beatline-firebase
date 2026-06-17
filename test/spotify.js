@@ -59,22 +59,122 @@ async function fetchSpotifyPlaylist(playlistUrl) {
 
 async function addPlaylistToFirebase(playlistName, playlistUrl) {
   try {
+    const addBtn = document.getElementById("addPlaylistButton");
+    if (addBtn) addBtn.disabled = true;
+    
     console.log("Försöker hämta spellista:", playlistName);
+    if (addBtn) addBtn.textContent = "Hämtar från Spotify...";
+    
     const tracks = await fetchSpotifyPlaylist(playlistUrl);
     
     if (!tracks || Object.keys(tracks).length === 0) {
       alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
+      if (addBtn) { addBtn.disabled = false; addBtn.textContent = "Lägg till"; }
       return;
     }
+    
+    // --- VERIFIERING VID UPPLADDNING ---
+    if (addBtn) addBtn.textContent = "Laddar cache...";
+    
+    // Hämta verifiedTracks från Firebase
+    let verifiedTracks = {};
+    try {
+      const verifiedRef = window.firebaseRef(window.firebaseDb, 'verifiedTracks');
+      const snapshot = await new Promise((resolve, reject) => {
+        window.firebaseOnValue(verifiedRef, snap => resolve(snap), err => reject(err), { onlyOnce: true });
+      });
+      if (snapshot.exists()) {
+        verifiedTracks = snapshot.val();
+      }
+    } catch (e) {
+      console.warn("Kunde inte hämta verifiedTracks:", e);
+    }
+    
+    const trackKeys = Object.keys(tracks);
+    const totalTracks = trackKeys.length;
+    let verifiedCount = 0;
+    let itunesCount = 0;
+    let aiCount = 0;
+    
+    for (let i = 0; i < totalTracks; i++) {
+      const trackId = trackKeys[i];
+      const track = tracks[trackId];
+      
+      if (addBtn) addBtn.textContent = `Verifierar... ${i+1}/${totalTracks}`;
+      
+      // 1. Kolla cache (verifiedTracks)
+      if (verifiedTracks[trackId] && verifiedTracks[trackId].year) {
+        track.year = String(verifiedTracks[trackId].year);
+        verifiedCount++;
+        continue;
+      }
+      
+      // 2. Kolla iTunes API
+      let usedItunes = false;
+      try {
+        if (window.itunesApi) {
+          const itunesData = await window.itunesApi.searchTrack(track.title, track.artist);
+          if (itunesData && itunesData.releaseYear) {
+            const itunesYear = parseInt(itunesData.releaseYear);
+            const spotifyYear = parseInt(track.year);
+            // Om iTunes har ett äldre årtal, lita på iTunes
+            if (!isNaN(itunesYear) && !isNaN(spotifyYear) && itunesYear < spotifyYear) {
+              track.year = String(itunesYear);
+              itunesCount++;
+              usedItunes = true;
+            }
+          }
+          // Liten paus för att inte överbelasta iTunes API
+          await new Promise(r => setTimeout(r, 100));
+        }
+      } catch (e) {
+        console.warn("iTunes API sökning misslyckades för", track.title);
+      }
+      
+      // 3. Kolla AI via Backend (getSongYearAi) om varken Cache eller iTunes lyckades
+      if (!usedItunes && !verifiedTracks[trackId]) {
+        try {
+          if (addBtn) addBtn.textContent = `Frågar AI... ${i+1}/${totalTracks}`;
+          
+          if (window.firebaseFunctions && window.httpsCallable) {
+            const getSongYearAi = window.httpsCallable(window.firebaseFunctions, 'getSongYearAi');
+            const result = await getSongYearAi({ title: track.title, artist: track.artist });
+            
+            if (result && result.data && result.data.year) {
+              const aiYear = parseInt(result.data.year, 10);
+              const spotifyYear = parseInt(track.year);
+              if (!isNaN(aiYear) && !isNaN(spotifyYear) && aiYear < spotifyYear) {
+                track.year = String(aiYear);
+                aiCount++;
+              }
+            }
+          } else {
+            console.warn("Firebase Functions är inte initierat.");
+          }
+        } catch (e) {
+          console.warn("Kunde inte anropa Backend AI för", track.title, e);
+        }
+      }
+    }
+    
+    console.log(`Validering klar: ${verifiedCount} från cache, ${itunesCount} korrigerade via iTunes, ${aiCount} korrigerade via AI.`);
+    if (addBtn) addBtn.textContent = "Sparar...";
+    // -----------------------------------
     
     const userId = window.auth.currentUser.uid;
     const userPlaylistsRef = window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}`);
     await window.firebaseSet(userPlaylistsRef, { songs: tracks });
     
-    alert(`Spellistan "${playlistName}" har lagts till i dina spellistor!`);
+    alert(`Spellistan "${playlistName}" har lagts till i dina spellistor! \n(Verifierades: ${verifiedCount} db, ${itunesCount} iTunes, ${aiCount} AI)`);
   } catch (error) {
     console.error("Fel vid lagring av spellista:", error);
     alert("Något gick fel vid lagring av spellistan.");
+  } finally {
+    const addBtn = document.getElementById("addPlaylistButton");
+    if (addBtn) {
+      addBtn.disabled = false;
+      addBtn.textContent = "Lägg till";
+    }
   }
 }
 
