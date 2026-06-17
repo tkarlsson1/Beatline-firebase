@@ -177,151 +177,63 @@ function detectCompilationAlbum(track) {
 function crossValidateYear(track) {
   const sources = [];
   
-  // Collect all year sources
-  if (track.spotifyYear) {
-    sources.push({ name: 'Spotify', year: track.spotifyYear, weight: 1 });
-  }
-  
-  // Spotify Original (highest weight - Spotify's own data for original album)
-  if (track.spotifyOriginalYear) {
-    sources.push({ name: 'Spotify Original', year: track.spotifyOriginalYear, weight: 3 });
-  }
-  
-  // iTunes (väldigt pålitlig för original-release)
-  if (track.itunesYear) {
-    sources.push({ name: 'iTunes', year: track.itunesYear, weight: 5 });
-  }
-  
-  // DISABLED: Last.fm ger ofta remaster-år istället för original
-  // if (track.lastFmYear) {
-  //   sources.push({ name: 'Last.fm', year: track.lastFmYear, weight: 2 });
-  // }
-  
-  if (track.earliestRecordingYear) {
-    sources.push({ name: 'MusicBrainz', year: track.earliestRecordingYear, weight: 2 });
-  }
-  
-  if (sources.length === 0) {
-    return {
-      bestYear: track.spotifyYear,
-      confidence: 'low',
-      sourcesAgree: false,
-      sources: []
-    };
-  }
-  
-  // ========================================
-  // SPECIAL RULE: ONE YEAR DIFFERENCE
-  // Always choose OLDER year (92% accuracy)
-  // ========================================
-  const spotifySource = sources.find(s => s.name === 'Spotify');
-  const mbSource = sources.find(s => s.name === 'MusicBrainz');
-  
-  if (spotifySource && mbSource && Math.abs(spotifySource.year - mbSource.year) === 1) {
-    const olderYear = Math.min(spotifySource.year, mbSource.year);
-    console.log(`[Validator] One-year-diff detected: Spotify ${spotifySource.year} vs MB ${mbSource.year} → choosing ${olderYear}`);
-    
-    // Create votes object for the older year
-    const votes = {
-      [olderYear]: {
-        count: 2,
-        weight: 3,
-        sources: ['Spotify', 'MusicBrainz']
-      }
-    };
-    
-    return {
-      bestYear: olderYear,
-      confidence: 'high', // High confidence for this rule
-      sourcesAgree: false,
-      majorityAgree: true,
-      sources: sources,
-      votes: votes, // Add votes to prevent crashes
-      oneYearDiffApplied: true
-    };
-  }
-  
-  // Count votes (weighted)
-  const yearVotes = {};
-  sources.forEach(source => {
-    if (!yearVotes[source.year]) {
-      yearVotes[source.year] = { count: 0, weight: 0, sources: [] };
-    }
-    yearVotes[source.year].count++;
-    yearVotes[source.year].weight += source.weight;
-    yearVotes[source.year].sources.push(source.name);
-  });
-  
-  // Find year with most votes/weight
-  let bestYear = null;
-  let bestWeight = 0;
-  let bestCount = 0;
-  
-  Object.entries(yearVotes).forEach(([year, data]) => {
-    if (data.weight > bestWeight || (data.weight === bestWeight && data.count > bestCount)) {
-      bestYear = parseInt(year);
-      bestWeight = data.weight;
-      bestCount = data.count;
-    }
-  });
-  
-  // Determine if sources agree
-  const uniqueYears = Object.keys(yearVotes).length;
-  const sourcesAgree = uniqueYears === 1;
-  const majorityAgree = bestCount >= Math.ceil(sources.length / 2);
-  
-  // Determine confidence
-  let confidence;
-  if (sourcesAgree && sources.length >= 2) {
-    confidence = 'very_high';
-  } else if (majorityAgree && bestCount >= 2) {
+  // Build sources for reference/display
+  if (track.spotifyYear) sources.push({ name: 'Spotify', year: track.spotifyYear });
+  if (track.spotifyOriginalYear) sources.push({ name: 'Spotify Original', year: track.spotifyOriginalYear });
+  if (track.earliestRecordingYear) sources.push({ name: 'MusicBrainz', year: track.earliestRecordingYear });
+  if (track.itunesYear) sources.push({ name: 'iTunes', year: track.itunesYear });
+
+  let bestYear = track.spotifyYear;
+  let confidence = 'low';
+
+  // Rule 1: iTunes precedence
+  if (track.itunesYear && track.itunesYear <= track.spotifyYear) {
+    bestYear = track.itunesYear;
     confidence = 'high';
-  } else if (sources.length >= 2) {
+  } 
+  // Rule 2: Perfect Agreement between MusicBrainz and Spotify
+  else if (track.earliestRecordingYear && track.earliestRecordingYear === track.spotifyYear) {
+    bestYear = track.spotifyYear;
+    confidence = 'high';
+  }
+  // Rule 3: MusicBrainz precedence
+  else if (track.earliestRecordingYear && track.earliestRecordingYear < track.spotifyYear) {
+    bestYear = track.earliestRecordingYear;
     confidence = 'medium';
-  } else {
-    confidence = 'low';
   }
-  
-  // Special case: If MB and Last.fm agree but differ from Spotify
-  const mbYear = track.earliestRecordingYear;
-  const lfmYear = track.lastFmYear;
-  if (mbYear && lfmYear && mbYear === lfmYear && mbYear !== track.spotifyYear) {
-    confidence = 'very_high';
-    bestYear = mbYear;
-  }
+
+  // Determine if main sources perfectly agree
+  const availableYears = [track.spotifyYear];
+  if (track.earliestRecordingYear) availableYears.push(track.earliestRecordingYear);
+  if (track.itunesYear) availableYears.push(track.itunesYear);
+  const uniqueYears = new Set(availableYears);
   
   return {
-    bestYear: bestYear || track.spotifyYear,
+    bestYear: bestYear,
     confidence: confidence,
-    sourcesAgree: sourcesAgree,
-    majorityAgree: majorityAgree,
-    sources: sources,
-    votes: yearVotes
+    sourcesAgree: uniqueYears.size <= 1,
+    sources: sources
   };
 }
 
-/**
- * Analyze tracks and assign flags based on various criteria
- */
 function analyzeAndFlagTracks(tracks) {
   return tracks.map(track => {
     // ========================================
     // SKIP VALIDATION FOR PRE-VERIFIED TRACKS
-    // These were already validated in a previous session
     // ========================================
     if (track.previouslyVerified) {
       return {
         ...track,
         status: 'green',
         flags: [],
-        autoApproveCandidate: false // Already verified, no need to auto-approve
+        autoApproveCandidate: false
       };
     }
     
     const flags = [];
     let status = 'green';
     
-    // Get compilation detection
+    // Get compilation detection (kept for UI info only)
     const compilationResult = detectCompilationAlbum(track);
     track.compilationDetection = compilationResult;
     
@@ -329,21 +241,9 @@ function analyzeAndFlagTracks(tracks) {
     const validation = crossValidateYear(track);
     track.validation = validation;
     track.recommendedYear = validation.bestYear;
-    
-    // Store the default/recommended selection for override tracking
     track.defaultSelectedYear = validation.bestYear;
     
-    // Calculate oldest available year for yearChoice tracking
-    const availableYears = [];
-    if (track.spotifyYear) availableYears.push(track.spotifyYear);
-    if (track.spotifyOriginalYear) availableYears.push(track.spotifyOriginalYear);
-    if (track.earliestRecordingYear) availableYears.push(track.earliestRecordingYear);
-    if (track.itunesYear) availableYears.push(track.itunesYear);
-    // LastFm removed - 18% accuracy, unreliable
-    track.oldestAvailableYear = availableYears.length > 0 ? Math.min(...availableYears) : null;
-    track.availableYearsCount = new Set(availableYears).size;
-    
-    // 1. Compilation detected
+    // Add compilation flag if detected (for info only, does not affect status)
     if (compilationResult.isCompilation) {
       flags.push({
         type: 'compilation',
@@ -351,25 +251,9 @@ function analyzeAndFlagTracks(tracks) {
         message: `Compilation album detected (${compilationResult.confidence} confidence)`,
         details: compilationResult.reasons.join('; ')
       });
-      
-      if (validation.sourcesAgree && validation.bestYear < track.spotifyYear) {
-        flags.push({
-          type: 'compilation_resolved',
-          level: 'info',
-          message: `All sources agree on ${validation.bestYear} (earlier than Spotify ${track.spotifyYear})`
-        });
-        status = 'green';
-      } else if (!validation.sourcesAgree) {
-        status = 'yellow';
-        flags.push({
-          type: 'year_conflict',
-          level: 'warning',
-          message: `Sources disagree: ${validation.votes ? Object.keys(validation.votes).join(', ') : 'N/A'}`
-        });
-      }
     }
-    
-    // 2. Multiple artists (featuring)
+
+    // Add info flag for multiple artists
     if (track.artist.includes('feat.') || track.artist.includes('&')) {
       flags.push({
         type: 'multiple_artists',
@@ -377,80 +261,57 @@ function analyzeAndFlagTracks(tracks) {
         message: 'Multiple artists detected in track'
       });
     }
-    
-    // 3. Remix/Remaster
+
+    // Check if it's a remix/live/remaster
     const titleLower = track.title.toLowerCase();
     const isRemixOrRemaster = titleLower.includes('remix') || 
                               titleLower.includes('remaster') ||
                               titleLower.includes('live') ||
                               titleLower.includes('acoustic') ||
                               titleLower.includes('demo');
-    
-    if (isRemixOrRemaster && !validation.sourcesAgree) {
-      flags.push({
-        type: 'remix_remaster',
-        level: 'warning',
-        message: 'Remix/remaster/live version with conflicting years',
-        details: `Sources: ${validation.sources.map(s => `${s.name}: ${s.year}`).join(', ')}`
-      });
-      status = 'yellow';
-    }
-    
-    // 4. Year conflict without compilation
-    if (!compilationResult.isCompilation && !validation.sourcesAgree) {
-      flags.push({
-        type: 'year_conflict',
-        level: 'warning',
-        message: 'Year conflict between sources',
-        details: `Sources: ${validation.sources.map(s => `${s.name}: ${s.year}`).join(', ')}`
-      });
-      status = 'yellow';
-    }
-    
-    // 5. Large year difference
+
     const yearDiff = Math.abs(track.spotifyYear - validation.bestYear);
-    if (yearDiff >= 5) {
-      flags.push({
-        type: 'large_year_diff',
-        level: 'warning',
-        message: `Large year difference: ${yearDiff} years`,
-        details: `Spotify: ${track.spotifyYear}, Recommended: ${validation.bestYear}`
-      });
-      status = 'yellow';
-    }
+
+    // ========================================
+    // NEW STATUS LOGIC
+    // ========================================
     
-    // 5b. ONE YEAR DIFFERENCE (special case)
-    const oneYearDiff = yearDiff === 1;
-    if (oneYearDiff && track.earliestRecordingYear) {
-      // Check if Spotify Original can resolve this
-      const hasSpotifyOriginal = track.spotifyOriginalYear && 
-                                 Math.abs(track.spotifyOriginalYear - track.earliestRecordingYear) === 0;
+    // Check if Spotify Original matches the recommended year
+    const spotifyOriginalMatches = track.spotifyOriginalYear && track.spotifyOriginalYear === validation.bestYear;
+
+    if (validation.confidence === 'high') {
+      // Rule 1: High confidence (iTunes or perfect MB/Spotify agreement) -> Green
+      status = 'green';
+    } else if (yearDiff <= 1) {
+      // Rule 2: Max 1 year difference -> Green
+      status = 'green';
+    } else if (spotifyOriginalMatches) {
+      // Rule 3: Spotify Original confirms the year -> Green
+      status = 'green';
+    } else {
+      // Otherwise -> Yellow (requires review)
+      status = 'yellow';
       
-      if (hasSpotifyOriginal) {
-        // Spotify Original resolves it - trust that
+      // Add warning flags explaining why it needs review
+      if (isRemixOrRemaster && !validation.sourcesAgree) {
         flags.push({
-          type: 'one_year_diff_resolved',
-          level: 'info',
-          message: `1 year difference resolved by Spotify Original (${track.spotifyOriginalYear})`
+          type: 'remix_remaster',
+          level: 'warning',
+          message: 'Remix/remaster/live version with conflicting years',
+          details: `Sources: ${validation.sources.map(s => `${s.name}: ${s.year}`).join(', ')}`
         });
       } else {
-        // Not resolved - flag for manual review
         flags.push({
-          type: 'one_year_diff',
-          level: 'info',
-          message: `1 year difference between sources`,
-          details: `Spotify: ${track.spotifyYear}, MusicBrainz: ${track.earliestRecordingYear}`
+          type: 'year_conflict',
+          level: 'warning',
+          message: `Year difference of ${yearDiff} years (${validation.confidence} confidence)`,
+          details: `Sources: ${validation.sources.map(s => `${s.name}: ${s.year}`).join(', ')}`
         });
-        // Don't change status - often both are valid (single vs album)
       }
-      
-      // Store metadata for ML training
-      track.oneYearDifference = true;
-      track.oneYearDifferenceResolved = hasSpotifyOriginal;
     }
-    
-    // 6. No external validation (only Spotify data)
-    if (!track.earliestRecordingYear && !track.spotifyOriginalYear) {
+
+    // If only Spotify data is available
+    if (validation.sources.length === 1) {
       flags.push({
         type: 'no_validation',
         level: 'info',
@@ -458,29 +319,9 @@ function analyzeAndFlagTracks(tracks) {
         details: 'Only Spotify data available'
       });
     }
-    
-    // 7. CRITICAL: Compilation with major disagreement
-    if (compilationResult.isCompilation && yearDiff >= 10) {
-      flags.push({
-        type: 'critical_compilation',
-        level: 'error',
-        message: 'Compilation with large year discrepancy',
-        details: `Spotify shows ${track.spotifyYear}, but sources suggest ${validation.bestYear}`
-      });
-      status = 'red';
-    }
-    
-    // 8. AUTO-APPROVE CANDIDATE (visuell grön markering baserat på statistik)
-    track.autoApproveCandidate = shouldAutoApprove(track, validation, compilationResult, yearDiff);
-    
-    // 9. FINAL OVERRIDE: Auto-approve trumps all flag-based statuses
-    // Data from analysis of 696 tracks shows that 94% of autoApprove candidates
-    // have the correct year, but aggressive flagging rules (critical_compilation,
-    // large_year_diff, etc.) were blocking them. If the model is confident,
-    // trust it regardless of how much the year differs from Spotify.
-    if (track.autoApproveCandidate) {
-      status = 'green';
-    }
+
+    // We no longer use autoApproveCandidate, but we set it to true if green to maintain compatibility
+    track.autoApproveCandidate = status === 'green';
     
     return {
       ...track,
@@ -489,99 +330,6 @@ function analyzeAndFlagTracks(tracks) {
       needsReview: status !== 'green'
     };
   });
-}
-
-/**
- * Determine if track should be auto-approve candidate (green flag)
- * Based on statistical analysis showing which patterns have >95% accuracy
- */
-function shouldAutoApprove(track, validation, compilationResult, yearDiff) {
-  // ========================================
-  // STATISTICAL AUTO-APPROVAL RULES
-  // Based on 1466 validated tracks
-  // Updated: 2026-02-27 (CRITICAL FIX: confidence order)
-  // ========================================
-  
-  // === CRITICAL: Remix/Remaster blocker ===
-  const titleLower = track.title.toLowerCase();
-  const isRemixOrRemaster = titleLower.includes('remix') || 
-                            titleLower.includes('remaster') ||
-                            titleLower.includes('live') ||
-                            titleLower.includes('acoustic') ||
-                            titleLower.includes('demo');
-                            
-  // Ny iTunes-regel: Om iTunes har hittat ett år och vi har en remaster/remix, 
-  // så litar vi ändå på iTunes om det är mycket äldre (det ger oss originalåret för kompositionen).
-  const hasStrongItunesMatch = track.itunesYear && (track.spotifyYear - track.itunesYear >= 2);
-  
-  if (isRemixOrRemaster && !hasStrongItunesMatch) {
-    return false; // 33% accuracy without iTunes - always block
-  }
-  
-  // === NY ITUNES-REGEL: Lita nästan alltid på iTunes om det är äldre eller samma som Spotify ===
-  if (track.itunesYear && track.itunesYear <= track.spotifyYear) {
-    // Om iTunes bekräftar samma år eller pekar ut ett äldre originalår, är det nästan alltid rätt
-    return true;
-  }
-  
-  // === HIGH-CONFIDENCE RULES (>95% accuracy) - MUST COME BEFORE OTHER BLOCKERS ===
-  
-  // 1. HIGH CONFIDENCE ALWAYS WINS = 98% accuracy (90/92) ⭐
-  // Overrides large_year_diff, compilation, etc.
-  if (validation.confidence === 'high') {
-    return true;
-  }
-  
-  // 2. VERY HIGH CONFIDENCE = 98.4% accuracy (836/850) ⭐
-  if (validation.confidence === 'very_high') {
-    return true;
-  }
-  
-  // === BLOCKERS: Never auto-approve (poor accuracy) ===
-  
-  // Medium confidence = 46% accuracy (200/438)
-  if (validation.confidence === 'medium') {
-    return false;
-  }
-  
-  // Large year diff = 41% accuracy
-  if (yearDiff >= 5) {
-    return false;
-  }
-  
-  // Multiple artists removed as blocker - high/very_high confidence overrides it
-  
-  // Compilation with large year diff = risky
-  if (compilationResult.isCompilation && yearDiff >= 7) {
-    return false;
-  }
-  
-  // === OTHER GREEN FLAG CRITERIA (>90% accuracy) ===
-  
-  // 3. SPOTIFY-ONLY (no validation) = 95% accuracy (42/44) ⭐
-  if (validation.confidence === 'low' && validation.sources.length === 1) {
-    return true;
-  }
-  
-  // 4. SINGLE + 2000s or later = 90% accuracy ⭐
-  if (track.albumType === 'single' && track.spotifyYear >= 2000) {
-    return true;
-  }
-  
-  // 5. DECADE-BASED LIBERAL APPROVAL ⭐
-  // 2020s = 94% accuracy
-  if (track.spotifyYear >= 2020 && validation.confidence !== 'medium') {
-    return true;
-  }
-  
-  // 6. 1990s-2000s DECADE RULE ⭐
-  // 1990s: 82%, 2000s: 82%
-  if (track.spotifyYear >= 1990 && track.spotifyYear < 2010 && 
-      validation.confidence !== 'medium') {
-    return true;
-  }
-  
-  return false;
 }
 
 /**
