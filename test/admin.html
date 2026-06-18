@@ -154,6 +154,8 @@
                             const track = playlist.songs[trackId];
                             totalChecked++;
 
+                            console.log(`[Granskar] ${track.artist} - ${track.title} (nuvarande år: ${track.year})`);
+
                             statusEl.innerHTML = `Validerar listan "${listName}" (${i + 1}/${songIds.length}). Låt: ${track.title}`;
 
                             let oldYearStr = String(track.year);
