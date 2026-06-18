@@ -557,49 +557,38 @@ function renderChallengeButton() {
 // DROP POSITION & INDICATORS
 // ============================================
 function getDropPositionFromCoords(x, y) {
-  // Find which position in timeline based on x coordinate
-  // Position is based on actual index in DOM, not dataset.position
-  const timeline = document.getElementById('timeline');
-  const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
-  
-  if (cards.length === 0) {
-    return 0;
-  }
-  
-  // Check if before first card
-  const firstCard = cards[0];
-  const firstRect = firstCard.getBoundingClientRect();
-  if (x < firstRect.left + firstRect.width / 2) {
-    return 0;
-  }
-  
-  // Check if after last card
-  const lastCard = cards[cards.length - 1];
-  const lastRect = lastCard.getBoundingClientRect();
-  if (x > lastRect.right - lastRect.width / 2) {
+    // Find which position in timeline based on x,y coordinates
+    // Position is based on actual index in DOM, not dataset.position
+    const timeline = document.getElementById('timeline');
+    const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
+    
+    if (cards.length === 0) {
+      return 0;
+    }
+    
+    // Iterate through all cards to find where we are dropping (supports multi-row flex-wrap)
+    for (let i = 0; i < cards.length; i++) {
+      const rect = cards[i].getBoundingClientRect();
+      
+      // Are we roughly on the same row? (y coordinate within the card's vertical span, allowing some margin)
+      const onSameRow = y >= rect.top - 20 && y <= rect.bottom + 20;
+      
+      if (onSameRow) {
+        // If we are to the left of the card's center, insert before it
+        const cardCenter = rect.left + rect.width / 2;
+        if (x < cardCenter) {
+          return i;
+        }
+      } else if (y < rect.top - 20) {
+        // We are strictly above this row, meaning we should be inserted before this card
+        // This handles dropping at the end of the previous row
+        return i;
+      }
+    }
+    
+    // Default to after last card
     return cards.length;
   }
-  
-  // Check between cards
-  for (let i = 0; i < cards.length - 1; i++) {
-    const currentCard = cards[i];
-    const nextCard = cards[i + 1];
-    
-    const currentRect = currentCard.getBoundingClientRect();
-    const nextRect = nextCard.getBoundingClientRect();
-    
-    const currentCenter = currentRect.left + currentRect.width / 2;
-    const nextCenter = nextRect.left + nextRect.width / 2;
-    
-    // If x is between current card center and next card center
-    if (x >= currentCenter && x < nextCenter) {
-      return i + 1;
-    }
-  }
-  
-  // Default to after last card
-  return cards.length;
-}
 
 function showDynamicDropIndicator(x, y) {
   // Remove existing indicator
