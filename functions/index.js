@@ -288,7 +288,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-5.5",
         messages: [{ role: "user", content: promptText }],
         temperature: 0.1,
         max_tokens: 10
