@@ -185,12 +185,20 @@
                                 if (!fixedBy) {
                                     try {
                                         statusEl.innerHTML = `Frågar AI om "${track.title}"...`;
+                                        console.log(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
                                         const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
                                         if (aiResult && aiResult.data && aiResult.data.year) {
                                             const aiYear = String(aiResult.data.year).trim();
+                                            console.log(`[AI-Svar] GPT-5.5 svarade: ${aiYear} (Nuvarande: ${oldYearStr})`);
+                                            
                                             if (aiYear !== "UNKNOWN" && aiYear !== oldYearStr) {
                                                 newYearStr = aiYear;
                                                 fixedBy = "AI";
+                                                console.log(`[JUSTERING] 🔥 AI hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
+                                            } else if (aiYear === oldYearStr) {
+                                                console.log(`[OK] AI bekräftar att ${oldYearStr} redan är rätt.`);
+                                            } else {
+                                                console.log(`[OKÄNT] AI kunde inte hitta årtalet.`);
                                             }
                                         }
                                     } catch (e) {
