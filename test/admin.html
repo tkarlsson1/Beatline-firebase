@@ -206,6 +206,12 @@
                                     fixedBy: fixedBy
                                 });
                             }
+                            
+                            // Sömn för att inte bli blockerad av iTunes rate limits (HTTP 429 Too Many Requests)
+                            // Apple tillåter ca 20-30 requests per minut utan API-nyckel.
+                            if (!verifiedTracks[trackId]) {
+                                await new Promise(r => setTimeout(r, 2000));
+                            }
                         }
                     }
 
