@@ -291,7 +291,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
         model: "gpt-5.5",
         messages: [{ role: "user", content: promptText }],
         temperature: 0.1,
-        max_tokens: 10
+        max_completion_tokens: 10
       })
     });
     
