@@ -570,8 +570,8 @@ function getDropPositionFromCoords(x, y) {
     for (let i = 0; i < cards.length; i++) {
       const rect = cards[i].getBoundingClientRect();
       
-      // Are we roughly on the same row? (y coordinate within the card's vertical span, allowing some margin)
-      const onSameRow = y >= rect.top - 20 && y <= rect.bottom + 20;
+      // Are we roughly on the same row? (Generous vertical margin of 60px for touch screens)
+      const onSameRow = y >= rect.top - 60 && y <= rect.bottom + 60;
       
       if (onSameRow) {
         // If we are to the left of the card's center, insert before it
@@ -579,7 +579,7 @@ function getDropPositionFromCoords(x, y) {
         if (x < cardCenter) {
           return i;
         }
-      } else if (y < rect.top - 20) {
+      } else if (y < rect.top - 60) {
         // We are strictly above this row, meaning we should be inserted before this card
         // This handles dropping at the end of the previous row
         return i;
@@ -615,6 +615,7 @@ function showDynamicDropIndicator(x, y) {
     border-radius: 2px;
     box-shadow: 0 0 10px #4CAF50;
     animation: pulse 1s infinite;
+    pointer-events: none;
   `;
   
   // Add arrow indicator
