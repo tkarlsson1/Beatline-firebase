@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.013</title>
+    <title>Adminpanel 0.014</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -141,6 +141,7 @@
                     let totalChecked = 0;
                     let proposedChanges = [];
                     const useItunes = document.getElementById("useItunesCheckbox").checked;
+                    const forceRescan = document.getElementById("forceRescanCheckbox").checked;
 
                     // 3. Validera spellistor
                     const playlistNames = Object.keys(standardLists);
@@ -163,12 +164,12 @@
                             let fixedBy = null;
 
                             // Cache?
-                            if (verifiedTracks[trackId] && String(verifiedTracks[trackId].year) !== oldYearStr) {
+                            if (!forceRescan && verifiedTracks[trackId] && String(verifiedTracks[trackId].year) !== oldYearStr) {
                                 newYearStr = String(verifiedTracks[trackId].year);
                                 fixedBy = "Cache";
                             }
                             // iTunes?
-                            else if (!verifiedTracks[trackId]) {
+                            else if (forceRescan || !verifiedTracks[trackId]) {
                                 if (useItunes && window.itunesApi && window.itunesApi.getTrackInfo) {
                                     const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
                                     if (itunesResult && itunesResult.found && itunesResult.year) {
@@ -213,7 +214,7 @@
 
                             // Sömn för att inte bli blockerad av iTunes rate limits (HTTP 429 Too Many Requests)
                             // Apple tillåter ca 20-30 requests per minut utan API-nyckel.
-                            if (useItunes && !verifiedTracks[trackId]) {
+                            if (useItunes && (forceRescan || !verifiedTracks[trackId])) {
                                 await new Promise(r => setTimeout(r, 2000));
                             }
                         }
@@ -312,8 +313,14 @@
         <p>Gör igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
         <div style="margin-bottom: 10px;">
             <label style="cursor: pointer;">
-                <input type="checkbox" id="useItunesCheckbox" checked>
+                <input type="checkbox" id="useItunesCheckbox">
                 Använd iTunes-sökning först (Säkert, men tar längre tid pga 2-sekunders-fördröjning)
+            </label>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="cursor: pointer; color: #d9534f; font-weight: bold;">
+                <input type="checkbox" id="forceRescanCheckbox" checked>
+                Tvinga fullständig omskanning (Ignorera cache. Kostar mer API-anrop men rättar gamla fel!)
             </label>
         </div>
         <button id="cleanDatabaseBtn"
