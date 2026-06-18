@@ -1,6 +1,6 @@
 // service-worker.js (consolidated)
 // Notestream PWA — unified cache & offline fallback
-const NS_CACHE = 'ns-appshell-v1-2026-06-18';
+const NS_CACHE = 'ns-appshell-v1-2026-06-18-v2';
 const NS_ASSETS = [
   '/', '/index.html', '/manifest.json',
   '/offline.html',
@@ -25,6 +25,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
+
+  // Ignorera cross-origin-anrop (som iTunes API)
+  if (!req.url.startsWith(self.location.origin)) {
+    return;
+  }
 
   // HTML navigations: go network first, fall back to offline.html
   if (req.mode === 'navigate') {
