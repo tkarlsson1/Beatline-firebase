@@ -166,11 +166,14 @@
                             }
                             // iTunes?
                             else if (!verifiedTracks[trackId]) {
-                                if (window.fetchItunesReleaseYear) {
-                                    const itunesYear = await window.fetchItunesReleaseYear(track.title, track.artist);
-                                    if (itunesYear && String(itunesYear) !== oldYearStr) {
-                                        newYearStr = String(itunesYear);
-                                        fixedBy = "iTunes";
+                                if (window.itunesApi && window.itunesApi.getTrackInfo) {
+                                    const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
+                                    if (itunesResult && itunesResult.found && itunesResult.year) {
+                                        const itunesYear = itunesResult.year;
+                                        if (String(itunesYear) !== oldYearStr) {
+                                            newYearStr = String(itunesYear);
+                                            fixedBy = "iTunes";
+                                        }
                                     }
                                 }
 
