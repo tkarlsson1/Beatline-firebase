@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.006</title>
+    <title>Adminpanel 0.007</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -212,7 +212,7 @@
                         const reviewContainer = document.getElementById("reviewContainer");
                         const tbody = document.getElementById("reviewTableBody");
                         tbody.innerHTML = "";
-                        
+
                         proposedChanges.forEach((change, index) => {
                             const tr = document.createElement("tr");
                             tr.style.borderBottom = "1px solid #eee";
@@ -238,10 +238,10 @@
                             const saveBtn = document.getElementById("saveChangesBtn");
                             saveBtn.disabled = true;
                             saveBtn.innerHTML = "Sparar...";
-                            
+
                             let databaseUpdates = {};
                             let cacheUpdates = {};
-                            
+
                             document.querySelectorAll(".change-checkbox:checked").forEach(cb => {
                                 const change = proposedChanges[cb.getAttribute("data-index")];
                                 databaseUpdates[`standardLists/${change.listName}/songs/${change.trackId}/year`] = change.newYear;
@@ -319,8 +319,11 @@
                 </thead>
                 <tbody id="reviewTableBody"></tbody>
             </table>
-            <button id="saveChangesBtn" style="background-color: #5cb85c; color: white; padding: 10px; border: none; cursor: pointer; font-weight: bold;">Godkänn och Spara markerade</button>
+            <button id="saveChangesBtn"
+                style="background-color: #5cb85c; color: white; padding: 10px; border: none; cursor: pointer; font-weight: bold;">Godkänn
+                och Spara markerade</button>
         </div>
     </div>
 </body>
+
 </html>

@@ -278,17 +278,17 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
   }
   
-  const promptText = `Vilket var det ursprungliga utgivningsåret för låten '${title}' av artisten '${artist}'? Svara enbart med ett fyrsiffrigt årtal, inga andra ord.`;
+  const promptText = `Vilket var det ursprungliga utgivningsåret för låten '${title}' av artisten '${artist}'? Svara enbart med ett fyrsiffrigt årtal, inga andra ord. Om du är osäker eller om låten/artisten är okänd, svara UNKNOWN.`;
   
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=utf-8",
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4o-mini",
         messages: [{ role: "user", content: promptText }],
         temperature: 0.1,
         max_tokens: 10
