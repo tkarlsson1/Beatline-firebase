@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.014</title>
+    <title>Adminpanel 0.015</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -190,7 +190,7 @@
                                         if (aiResult && aiResult.data && aiResult.data.year) {
                                             const aiYear = String(aiResult.data.year).trim();
                                             console.log(`[AI-Svar] GPT-5.5 svarade: ${aiYear} (Nuvarande: ${oldYearStr})`);
-                                            
+
                                             if (aiYear !== "UNKNOWN" && aiYear !== oldYearStr) {
                                                 newYearStr = aiYear;
                                                 fixedBy = "AI";
