@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.016</title>
+    <title>Adminpanel 0.017</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -170,19 +170,29 @@
                             }
                             // iTunes?
                             else if (forceRescan || !verifiedTracks[trackId]) {
+                                let skipAi = false;
                                 if (useItunes && window.itunesApi && window.itunesApi.getTrackInfo) {
+                                    statusEl.innerHTML = `Söker via iTunes: "${track.title}"...`;
+                                    console.log(`[iTunes-Sökning] Letar efter "${track.artist} - ${track.title}"...`);
                                     const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
+                                    
                                     if (itunesResult && itunesResult.found && itunesResult.year) {
+                                        skipAi = true; // Hittades i iTunes, avbryt AI-fallback
                                         const itunesYear = itunesResult.year;
                                         if (String(itunesYear) !== oldYearStr) {
                                             newYearStr = String(itunesYear);
                                             fixedBy = "iTunes";
+                                            console.log(`[JUSTERING] 🍏 iTunes hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
+                                        } else {
+                                            console.log(`[OK] 🍏 iTunes bekräftar att ${oldYearStr} redan är rätt.`);
                                         }
+                                    } else {
+                                        console.log(`[iTunes] Låten hittades inte i iTunes. Går över till AI...`);
                                     }
                                 }
 
-                                // AI?
-                                if (!fixedBy) {
+                                // AI? (Bara om iTunes var avstängt, eller om iTunes misslyckades)
+                                if (!fixedBy && !skipAi) {
                                     try {
                                         statusEl.innerHTML = `Frågar AI om "${track.title}"...`;
                                         console.log(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
@@ -321,7 +331,7 @@
         <p>Gör igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
         <div style="margin-bottom: 10px;">
             <label style="cursor: pointer;">
-                <input type="checkbox" id="useItunesCheckbox">
+                <input type="checkbox" id="useItunesCheckbox" checked>
                 Använd iTunes-sökning först (Säkert, men tar längre tid pga 2-sekunders-fördröjning)
             </label>
         </div>
