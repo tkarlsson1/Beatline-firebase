@@ -138,13 +138,8 @@
 
                     // Initiera callable funktion
                     const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
-
                     let totalChecked = 0;
-                    let totalCacheFixes = 0;
-                    let totalItunesFixes = 0;
-                    let totalAiFixes = 0;
-                    let newVerifiedTracks = {};
-                    let databaseUpdates = {}; // Patch för databasen
+                    let proposedChanges = [];
 
                     // 3. Validera spellistor
                     const playlistNames = Object.keys(standardLists);
@@ -165,19 +160,17 @@
                             let fixedBy = null;
 
                             // Cache?
-                            if (verifiedTracks[trackId] && verifiedTracks[trackId].year < oldYearStr) {
-                                newYearStr = verifiedTracks[trackId].year;
+                            if (verifiedTracks[trackId] && String(verifiedTracks[trackId].year) !== oldYearStr) {
+                                newYearStr = String(verifiedTracks[trackId].year);
                                 fixedBy = "Cache";
-                                totalCacheFixes++;
                             }
                             // iTunes?
                             else if (!verifiedTracks[trackId]) {
                                 if (window.fetchItunesReleaseYear) {
                                     const itunesYear = await window.fetchItunesReleaseYear(track.title, track.artist);
-                                    if (itunesYear && itunesYear < oldYearStr) {
+                                    if (itunesYear && String(itunesYear) !== oldYearStr) {
                                         newYearStr = String(itunesYear);
                                         fixedBy = "iTunes";
-                                        totalItunesFixes++;
                                     }
                                 }
 
@@ -187,11 +180,10 @@
                                         statusEl.innerHTML = `Frågar AI om "${track.title}"...`;
                                         const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
                                         if (aiResult && aiResult.data && aiResult.data.year) {
-                                            const aiYear = String(aiResult.data.year);
-                                            if (aiYear < oldYearStr) {
+                                            const aiYear = String(aiResult.data.year).trim();
+                                            if (aiYear !== "UNKNOWN" && aiYear !== oldYearStr) {
                                                 newYearStr = aiYear;
                                                 fixedBy = "AI";
-                                                totalAiFixes++;
                                             }
                                         }
                                     } catch (e) {
@@ -200,47 +192,84 @@
                                 }
                             }
 
-                            // Om året ändrades eller låten var helt ny i cache
-                            if (fixedBy || !verifiedTracks[trackId]) {
-                                if (fixedBy) {
-                                    databaseUpdates[`standardLists/${listName}/songs/${trackId}/year`] = newYearStr;
-                                    console.log(`[Rättad] ${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
-                                }
-
-                                newVerifiedTracks[trackId] = {
+                            if (fixedBy) {
+                                proposedChanges.push({
+                                    trackId: trackId,
+                                    listName: listName,
                                     title: track.title,
                                     artist: track.artist,
-                                    year: newYearStr
-                                };
-                                verifiedTracks[trackId] = newVerifiedTracks[trackId]; // uppdatera lokalt
+                                    oldYear: oldYearStr,
+                                    newYear: newYearStr,
+                                    fixedBy: fixedBy
+                                });
                             }
                         }
                     }
 
-                    // 4. Skriv tillbaka
-                    statusEl.innerHTML = "Sparar ändringar i databasen...";
-                    if (Object.keys(databaseUpdates).length > 0) {
-                        await update(ref(db), databaseUpdates);
-                    }
-                    if (Object.keys(newVerifiedTracks).length > 0) {
-                        // Spara individuella verifiedTracks för att inte skriva över hela cachen
-                        const cacheUpdates = {};
-                        for (const key in newVerifiedTracks) {
-                            cacheUpdates[key] = newVerifiedTracks[key];
-                        }
-                        await update(ref(db, "verifiedTracks"), cacheUpdates);
-                    }
+                    // 4. Visa granskningsvy
+                    if (proposedChanges.length > 0) {
+                        statusEl.innerHTML = `Hittade ${proposedChanges.length} ändringar av totalt ${totalChecked} låtar. Granska dem nedan.`;
+                        const reviewContainer = document.getElementById("reviewContainer");
+                        const tbody = document.getElementById("reviewTableBody");
+                        tbody.innerHTML = "";
+                        
+                        proposedChanges.forEach((change, index) => {
+                            const tr = document.createElement("tr");
+                            tr.style.borderBottom = "1px solid #eee";
+                            tr.innerHTML = `
+                                <td><input type="checkbox" class="change-checkbox" data-index="${index}" checked></td>
+                                <td>${change.title}</td>
+                                <td>${change.artist}</td>
+                                <td>${change.oldYear}</td>
+                                <td style="font-weight:bold; color:green;">${change.newYear}</td>
+                                <td>${change.fixedBy}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        reviewContainer.style.display = "block";
 
-                    statusEl.innerHTML = `<strong>Klar!</strong><br>
-                        Gick igenom: ${totalChecked} låtar.<br>
-                        Rättades via Cache: ${totalCacheFixes}<br>
-                        Rättades via iTunes: ${totalItunesFixes}<br>
-                        Rättades via AI: ${totalAiFixes}`;
+                        // Handle "Select All"
+                        document.getElementById("selectAllCheckbox").addEventListener("change", (e) => {
+                            document.querySelectorAll(".change-checkbox").forEach(cb => cb.checked = e.target.checked);
+                        });
+
+                        // Spara-knappen
+                        document.getElementById("saveChangesBtn").onclick = async () => {
+                            const saveBtn = document.getElementById("saveChangesBtn");
+                            saveBtn.disabled = true;
+                            saveBtn.innerHTML = "Sparar...";
+                            
+                            let databaseUpdates = {};
+                            let cacheUpdates = {};
+                            
+                            document.querySelectorAll(".change-checkbox:checked").forEach(cb => {
+                                const change = proposedChanges[cb.getAttribute("data-index")];
+                                databaseUpdates[`standardLists/${change.listName}/songs/${change.trackId}/year`] = change.newYear;
+                                cacheUpdates[change.trackId] = {
+                                    title: change.title,
+                                    artist: change.artist,
+                                    year: change.newYear
+                                };
+                            });
+
+                            if (Object.keys(databaseUpdates).length > 0) {
+                                await update(ref(db), databaseUpdates);
+                                await update(ref(db, "verifiedTracks"), cacheUpdates);
+                                statusEl.innerHTML = `<span style="color:green">Sparade ${Object.keys(cacheUpdates).length} ändringar i databasen!</span>`;
+                                reviewContainer.style.display = "none";
+                            } else {
+                                statusEl.innerHTML = "Inga ändringar markerade att spara.";
+                            }
+                            btn.disabled = false;
+                        };
+                    } else {
+                        statusEl.innerHTML = `<strong>Klar!</strong> Inga felaktiga årtal hittades (gick igenom ${totalChecked} låtar).`;
+                        btn.disabled = false;
+                    }
 
                 } catch (error) {
                     console.error(error);
                     statusEl.innerHTML = `<span style="color:red">Fel: ${error.message}</span>`;
-                } finally {
                     btn.disabled = false;
                 }
             });
@@ -267,12 +296,31 @@
 
         <hr style="margin-top: 30px;">
         <h3>Städa Databasen (Rätta årtal)</h3>
-        <p>Går igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
+        <p>Gör igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
         <button id="cleanDatabaseBtn"
             style="background-color: #d9534f; color: white; padding: 10px; border: none; cursor: pointer;">Städa Hela
             Databasen</button>
         <p id="cleanStatus" style="margin-top: 10px; font-weight: bold;"></p>
+
+        <!-- Review UI -->
+        <div id="reviewContainer" style="display: none; margin-top: 20px;">
+            <h4>Granska ändringar</h4>
+            <p>Markera de ändringar du vill spara till databasen.</p>
+            <table id="reviewTable" style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ccc; text-align: left;">
+                        <th style="padding: 8px;"><input type="checkbox" id="selectAllCheckbox" checked></th>
+                        <th style="padding: 8px;">Låt</th>
+                        <th style="padding: 8px;">Artist</th>
+                        <th style="padding: 8px;">Gammalt År</th>
+                        <th style="padding: 8px;">Nytt År</th>
+                        <th style="padding: 8px;">Källa</th>
+                    </tr>
+                </thead>
+                <tbody id="reviewTableBody"></tbody>
+            </table>
+            <button id="saveChangesBtn" style="background-color: #5cb85c; color: white; padding: 10px; border: none; cursor: pointer; font-weight: bold;">Godkänn och Spara markerade</button>
+        </div>
     </div>
 </body>
-
 </html>
