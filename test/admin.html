@@ -499,7 +499,7 @@
                                 // Filter 4: Stort hopp bakåt (metadata-fel hos iTunes, t.ex. Bruce Springsteen 1966)
                                 const oldYearNum = parseInt(oldYearStr);
                                 const newYearNum = parseInt(newYearStr);
-                                const isSuspiciouslyOld = (oldYearNum - newYearNum > 10);
+                                const isSuspiciouslyOld = (oldYearNum - newYearNum > 5);
 
                                 const requiresManualReview = isRemix || isSuspiciouslyOld;
                                 const warningFlag = requiresManualReview ? '⚠️ ' : '';

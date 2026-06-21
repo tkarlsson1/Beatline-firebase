@@ -279,7 +279,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
   }
   
   const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året en specifik låt gavs ut offentligt på singel eller studioalbum. Du MÅSTE ignorera nyutgåvor, remasters, live-versioner och samlingsalbum (Greatest Hits). Svara alltid med det äldsta kända årtalet för originalinspelningen. VIKTIGT UNDANTAG: Om artistnamnet indikerar en cover, eller ett modernt samarbete/DJ-remix av en gammal låt (t.ex. Kygo, Whitney Houston - Higher Love), så MÅSTE du svara med årtalet för just den specifika remixen/versionen, INTE originalets årtal.";
-  const userPrompt = `Vilket var det ursprungliga utgivningsåret för låten '${title}' av artisten '${artist}'? Svara enbart med ett fyrsiffrigt årtal, inga andra ord. Om du är osäker eller om låten/artisten är okänd, svara UNKNOWN.`;
+  const userPrompt = `Analysera kortfattat låten '${title}' av artisten '${artist}'. Identifiera när den spelades in, om det är en cover/remix, och när den släpptes första gången. Avsluta sedan ditt svar med exakt: 'ÅR: 19XX' (där 19XX är det fyrsiffriga årtalet). Om du är osäker, svara UNKNOWN.`;
   
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -294,7 +294,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_completion_tokens: 10
+        max_completion_tokens: 150
       })
     });
     
