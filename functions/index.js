@@ -306,10 +306,19 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
     const aiData = await response.json();
     const aiText = aiData.choices?.[0]?.message?.content?.trim() || "";
     
-    // Extract a 4 digit year
-    const aiYearMatch = aiText.match(/\b(19|20)\d{2}\b/);
-    if (aiYearMatch) {
-      const aiYear = parseInt(aiYearMatch[0], 10);
+    // Extract a 4 digit year from the final answer "ÅR: 19XX"
+    let aiYearMatch = aiText.match(/ÅR:\s*(19\d{2}|20\d{2})/i);
+    
+    // Fallback: get the LAST 4-digit number in the text if "ÅR:" is missing
+    if (!aiYearMatch) {
+      const allYears = aiText.match(/\b(19\d{2}|20\d{2})\b/g);
+      if (allYears && allYears.length > 0) {
+        aiYearMatch = [null, allYears[allYears.length - 1]];
+      }
+    }
+
+    if (aiYearMatch && aiYearMatch[1]) {
+      const aiYear = parseInt(aiYearMatch[1], 10);
       return { year: aiYear };
     } else {
       functions.logger.warn(`OpenAI could not determine a valid year. Response: ${aiText}`);
