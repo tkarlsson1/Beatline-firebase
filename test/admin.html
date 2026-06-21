@@ -348,7 +348,7 @@
 
                 const logEl = document.getElementById("liveLog");
                 logEl.innerHTML = "";
-                logEl.style.display = "block";
+                logEl.style.display = "none"; // Döljer loggen då den blir rörig med Turbo-mode
 
                 const logToUI = (msg) => {
                     const div = document.createElement("div");
