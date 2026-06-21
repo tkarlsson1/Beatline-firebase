@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.021</title>
+    <title>Adminpanel 0.022</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -231,6 +231,18 @@
                 const btn = document.getElementById("cleanDatabaseBtn");
                 btn.disabled = true;
 
+                const logEl = document.getElementById("liveLog");
+                logEl.innerHTML = "";
+                logEl.style.display = "block";
+                
+                const logToUI = (msg) => {
+                    const div = document.createElement("div");
+                    div.textContent = msg;
+                    logEl.appendChild(div);
+                    logEl.scrollTop = logEl.scrollHeight;
+                    console.log(msg); // Också till console för säkerhets skull
+                };
+
                 try {
                     // 1. Hämta verifiedTracks
                     statusEl.innerHTML = "Hämtar cache (verifiedTracks)...";
@@ -267,7 +279,7 @@
                             const track = playlist.songs[trackId];
                             totalChecked++;
 
-                            console.log(`[Granskar] ${track.artist} - ${track.title} (nuvarande år: ${track.year})`);
+                            logToUI(`[Granskar] ${track.artist} - ${track.title} (nuvarande år: ${track.year})`);
 
                             statusEl.innerHTML = `Validerar listan "${listName}" (${i + 1}/${songIds.length}). Låt: ${track.title}`;
 
@@ -280,7 +292,7 @@
                             if (verifiedTracks[trackId] && verifiedTracks[trackId].manuallyVerified) {
                                 newYearStr = String(verifiedTracks[trackId].year);
                                 fixedBy = "Manuellt Låst (Cache)";
-                                console.log(`[LÅST] ${track.title} har ett manuellt låst årtal i cachen (${newYearStr}).`);
+                                logToUI(`[LÅST] ${track.title} har ett manuellt låst årtal i cachen (${newYearStr}).`);
                             }
                             else if (!forceRescan && verifiedTracks[trackId]) {
                                 if (String(verifiedTracks[trackId].year) !== oldYearStr) {
@@ -293,7 +305,7 @@
                                 let skipAi = false;
                                 if (useItunes && window.itunesApi && window.itunesApi.getTrackInfo) {
                                     statusEl.innerHTML = `Söker via iTunes: "${track.title}"...`;
-                                    console.log(`[iTunes-Sökning] Letar efter "${track.artist} - ${track.title}"...`);
+                                    logToUI(`[iTunes-Sökning] Letar efter "${track.artist} - ${track.title}"...`);
                                     const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
                                     
                                     if (itunesResult && itunesResult.found && itunesResult.year) {
@@ -302,12 +314,12 @@
                                         if (String(itunesYear) !== oldYearStr) {
                                             newYearStr = String(itunesYear);
                                             fixedBy = "iTunes";
-                                            console.log(`[JUSTERING] 🍏 iTunes hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
+                                            logToUI(`[JUSTERING] 🍏 iTunes hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
                                         } else {
-                                            console.log(`[OK] 🍏 iTunes bekräftar att ${oldYearStr} redan är rätt.`);
+                                            logToUI(`[OK] 🍏 iTunes bekräftar att ${oldYearStr} redan är rätt.`);
                                         }
                                     } else {
-                                        console.log(`[iTunes] Låten hittades inte i iTunes. Går över till AI...`);
+                                        logToUI(`[iTunes] Låten hittades inte i iTunes. Går över till AI...`);
                                     }
                                 }
 
@@ -315,24 +327,25 @@
                                 if (!fixedBy && !skipAi) {
                                     try {
                                         statusEl.innerHTML = `Frågar AI om "${track.title}"...`;
-                                        console.log(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
+                                        logToUI(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
                                         const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
                                         if (aiResult && aiResult.data && aiResult.data.year) {
                                             const aiYear = String(aiResult.data.year).trim();
-                                            console.log(`[AI-Svar] GPT-5.5 svarade: ${aiYear} (Nuvarande: ${oldYearStr})`);
+                                            logToUI(`[AI-Svar] GPT-5.5 svarade: ${aiYear} (Nuvarande: ${oldYearStr})`);
 
                                             if (aiYear !== "UNKNOWN" && aiYear !== oldYearStr) {
                                                 newYearStr = aiYear;
                                                 fixedBy = "AI";
-                                                console.log(`[JUSTERING] 🔥 AI hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
+                                                logToUI(`[JUSTERING] 🔥 AI hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
                                             } else if (aiYear === oldYearStr) {
-                                                console.log(`[OK] AI bekräftar att ${oldYearStr} redan är rätt.`);
+                                                logToUI(`[OK] AI bekräftar att ${oldYearStr} redan är rätt.`);
                                             } else {
-                                                console.log(`[OKÄNT] AI kunde inte hitta årtalet.`);
+                                                logToUI(`[OKÄNT] AI kunde inte hitta årtalet.`);
                                             }
                                         }
                                     } catch (e) {
                                         console.warn("AI anrop misslyckades för", track.title, e);
+                                        logToUI(`[FEL] AI-anrop misslyckades för ${track.title}`);
                                     }
                                 }
                             }
@@ -341,17 +354,15 @@
                             if (fixedBy) {
                                 const newYearNum = parseInt(newYearStr);
                                 const oldYearNum = parseInt(oldYearStr);
-                                const titleLower = track.title.toLowerCase();
-                                const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
-
+                                
                                 // Filter 1: Orimliga årtal (t.ex. 1900)
                                 if (newYearNum < 1950) {
-                                    console.log(`[FILTRERAD] ❌ Orimligt årtal ${newYearStr} för "${track.title}", ignorerar.`);
+                                    logToUI(`[FILTRERAD] ❌ Orimligt årtal ${newYearStr} för "${track.title}", ignorerar.`);
                                     fixedBy = null;
                                 }
                                 // Filter 2: Förslag >5 år nyare än Spotify = troligen nyutgåva, inte original
                                 else if (newYearNum > oldYearNum + 5) {
-                                    console.log(`[FILTRERAD] ❌ Förslaget ${newYearStr} är ${newYearNum - oldYearNum} år nyare än Spotify (${oldYearStr}), ignorerar.`);
+                                    logToUI(`[FILTRERAD] ❌ Förslaget ${newYearStr} är ${newYearNum - oldYearNum} år nyare än Spotify (${oldYearStr}), ignorerar.`);
                                     fixedBy = null;
                                 }
                             }
@@ -369,7 +380,7 @@
                                 const requiresManualReview = isRemix || isSuspiciouslyOld;
                                 const warningFlag = requiresManualReview ? '⚠️ ' : '';
 
-                                console.log(`[Förslag] ${warningFlag}${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
+                                logToUI(`[Förslag] ${warningFlag}${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
                                 proposedChanges.push({
                                     trackId: trackId,
                                     listName: listName,
@@ -411,6 +422,7 @@
                             const warningIcon = change.requiresManualReview ? '⚠️ ' : '';
                             const defaultChecked = change.requiresManualReview ? '' : 'checked';
                             const inputColor = change.requiresManualReview ? '#fbbf24' : '#10b981';
+                            const googleQuery = encodeURIComponent(`${change.artist} ${change.title} release year`);
                             
                             tr.innerHTML = `
                                 <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
@@ -419,6 +431,10 @@
                                 <td>${change.oldYear}</td>
                                 <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${inputColor}; padding: 6px; text-align: center;"></td>
                                 <td style="color: var(--text-muted);">${change.fixedBy}</td>
+                                <td style="display: flex; gap: 8px;">
+                                    <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
+                                    <button class="btn-danger flag-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Flagga för senare">🚩 Flagga</button>
+                                </td>
                             `;
                             tbody.appendChild(tr);
                         });
@@ -429,6 +445,26 @@
                             document.querySelectorAll(".change-checkbox").forEach(cb => cb.checked = e.target.checked);
                         });
 
+                        // Handle Flag buttons
+                        document.querySelectorAll(".flag-btn").forEach(btn => {
+                            btn.addEventListener("click", (e) => {
+                                const tr = e.target.closest("tr");
+                                const isFlagged = tr.dataset.flagged === "true";
+                                if (!isFlagged) {
+                                    tr.dataset.flagged = "true";
+                                    tr.style.opacity = "0.6";
+                                    tr.querySelector(".change-checkbox").checked = false; // Avbocka auto
+                                    e.target.innerHTML = "Avflagga";
+                                    e.target.classList.replace("btn-danger", "btn-primary");
+                                } else {
+                                    tr.dataset.flagged = "false";
+                                    tr.style.opacity = "1";
+                                    e.target.innerHTML = "🚩 Flagga";
+                                    e.target.classList.replace("btn-primary", "btn-danger");
+                                }
+                            });
+                        });
+
                         // Spara-knappen
                         document.getElementById("saveChangesBtn").onclick = async () => {
                             const saveBtn = document.getElementById("saveChangesBtn");
@@ -437,6 +473,7 @@
 
                             // Gruppera ändringar per lista (undviker root-level permission_denied)
                             let updatesByList = {};
+                            let flaggedUpdates = {};
                             let totalSaved = 0;
 
                             // Hantera listan med ändringar
@@ -446,8 +483,21 @@
                             checkboxes.forEach((cb, i) => {
                                 const change = proposedChanges[cb.getAttribute("data-index")];
                                 const finalYear = inputs[i].value.trim(); // Hämta värdet från input-fältet!
+                                const tr = cb.closest("tr");
+                                const isFlagged = tr.dataset.flagged === "true";
 
-                                if (cb.checked) {
+                                if (isFlagged) {
+                                    // Spara till flaggedTracks för senare granskning
+                                    flaggedUpdates[change.trackId] = {
+                                        title: change.title,
+                                        artist: change.artist,
+                                        listName: change.listName,
+                                        oldYear: change.oldYear,
+                                        suggestedYear: finalYear,
+                                        fixedBy: change.fixedBy,
+                                        flaggedAt: new Date().toISOString()
+                                    };
+                                } else if (cb.checked) {
                                     // Godkänd! Spara till databasen och cachen med 'manuallyVerified'
                                     if (!updatesByList[change.listName]) updatesByList[change.listName] = {};
                                     updatesByList[change.listName][`${change.trackId}/year`] = finalYear;
@@ -469,6 +519,11 @@
                                     };
                                 }
                             });
+
+                            if (Object.keys(flaggedUpdates).length > 0) {
+                                statusEl.innerHTML = "Sparar flaggade låtar...";
+                                await update(ref(db, "flaggedTracks"), flaggedUpdates);
+                            }
 
                             if (totalSaved > 0 || Object.keys(tracksToCache).length > 0) {
                                 // Spara spellistor (bara de låtar som faktiskt ändrades)
@@ -582,6 +637,7 @@
 
                 <button id="cleanDatabaseBtn" class="btn-danger" style="margin-top: 20px; width: 100%; padding: 15px; font-size: 16px;">Städa Hela Databasen</button>
                 <p id="cleanStatus" style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
+                <div id="liveLog" style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;"></div>
             </div>
 
             <!-- Review UI -->
@@ -599,6 +655,7 @@
                                 <th>Gammalt År</th>
                                 <th>Nytt År</th>
                                 <th>Källa</th>
+                                <th>Handlingar</th>
                             </tr>
                         </thead>
                         <tbody id="reviewTableBody"></tbody>
