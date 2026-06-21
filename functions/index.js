@@ -278,7 +278,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
   }
   
-  const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året en specifik låt gavs ut offentligt på singel eller studioalbum. Du MÅSTE ignorera nyutgåvor, remasters, live-versioner och samlingsalbum (Greatest Hits). Svara alltid med det äldsta kända årtalet för originalinspelningen.";
+  const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året en specifik låt gavs ut offentligt på singel eller studioalbum. Du MÅSTE ignorera nyutgåvor, remasters, live-versioner och samlingsalbum (Greatest Hits). Svara alltid med det äldsta kända årtalet för originalinspelningen. VIKTIGT UNDANTAG: Om artistnamnet indikerar en cover, eller ett modernt samarbete/DJ-remix av en gammal låt (t.ex. Kygo, Whitney Houston - Higher Love), så MÅSTE du svara med årtalet för just den specifika remixen/versionen, INTE originalets årtal.";
   const userPrompt = `Vilket var det ursprungliga utgivningsåret för låten '${title}' av artisten '${artist}'? Svara enbart med ett fyrsiffrigt årtal, inga andra ord. Om du är osäker eller om låten/artisten är okänd, svara UNKNOWN.`;
   
   try {
