@@ -391,21 +391,30 @@
                     saveBtn.disabled = true;
                     saveBtn.innerHTML = "Skannar... Vänligen vänta";
 
-                    // 3. Validera spellistor
+                    // 3. Validera spellistor (Parallell bearbetning)
+                    const tasks = [];
                     const playlistNames = Object.keys(standardLists);
                     for (const listName of playlistNames) {
                         const playlist = standardLists[listName];
                         if (!playlist || !playlist.songs) continue;
-
                         const songIds = Object.keys(playlist.songs);
-                        for (let i = 0; i < songIds.length; i++) {
-                            const trackId = songIds[i];
-                            const track = playlist.songs[trackId];
+                        for (const trackId of songIds) {
+                            tasks.push({ listName, trackId, track: playlist.songs[trackId] });
+                        }
+                    }
+
+                    const CONCURRENCY = useItunes ? 1 : 5; // iTunes tvingar 1 (pga rate limits), AI tillåter 5 parallella!
+                    let currentTaskIndex = 0;
+                    let completedTasks = 0;
+
+                    async function worker() {
+                        while (currentTaskIndex < tasks.length) {
+                            const taskIndex = currentTaskIndex++;
+                            const { listName, trackId, track } = tasks[taskIndex];
                             totalChecked++;
 
                             logToUI(`[Granskar] ${track.artist} - ${track.title} (nuvarande år: ${track.year})`);
-
-                            statusEl.innerHTML = `Validerar listan "${listName}" (${i + 1}/${songIds.length}). Låt: ${track.title}`;
+                            statusEl.innerHTML = `Validerar låtar (${completedTasks + 1}/${tasks.length})... Låt: ${track.title}`;
 
                             let oldYearStr = String(track.year);
                             let newYearStr = oldYearStr;
@@ -428,7 +437,6 @@
                             else {
                                 let skipAi = false;
                                 if (useItunes && window.itunesApi && window.itunesApi.getTrackInfo) {
-                                    statusEl.innerHTML = `Söker via iTunes: "${track.title}"...`;
                                     logToUI(`[iTunes-Sökning] Letar efter "${track.artist} - ${track.title}"...`);
                                     const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
 
@@ -450,7 +458,6 @@
                                 // AI? (Bara om iTunes var avstängt, eller om iTunes misslyckades)
                                 if (!fixedBy && !skipAi) {
                                     try {
-                                        statusEl.innerHTML = `Frågar AI om "${track.title}"...`;
                                         logToUI(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
                                         const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
                                         if (aiResult && aiResult.data && aiResult.data.year) {
@@ -474,7 +481,7 @@
                                 }
                             }
 
-                            // === SMARTA FILTER (v0.018) ===
+                            // === SMARTA FILTER ===
                             if (fixedBy) {
                                 const newYearNum = parseInt(newYearStr);
                                 const oldYearNum = parseInt(oldYearStr);
@@ -492,11 +499,9 @@
                             }
 
                             if (fixedBy && fixedBy !== "Manuellt Låst (Cache)") {
-                                // Filter 3 & 4: Flagga osäkra förslag (men visa dem)
+                                // Filter 3 & 4: Flagga osäkra förslag
                                 const titleLower = track.title.toLowerCase();
                                 const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
-
-                                // Filter 4: Stort hopp bakåt (metadata-fel hos iTunes, t.ex. Bruce Springsteen 1966)
                                 const oldYearNum = parseInt(oldYearStr);
                                 const newYearNum = parseInt(newYearStr);
                                 const isSuspiciouslyOld = (oldYearNum - newYearNum > 5);
@@ -581,13 +586,21 @@
                                 };
                             }
 
-                            // Sömn för att inte bli blockerad av iTunes rate limits (HTTP 429 Too Many Requests)
-                            // Apple tillåter ca 20-30 requests per minut utan API-nyckel.
+                            completedTasks++;
+                            
+                            // Sömn för att inte bli blockerad av iTunes rate limits
                             if (useItunes && (!verifiedTracks[trackId] || (forceRescan && !verifiedTracks[trackId].manuallyVerified))) {
                                 await new Promise(r => setTimeout(r, 2000));
                             }
                         }
                     }
+
+                    // Starta arbetarna
+                    const workers = [];
+                    for (let i = 0; i < CONCURRENCY; i++) {
+                        workers.push(worker());
+                    }
+                    await Promise.all(workers);
 
                     // 4. Skanning klar - aktivera Spara-knappen
                     if (proposedChanges.length > 0) {
