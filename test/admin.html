@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.017</title>
+    <title>Adminpanel 0.018</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -217,8 +217,32 @@
                                 }
                             }
 
+                            // === SMARTA FILTER (v0.018) ===
                             if (fixedBy) {
-                                console.log(`[Förslag] ${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
+                                const newYearNum = parseInt(newYearStr);
+                                const oldYearNum = parseInt(oldYearStr);
+                                const titleLower = track.title.toLowerCase();
+                                const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
+
+                                // Filter 1: Orimliga årtal (t.ex. 1900)
+                                if (newYearNum < 1950) {
+                                    console.log(`[FILTRERAD] ❌ Orimligt årtal ${newYearStr} för "${track.title}", ignorerar.`);
+                                    fixedBy = null;
+                                }
+                                // Filter 2: Förslag >5 år nyare än Spotify = troligen nyutgåva, inte original
+                                else if (newYearNum > oldYearNum + 5) {
+                                    console.log(`[FILTRERAD] ❌ Förslaget ${newYearStr} är ${newYearNum - oldYearNum} år nyare än Spotify (${oldYearStr}), ignorerar.`);
+                                    fixedBy = null;
+                                }
+                            }
+
+                            if (fixedBy) {
+                                // Filter 3: Flagga remixer/remasters som osäkra (men visa ändå)
+                                const titleLower = track.title.toLowerCase();
+                                const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
+                                const warningFlag = isRemix ? '⚠️ ' : '';
+
+                                console.log(`[Förslag] ${warningFlag}${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
                                 proposedChanges.push({
                                     trackId: trackId,
                                     listName: listName,
@@ -226,7 +250,8 @@
                                     artist: track.artist,
                                     oldYear: oldYearStr,
                                     newYear: newYearStr,
-                                    fixedBy: fixedBy
+                                    fixedBy: fixedBy,
+                                    isRemix: isRemix
                                 });
                             }
 
@@ -248,12 +273,15 @@
                         proposedChanges.forEach((change, index) => {
                             const tr = document.createElement("tr");
                             tr.style.borderBottom = "1px solid #eee";
+                            if (change.isRemix) tr.style.backgroundColor = "#fff3cd";
+                            const remixIcon = change.isRemix ? '⚠️ ' : '';
+                            const defaultChecked = change.isRemix ? '' : 'checked';
                             tr.innerHTML = `
-                                <td><input type="checkbox" class="change-checkbox" data-index="${index}" checked></td>
-                                <td>${change.title}</td>
+                                <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
+                                <td>${remixIcon}${change.title}</td>
                                 <td>${change.artist}</td>
                                 <td>${change.oldYear}</td>
-                                <td style="font-weight:bold; color:green;">${change.newYear}</td>
+                                <td style="font-weight:bold; color:${change.isRemix ? 'orange' : 'green'};">${change.newYear}</td>
                                 <td>${change.fixedBy}</td>
                             `;
                             tbody.appendChild(tr);
@@ -271,23 +299,34 @@
                             saveBtn.disabled = true;
                             saveBtn.innerHTML = "Sparar...";
 
-                            let databaseUpdates = {};
+                            // Gruppera ändringar per lista (undviker root-level permission_denied)
+                            let updatesByList = {};
                             let cacheUpdates = {};
+                            let totalSaved = 0;
 
                             document.querySelectorAll(".change-checkbox:checked").forEach(cb => {
                                 const change = proposedChanges[cb.getAttribute("data-index")];
-                                databaseUpdates[`standardLists/${change.listName}/songs/${change.trackId}/year`] = change.newYear;
+                                if (!updatesByList[change.listName]) updatesByList[change.listName] = {};
+                                updatesByList[change.listName][`${change.trackId}/year`] = change.newYear;
                                 cacheUpdates[change.trackId] = {
                                     title: change.title,
                                     artist: change.artist,
                                     year: change.newYear
                                 };
+                                totalSaved++;
                             });
 
-                            if (Object.keys(databaseUpdates).length > 0) {
-                                await update(ref(db), databaseUpdates);
-                                await update(ref(db, "verifiedTracks"), cacheUpdates);
-                                statusEl.innerHTML = `<span style="color:green">Sparade ${Object.keys(cacheUpdates).length} ändringar i databasen!</span>`;
+                            if (totalSaved > 0) {
+                                // Spara lista för lista
+                                for (const [listName, listUpdates] of Object.entries(updatesByList)) {
+                                    statusEl.innerHTML = `Sparar lista "${listName}"...`;
+                                    await update(ref(db, `standardLists/${listName}/songs`), listUpdates);
+                                }
+                                // Spara cache
+                                for (const [trackId, trackData] of Object.entries(cacheUpdates)) {
+                                    await set(ref(db, `verifiedTracks/${trackId}`), trackData);
+                                }
+                                statusEl.innerHTML = `<span style="color:green">Sparade ${totalSaved} ändringar i databasen!</span>`;
                                 reviewContainer.style.display = "none";
                             } else {
                                 statusEl.innerHTML = "Inga ändringar markerade att spara.";

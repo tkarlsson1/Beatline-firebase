@@ -1,0 +1,26 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": false,
+    "standardLists": {
+      ".read": true,
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      "$listId": {
+        ".validate": "newData.hasChildren(['songs'])"
+      }
+    },
+    "verifiedTracks": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'"
+    },
+    "userPlaylists": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid",
+        "$playlistId": {
+          ".validate": "newData.hasChildren(['title','tracks'])"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Räddnings-script för databasen</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+            authDomain: "beatlinefirebase.firebaseapp.com",
+            databaseURL: "https://beatlinefirebase-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "beatlinefirebase",
+            storageBucket: "beatlinefirebase.firebasestorage.app",
+            messagingSenderId: "196231817325",
+            appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        let reviewData = null;
+
+        document.getElementById("fileInput").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    reviewData = JSON.parse(event.target.result);
+                    document.getElementById("status").innerHTML = `<span style="color:green">Laddade in ${reviewData.length} låtar från filen!</span>`;
+                } catch (err) {
+                    document.getElementById("status").innerHTML = `<span style="color:red">Kunde inte läsa JSON: ${err.message}</span>`;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById("startRescueBtn").addEventListener("click", async () => {
+            const statusEl = document.getElementById("status");
+            const email = document.getElementById("adminEmail").value;
+            const password = document.getElementById("adminPassword").value;
+
+            if (!reviewData) {
+                alert("Välj JSON-filen först!");
+                return;
+            }
+            if (!email || !password) {
+                alert("Fyll i e-post och lösenord!");
+                return;
+            }
+
+            statusEl.innerText = "Loggar in...";
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // Filtrera fram de godkända
+                const approvedChanges = reviewData.filter(item => item.godkänd);
+                statusEl.innerText = `Hittade ${approvedChanges.length} godkända ändringar. Hämtar databasen...`;
+
+                // Hämta hela standardLists
+                const listsSnap = await get(ref(db, "standardLists"));
+                if (!listsSnap.exists()) {
+                    statusEl.innerText = "Kunde inte hitta standardLists i databasen!";
+                    return;
+                }
+                const standardLists = listsSnap.val();
+
+                statusEl.innerText = "Matchar låtar och förbereder uppdateringar...";
+
+                let totalUpdates = 0;
+                let cacheUpdates = {};
+
+                // Gå igenom alla standardLists och leta efter låtar som matchar
+                for (const [listName, playlist] of Object.entries(standardLists)) {
+                    if (!playlist.songs) continue;
+                    
+                    let hasChanges = false;
+
+                    for (const [trackId, track] of Object.entries(playlist.songs)) {
+                        // Hitta om denna låt finns i approvedChanges
+                        const change = approvedChanges.find(c => c.låt === track.title && c.artist === track.artist);
+                        
+                        if (change && String(track.year) !== String(change.förslag)) {
+                            // Uppdatera låten lokalt i objektet
+                            playlist.songs[trackId].year = String(change.förslag);
+                            hasChanges = true;
+                            
+                            // Förbered för verifiedTracks (cachen)
+                            cacheUpdates[trackId] = {
+                                title: track.title,
+                                artist: track.artist,
+                                year: String(change.förslag)
+                            };
+                            totalUpdates++;
+                        }
+                    }
+
+                    // Skriv över hela spellistan på samma sätt som när en ny läggs till
+                    if (hasChanges) {
+                        statusEl.innerText = `Skriver över spellistan "${listName}" med nya årtal...`;
+                        await set(ref(db, `standardLists/${listName}`), { songs: playlist.songs });
+                    }
+                }
+
+                // Uppdatera cachen
+                if (Object.keys(cacheUpdates).length > 0) {
+                    statusEl.innerText = `Uppdaterar cachen (verifiedTracks) med ${Object.keys(cacheUpdates).length} låtar...`;
+                    
+                    // Om det är väldigt många kan update på hela verifiedTracks också bli blockerat om regeln är strikt
+                    // Vi gör det iterativt för säkerhets skull
+                    for (const [trackId, trackData] of Object.entries(cacheUpdates)) {
+                        await set(ref(db, `verifiedTracks/${trackId}`), trackData);
+                    }
+                }
+
+                statusEl.innerHTML = `<span style="color:green; font-weight:bold;">Klart! Totalt ${totalUpdates} ändringar har nu sparats säkert till Firebase!</span>`;
+
+            } catch (error) {
+                console.error(error);
+                statusEl.innerHTML = `<span style="color:red; font-weight:bold;">Ett fel uppstod: ${error.message}</span>`;
+            }
+        });
+    </script>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+    <h2>Rädda dina godkända låtar 🚑</h2>
+    <p>Detta script laddar in din fil <b>all_songs_review.json</b>, hittar de låtar du kryssat för, och sparar dem säkert till databasen lista för lista (för att undvika "permission_denied").</p>
+    
+    <div style="margin-bottom: 15px; border: 2px dashed #ccc; padding: 10px;">
+        <label style="font-weight:bold;">1. Välj filen du precis laddade ner:</label><br><br>
+        <input type="file" id="fileInput" accept=".json">
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label style="font-weight:bold;">2. Ange admin-inloggning:</label><br>
+        <input type="email" id="adminEmail" placeholder="Admin-e-post" style="padding: 5px;">
+        <input type="password" id="adminPassword" placeholder="Lösenord" style="padding: 5px;">
+    </div>
+    
+    <button id="startRescueBtn" style="padding: 10px 15px; background: #5cb85c; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px;">
+        3. Spara ändringar till databasen
+    </button>
+    
+    <p id="status" style="margin-top: 15px;"></p>
+</body>
+</html>

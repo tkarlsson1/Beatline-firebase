@@ -1,0 +1,6722 @@
+[
+  {
+    "låt": "Go Your Own Way - 2004 Remaster",
+    "artist": "Fleetwood Mac",
+    "spotifyÅr": "1977",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Because the Night",
+    "artist": "Patti Smith",
+    "spotifyÅr": "1978",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Easy",
+    "artist": "Commodores",
+    "spotifyÅr": "1995",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hold the Line",
+    "artist": "TOTO",
+    "spotifyÅr": "2014",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ma Baker",
+    "artist": "Boney M.",
+    "spotifyÅr": "1977",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dreadlock Holiday",
+    "artist": "10cc",
+    "spotifyÅr": "1978",
+    "förslag": "1951",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Take Me Home, Country Roads",
+    "artist": "John Denver",
+    "spotifyÅr": "1997",
+    "förslag": "1971",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's a Heartache",
+    "artist": "Bonnie Tyler",
+    "spotifyÅr": "1978",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Way We Were",
+    "artist": "Barbra Streisand",
+    "spotifyÅr": "1974",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Yes Sir, I Can Boogie",
+    "artist": "Baccara",
+    "spotifyÅr": "1998",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Have You Ever Seen The Rain",
+    "artist": "Creedence Clearwater Revival",
+    "spotifyÅr": "1970",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Nutbush City Limits",
+    "artist": "Ike & Tina Turner",
+    "spotifyÅr": "2003",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm Every Woman",
+    "artist": "Chaka Khan",
+    "spotifyÅr": "1996",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stumblin' In - 2017 Remaster",
+    "artist": "Chris Norman, Suzi Quatro",
+    "spotifyÅr": "1978",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mr. Blue Sky",
+    "artist": "Electric Light Orchestra",
+    "spotifyÅr": "1977",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jolene",
+    "artist": "Dolly Parton",
+    "spotifyÅr": "1974",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rapper's Delight",
+    "artist": "The Sugarhill Gang",
+    "spotifyÅr": "2010",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Disco Inferno - Edit",
+    "artist": "The Trammps",
+    "spotifyÅr": "2016",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Young Hearts Run Free",
+    "artist": "Candi Staton",
+    "spotifyÅr": "1976",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Killing Me Softly With His Song",
+    "artist": "Roberta Flack",
+    "spotifyÅr": "1973",
+    "förslag": "1970",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stayin' Alive - From \"Saturday Night Fever\" Soundtrack",
+    "artist": "Bee Gees",
+    "spotifyÅr": "1979",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You're The First, The Last, My Everything - Edit",
+    "artist": "Barry White",
+    "spotifyÅr": "1994",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "September",
+    "artist": "Earth, Wind & Fire",
+    "spotifyÅr": "2014",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heart Of Glass",
+    "artist": "Blondie",
+    "spotifyÅr": "2006",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Boys Are Back In Town",
+    "artist": "Thin Lizzy",
+    "spotifyÅr": "1976",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Stop 'Til You Get Enough",
+    "artist": "Michael Jackson",
+    "spotifyÅr": "1979",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "She's A Lady",
+    "artist": "Tom Jones",
+    "spotifyÅr": "1997",
+    "förslag": "1971",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You Should Be Dancing",
+    "artist": "Bee Gees",
+    "spotifyÅr": "2009",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Living Next Door to Alice",
+    "artist": "Smokie",
+    "spotifyÅr": "1975",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love Is in the Air",
+    "artist": "John Paul Young",
+    "spotifyÅr": "2006",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "A Horse with No Name",
+    "artist": "America, George Martin",
+    "spotifyÅr": "1972",
+    "förslag": "1971",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Got to Be Real",
+    "artist": "Cheryl Lynn",
+    "spotifyÅr": "1978",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rich Girl",
+    "artist": "Daryl Hall & John Oates",
+    "spotifyÅr": "2005",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rock 'n' Roll (Part 2)",
+    "artist": "Gary Glitter",
+    "spotifyÅr": "1973",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Are Family - 1995 Remaster",
+    "artist": "Sister Sledge",
+    "spotifyÅr": "1995",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "He's the Greatest Dancer - 1995 Remaster",
+    "artist": "Sister Sledge",
+    "spotifyÅr": "1995",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wuthering Heights",
+    "artist": "Kate Bush",
+    "spotifyÅr": "1978",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Chain - 2004 Remaster",
+    "artist": "Fleetwood Mac",
+    "spotifyÅr": "1977",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crocodile Rock",
+    "artist": "Elton John",
+    "spotifyÅr": "1973",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Knock on Wood (7\" Edit)",
+    "artist": "Amii Stewart",
+    "spotifyÅr": "2024",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Black Betty",
+    "artist": "Ram Jam",
+    "spotifyÅr": "1977",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crazy Little Thing Called Love - Remastered 2011",
+    "artist": "Queen",
+    "spotifyÅr": "1980",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Daddy Cool",
+    "artist": "Boney M.",
+    "spotifyÅr": "1994",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Bring Me Down",
+    "artist": "Electric Light Orchestra",
+    "spotifyÅr": "1979",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rivers of Babylon",
+    "artist": "Boney M.",
+    "spotifyÅr": "1978",
+    "förslag": "1900",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "I Feel Love - 12\" Version",
+    "artist": "Donna Summer",
+    "spotifyÅr": "1979",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Don't Like Mondays",
+    "artist": "The Boomtown Rats",
+    "spotifyÅr": "1979",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heroes - 2017 Remaster",
+    "artist": "David Bowie",
+    "spotifyÅr": "1977",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "T.N.T.",
+    "artist": "AC/DC",
+    "spotifyÅr": "1976",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Can See Clearly Now",
+    "artist": "Jimmy Cliff",
+    "spotifyÅr": "2002",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Will Survive - Single Version",
+    "artist": "Gloria Gaynor",
+    "spotifyÅr": "2000",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Video Killed The Radio Star",
+    "artist": "The Buggles",
+    "spotifyÅr": "1980",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Burning Love",
+    "artist": "Elvis Presley",
+    "spotifyÅr": "1973",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wouldn't It Be Good",
+    "artist": "Nik Kershaw",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Always on My Mind",
+    "artist": "Pet Shop Boys",
+    "spotifyÅr": "1998",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summer Of '69",
+    "artist": "Bryan Adams",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wonderful Life",
+    "artist": "Black",
+    "spotifyÅr": "1987",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runaway",
+    "artist": "Bon Jovi",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Abracadabra",
+    "artist": "Steve Miller Band",
+    "spotifyÅr": "2019",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bette Davis Eyes",
+    "artist": "Kim Carnes",
+    "spotifyÅr": "1981",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Power of Love",
+    "artist": "Jennifer Rush",
+    "spotifyÅr": "1995",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Never Ending Story",
+    "artist": "Limahl",
+    "spotifyÅr": "2009",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Time After Time",
+    "artist": "Cyndi Lauper",
+    "spotifyÅr": "2014",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hungry Heart",
+    "artist": "Bruce Springsteen",
+    "spotifyÅr": "1980",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Sweet Dreams (Are Made of This) - 2005 Remaster",
+    "artist": "Eurythmics, Annie Lennox, Dave Stewart",
+    "spotifyÅr": "1983",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "(I've Had) The Time of My Life - From \"Dirty Dancing\" Soundtrack",
+    "artist": "Bill Medley, Jennifer Warnes",
+    "spotifyÅr": "2009",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump (Original Mix)",
+    "artist": "The Pointer Sisters",
+    "spotifyÅr": "1983",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Man in the Mirror - 2012 Remaster",
+    "artist": "Michael Jackson",
+    "spotifyÅr": "2012",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm So Excited",
+    "artist": "The Pointer Sisters",
+    "spotifyÅr": "1982",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Boys - Summertime Love",
+    "artist": "Sabrina",
+    "spotifyÅr": "1988",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "One Night In Bangkok - Radio Edit / From “Chess” / Remastered 2016",
+    "artist": "Murray Head",
+    "spotifyÅr": "2016",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cruel Summer",
+    "artist": "Bananarama",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Relax",
+    "artist": "Frankie Goes To Hollywood",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Eye of the Tiger",
+    "artist": "Survivor",
+    "spotifyÅr": "1985",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ain't Nobody",
+    "artist": "Chaka Khan",
+    "spotifyÅr": "1996",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Somebody's Watching Me - Single Version",
+    "artist": "Rockwell",
+    "spotifyÅr": "2023",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Night Long (All Night) - Single Version",
+    "artist": "Lionel Richie",
+    "spotifyÅr": "2003",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Take on Me",
+    "artist": "a-ha",
+    "spotifyÅr": "1985",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Teardrops",
+    "artist": "Womack & Womack",
+    "spotifyÅr": "2001",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Under Pressure - Remastered 2011",
+    "artist": "Queen, David Bowie",
+    "spotifyÅr": "1982",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Power Of Love",
+    "artist": "Huey Lewis & The News",
+    "spotifyÅr": "2006",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Like a Prayer",
+    "artist": "Madonna",
+    "spotifyÅr": "1989",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hungry Eyes - From \"Dirty Dancing\" Soundtrack",
+    "artist": "Eric Carmen",
+    "spotifyÅr": "1997",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Danger Zone - From \"Top Gun\" Original Soundtrack",
+    "artist": "Kenny Loggins",
+    "spotifyÅr": "1997",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Didn't Start the Fire",
+    "artist": "Billy Joel",
+    "spotifyÅr": "1989",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's a Sin",
+    "artist": "Pet Shop Boys",
+    "spotifyÅr": "1998",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Funkytown",
+    "artist": "Lipps Inc.",
+    "spotifyÅr": "2004",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Celebration",
+    "artist": "Kool & The Gang",
+    "spotifyÅr": "1980",
+    "förslag": "1969",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump (For My Love)",
+    "artist": "The Pointer Sisters",
+    "spotifyÅr": "1983",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Come On Eileen",
+    "artist": "Dexys Midnight Runners",
+    "spotifyÅr": "1982",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sexual Healing",
+    "artist": "Marvin Gaye",
+    "spotifyÅr": "1982",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tell It to My Heart",
+    "artist": "Taylor Dayne",
+    "spotifyÅr": "1988",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Give It Up",
+    "artist": "KC & The Sunshine Band",
+    "spotifyÅr": "2016",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Give It Up",
+    "artist": "KC & The Sunshine Band",
+    "spotifyÅr": "1998",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Karma Chameleon",
+    "artist": "Culture Club",
+    "spotifyÅr": "1993",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Karma Chameleon",
+    "artist": "Culture Club",
+    "spotifyÅr": "1989",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Boys Of Summer - Remastered 2024",
+    "artist": "Don Henley",
+    "spotifyÅr": "2024",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Safety Dance",
+    "artist": "Men Without Hats",
+    "spotifyÅr": "2010",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Moonlight Shadow",
+    "artist": "Mike Oldfield",
+    "spotifyÅr": "2009",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Night Long (All Night) - Single Version",
+    "artist": "Lionel Richie",
+    "spotifyÅr": "1992",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "She Drives Me Crazy",
+    "artist": "Fine Young Cannibals",
+    "spotifyÅr": "1988",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "What's Love Got to Do with It",
+    "artist": "Tina Turner",
+    "spotifyÅr": "1993",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Material Girl - 2024 Remaster",
+    "artist": "Madonna",
+    "spotifyÅr": "1985",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Red Red Wine",
+    "artist": "UB40",
+    "spotifyÅr": "2000",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Get Down On It - Single Version",
+    "artist": "Kool & The Gang",
+    "spotifyÅr": "1999",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Conga",
+    "artist": "Miami Sound Machine",
+    "spotifyÅr": "1992",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Abracadabra - Remastered 2017",
+    "artist": "Steve Miller Band",
+    "spotifyÅr": "2017",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Billie Jean",
+    "artist": "Michael Jackson",
+    "spotifyÅr": "2008",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Holding Out for a Hero - From \"Footloose\" Soundtrack",
+    "artist": "Bonnie Tyler",
+    "spotifyÅr": "1986",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You're the Voice",
+    "artist": "John Farnham",
+    "spotifyÅr": "2008",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's Raining Men - Single Version",
+    "artist": "The Weather Girls",
+    "spotifyÅr": "1982",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Kokomo",
+    "artist": "The Beach Boys",
+    "spotifyÅr": "2003",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Won't Let The Sun Go Down On Me",
+    "artist": "Nik Kershaw",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm Gonna Be (500 Miles)",
+    "artist": "The Proclaimers",
+    "spotifyÅr": "2003",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Self Control",
+    "artist": "Laura Branigan",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dirty Diana",
+    "artist": "Michael Jackson",
+    "spotifyÅr": "1979",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Enjoy the Silence",
+    "artist": "Depeche Mode",
+    "spotifyÅr": "1998",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Walk This Way (feat. Aerosmith)",
+    "artist": "Run–D.M.C., Aerosmith",
+    "spotifyÅr": "1986",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You Shook Me All Night Long",
+    "artist": "AC/DC",
+    "spotifyÅr": "1986",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Stop Believin'",
+    "artist": "Journey",
+    "spotifyÅr": "2001",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Easy Lover",
+    "artist": "Philip Bailey, Phil Collins",
+    "spotifyÅr": "1985",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump - 2015 Remaster",
+    "artist": "Van Halen",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Live Is Life - Live",
+    "artist": "Opus",
+    "spotifyÅr": "1997",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Video Killed The Radio Star",
+    "artist": "The Buggles",
+    "spotifyÅr": "1980",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Total Eclipse of the Heart",
+    "artist": "Bonnie Tyler",
+    "spotifyÅr": "2009",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "In The Summertime",
+    "artist": "Shaggy, Rayvon",
+    "spotifyÅr": "2008",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's Like That",
+    "artist": "Run–D.M.C., Jason Nevins",
+    "spotifyÅr": "2002",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Key, The Secret",
+    "artist": "Urban Cookie Collective",
+    "spotifyÅr": "2006",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "A Girl Like You",
+    "artist": "Edwyn Collins",
+    "spotifyÅr": "2011",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "What Is Love - 7\" Mix",
+    "artist": "Haddaway",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love Is All Around - From \"Four Weddings And A Funeral\"",
+    "artist": "Wet Wet Wet",
+    "spotifyÅr": "1995",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Shoop",
+    "artist": "Salt-N-Pepa",
+    "spotifyÅr": "1993",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Power (7\" Version)",
+    "artist": "SNAP!",
+    "spotifyÅr": "1990",
+    "förslag": "1989",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "When You Say Nothing At All",
+    "artist": "Ronan Keating",
+    "spotifyÅr": "2000",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Another Night",
+    "artist": "Real McCoy",
+    "spotifyÅr": "1995",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Rhythm of the Night",
+    "artist": "Corona",
+    "spotifyÅr": "1994",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Push The Feeling On - Mk Dub Revisited Edit",
+    "artist": "Nightcrawlers, MK",
+    "spotifyÅr": "1995",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Narcotic - Radio Edit",
+    "artist": "Liquido",
+    "spotifyÅr": "1998",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Missing - Todd Terry Remix / Radio Edit",
+    "artist": "Everything But The Girl",
+    "spotifyÅr": "2002",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm Too Sexy",
+    "artist": "Right Said Fred",
+    "spotifyÅr": "2007",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Baby, I Love Your Way",
+    "artist": "Big Mountain",
+    "spotifyÅr": "1999",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Would I Lie To You? - Album Edit",
+    "artist": "Charles & Eddie",
+    "spotifyÅr": "1992",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Praise You (Radio Edit)",
+    "artist": "Fatboy Slim",
+    "spotifyÅr": "2023",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Boom Boom Boom - Don't Break My Balls Mix",
+    "artist": "The Outhere Brothers",
+    "spotifyÅr": "1994",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Breakfast At Tiffany's",
+    "artist": "Deep Blue Something",
+    "spotifyÅr": "1995",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Vogue",
+    "artist": "Madonna",
+    "spotifyÅr": "2009",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm Outta Love - Radio Edit",
+    "artist": "Anastacia",
+    "spotifyÅr": "1999",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Men In Black - From \"Men In Black\" Soundtrack",
+    "artist": "Will Smith",
+    "spotifyÅr": "1997",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Informer",
+    "artist": "Snow",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Living On My Own - No More Brothers Radio Mix",
+    "artist": "Freddie Mercury, Serge Ramaekers, Carl Ward, Colin Peter",
+    "spotifyÅr": "2019",
+    "förslag": "1993",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Turn Around - Radio Edit",
+    "artist": "Phats & Small, Toney Lee",
+    "spotifyÅr": "2000",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sweet Dreams",
+    "artist": "La Bouche",
+    "spotifyÅr": "2007",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mysterious Girl - Radio Edit",
+    "artist": "Peter Andre",
+    "spotifyÅr": "2004",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Rhythm of the Night",
+    "artist": "Corona",
+    "spotifyÅr": "2008",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "...Baby One More Time",
+    "artist": "Britney Spears",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'll Be Missing You (feat. Faith Evans, 112)",
+    "artist": "Diddy, Faith Evans, 112",
+    "spotifyÅr": "2004",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Insomnia - Radio Edit",
+    "artist": "Faithless",
+    "spotifyÅr": "2008",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "American Woman",
+    "artist": "Lenny Kravitz",
+    "spotifyÅr": "1998",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Maria Maria (feat. The Product G&B)",
+    "artist": "Santana, The Product G&B",
+    "spotifyÅr": "1999",
+    "förslag": "1900",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sandstorm",
+    "artist": "Darude",
+    "spotifyÅr": "2000",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Streets of Philadelphia - Single Edit",
+    "artist": "Bruce Springsteen",
+    "spotifyÅr": "1995",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "California Love - Original Version",
+    "artist": "2Pac, Roger, Dr. Dre",
+    "spotifyÅr": "1998",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Shy Guy",
+    "artist": "Diana King",
+    "spotifyÅr": "1995",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ride on Time",
+    "artist": "Black Box",
+    "spotifyÅr": "2006",
+    "förslag": "1989",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Freed From Desire - prod. Molella, Phil Jay",
+    "artist": "Gala, Molella, Phil Jay",
+    "spotifyÅr": "1997",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ready or Not",
+    "artist": "Fugees, Ms. Lauryn Hill, Wyclef Jean, Pras",
+    "spotifyÅr": "1996",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "How Bizarre",
+    "artist": "OMC",
+    "spotifyÅr": "1996",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Blue (Da Ba Dee) - Gabry Ponte Ice Pop Radio",
+    "artist": "Eiffel 65, Gabry Ponte",
+    "spotifyÅr": "2011",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "That Don't Impress Me Much",
+    "artist": "Shania Twain",
+    "spotifyÅr": "1999",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sing It Back - Boris Musical Mix - Edit",
+    "artist": "Moloko, Boris Dlugosch, Michael Lange",
+    "spotifyÅr": "1998",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Friday I'm In Love",
+    "artist": "The Cure",
+    "spotifyÅr": "1992",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "King of My Castle (Roy Malone's King Mix)",
+    "artist": "Wamdue Project, Roy Malone",
+    "spotifyÅr": "2023",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Like To Move It (feat. The Mad Stuntman) ( Erick \"More\" Album Mix)",
+    "artist": "Reel 2 Real, The Mad Stuntman, Erick Morillo",
+    "spotifyÅr": "1994",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Show Me Love",
+    "artist": "Robin S",
+    "spotifyÅr": "1993",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Children",
+    "artist": "Robert Miles",
+    "spotifyÅr": "1996",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I've Been Thinking About You",
+    "artist": "Londonbeat",
+    "spotifyÅr": "1995",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Saturday Night - Radio Mix",
+    "artist": "Whigfield",
+    "spotifyÅr": "1994",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Go West - 2003 Remaster",
+    "artist": "Pet Shop Boys",
+    "spotifyÅr": "2003",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Life",
+    "artist": "Des'ree",
+    "spotifyÅr": "1998",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Boom, Boom, Boom, Boom!!",
+    "artist": "Vengaboys",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Try",
+    "artist": "Macy Gray",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Better Off Alone",
+    "artist": "Alice Deejay",
+    "spotifyÅr": "2000",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Coco Jamboo",
+    "artist": "Mr. President",
+    "spotifyÅr": "1996",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rhythm Is a Dancer - 7\" Edit",
+    "artist": "SNAP!",
+    "spotifyÅr": "1992",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The One and Only",
+    "artist": "Chesney Hawkes",
+    "spotifyÅr": "1991",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Scatman (ski-ba-bop-ba-dop-bop)",
+    "artist": "Scatman John",
+    "spotifyÅr": "1995",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ain't that Just the Way",
+    "artist": "Lutricia McNeal",
+    "spotifyÅr": "1997",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tubthumping",
+    "artist": "Chumbawamba",
+    "spotifyÅr": "2008",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crazy",
+    "artist": "Seal",
+    "spotifyÅr": "2004",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Enjoy the Silence",
+    "artist": "Depeche Mode",
+    "spotifyÅr": "1998",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "This Is How We Do It",
+    "artist": "Montell Jordan",
+    "spotifyÅr": "2015",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Macarena - Bayside Boys Remix",
+    "artist": "Los Del Rio",
+    "spotifyÅr": "2018",
+    "förslag": "1995",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "All That She Wants",
+    "artist": "Ace of Base",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It Must Have Been Love - From the Film \"Pretty Woman\"",
+    "artist": "Roxette",
+    "spotifyÅr": "1990",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pony",
+    "artist": "Ginuwine",
+    "spotifyÅr": "1999",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Moving on Up",
+    "artist": "M People",
+    "spotifyÅr": "1998",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "7 Seconds (feat. Neneh Cherry)",
+    "artist": "Youssou N'Dour, Neneh Cherry",
+    "spotifyÅr": "2004",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump Around - 30 Years Remaster",
+    "artist": "House Of Pain",
+    "spotifyÅr": "2022",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ooh Aah...Just a Little Bit - Motiv8 Radio Edit",
+    "artist": "Gina G, Motiv8",
+    "spotifyÅr": "1997",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "She's so High",
+    "artist": "Tal Bachman",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "No Limit",
+    "artist": "2 Unlimited",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mr. Brightside",
+    "artist": "The Killers",
+    "spotifyÅr": "2004",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Another Chance",
+    "artist": "Roger Sanchez",
+    "spotifyÅr": "2000",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Turn Me On",
+    "artist": "Kevin Lyttle",
+    "spotifyÅr": "2004",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Stop The Music",
+    "artist": "Rihanna",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Low (feat. T-Pain)",
+    "artist": "Flo Rida, T-Pain",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "When Love Takes Over (feat. Kelly Rowland)",
+    "artist": "David Guetta, Kelly Rowland",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "TiK ToK",
+    "artist": "Kesha",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heaven",
+    "artist": "DJ Sammy, Yanou, Do",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Rise",
+    "artist": "Blue",
+    "spotifyÅr": "2004",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It Wasn't Me",
+    "artist": "Shaggy, Rik Rok",
+    "spotifyÅr": "2008",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Evacuate The Dancefloor - Radio Edit",
+    "artist": "Cascada",
+    "spotifyÅr": "2011",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "One More Time - Radio Edit [Short Radio Edit]",
+    "artist": "Daft Punk",
+    "spotifyÅr": "2006",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "From Paris to Berlin",
+    "artist": "Infernal",
+    "spotifyÅr": "2006",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You're Beautiful",
+    "artist": "James Blunt",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dancing in the Moonlight",
+    "artist": "Toploader",
+    "spotifyÅr": "2000",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "I Know You Want Me (Calle Ocho)",
+    "artist": "Pitbull",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Kids",
+    "artist": "MGMT",
+    "spotifyÅr": "2007",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "4 Minutes (feat. Justin Timberlake & Timbaland)",
+    "artist": "Madonna, Justin Timberlake, Timbaland",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pocketful of Sunshine",
+    "artist": "Natasha Bedingfield",
+    "spotifyÅr": "2007",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crazy",
+    "artist": "Gnarls Barkley",
+    "spotifyÅr": "2006",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You've Got The Love",
+    "artist": "Florence + The Machine",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "New Shoes",
+    "artist": "Paolo Nutini",
+    "spotifyÅr": "2007",
+    "förslag": "2006",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dynamite",
+    "artist": "Taio Cruz",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Alors on danse - Radio Edit",
+    "artist": "Stromae",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Little Lion Man",
+    "artist": "Mumford & Sons",
+    "spotifyÅr": "2009",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Survivor",
+    "artist": "Destiny's Child",
+    "spotifyÅr": "2001",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cooler Than Me - Single Mix",
+    "artist": "Mike Posner, Gigamesh",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Disturbia",
+    "artist": "Rihanna",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sexy Bitch (feat. Akon)",
+    "artist": "David Guetta, Akon",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Intro",
+    "artist": "The xx",
+    "spotifyÅr": "2009",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dancing in the Moonlight",
+    "artist": "Toploader",
+    "spotifyÅr": "2000",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "World Hold On (Children of the Sky) - Radio Edit",
+    "artist": "Bob Sinclar, Steve Edwards",
+    "spotifyÅr": "2006",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Forever",
+    "artist": "Chris Brown",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Maria Maria (feat. The Product G&B)",
+    "artist": "Santana, The Product G&B",
+    "spotifyÅr": "1999",
+    "förslag": "1900",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "California - Tchad Blake Mix",
+    "artist": "Phantom Planet",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Umbrella",
+    "artist": "Rihanna, JAY-Z",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lady - Hear Me Tonight",
+    "artist": "Modjo",
+    "spotifyÅr": "2001",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm Outta Love",
+    "artist": "Anastacia",
+    "spotifyÅr": "2010",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hey, Soul Sister",
+    "artist": "Train",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It Feels So Good",
+    "artist": "Sonique",
+    "spotifyÅr": "2000",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bonkers",
+    "artist": "Dizzee Rascal, Armand Van Helden",
+    "spotifyÅr": "2011",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Wish I Was a Punk Rocker (with Flowers in My Hair)",
+    "artist": "Sandi Thom",
+    "spotifyÅr": "2006",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "A Little Less Conversation - JXL Radio Edit Remix",
+    "artist": "Elvis Presley, Junkie XL",
+    "spotifyÅr": "2002",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Murder On The Dancefloor",
+    "artist": "Sophie Ellis-Bextor",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "L'Amour Toujours",
+    "artist": "Gigi D'Agostino",
+    "spotifyÅr": "2001",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dragostea din tei",
+    "artist": "O-Zone",
+    "spotifyÅr": "2004",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Breathless",
+    "artist": "The Corrs",
+    "spotifyÅr": "2000",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Everytime We Touch",
+    "artist": "Cascada",
+    "spotifyÅr": "2010",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lose Yourself",
+    "artist": "Eminem",
+    "spotifyÅr": "2005",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Day 'N' Nite (Nightmare)",
+    "artist": "Kid Cudi",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sandstorm",
+    "artist": "Darude",
+    "spotifyÅr": "2001",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Ketchup Song (Aserejé) - Spanglish Version",
+    "artist": "Las Ketchup",
+    "spotifyÅr": "2002",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "I Know You Want Me (Calle Ocho)",
+    "artist": "Pitbull",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Get Busy",
+    "artist": "Sean Paul",
+    "spotifyÅr": "2022",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Apologize",
+    "artist": "Timbaland, OneRepublic",
+    "spotifyÅr": "2007",
+    "förslag": "2006",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Break Your Heart",
+    "artist": "Taio Cruz",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ayo Technology",
+    "artist": "Milow",
+    "spotifyÅr": "2012",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Run This Town",
+    "artist": "JAY-Z, Rihanna, Kanye West",
+    "spotifyÅr": "2009",
+    "förslag": "2024",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Numb / Encore",
+    "artist": "JAY-Z, Linkin Park",
+    "spotifyÅr": "2004",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sober",
+    "artist": "P!nk",
+    "spotifyÅr": "2010",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Rise",
+    "artist": "Blue",
+    "spotifyÅr": "2001",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pumped Up Kicks",
+    "artist": "Foster The People",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Whatcha Say",
+    "artist": "Jason Derulo",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Around The World (La La La)",
+    "artist": "R3HAB, A Touch Of Class",
+    "spotifyÅr": "2019",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Moonlight",
+    "artist": "Gaullin",
+    "spotifyÅr": "2018",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Call on Me - Ryan Riback Remix",
+    "artist": "Starley, Ryan Riback",
+    "spotifyÅr": "2020",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "In My Mind",
+    "artist": "Dynoro, Gigi D'Agostino",
+    "spotifyÅr": "2018",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "What Lovers Do (feat. SZA)",
+    "artist": "Maroon 5, SZA",
+    "spotifyÅr": "2018",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sweat - Snoop Dogg vs David Guetta Remix",
+    "artist": "Snoop Dogg, David Guetta",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Titanium (feat. Sia)",
+    "artist": "David Guetta, Sia",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dynamite",
+    "artist": "Taio Cruz",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ritual",
+    "artist": "Tiësto, Jonas Blue, Rita Ora",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Took A Pill In Ibiza - Seeb Remix",
+    "artist": "Mike Posner, Seeb",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cool Kids",
+    "artist": "Echosmith",
+    "spotifyÅr": "2013",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stereo Love",
+    "artist": "Edward Maya, Vika Jigulina",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Waves - Robin Schulz Radio Edit",
+    "artist": "Mr. Probz, Robin Schulz",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hold Back The River",
+    "artist": "James Bay",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wild Ones (feat. Sia)",
+    "artist": "Flo Rida, Sia",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Am I Wrong",
+    "artist": "Nico & Vinz",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Feel So Close - Radio Edit",
+    "artist": "Calvin Harris",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Blah Blah Blah",
+    "artist": "Armin van Buuren",
+    "spotifyÅr": "2019",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Give Me Your Love",
+    "artist": "Sigala, John Newman, Nile Rodgers",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lush Life",
+    "artist": "Zara Larsson",
+    "spotifyÅr": "2017",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Havana (feat. Young Thug)",
+    "artist": "Camila Cabello, Young Thug",
+    "spotifyÅr": "2018",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Call Me Maybe",
+    "artist": "Carly Rae Jepsen",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Burn",
+    "artist": "Ellie Goulding",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Good Feeling",
+    "artist": "Flo Rida",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cooler Than Me - Single Mix",
+    "artist": "Mike Posner, Gigamesh",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Scream & Shout",
+    "artist": "will.i.am, Britney Spears",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Little Talks",
+    "artist": "Of Monsters and Men",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Budapest",
+    "artist": "George Ezra",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We No Speak Americano (Edit)",
+    "artist": "Yolanda Be Cool, DCup",
+    "spotifyÅr": "2020",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pretty Girl - Cheat Codes X CADE Remix",
+    "artist": "Maggie Lindemann, CADE, Cheat Codes",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Work Bitch",
+    "artist": "Britney Spears",
+    "spotifyÅr": "2013",
+    "förslag": "2023",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Solo (feat. Demi Lovato)",
+    "artist": "Clean Bandit, Demi Lovato",
+    "spotifyÅr": "2018",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Perfect Strangers",
+    "artist": "Jonas Blue, JP Cooper",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Without You (feat. Usher)",
+    "artist": "David Guetta, USHER",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Can't Hold Us (feat. Ray Dalton)",
+    "artist": "Macklemore, Ryan Lewis, Macklemore & Ryan Lewis, Ray Dalton",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ain't Nobody (Loves Me Better) (feat. Jasmine Thompson)",
+    "artist": "Felix Jaehn, Jasmine Thompson",
+    "spotifyÅr": "2018",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Found Love",
+    "artist": "Rihanna, Calvin Harris",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Are You With Me",
+    "artist": "Lost Frequencies",
+    "spotifyÅr": "2016",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runaway (U & I)",
+    "artist": "Galantis",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "No Lie",
+    "artist": "Sean Paul, Dua Lipa",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Break Your Heart",
+    "artist": "Taio Cruz, Ludacris",
+    "spotifyÅr": "2011",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dynamite",
+    "artist": "Taio Cruz",
+    "spotifyÅr": "2011",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Power Over Me",
+    "artist": "Dermot Kennedy",
+    "spotifyÅr": "2019",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Latch",
+    "artist": "Disclosure, Sam Smith",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You Know You Like It",
+    "artist": "DJ Snake, AlunaGeorge",
+    "spotifyÅr": "2014",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Safe and Sound",
+    "artist": "Capital Cities",
+    "spotifyÅr": "2013",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Piece Of Your Heart",
+    "artist": "MEDUZA, Goodboys",
+    "spotifyÅr": "2023",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Play Hard (feat. Ne-Yo & Akon)",
+    "artist": "David Guetta, Ne-Yo, Akon",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hotter Than Hell",
+    "artist": "Dua Lipa",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stole the Show",
+    "artist": "Kygo, Parson James",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Are Young (feat. Janelle Monáe)",
+    "artist": "fun., Janelle Monáe",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Nevermind",
+    "artist": "Dennis Lloyd",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Faded",
+    "artist": "Alan Walker",
+    "spotifyÅr": "2018",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "No Money",
+    "artist": "Galantis",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summertime Sadness (Lana Del Rey Vs. Cedric Gervais) - Cedric Gervais Remix",
+    "artist": "Lana Del Rey, Cedric Gervais",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "In My Head",
+    "artist": "Jason Derulo",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cool for the Summer",
+    "artist": "Demi Lovato",
+    "spotifyÅr": "2019",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Gold",
+    "artist": "Kiiara",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cheap Thrills (feat. Sean Paul)",
+    "artist": "Sia, Sean Paul",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Club Can't Handle Me (feat. David Guetta)",
+    "artist": "Flo Rida, David Guetta",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Never Forget You",
+    "artist": "Zara Larsson, MNEK",
+    "spotifyÅr": "2017",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Higher Love",
+    "artist": "Kygo, Whitney Houston",
+    "spotifyÅr": "2019",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ex's & Oh's",
+    "artist": "Elle King",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cake By The Ocean",
+    "artist": "DNCE",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sweet but Psycho",
+    "artist": "Ava Max",
+    "spotifyÅr": "2020",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mama",
+    "artist": "Jonas Blue, William Singe",
+    "spotifyÅr": "2018",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Where Them Girls At (feat. Nicki Minaj & Flo Rida)",
+    "artist": "David Guetta, Flo Rida, Nicki Minaj",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Want to Want Me",
+    "artist": "Jason Derulo",
+    "spotifyÅr": "2015",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Give Me Everything (feat. Nayer)",
+    "artist": "Pitbull, AFROJACK, Ne-Yo, Nayer",
+    "spotifyÅr": "2017",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sail",
+    "artist": "AWOLNATION",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cheerleader (Felix Jaehn Remix) - Radio Edit",
+    "artist": "OMI, Felix Jaehn",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pumped Up Kicks",
+    "artist": "Foster The People",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Took A Pill In Ibiza",
+    "artist": "Mike Posner",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Blinding Lights",
+    "artist": "The Weeknd",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rasputin",
+    "artist": "Majestic, Boney M.",
+    "spotifyÅr": "2021",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "3:15 (Breathe)",
+    "artist": "Russ",
+    "spotifyÅr": "2021",
+    "förslag": "2024",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tusa",
+    "artist": "KAROL G, Nicki Minaj",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Life Goes On",
+    "artist": "Oliver Tree",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Levitating (feat. DaBaby)",
+    "artist": "Dua Lipa, DaBaby",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Water",
+    "artist": "Tyla",
+    "spotifyÅr": "2024",
+    "förslag": "2023",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Good Days",
+    "artist": "SZA",
+    "spotifyÅr": "2022",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Calm Down (with Selena Gomez)",
+    "artist": "Rema, Selena Gomez",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "PSYCHO",
+    "artist": "Anne-Marie, Aitch",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "ceilings",
+    "artist": "Lizzy McAlpine",
+    "spotifyÅr": "2022",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love Tonight (David Guetta Remix Edit)",
+    "artist": "Shouse, David Guetta",
+    "spotifyÅr": "2021",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "BILLIE EILISH.",
+    "artist": "Armani White",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Austin (Boots Stop Workin')",
+    "artist": "Dasha",
+    "spotifyÅr": "2024",
+    "förslag": "2023",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Save Your Tears (with Ariana Grande) (Remix)",
+    "artist": "The Weeknd, Ariana Grande",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Forget Me",
+    "artist": "Lewis Capaldi",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Motto",
+    "artist": "Tiësto, Ava Max",
+    "spotifyÅr": "2023",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "End of Beginning",
+    "artist": "Djo",
+    "spotifyÅr": "2022",
+    "förslag": "2024",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bad Habits",
+    "artist": "Ed Sheeran",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "KU LO SA",
+    "artist": "Oxlade",
+    "spotifyÅr": "2025",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "you broke me first",
+    "artist": "Tate McRae",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Big Energy",
+    "artist": "Latto",
+    "spotifyÅr": "2022",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rover (feat. DTG)",
+    "artist": "S1mba, DTG",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Daylight",
+    "artist": "David Kushner",
+    "spotifyÅr": "2024",
+    "förslag": "2023",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sunroof",
+    "artist": "Nicky Youre, hey daisy",
+    "spotifyÅr": "2023",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Borderline",
+    "artist": "Tame Impala",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Escapism.",
+    "artist": "RAYE, 070 Shake",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Strangers",
+    "artist": "Kenya Grace",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Goosebumps - Remix",
+    "artist": "Travis Scott, HVME",
+    "spotifyÅr": "2021",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "go",
+    "artist": "Cat Burns",
+    "spotifyÅr": "2024",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Boy's a liar Pt. 2",
+    "artist": "PinkPantheress, Ice Spice",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "hot girl bummer",
+    "artist": "blackbear",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "10 Things I Hate About You",
+    "artist": "Leah Kate",
+    "spotifyÅr": "2022",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Around The World (La La La)",
+    "artist": "R3HAB, A Touch Of Class",
+    "spotifyÅr": "2019",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Call on Me - Ryan Riback Remix",
+    "artist": "Starley, Ryan Riback",
+    "spotifyÅr": "2020",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "In My Mind",
+    "artist": "Dynoro, Gigi D'Agostino",
+    "spotifyÅr": "2018",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "When Love Takes Over (feat. Kelly Rowland)",
+    "artist": "David Guetta, Kelly Rowland",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Shooting Stars",
+    "artist": "Bag Raiders",
+    "spotifyÅr": "2011",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rasputin",
+    "artist": "Majestic, Boney M.",
+    "spotifyÅr": "2021",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Levitating (feat. DaBaby)",
+    "artist": "Dua Lipa, DaBaby",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Know You Want Me (Calle Ocho)",
+    "artist": "Pitbull",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sun Is Shining - De Luxe Edit",
+    "artist": "Funkstar De Luxe",
+    "spotifyÅr": "2017",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Is This Love - Remix",
+    "artist": "Bob Marley & The Wailers, LVNDSCAPE, Bolier",
+    "spotifyÅr": "2016",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Waves - Robin Schulz Radio Edit",
+    "artist": "Mr. Probz, Robin Schulz",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Higher Love",
+    "artist": "Kygo, Whitney Houston",
+    "spotifyÅr": "2020",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Cry for You",
+    "artist": "September",
+    "spotifyÅr": "2007",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hypnotized",
+    "artist": "Purple Disco Machine, Sophie and the Giants",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Good Feeling",
+    "artist": "Flo Rida",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cooler Than Me - Single Mix",
+    "artist": "Mike Posner, Gigamesh",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Mack",
+    "artist": "Nevada, Mark Morrison, Fetty Wap",
+    "spotifyÅr": "2016",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Espresso - Mark Ronson x FNZ Working Late Remix",
+    "artist": "Sabrina Carpenter, Mark Ronson, FNZ",
+    "spotifyÅr": "2024",
+    "förslag": "2023",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Barbra Streisand - Radio Edit",
+    "artist": "Duck Sauce",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Breaking Me",
+    "artist": "Topic, A7S",
+    "spotifyÅr": "2019",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "World Hold On (Children of the Sky) - Radio Edit",
+    "artist": "Bob Sinclar, Steve Edwards",
+    "spotifyÅr": "2006",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ain't Nobody (Loves Me Better) (feat. Jasmine Thompson)",
+    "artist": "Felix Jaehn, Jasmine Thompson",
+    "spotifyÅr": "2018",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bad Habits",
+    "artist": "Ed Sheeran",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Found Love",
+    "artist": "Rihanna, Calvin Harris",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heroes (we could be)",
+    "artist": "Alesso, Tove Lo",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Are You With Me",
+    "artist": "Lost Frequencies",
+    "spotifyÅr": "2016",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "My Love",
+    "artist": "Route 94, Jess Glynne",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Are The People - southstar Remix",
+    "artist": "Empire Of The Sun, southstar",
+    "spotifyÅr": "2023",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Big Energy",
+    "artist": "Latto",
+    "spotifyÅr": "2022",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Barbie Girl - Tiësto Remix",
+    "artist": "Aqua, Tiësto",
+    "spotifyÅr": "2023",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Latch",
+    "artist": "Disclosure, Sam Smith",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Memories (feat. Kid Cudi) - 2021 Remix",
+    "artist": "David Guetta, Kid Cudi",
+    "spotifyÅr": "2021",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Last Last",
+    "artist": "Burna Boy",
+    "spotifyÅr": "2022",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Easy Love",
+    "artist": "Sigala",
+    "spotifyÅr": "2018",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Con Calma",
+    "artist": "Daddy Yankee, Snow",
+    "spotifyÅr": "2019",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summertime Sadness (Lana Del Rey Vs. Cedric Gervais) - Cedric Gervais Remix",
+    "artist": "Lana Del Rey, Cedric Gervais",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summer Jam 2003 - Remix",
+    "artist": "The Underdog Project, Summermix",
+    "spotifyÅr": "2003",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Despacito",
+    "artist": "Luis Fonsi, Daddy Yankee",
+    "spotifyÅr": "2019",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Magic Key",
+    "artist": "Trinix, One-T",
+    "spotifyÅr": "2023",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Some Say - Felix Jaehn Remix",
+    "artist": "Nea, Felix Jaehn",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Currency (Count On Me) (ft Cimafunk and PAMÉ)",
+    "artist": "ANOTR, Cimafunk, PAMÉ",
+    "spotifyÅr": "2025",
+    "förslag": "2024",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Where Them Girls At (feat. Nicki Minaj & Flo Rida)",
+    "artist": "David Guetta, Flo Rida, Nicki Minaj",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Body Talk",
+    "artist": "Ofenbach, SVEA",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Changes",
+    "artist": "2Pac, Talent",
+    "spotifyÅr": "2007",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Low (feat. T-Pain)",
+    "artist": "Flo Rida, T-Pain",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Shoop",
+    "artist": "Salt-N-Pepa",
+    "spotifyÅr": "1993",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tipsy - Club Mix",
+    "artist": "J-Kwon",
+    "spotifyÅr": "2004",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Get Low",
+    "artist": "Lil Jon & The East Side Boyz, Ying Yang Twins",
+    "spotifyÅr": "2011",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Protect Ya Neck",
+    "artist": "Wu-Tang Clan",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hip Hop Hooray",
+    "artist": "Naughty By Nature",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Notorious B.I.G. (feat. Lil' Kim & Puff Daddy) - 2005 Remaster",
+    "artist": "The Notorious B.I.G., Lil' Kim, Diddy",
+    "spotifyÅr": "1999",
+    "förslag": "1997",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Keep Their Heads Ringin'",
+    "artist": "Dr. Dre",
+    "spotifyÅr": "1995",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "You Can Do It",
+    "artist": "Ice Cube, Mack 10, Ms. Toi",
+    "spotifyÅr": "2007",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'll Be Missing You",
+    "artist": "Diddy, 112, Faith Evans",
+    "spotifyÅr": "2022",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Informer",
+    "artist": "Snow",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rapper's Delight",
+    "artist": "The Sugarhill Gang",
+    "spotifyÅr": "2010",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Jump Off (feat. Mr. Cheeks) - Remix",
+    "artist": "Lil' Kim, Mr. Cheeks",
+    "spotifyÅr": "2003",
+    "förslag": "2025",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Sound of da Police",
+    "artist": "KRS-One",
+    "spotifyÅr": "1993",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "California Love - Original Version",
+    "artist": "2Pac, Roger, Dr. Dre",
+    "spotifyÅr": "1998",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ready or Not",
+    "artist": "Fugees, Ms. Lauryn Hill, Wyclef Jean, Pras",
+    "spotifyÅr": "1996",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cold as Ice",
+    "artist": "M.O.P.",
+    "spotifyÅr": "2000",
+    "förslag": "1996",
+    "källa": "AI",
+    "godkänd": false
+  },
+  {
+    "låt": "Flava in Ya Ear Remix (feat. The Notorious B.I.G., LL Cool J, Busta Rhymes, Rampage)",
+    "artist": "Craig Mack, Busta Rhymes, LL COOL J, Rampage, The Notorious B.I.G.",
+    "spotifyÅr": "1994",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Touch It - Remix/Featuring Mary J. Blige, Rah Digga, Missy Elliot, Lloyd Banks, Papoose & DMX (Explcit)",
+    "artist": "Busta Rhymes, Mary J. Blige, Missy Elliott, DMX, Rah Digga, Lloyd Banks, Papoose",
+    "spotifyÅr": "2005",
+    "förslag": "2006",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "I Like That",
+    "artist": "Houston, Chingy, Nate Dogg, I-20",
+    "spotifyÅr": "2004",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "How We Do",
+    "artist": "The Game, 50 Cent",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Freek-A-Leek",
+    "artist": "Petey Pablo",
+    "spotifyÅr": "2003",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "O.P.P. (Re-Recorded)",
+    "artist": "Naughty By Nature",
+    "spotifyÅr": "2011",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Black and Yellow",
+    "artist": "Wiz Khalifa",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Too Close",
+    "artist": "Next",
+    "spotifyÅr": "1997",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Thong Song",
+    "artist": "Sisqo",
+    "spotifyÅr": "1999",
+    "förslag": "2000",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Ante Up (feat. Busta Rhymes, Teflon & Remi Martin) - Remix",
+    "artist": "M.O.P., Busta Rhymes, Teflon, Remi Martin",
+    "spotifyÅr": "2000",
+    "förslag": "2025",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Simon Says",
+    "artist": "Pharoahe Monch",
+    "spotifyÅr": "2019",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hope",
+    "artist": "Twista, Faith Evans",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Disco Inferno",
+    "artist": "50 Cent",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "This Is How We Do It",
+    "artist": "Montell Jordan",
+    "spotifyÅr": "2015",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "So Fresh, So Clean",
+    "artist": "Outkast",
+    "spotifyÅr": "2000",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "C U When U Get There",
+    "artist": "Coolio, 40 Thevz",
+    "spotifyÅr": "1997",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Need A Doctor",
+    "artist": "Dr. Dre, Eminem, Skylar Grey",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump Around - 30 Years Remaster",
+    "artist": "House Of Pain",
+    "spotifyÅr": "2022",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Run This Town",
+    "artist": "JAY-Z, Rihanna, Kanye West",
+    "spotifyÅr": "2009",
+    "förslag": "2024",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Big Pimpin'",
+    "artist": "JAY-Z, UGK",
+    "spotifyÅr": "1999",
+    "förslag": "2000",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Hot Stuff",
+    "artist": "Kygo, Donna Summer",
+    "spotifyÅr": "2020",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Wheel of Fortune",
+    "artist": "Ace of Base",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Call on Me - Ryan Riback Remix",
+    "artist": "Starley, Ryan Riback",
+    "spotifyÅr": "2020",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Nån Annan (feat. Jacco)",
+    "artist": "Dani M, Jacco",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bittersweet Symphony",
+    "artist": "GAMPER & DADONI, Emily Roberts",
+    "spotifyÅr": "2024",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Torn",
+    "artist": "Natalie Imbruglia",
+    "spotifyÅr": "1998",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sweat - Snoop Dogg vs David Guetta Remix",
+    "artist": "Snoop Dogg, David Guetta",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Blinding Lights",
+    "artist": "The Weeknd",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Upside Down",
+    "artist": "Jack Johnson",
+    "spotifyÅr": "2006",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rasputin",
+    "artist": "Majestic, Boney M.",
+    "spotifyÅr": "2021",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "rockstar (feat. 21 Savage)",
+    "artist": "Post Malone, 21 Savage",
+    "spotifyÅr": "2018",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Shots - Broiler Remix",
+    "artist": "Imagine Dragons, Broiler",
+    "spotifyÅr": "2015",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's a Beautiful Day",
+    "artist": "Michael Bublé",
+    "spotifyÅr": "2013",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Took A Pill In Ibiza - Seeb Remix",
+    "artist": "Mike Posner, Seeb",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "September Song",
+    "artist": "JP Cooper",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love Again - Imanbek Remix",
+    "artist": "Dua Lipa, Imanbek",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Closing Time",
+    "artist": "Semisonic",
+    "spotifyÅr": "2003",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Waves - Robin Schulz Radio Edit",
+    "artist": "Mr. Probz, Robin Schulz",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Baby, I Love Your Way",
+    "artist": "Big Mountain",
+    "spotifyÅr": "1999",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ett sista glas",
+    "artist": "Miriam Bryant",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Would I Lie To You? - Album Edit",
+    "artist": "Charles & Eddie",
+    "spotifyÅr": "1992",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wasted Love (feat. Lagique)",
+    "artist": "Ofenbach, Lagique",
+    "spotifyÅr": "2022",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sommartider",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "1982",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Feel So Close - Radio Edit",
+    "artist": "Calvin Harris",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "People Everyday - Metamorphosis Mix",
+    "artist": "Arrested Development",
+    "spotifyÅr": "2003",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lush Life",
+    "artist": "Zara Larsson",
+    "spotifyÅr": "2017",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "By Your Side (feat. Tom Grennan)",
+    "artist": "Calvin Harris, Tom Grennan",
+    "spotifyÅr": "2024",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Can't Hold Us (feat. Ray Dalton)",
+    "artist": "Macklemore, Ryan Lewis, Macklemore & Ryan Lewis, Ray Dalton",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Your Wish",
+    "artist": "Talisco",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bullet",
+    "artist": "Infinite Mass",
+    "spotifyÅr": "2001",
+    "förslag": "1998",
+    "källa": "AI",
+    "godkänd": false
+  },
+  {
+    "låt": "Stay (feat. Maty Noyes)",
+    "artist": "Kygo, Maty Noyes",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Start Now",
+    "artist": "Dua Lipa",
+    "spotifyÅr": "2021",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heatwave (feat. Akon)",
+    "artist": "Robin Schulz, Akon",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jerusalema (feat. Nomcebo Zikode)",
+    "artist": "Master KG, Nomcebo Zikode",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dance Monkey",
+    "artist": "Tones And I",
+    "spotifyÅr": "2021",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Head Shoulders Knees & Toes (feat. Norma Jean Martine)",
+    "artist": "Ofenbach, Quarterhead, Norma Jean Martine",
+    "spotifyÅr": "2022",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "So Am I",
+    "artist": "Ava Max",
+    "spotifyÅr": "2020",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Forgive Me Friend",
+    "artist": "Smith & Thell, Swedish Jam Factory",
+    "spotifyÅr": "2021",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sexy Bitch (feat. Akon)",
+    "artist": "David Guetta, Akon",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Nothing Left (feat. Will Heard)",
+    "artist": "Kygo, Will Heard",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Budapest",
+    "artist": "George Ezra",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "2 Heads",
+    "artist": "Coleman Hell",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Uptown Funk (feat. Bruno Mars)",
+    "artist": "Mark Ronson, Bruno Mars",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "What's Love Got to Do with It",
+    "artist": "Kygo, Tina Turner",
+    "spotifyÅr": "2020",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Concrete Schoolyard",
+    "artist": "Jurassic 5",
+    "spotifyÅr": "2008",
+    "förslag": "2006",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bad Memories",
+    "artist": "MEDUZA, James Carter, Elley Duhé, FAST BOY",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ortens favoriter - Remix",
+    "artist": "Labyrint, Black Ghost, STOR, Aleks, Allyawan, Påse, Dani M, Alladin, Jaqe",
+    "spotifyÅr": "2012",
+    "förslag": "2014",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "...Baby One More Time",
+    "artist": "Britney Spears",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Maria Maria (feat. The Product G&B)",
+    "artist": "Santana, The Product G&B",
+    "spotifyÅr": "1999",
+    "förslag": "1900",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "My Way",
+    "artist": "Calvin Harris",
+    "spotifyÅr": "2024",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bad Habits",
+    "artist": "Ed Sheeran",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Redbone",
+    "artist": "Childish Gambino",
+    "spotifyÅr": "2016",
+    "förslag": "2023",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Pumped Up",
+    "artist": "Klingande",
+    "spotifyÅr": "2019",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Paradise",
+    "artist": "MEDUZA, Dermot Kennedy",
+    "spotifyÅr": "2023",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dog Days Are Over",
+    "artist": "Florence + The Machine",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runaway (U & I)",
+    "artist": "Galantis",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stationen (feat. STOR & Aleks) - Single Version",
+    "artist": "Ison & Fille, ISON, Fille Danza, STOR, Aleks",
+    "spotifyÅr": "2015",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "How Bizarre",
+    "artist": "OMC",
+    "spotifyÅr": "1996",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "No Lie",
+    "artist": "Sean Paul, Dua Lipa",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "California - Tchad Blake Mix",
+    "artist": "Phantom Planet",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hey, Soul Sister",
+    "artist": "Train",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dreams",
+    "artist": "The Cranberries",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Would Like",
+    "artist": "Zara Larsson",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ocean Drive",
+    "artist": "Duke Dumont",
+    "spotifyÅr": "2020",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cynical",
+    "artist": "twocolors, Safri Duo, Chris de Sarandy",
+    "spotifyÅr": "2024",
+    "förslag": "2023",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "She Doesn't Mind",
+    "artist": "Sean Paul",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Murder On The Dancefloor",
+    "artist": "Sophie Ellis-Bextor",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love Is in the Air",
+    "artist": "John Paul Young",
+    "spotifyÅr": "2006",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Congratulations",
+    "artist": "Don Diablo, Brando",
+    "spotifyÅr": "2021",
+    "förslag": "2019",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Memories (feat. Kid Cudi) - 2021 Remix",
+    "artist": "David Guetta, Kid Cudi",
+    "spotifyÅr": "2021",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Following the Sun",
+    "artist": "SUPER-Hi, NEEKA",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Girls Like (feat. Zara Larsson)",
+    "artist": "Tinie Tempah, Zara Larsson",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "This Girl (Kungs Vs Cookin' On 3 Burners) - Extended",
+    "artist": "Kungs, Cookin' On 3 Burners",
+    "spotifyÅr": "2016",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Best Day Of My Life",
+    "artist": "American Authors",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Breathless",
+    "artist": "The Corrs",
+    "spotifyÅr": "2000",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Oh boy",
+    "artist": "Peps Persson",
+    "spotifyÅr": "2004",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Try",
+    "artist": "Macy Gray",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Play Hard (feat. Ne-Yo & Akon)",
+    "artist": "David Guetta, Ne-Yo, Akon",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Worry Be Happy",
+    "artist": "Bobby McFerrin",
+    "spotifyÅr": "1997",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Night Long (All Night) - Recorded at Spotify Studios Stockholm",
+    "artist": "Benjamin Ingrosso",
+    "spotifyÅr": "2019",
+    "förslag": "2018",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Chasing Cars",
+    "artist": "Snow Patrol",
+    "spotifyÅr": "2006",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heartbeats",
+    "artist": "José González",
+    "spotifyÅr": "2003",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stole the Show",
+    "artist": "Kygo, Parson James",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Suddenly I See",
+    "artist": "KT Tunstall",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Never Seen the Rain",
+    "artist": "Tones And I",
+    "spotifyÅr": "2021",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Happy - From \"Despicable Me 2\"",
+    "artist": "Pharrell Williams",
+    "spotifyÅr": "2014",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Värsting",
+    "artist": "Daddy Boastin",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Prayer in C - Robin Schulz Radio Edit",
+    "artist": "Lilly Wood and The Prick, Robin Schulz",
+    "spotifyÅr": "2019",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Castle on the Hill",
+    "artist": "Ed Sheeran",
+    "spotifyÅr": "2017",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rude",
+    "artist": "MAGIC!",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Desire",
+    "artist": "Olly Alexander (Years & Years), Tove Lo",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "One Day",
+    "artist": "Matisyahu",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Don't Care",
+    "artist": "Ed Sheeran, Justin Bieber",
+    "spotifyÅr": "2024",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Higher Love",
+    "artist": "Kygo, Whitney Houston",
+    "spotifyÅr": "2019",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Remind Me to Forget",
+    "artist": "Kygo, Miguel",
+    "spotifyÅr": "2017",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "1, 2, 3 (feat. Jason Derulo & De La Ghetto)",
+    "artist": "Sofía Reyes, Jason Derulo, De La Ghetto",
+    "spotifyÅr": "2022",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "How Will I Know",
+    "artist": "Whitney Houston, Clean Bandit",
+    "spotifyÅr": "2021",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Down Under (feat. Colin Hay)",
+    "artist": "Luude, Colin Hay",
+    "spotifyÅr": "2021",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Some Say - Felix Jaehn Remix",
+    "artist": "Nea, Felix Jaehn",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "WOW",
+    "artist": "Zara Larsson",
+    "spotifyÅr": "2021",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Iko Iko (My Bestie)",
+    "artist": "Justin Wellington, Small Jam",
+    "spotifyÅr": "2019",
+    "förslag": "2017",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Close Your Eyes",
+    "artist": "Felix Jaehn, VIZE, Miss Li",
+    "spotifyÅr": "2019",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Memories (feat. Kid Cudi)",
+    "artist": "David Guetta, Kid Cudi",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love We Lost",
+    "artist": "Armin van Buuren, R3HAB, Simon Ward",
+    "spotifyÅr": "2023",
+    "förslag": "2022",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Where Them Girls At (feat. Nicki Minaj & Flo Rida)",
+    "artist": "David Guetta, Flo Rida, Nicki Minaj",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Close Your Eyes",
+    "artist": "Felix Jaehn, VIZE, Miss Li",
+    "spotifyÅr": "2021",
+    "förslag": "2020",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "She's so High",
+    "artist": "Tal Bachman",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Best Part of Life - Imanbek Remix",
+    "artist": "SAINt JHN, Imanbek",
+    "spotifyÅr": "2022",
+    "förslag": "2021",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Younger - Kygo Remix",
+    "artist": "Seinabo Sey, Kygo",
+    "spotifyÅr": "2015",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Gold",
+    "artist": "Kiiara",
+    "spotifyÅr": "2020",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Riptide",
+    "artist": "Vance Joy",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Around The World (La La La)",
+    "artist": "R3HAB, A Touch Of Class",
+    "spotifyÅr": "2019",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Summer Of '69",
+    "artist": "Bryan Adams",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Bittersweet Symphony",
+    "artist": "GAMPER & DADONI, Emily Roberts",
+    "spotifyÅr": "2024",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Titanium (feat. Sia)",
+    "artist": "David Guetta, Sia",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Blinding Lights",
+    "artist": "The Weeknd",
+    "spotifyÅr": "2020",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "(I Just) Died In Your Arms",
+    "artist": "Cutting Crew",
+    "spotifyÅr": "1993",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cruel Summer",
+    "artist": "Bananarama",
+    "spotifyÅr": "2017",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Trumpets",
+    "artist": "Jason Derulo",
+    "spotifyÅr": "2016",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Firestone",
+    "artist": "Kygo, Conrad Sewell",
+    "spotifyÅr": "2016",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Time After Time",
+    "artist": "Cyndi Lauper",
+    "spotifyÅr": "2014",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wild Ones (feat. Sia)",
+    "artist": "Flo Rida, Sia",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Baby, I Love Your Way",
+    "artist": "Big Mountain",
+    "spotifyÅr": "1999",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sweet Dreams (Are Made of This) - 2005 Remaster",
+    "artist": "Eurythmics, Annie Lennox, Dave Stewart",
+    "spotifyÅr": "1983",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "One Way Or Another",
+    "artist": "Blondie",
+    "spotifyÅr": "1981",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I'm So Excited",
+    "artist": "The Pointer Sisters",
+    "spotifyÅr": "1982",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Lush Life",
+    "artist": "Zara Larsson",
+    "spotifyÅr": "2017",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Breakfast At Tiffany's",
+    "artist": "Deep Blue Something",
+    "spotifyÅr": "1995",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "These Days (feat. Jess Glynne, Macklemore & Dan Caplen)",
+    "artist": "Rudimental, Jess Glynne, Macklemore, Dan Caplen",
+    "spotifyÅr": "2019",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "You've Got The Love",
+    "artist": "Florence + The Machine",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dynamite",
+    "artist": "Taio Cruz",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Come On Eileen",
+    "artist": "Dexys Midnight Runners",
+    "spotifyÅr": "2018",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Have You Ever Seen The Rain",
+    "artist": "Creedence Clearwater Revival",
+    "spotifyÅr": "1970",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "American Pie",
+    "artist": "Don McLean",
+    "spotifyÅr": "1988",
+    "förslag": "1971",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Kokomo",
+    "artist": "The Beach Boys",
+    "spotifyÅr": "2012",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Night Long (All Night) - Single Version",
+    "artist": "Lionel Richie",
+    "spotifyÅr": "2003",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Under Pressure - Remastered 2011",
+    "artist": "Queen, David Bowie",
+    "spotifyÅr": "1982",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rockabye (feat. Sean Paul & Anne-Marie)",
+    "artist": "Clean Bandit, Anne-Marie, Sean Paul",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Edge of Seventeen",
+    "artist": "Stevie Nicks",
+    "spotifyÅr": "2007",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Power Of Love",
+    "artist": "Huey Lewis & The News",
+    "spotifyÅr": "2006",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Riptide",
+    "artist": "Vance Joy",
+    "spotifyÅr": "2014",
+    "förslag": "2013",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hungry Eyes - From \"Dirty Dancing\" Soundtrack",
+    "artist": "Eric Carmen",
+    "spotifyÅr": "1997",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Danger Zone - From \"Top Gun\" Original Soundtrack",
+    "artist": "Kenny Loggins",
+    "spotifyÅr": "1997",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Didn't Start the Fire",
+    "artist": "Billy Joel",
+    "spotifyÅr": "1989",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "World Hold On (Children of the Sky) - Radio Edit",
+    "artist": "Bob Sinclar, Steve Edwards",
+    "spotifyÅr": "2006",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Stop Believin'",
+    "artist": "Journey",
+    "spotifyÅr": "2010",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Solo (feat. Demi Lovato)",
+    "artist": "Clean Bandit, Demi Lovato",
+    "spotifyÅr": "2018",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Perfect Strangers",
+    "artist": "Jonas Blue, JP Cooper",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sunset Lover",
+    "artist": "Petit Biscuit",
+    "spotifyÅr": "2017",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Should I Stay or Should I Go - Remastered",
+    "artist": "The Clash",
+    "spotifyÅr": "2013",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Follow Rivers - The Magician Remix",
+    "artist": "Lykke Li, The Magician",
+    "spotifyÅr": "2021",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Are You With Me",
+    "artist": "Lost Frequencies",
+    "spotifyÅr": "2016",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mama Said",
+    "artist": "Lukas Graham",
+    "spotifyÅr": "2016",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Boys Of Summer - Remastered 2024",
+    "artist": "Don Henley",
+    "spotifyÅr": "2024",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Go Your Own Way - 2004 Remaster",
+    "artist": "Fleetwood Mac",
+    "spotifyÅr": "1977",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Walk Of Life",
+    "artist": "Dire Straits",
+    "spotifyÅr": "2005",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Here I Go Again - 2011 Remaster",
+    "artist": "Whitesnake",
+    "spotifyÅr": "1982",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rich Girl",
+    "artist": "Daryl Hall & John Oates",
+    "spotifyÅr": "2005",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Piece Of Your Heart",
+    "artist": "MEDUZA, Goodboys",
+    "spotifyÅr": "2023",
+    "förslag": "2019",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's Raining Men - Single Version",
+    "artist": "The Weather Girls",
+    "spotifyÅr": "1982",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runnin' Down A Dream",
+    "artist": "Tom Petty",
+    "spotifyÅr": "2019",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Nevermind",
+    "artist": "Dennis Lloyd",
+    "spotifyÅr": "2017",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Prayer in C - Robin Schulz Radio Edit",
+    "artist": "Lilly Wood and The Prick, Robin Schulz",
+    "spotifyÅr": "2019",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All Summer Long",
+    "artist": "Kid Rock",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Higher Love",
+    "artist": "Kygo, Whitney Houston",
+    "spotifyÅr": "2019",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Remind Me to Forget",
+    "artist": "Kygo, Miguel",
+    "spotifyÅr": "2017",
+    "förslag": "2018",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crazy Little Thing Called Love - Remastered 2011",
+    "artist": "Queen",
+    "spotifyÅr": "1980",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Don't Bring Me Down",
+    "artist": "Electric Light Orchestra",
+    "spotifyÅr": "1979",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Because the Night",
+    "artist": "Patti Smith",
+    "spotifyÅr": "1978",
+    "förslag": "1977",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Escape (The Pina Colada Song)",
+    "artist": "Rupert Holmes",
+    "spotifyÅr": "2007",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cheap Thrills",
+    "artist": "Sia",
+    "spotifyÅr": "2016",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Call Me",
+    "artist": "Blondie",
+    "spotifyÅr": "2004",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heroes - 2017 Remaster",
+    "artist": "David Bowie",
+    "spotifyÅr": "1977",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Are Young (feat. Janelle Monáe)",
+    "artist": "fun., Janelle Monáe",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Want to Want Me",
+    "artist": "Jason Derulo",
+    "spotifyÅr": "2015",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Cheerleader (Felix Jaehn Remix) - Radio Edit",
+    "artist": "OMI, Felix Jaehn",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pumped Up Kicks",
+    "artist": "Foster The People",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mr. Brightside",
+    "artist": "The Killers",
+    "spotifyÅr": "2004",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "My Number",
+    "artist": "Foals",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Go Your Own Way - 2004 Remaster",
+    "artist": "Fleetwood Mac",
+    "spotifyÅr": "1977",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summer Of '69",
+    "artist": "Bryan Adams",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Limelight",
+    "artist": "Rush",
+    "spotifyÅr": "1981",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hey Joe",
+    "artist": "Jimi Hendrix",
+    "spotifyÅr": "1967",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runaway",
+    "artist": "Bon Jovi",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sharp Dressed Man (2008 Remaster)",
+    "artist": "ZZ Top",
+    "spotifyÅr": "1983",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Whole Lotta Shakin' Going On - Remastered 2022",
+    "artist": "Jerry Lee Lewis",
+    "spotifyÅr": "2022",
+    "förslag": "1957",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lay It Down",
+    "artist": "Ratt",
+    "spotifyÅr": "1984",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "American Woman - 7\" Single Version",
+    "artist": "The Guess Who",
+    "spotifyÅr": "1970",
+    "förslag": "1900",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Shots - Broiler Remix",
+    "artist": "Imagine Dragons, Broiler",
+    "spotifyÅr": "2015",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Good Times Roll - 2016 Remaster",
+    "artist": "The Cars",
+    "spotifyÅr": "2016",
+    "förslag": "1978",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "You're in Love",
+    "artist": "Ratt",
+    "spotifyÅr": "1984",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Long Cool Woman (In a Black Dress) - 1999 Remaster",
+    "artist": "The Hollies",
+    "spotifyÅr": "1971",
+    "förslag": "1967",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Times Like These - Acoustic Version",
+    "artist": "Foo Fighters",
+    "spotifyÅr": "2019",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "White Wedding - Pt.1",
+    "artist": "Billy Idol",
+    "spotifyÅr": "2023",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lay It On The Line",
+    "artist": "Triumph",
+    "spotifyÅr": "2010",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Any Way You Want It",
+    "artist": "Journey",
+    "spotifyÅr": "2001",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bullet",
+    "artist": "Infinite Mass",
+    "spotifyÅr": "2001",
+    "förslag": "1994",
+    "källa": "AI",
+    "godkänd": false
+  },
+  {
+    "låt": "Eye of the Tiger",
+    "artist": "Survivor",
+    "spotifyÅr": "1985",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Have You Ever Seen The Rain",
+    "artist": "Creedence Clearwater Revival",
+    "spotifyÅr": "1970",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Wait",
+    "artist": "White Lion",
+    "spotifyÅr": "2010",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mr. Blue Sky",
+    "artist": "Electric Light Orchestra",
+    "spotifyÅr": "1977",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Black Betty",
+    "artist": "Ram Jam",
+    "spotifyÅr": "1990",
+    "förslag": "1972",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Legendary",
+    "artist": "Welshly Arms",
+    "spotifyÅr": "2018",
+    "förslag": "2016",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Under Pressure - Remastered 2011",
+    "artist": "Queen, David Bowie",
+    "spotifyÅr": "1982",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summertime Girls - Studio Version",
+    "artist": "Y&T",
+    "spotifyÅr": "1990",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Come with Me Now",
+    "artist": "KONGOS",
+    "spotifyÅr": "2014",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Brass in Pocket - 2018 Remaster",
+    "artist": "Pretenders",
+    "spotifyÅr": "1980",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mr. Crowley",
+    "artist": "Ozzy Osbourne",
+    "spotifyÅr": "2020",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It's Time",
+    "artist": "Imagine Dragons",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Enter Sandman - Remastered 2021",
+    "artist": "Metallica",
+    "spotifyÅr": "2021",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tom Sawyer",
+    "artist": "Rush",
+    "spotifyÅr": "1981",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Honky Tonk Women - Mono Version",
+    "artist": "The Rolling Stones",
+    "spotifyÅr": "1971",
+    "förslag": "1966",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heartbreak Hotel",
+    "artist": "Elvis Presley, Axton, Durden, Presley",
+    "spotifyÅr": "2014",
+    "förslag": "1956",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Mary Jane's Last Dance",
+    "artist": "Tom Petty and the Heartbreakers",
+    "spotifyÅr": "2008",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Summertime Blues",
+    "artist": "Eddie Cochran",
+    "spotifyÅr": "1960",
+    "förslag": "1958",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "November Rain - 2022 Version",
+    "artist": "Guns N' Roses",
+    "spotifyÅr": "2022",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "She Sells Sanctuary",
+    "artist": "The Cult",
+    "spotifyÅr": "1985",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Under Pressure - Single Version; 2017 Remaster",
+    "artist": "Queen, David Bowie",
+    "spotifyÅr": "2017",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Boys Are Back In Town",
+    "artist": "Thin Lizzy",
+    "spotifyÅr": "1976",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rock You Like a Hurricane - 2011",
+    "artist": "Scorpions",
+    "spotifyÅr": "2011",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Talk Dirty To Me",
+    "artist": "Poison",
+    "spotifyÅr": "2011",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "A Little Less Conversation",
+    "artist": "Elvis Presley",
+    "spotifyÅr": "2007",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Up All Night",
+    "artist": "Slaughter",
+    "spotifyÅr": "1995",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runnin' Down A Dream",
+    "artist": "Tom Petty",
+    "spotifyÅr": "1989",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Fortunate Son",
+    "artist": "Creedence Clearwater Revival",
+    "spotifyÅr": "1969",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Knockin' On Heaven's Door",
+    "artist": "Guns N' Roses",
+    "spotifyÅr": "1991",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Blitzkrieg Bop - 2016 Remaster",
+    "artist": "Ramones",
+    "spotifyÅr": "1976",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Down in Mexico",
+    "artist": "The Coasters",
+    "spotifyÅr": "2005",
+    "förslag": "1956",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Boys Of Summer - Remastered 2024",
+    "artist": "Don Henley",
+    "spotifyÅr": "2024",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Detroit Rock City",
+    "artist": "KISS",
+    "spotifyÅr": "1978",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Friday I'm In Love",
+    "artist": "The Cure",
+    "spotifyÅr": "1992",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Personal Jesus - Single Version",
+    "artist": "Depeche Mode",
+    "spotifyÅr": "1998",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Black Magic Woman - Single Version",
+    "artist": "Santana",
+    "spotifyÅr": "1994",
+    "förslag": "1970",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Back on the Chain Gang - 2007 Remaster",
+    "artist": "Pretenders",
+    "spotifyÅr": "1984",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Spirit Of Radio",
+    "artist": "Rush",
+    "spotifyÅr": "1980",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "House of the Rising Sun",
+    "artist": "The Animals",
+    "spotifyÅr": "1987",
+    "förslag": "1963",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Want To Hold Your Hand - Remastered 2015",
+    "artist": "The Beatles",
+    "spotifyÅr": "2000",
+    "förslag": "1963",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Call Me",
+    "artist": "Blondie",
+    "spotifyÅr": "1999",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mississippi Queen",
+    "artist": "Mountain",
+    "spotifyÅr": "1970",
+    "förslag": "1969",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Howlin' for You",
+    "artist": "The Black Keys",
+    "spotifyÅr": "2020",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Killing In The Name",
+    "artist": "Rage Against The Machine",
+    "spotifyÅr": "1992",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Inside Out",
+    "artist": "XYZ",
+    "spotifyÅr": "2011",
+    "förslag": "1989",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump - 2015 Remaster",
+    "artist": "Van Halen",
+    "spotifyÅr": "2015",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "In My Dreams (Re-Recorded / Remastered)",
+    "artist": "Dokken",
+    "spotifyÅr": "2010",
+    "förslag": "1985",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Edge of Seventeen - 2016 Remaster",
+    "artist": "Stevie Nicks",
+    "spotifyÅr": "2016",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Loser",
+    "artist": "Beck",
+    "spotifyÅr": "1994",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We're Not Gonna Take It",
+    "artist": "Twisted Sister",
+    "spotifyÅr": "2007",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "One Way Or Another - Remastered 2001",
+    "artist": "Blondie",
+    "spotifyÅr": "1979",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Last Resort",
+    "artist": "Papa Roach",
+    "spotifyÅr": "2001",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jerk It Out",
+    "artist": "Caesars",
+    "spotifyÅr": "2002",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Chain - 2004 Remaster",
+    "artist": "Fleetwood Mac",
+    "spotifyÅr": "1977",
+    "förslag": "1974",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Funk #49",
+    "artist": "James Gang",
+    "spotifyÅr": "1970",
+    "förslag": "1969",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Great Balls Of Fire",
+    "artist": "Jerry Lee Lewis",
+    "spotifyÅr": "1989",
+    "förslag": "1957",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Balls to the Wall",
+    "artist": "Accept",
+    "spotifyÅr": "1983",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Runnin' Down A Dream",
+    "artist": "Tom Petty",
+    "spotifyÅr": "2019",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Surrender",
+    "artist": "Cheap Trick",
+    "spotifyÅr": "2004",
+    "förslag": "1978",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Roll Over Beethoven",
+    "artist": "Chuck Berry",
+    "spotifyÅr": "1959",
+    "förslag": "1956",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cum on Feel the Noize",
+    "artist": "Quiet Riot",
+    "spotifyÅr": "1996",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Here I Go Again - 2018 Remaster",
+    "artist": "Whitesnake",
+    "spotifyÅr": "1987",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Kryptonite",
+    "artist": "3 Doors Down",
+    "spotifyÅr": "2000",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Walk This Way (feat. Aerosmith)",
+    "artist": "Run–D.M.C., Aerosmith",
+    "spotifyÅr": "1986",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rock 'N' Roll Is King",
+    "artist": "Electric Light Orchestra",
+    "spotifyÅr": "1983",
+    "förslag": "1973",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crazy Little Thing Called Love - Remastered 2011",
+    "artist": "Queen",
+    "spotifyÅr": "1980",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Creep",
+    "artist": "Radiohead",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Love Song",
+    "artist": "Tesla",
+    "spotifyÅr": "1995",
+    "förslag": "1989",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Believe in a Thing Called Love",
+    "artist": "The Darkness",
+    "spotifyÅr": "2003",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crazy Train",
+    "artist": "Ozzy Osbourne",
+    "spotifyÅr": "2020",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heroes - 2017 Remaster",
+    "artist": "David Bowie",
+    "spotifyÅr": "1977",
+    "förslag": "1975",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jump - 2015 Remaster",
+    "artist": "Van Halen",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jane Says",
+    "artist": "Jane's Addiction",
+    "spotifyÅr": "1988",
+    "förslag": "1987",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sail",
+    "artist": "AWOLNATION",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rockin' Robin",
+    "artist": "Bobby Day",
+    "spotifyÅr": "1959",
+    "förslag": "1957",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Pumped Up Kicks",
+    "artist": "Foster The People",
+    "spotifyÅr": "2011",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Burning Love",
+    "artist": "Elvis Presley",
+    "spotifyÅr": "1973",
+    "förslag": "1968",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "In The Summertime",
+    "artist": "Shaggy, Rayvon",
+    "spotifyÅr": "2008",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Heaven",
+    "artist": "DJ Sammy, Yanou, Do",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dunka mig gul & blå",
+    "artist": "Frida",
+    "spotifyÅr": "2008",
+    "förslag": "2007",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "What's In It For Me",
+    "artist": "Amy Diamond",
+    "spotifyÅr": "2010",
+    "förslag": "2005",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Där jag hänger min hatt",
+    "artist": "Norlie & KKV",
+    "spotifyÅr": "2013",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Saxofuckingfon",
+    "artist": "Samir & Viktor",
+    "spotifyÅr": "2015",
+    "förslag": "2017",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Mister Cool",
+    "artist": "Snook",
+    "spotifyÅr": "2004",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Bailando - Video Edit",
+    "artist": "Paradisio, Marisa",
+    "spotifyÅr": "2011",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Would I Lie To You? - Album Edit",
+    "artist": "Charles & Eddie",
+    "spotifyÅr": "1992",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sommaren i City",
+    "artist": "Angel",
+    "spotifyÅr": "1997",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Waka Waka (This Time for Africa) [The Official 2010 FIFA World Cup (TM) Song] (feat. Freshlyground)",
+    "artist": "Shakira, Freshlyground",
+    "spotifyÅr": "2023",
+    "förslag": "2010",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sommartider",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "1982",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lady",
+    "artist": "Wayne Wade",
+    "spotifyÅr": "2010",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Lush Life",
+    "artist": "Zara Larsson",
+    "spotifyÅr": "2017",
+    "förslag": "2015",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Rap Das Armas - Lucana Video Edit",
+    "artist": "Cidinho & Doca",
+    "spotifyÅr": "2009",
+    "förslag": "2007",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Call Me Maybe",
+    "artist": "Carly Rae Jepsen",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ding Dong Song - Radio Edit",
+    "artist": "Günther",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Magaluf",
+    "artist": "Orup",
+    "spotifyÅr": "2008",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mr. Saxobeat - Radio Edit",
+    "artist": "Alexandra Stan",
+    "spotifyÅr": "2011",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Natteravn",
+    "artist": "Rasmus Seebach",
+    "spotifyÅr": "2010",
+    "förslag": "2009",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Kingston Town",
+    "artist": "UB40",
+    "spotifyÅr": "1991",
+    "förslag": "1989",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Din soldat",
+    "artist": "Albin Johnsén, Kristin Amparo",
+    "spotifyÅr": "2015",
+    "förslag": "2014",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Boys Of Summer - Remastered 2024",
+    "artist": "Don Henley",
+    "spotifyÅr": "2024",
+    "förslag": "1984",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Superstar",
+    "artist": "Navigators",
+    "spotifyÅr": "2001",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Murder On The Dancefloor",
+    "artist": "Sophie Ellis-Bextor",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Red Red Wine",
+    "artist": "UB40",
+    "spotifyÅr": "2000",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dragostea din tei",
+    "artist": "O-Zone",
+    "spotifyÅr": "2004",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Love Your Smile",
+    "artist": "Shanice",
+    "spotifyÅr": "1999",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Loco in Acapulco",
+    "artist": "Four Tops",
+    "spotifyÅr": "2010",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Boom, Boom, Boom, Boom!!",
+    "artist": "Vengaboys",
+    "spotifyÅr": "1999",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Oh boy",
+    "artist": "Peps Persson",
+    "spotifyÅr": "2004",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tu Es Foutu - Radio Edit",
+    "artist": "In-Grid",
+    "spotifyÅr": "2003",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Destination Calabria - Radio Edit",
+    "artist": "Alex Gaudino, Crystal Waters",
+    "spotifyÅr": "2007",
+    "förslag": "2006",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Tide Is High - Radio Mix",
+    "artist": "Atomic Kitten",
+    "spotifyÅr": "2003",
+    "förslag": "2002",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Better Off Alone",
+    "artist": "Alice Deejay",
+    "spotifyÅr": "2000",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Everytime We Touch",
+    "artist": "Cascada",
+    "spotifyÅr": "2006",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Coco Jamboo",
+    "artist": "Mr. President",
+    "spotifyÅr": "1996",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tacatà - Radio Edit",
+    "artist": "Tacabro",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Won't Let The Sun Go Down On Me - 7\" Original Radio",
+    "artist": "Robin Cook",
+    "spotifyÅr": "1997",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I Won't Let The Sun Go Down On Me",
+    "artist": "Nik Kershaw",
+    "spotifyÅr": "1984",
+    "förslag": "1983",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "My Number One",
+    "artist": "Helena Paparizou",
+    "spotifyÅr": "2005",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ingen vill veta var du köpt din tröja",
+    "artist": "Raymond & Maria",
+    "spotifyÅr": "2008",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Ketchup Song (Aserejé) - Spanglish Version",
+    "artist": "Las Ketchup",
+    "spotifyÅr": "2002",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Papaya Coconut",
+    "artist": "Kikki Danielsson",
+    "spotifyÅr": "2001",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hot",
+    "artist": "INNA",
+    "spotifyÅr": "2010",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Opa Opa",
+    "artist": "Antique",
+    "spotifyÅr": "2007",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Vart jag mig i världen vänder",
+    "artist": "Den svenska björnstammen",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Mister Cool",
+    "artist": "Snook",
+    "spotifyÅr": "2004",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Jerk It Out",
+    "artist": "Caesars",
+    "spotifyÅr": "2005",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Cry for You",
+    "artist": "September",
+    "spotifyÅr": "2007",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hurtful",
+    "artist": "Erik Hassle",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "AI",
+    "godkänd": true
+  },
+  {
+    "låt": "Segertåget",
+    "artist": "Maskinen",
+    "spotifyÅr": "2009",
+    "förslag": "2008",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "I samma bil",
+    "artist": "Bo Kaspers Orkester",
+    "spotifyÅr": "2014",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Boten Anna - Radio edit",
+    "artist": "Basshunter",
+    "spotifyÅr": "2008",
+    "förslag": "2006",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "With Every Heartbeat",
+    "artist": "Kleerup, Robyn",
+    "spotifyÅr": "2009",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Alive",
+    "artist": "Da Buzz",
+    "spotifyÅr": "2007",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Yours to Keep",
+    "artist": "Teddybears",
+    "spotifyÅr": "2000",
+    "förslag": "2006",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Someone New",
+    "artist": "Eskobar, Heather Nova",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Satellites",
+    "artist": "September",
+    "spotifyÅr": "2008",
+    "förslag": "2005",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ingen vill veta var du köpt din tröja",
+    "artist": "Raymond & Maria",
+    "spotifyÅr": "2008",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "This Is The World We Live In",
+    "artist": "Alcazar",
+    "spotifyÅr": "2005",
+    "förslag": "2003",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Crying at the Discoteque - Radio Edit",
+    "artist": "Alcazar",
+    "spotifyÅr": "1999",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "4 sekunder",
+    "artist": "Magnus Uggla",
+    "spotifyÅr": "1993",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Sleeping In My Car",
+    "artist": "Roxette",
+    "spotifyÅr": "1994",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Gå & fiska!",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "2000",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Vem tänder stjärnorna",
+    "artist": "Eva Dahlgren",
+    "spotifyÅr": "2010",
+    "förslag": "1991",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Det är över nu",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "2000",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Hos dig är jag underbar",
+    "artist": "Patrik Isaksson",
+    "spotifyÅr": "2008",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Trubaduren",
+    "artist": "Magnus Uggla",
+    "spotifyÅr": "1997",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It Must Have Been Love - From the Film \"Pretty Woman\"",
+    "artist": "Roxette",
+    "spotifyÅr": "2006",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Hiphopper (feat. Teddybears Sthlm)",
+    "artist": "Thomas Rusiak, Teddybears",
+    "spotifyÅr": "2016",
+    "förslag": "2000",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sommaren i City",
+    "artist": "Angel",
+    "spotifyÅr": "1997",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Catch the Moon",
+    "artist": "Stefan Andersson",
+    "spotifyÅr": "2007",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dina färger var blå",
+    "artist": "Tommy Nilsson",
+    "spotifyÅr": "1996",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Dansar aldrig nykter",
+    "artist": "Magnus Uggla",
+    "spotifyÅr": "2008",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "När vi gräver guld i USA",
+    "artist": "Glenmark Eriksson Strömstedt",
+    "spotifyÅr": "1995",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Eloise",
+    "artist": "Arvingarna",
+    "spotifyÅr": "1993",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Öppna din dörr",
+    "artist": "Tommy Nilsson",
+    "spotifyÅr": "2001",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Det Vackraste",
+    "artist": "Cecilia Vennersten",
+    "spotifyÅr": "2002",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tusen och en natt",
+    "artist": "Charlotte Perrelli",
+    "spotifyÅr": "2008",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Someone New",
+    "artist": "Eskobar, Heather Nova",
+    "spotifyÅr": "2002",
+    "förslag": "2001",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "All That She Wants",
+    "artist": "Ace of Base",
+    "spotifyÅr": "1993",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "We Are All The Winners",
+    "artist": "Nick Borgen",
+    "spotifyÅr": "2006",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dina färger var blå",
+    "artist": "Tommy Nilsson",
+    "spotifyÅr": "2006",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Gå & fiska!",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "2000",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "Hos dig är jag underbar",
+    "artist": "Patrik Isaksson",
+    "spotifyÅr": "2008",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Brev från kolonien",
+    "artist": "Cornelis Vreeswijk",
+    "spotifyÅr": "2001",
+    "förslag": "1965",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ljudet av ett annat hjärta - 7\" Single",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "1981",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sommaren i City",
+    "artist": "Angel",
+    "spotifyÅr": "1997",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Utan dina andetag",
+    "artist": "kent",
+    "spotifyÅr": "2000",
+    "förslag": "1997",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Sommartider",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "1982",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Trubaduren",
+    "artist": "Magnus Uggla",
+    "spotifyÅr": "2008",
+    "förslag": "1993",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Vill ha dig",
+    "artist": "Freestyle",
+    "spotifyÅr": "1998",
+    "förslag": "1981",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "När vi gräver guld i USA",
+    "artist": "Glenmark Eriksson Strömstedt",
+    "spotifyÅr": "2008",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Tusen bitar",
+    "artist": "Björn Afzelius",
+    "spotifyÅr": "2006",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Öppna din dörr",
+    "artist": "Tommy Nilsson",
+    "spotifyÅr": "1995",
+    "förslag": "1982",
+    "källa": "iTunes",
+    "godkänd": false
+  },
+  {
+    "låt": "När vi två blir en",
+    "artist": "Gyllene Tider",
+    "spotifyÅr": "1981",
+    "förslag": "1980",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Du får göra som du vill",
+    "artist": "Patrik Isaksson",
+    "spotifyÅr": "2008",
+    "förslag": "1999",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Magaluf",
+    "artist": "Orup",
+    "spotifyÅr": "2008",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Vågorna",
+    "artist": "Uno Svenningsson",
+    "spotifyÅr": "2003",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Eloise",
+    "artist": "Arvingarna",
+    "spotifyÅr": "1993",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Raggarrock (Pojkarna som busar)",
+    "artist": "Björn Rosenström",
+    "spotifyÅr": "1995",
+    "förslag": "1998",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Take A Chance On Me",
+    "artist": "ABBA",
+    "spotifyÅr": "1977",
+    "förslag": "1976",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Det Vackraste",
+    "artist": "Cecilia Vennersten",
+    "spotifyÅr": "2002",
+    "förslag": "1995",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Oh boy",
+    "artist": "Peps Persson",
+    "spotifyÅr": "2004",
+    "förslag": "1992",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Ingen vill veta var du köpt din tröja",
+    "artist": "Raymond & Maria",
+    "spotifyÅr": "2008",
+    "förslag": "2004",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "The Final Countdown",
+    "artist": "Europe",
+    "spotifyÅr": "1993",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Dansa Pausa",
+    "artist": "Panetoz",
+    "spotifyÅr": "2014",
+    "förslag": "2012",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "It Must Have Been Love - From the Film \"Pretty Woman\"",
+    "artist": "Roxette",
+    "spotifyÅr": "1995",
+    "förslag": "1986",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Just idag är jag stark",
+    "artist": "Kenta",
+    "spotifyÅr": "2008",
+    "förslag": "1979",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Inget stoppar oss nu",
+    "artist": "BlackJack",
+    "spotifyÅr": "2008",
+    "förslag": "1990",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Shoreline",
+    "artist": "Broder Daniel",
+    "spotifyÅr": "2003",
+    "förslag": "1996",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Stad i ljus",
+    "artist": "Tommy Körberg",
+    "spotifyÅr": "1995",
+    "förslag": "1988",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Vart jag mig i världen vänder",
+    "artist": "Den svenska björnstammen",
+    "spotifyÅr": "2012",
+    "förslag": "2011",
+    "källa": "iTunes",
+    "godkänd": true
+  },
+  {
+    "låt": "Vandraren",
+    "artist": "Nordman",
+    "spotifyÅr": "2001",
+    "förslag": "1994",
+    "källa": "iTunes",
+    "godkänd": true
+  }
+]
