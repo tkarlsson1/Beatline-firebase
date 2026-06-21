@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.023</title>
+    <title>Adminpanel 0.024</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -76,6 +76,10 @@
         .btn-danger:hover { background-color: var(--danger-hover); transform: translateY(-1px); }
         .btn-info { background-color: #0ea5e9; color: white; padding: 8px 16px; font-size: 14px; }
         .btn-info:hover { background-color: #0284c7; transform: translateY(-1px); }
+        .btn-secondary { background-color: #64748b; color: white; }
+        .btn-secondary:hover { background-color: #475569; transform: translateY(-1px); }
+        
+        .reviewed-row { opacity: 0.4; background-color: rgba(16, 185, 129, 0.05) !important; transition: all 0.2s; }
         
         label {
             display: flex;
@@ -418,9 +422,10 @@
                                     <td>${change.oldYear}</td>
                                     <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${inputColor}; padding: 6px; text-align: center;"></td>
                                     <td style="color: var(--text-muted);">${change.fixedBy}</td>
-                                    <td style="display: flex; gap: 8px;">
+                                    <td style="display: flex; gap: 8px; flex-wrap: wrap;">
                                         <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
                                         <button class="btn-danger flag-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Flagga för senare">🚩 Flagga</button>
+                                        <button class="btn-secondary reviewed-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Markera visuellt som granskad">✔ Klar</button>
                                     </td>
                                 `;
 
@@ -439,6 +444,17 @@
                                         tr.style.opacity = "1";
                                         e.target.innerHTML = "🚩 Flagga";
                                         e.target.classList.replace("btn-primary", "btn-danger");
+                                    }
+                                });
+
+                                // Bind Klar-knappen (visuell markering)
+                                const reviewedBtn = tr.querySelector(".reviewed-btn");
+                                reviewedBtn.addEventListener("click", (e) => {
+                                    tr.classList.toggle("reviewed-row");
+                                    if (tr.classList.contains("reviewed-row")) {
+                                        e.target.innerHTML = "Ångra";
+                                    } else {
+                                        e.target.innerHTML = "✔ Klar";
                                     }
                                 });
 
