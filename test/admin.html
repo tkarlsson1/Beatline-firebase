@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.022</title>
+    <title>Adminpanel 0.023</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -267,6 +267,15 @@
                     const useItunes = document.getElementById("useItunesCheckbox").checked;
                     const forceRescan = document.getElementById("forceRescanCheckbox").checked;
 
+                    // Setup Live Review Table
+                    const reviewContainer = document.getElementById("reviewContainer");
+                    const tbody = document.getElementById("reviewTableBody");
+                    const saveBtn = document.getElementById("saveChangesBtn");
+                    reviewContainer.style.display = "block";
+                    tbody.innerHTML = "";
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = "Skannar... Vänligen vänta";
+
                     // 3. Validera spellistor
                     const playlistNames = Object.keys(standardLists);
                     for (const listName of playlistNames) {
@@ -381,7 +390,7 @@
                                 const warningFlag = requiresManualReview ? '⚠️ ' : '';
 
                                 logToUI(`[Förslag] ${warningFlag}${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
-                                proposedChanges.push({
+                                const change = {
                                     trackId: trackId,
                                     listName: listName,
                                     title: track.title,
@@ -390,7 +399,51 @@
                                     newYear: newYearStr,
                                     fixedBy: fixedBy,
                                     requiresManualReview: requiresManualReview
+                                };
+                                const index = proposedChanges.length;
+                                proposedChanges.push(change);
+
+                                // LIVE UI UPDATE: Lägg till raden i tabellen direkt
+                                const tr = document.createElement("tr");
+                                if (change.requiresManualReview) tr.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
+                                const warningIcon = change.requiresManualReview ? '⚠️ ' : '';
+                                const defaultChecked = change.requiresManualReview ? '' : 'checked';
+                                const inputColor = change.requiresManualReview ? '#fbbf24' : '#10b981';
+                                const googleQuery = encodeURIComponent(`${change.artist} ${change.title} release year`);
+                                
+                                tr.innerHTML = `
+                                    <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
+                                    <td>${warningIcon}${change.title}</td>
+                                    <td>${change.artist}</td>
+                                    <td>${change.oldYear}</td>
+                                    <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${inputColor}; padding: 6px; text-align: center;"></td>
+                                    <td style="color: var(--text-muted);">${change.fixedBy}</td>
+                                    <td style="display: flex; gap: 8px;">
+                                        <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
+                                        <button class="btn-danger flag-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Flagga för senare">🚩 Flagga</button>
+                                    </td>
+                                `;
+
+                                // Bind Flag-knappen för denna rad direkt
+                                const flagBtn = tr.querySelector(".flag-btn");
+                                flagBtn.addEventListener("click", (e) => {
+                                    const isFlagged = tr.dataset.flagged === "true";
+                                    if (!isFlagged) {
+                                        tr.dataset.flagged = "true";
+                                        tr.style.opacity = "0.6";
+                                        tr.querySelector(".change-checkbox").checked = false; // Avbocka auto
+                                        e.target.innerHTML = "Avflagga";
+                                        e.target.classList.replace("btn-danger", "btn-primary");
+                                    } else {
+                                        tr.dataset.flagged = "false";
+                                        tr.style.opacity = "1";
+                                        e.target.innerHTML = "🚩 Flagga";
+                                        e.target.classList.replace("btn-primary", "btn-danger");
+                                    }
                                 });
+
+                                tbody.appendChild(tr);
+                                
                             } else if (!verifiedTracks[trackId]) {
                                 // Låten är okej (iTunes håller med Spotify), vi lägger den i cachen för att slippa söka igen!
                                 tracksToCache[trackId] = {
@@ -409,65 +462,30 @@
                         }
                     }
 
-                    // 4. Visa granskningsvy
+                    // 4. Skanning klar - aktivera Spara-knappen
                     if (proposedChanges.length > 0) {
                         statusEl.innerHTML = `Hittade ${proposedChanges.length} ändringar av totalt ${totalChecked} låtar. Granska dem nedan.`;
-                        const reviewContainer = document.getElementById("reviewContainer");
-                        const tbody = document.getElementById("reviewTableBody");
-                        tbody.innerHTML = "";
-
-                        proposedChanges.forEach((change, index) => {
-                            const tr = document.createElement("tr");
-                            if (change.requiresManualReview) tr.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
-                            const warningIcon = change.requiresManualReview ? '⚠️ ' : '';
-                            const defaultChecked = change.requiresManualReview ? '' : 'checked';
-                            const inputColor = change.requiresManualReview ? '#fbbf24' : '#10b981';
-                            const googleQuery = encodeURIComponent(`${change.artist} ${change.title} release year`);
-                            
-                            tr.innerHTML = `
-                                <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
-                                <td>${warningIcon}${change.title}</td>
-                                <td>${change.artist}</td>
-                                <td>${change.oldYear}</td>
-                                <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${inputColor}; padding: 6px; text-align: center;"></td>
-                                <td style="color: var(--text-muted);">${change.fixedBy}</td>
-                                <td style="display: flex; gap: 8px;">
-                                    <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
-                                    <button class="btn-danger flag-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Flagga för senare">🚩 Flagga</button>
-                                </td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                        reviewContainer.style.display = "block";
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = "Godkänn och Spara markerade";
 
                         // Handle "Select All"
-                        document.getElementById("selectAllCheckbox").addEventListener("change", (e) => {
-                            document.querySelectorAll(".change-checkbox").forEach(cb => cb.checked = e.target.checked);
-                        });
-
-                        // Handle Flag buttons
-                        document.querySelectorAll(".flag-btn").forEach(btn => {
-                            btn.addEventListener("click", (e) => {
-                                const tr = e.target.closest("tr");
-                                const isFlagged = tr.dataset.flagged === "true";
-                                if (!isFlagged) {
-                                    tr.dataset.flagged = "true";
-                                    tr.style.opacity = "0.6";
-                                    tr.querySelector(".change-checkbox").checked = false; // Avbocka auto
-                                    e.target.innerHTML = "Avflagga";
-                                    e.target.classList.replace("btn-danger", "btn-primary");
-                                } else {
-                                    tr.dataset.flagged = "false";
-                                    tr.style.opacity = "1";
-                                    e.target.innerHTML = "🚩 Flagga";
-                                    e.target.classList.replace("btn-primary", "btn-danger");
+                        const selectAllCb = document.getElementById("selectAllCheckbox");
+                        // Rensa tidigare listeners för att undvika dubbletter
+                        const newSelectAllCb = selectAllCb.cloneNode(true);
+                        selectAllCb.parentNode.replaceChild(newSelectAllCb, selectAllCb);
+                        
+                        newSelectAllCb.addEventListener("change", (e) => {
+                            document.querySelectorAll(".change-checkbox").forEach(cb => {
+                                // Om raden är flaggad, rör inte checkboxen
+                                const tr = cb.closest("tr");
+                                if (tr.dataset.flagged !== "true") {
+                                    cb.checked = e.target.checked;
                                 }
                             });
                         });
 
                         // Spara-knappen
-                        document.getElementById("saveChangesBtn").onclick = async () => {
-                            const saveBtn = document.getElementById("saveChangesBtn");
+                        saveBtn.onclick = async () => {
                             saveBtn.disabled = true;
                             saveBtn.innerHTML = "Sparar...";
 
@@ -545,6 +563,7 @@
                         };
                     } else {
                         // Inga fel hittades alls, MEN vi vill ändå spara auto-verifierade låtar till cachen!
+                        reviewContainer.style.display = "none";
                         if (Object.keys(tracksToCache).length > 0) {
                             statusEl.innerHTML = "Sparar felfria låtar till cachen...";
                             for (const [trackId, trackData] of Object.entries(tracksToCache)) {
