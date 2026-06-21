@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.024</title>
+    <title>Adminpanel 0.025</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,6 +20,7 @@
             --border: #334155;
             --input-bg: #0f172a;
         }
+
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
@@ -30,17 +31,33 @@
             flex-direction: column;
             align-items: center;
         }
-        h2, h3, h4 { color: #fff; margin-top: 0; font-weight: 600; }
-        .container { width: 100%; max-width: 900px; }
+
+        h2,
+        h3,
+        h4 {
+            color: #fff;
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 30px;
             margin-bottom: 24px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"] {
             background-color: var(--input-bg);
             border: 1px solid var(--border);
             color: var(--text-main);
@@ -53,7 +70,13 @@
             margin-bottom: 15px;
             transition: all 0.2s;
         }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
         button {
             font-family: 'Outfit', sans-serif;
             font-weight: 600;
@@ -68,19 +91,65 @@
             justify-content: center;
             gap: 8px;
         }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
-        .btn-success { background-color: var(--success); color: white; }
-        .btn-success:hover { background-color: var(--success-hover); transform: translateY(-1px); }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-danger:hover { background-color: var(--danger-hover); transform: translateY(-1px); }
-        .btn-info { background-color: #0ea5e9; color: white; padding: 8px 16px; font-size: 14px; }
-        .btn-info:hover { background-color: #0284c7; transform: translateY(-1px); }
-        .btn-secondary { background-color: #64748b; color: white; }
-        .btn-secondary:hover { background-color: #475569; transform: translateY(-1px); }
-        
-        .reviewed-row { opacity: 0.4; background-color: rgba(16, 185, 129, 0.05) !important; transition: all 0.2s; }
-        
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-info {
+            background-color: #0ea5e9;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-info:hover {
+            background-color: #0284c7;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+            transform: translateY(-1px);
+        }
+
+        .reviewed-row {
+            opacity: 0.4;
+            background-color: rgba(16, 185, 129, 0.05) !important;
+            transition: all 0.2s;
+        }
+
         label {
             display: flex;
             align-items: center;
@@ -91,8 +160,14 @@
             cursor: pointer;
             user-select: none;
         }
-        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
-        
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
         table {
             width: 100%;
             border-collapse: separate;
@@ -103,21 +178,57 @@
             overflow: hidden;
             border: 1px solid var(--border);
         }
-        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 15px; }
-        th { background-color: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 600; }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background-color: rgba(255,255,255,0.02); }
-        
+
+        th,
+        td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
         #readmeContent {
             background-color: var(--input-bg) !important;
             border: 1px solid var(--border) !important;
             color: var(--text-muted) !important;
         }
-        #readmeContent h4 { color: var(--text-main) !important; }
-        #adminLoginForm { max-width: 400px; margin: 0 auto; }
-        .flex-row { display: flex; gap: 15px; align-items: flex-start; }
-        .flex-row > * { margin-bottom: 0; }
-        .flex-row input { flex: 1; }
+
+        #readmeContent h4 {
+            color: var(--text-main) !important;
+        }
+
+        #adminLoginForm {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .flex-row>* {
+            margin-bottom: 0;
+        }
+
+        .flex-row input {
+            flex: 1;
+        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -238,7 +349,7 @@
                 const logEl = document.getElementById("liveLog");
                 logEl.innerHTML = "";
                 logEl.style.display = "block";
-                
+
                 const logToUI = (msg) => {
                     const div = document.createElement("div");
                     div.textContent = msg;
@@ -320,7 +431,7 @@
                                     statusEl.innerHTML = `Söker via iTunes: "${track.title}"...`;
                                     logToUI(`[iTunes-Sökning] Letar efter "${track.artist} - ${track.title}"...`);
                                     const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
-                                    
+
                                     if (itunesResult && itunesResult.found && itunesResult.year) {
                                         skipAi = true; // Hittades i iTunes, avbryt AI-fallback
                                         const itunesYear = itunesResult.year;
@@ -367,7 +478,7 @@
                             if (fixedBy) {
                                 const newYearNum = parseInt(newYearStr);
                                 const oldYearNum = parseInt(oldYearStr);
-                                
+
                                 // Filter 1: Orimliga årtal (t.ex. 1900)
                                 if (newYearNum < 1950) {
                                     logToUI(`[FILTRERAD] ❌ Orimligt årtal ${newYearStr} för "${track.title}", ignorerar.`);
@@ -384,12 +495,12 @@
                                 // Filter 3 & 4: Flagga osäkra förslag (men visa dem)
                                 const titleLower = track.title.toLowerCase();
                                 const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
-                                
+
                                 // Filter 4: Stort hopp bakåt (metadata-fel hos iTunes, t.ex. Bruce Springsteen 1966)
                                 const oldYearNum = parseInt(oldYearStr);
                                 const newYearNum = parseInt(newYearStr);
                                 const isSuspiciouslyOld = (oldYearNum - newYearNum > 10);
-                                
+
                                 const requiresManualReview = isRemix || isSuspiciouslyOld;
                                 const warningFlag = requiresManualReview ? '⚠️ ' : '';
 
@@ -414,7 +525,7 @@
                                 const defaultChecked = change.requiresManualReview ? '' : 'checked';
                                 const inputColor = change.requiresManualReview ? '#fbbf24' : '#10b981';
                                 const googleQuery = encodeURIComponent(`${change.artist} ${change.title} release year`);
-                                
+
                                 tr.innerHTML = `
                                     <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
                                     <td>${warningIcon}${change.title}</td>
@@ -459,7 +570,7 @@
                                 });
 
                                 tbody.appendChild(tr);
-                                
+
                             } else if (!verifiedTracks[trackId]) {
                                 // Låten är okej (iTunes håller med Spotify), vi lägger den i cachen för att slippa söka igen!
                                 tracksToCache[trackId] = {
@@ -489,7 +600,7 @@
                         // Rensa tidigare listeners för att undvika dubbletter
                         const newSelectAllCb = selectAllCb.cloneNode(true);
                         selectAllCb.parentNode.replaceChild(newSelectAllCb, selectAllCb);
-                        
+
                         newSelectAllCb.addEventListener("change", (e) => {
                             document.querySelectorAll(".change-checkbox").forEach(cb => {
                                 // Om raden är flaggad, rör inte checkboxen
@@ -535,7 +646,7 @@
                                     // Godkänd! Spara till databasen och cachen med 'manuallyVerified'
                                     if (!updatesByList[change.listName]) updatesByList[change.listName] = {};
                                     updatesByList[change.listName][`${change.trackId}/year`] = finalYear;
-                                    
+
                                     tracksToCache[change.trackId] = {
                                         title: change.title,
                                         artist: change.artist,
@@ -616,18 +727,22 @@
             <h3 style="text-align: center; margin-bottom: 20px;">Logga in</h3>
             <input type="email" id="adminEmail" aria-label="Admin e-post" placeholder="Admin-e-post">
             <input type="password" id="adminPassword" aria-label="Lösenord" placeholder="Lösenord">
-            <button id="adminLoginBtn" class="btn-primary" style="width: 100%; margin-top: 10px;" aria-label="Logga in">Logga in</button>
+            <button id="adminLoginBtn" class="btn-primary" style="width: 100%; margin-top: 10px;"
+                aria-label="Logga in">Logga in</button>
         </div>
 
         <div id="adminContent" style="display: none;">
-            
+
             <div class="card">
                 <h3>Lägg till spellista</h3>
-                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Klistra in en länk till en Spotify-spellista för att lägga till den i spelet.</p>
+                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Klistra in en länk till en
+                    Spotify-spellista för att lägga till den i spelet.</p>
                 <div class="flex-row">
-                    <input type="text" id="standardPlaylistName" placeholder="Spellistans namn (t.ex. 'Sommarhits 2024')">
+                    <input type="text" id="standardPlaylistName"
+                        placeholder="Spellistans namn (t.ex. 'Sommarhits 2024')">
                     <input type="text" id="standardPlaylistLink" placeholder="Spotify-länk">
-                    <button id="addStandardPlaylistButton" class="btn-success" style="white-space: nowrap;" aria-label="Lägg till">Lägg till</button>
+                    <button id="addStandardPlaylistButton" class="btn-success" style="white-space: nowrap;"
+                        aria-label="Lägg till">Lägg till</button>
                 </div>
             </div>
 
@@ -636,50 +751,73 @@
                     <h3 style="margin: 0;">Städa Databasen (Rätta årtal)</h3>
                     <button id="showReadmeBtn" class="btn-info">ℹ️ Hur funkar detta?</button>
                 </div>
-                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Går igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
-                
-                <div id="readmeContent" style="display: none; padding: 20px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
+                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Går igenom alla låtar i
+                    StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
+
+                <div id="readmeContent"
+                    style="display: none; padding: 20px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
                     <h4 style="margin-top: 0;">Så här fungerar städningen:</h4>
                     <ul style="margin-bottom: 15px;">
-                        <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i <code>verifiedTracks</code> (cachen), söker den via iTunes (eller AI). Hittas ett nytt årtal föreslås det i tabellen.</li>
-                        <li><strong>Använd iTunes-sökning först:</strong> Rekommenderas! iTunes är mest tillförlitligt. Ger ca 2 sekunders väntetid per låt.</li>
-                        <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om alla låtar. <em>Undantag:</em> Låtar som du manuellt godkänt eller avvisat är skyddade ("Manuellt Låst") och skrivs aldrig över!</li>
+                        <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i
+                            <code>verifiedTracks</code> (cachen), söker den via iTunes (eller AI). Hittas ett nytt årtal
+                            föreslås det i tabellen.</li>
+                        <li><strong>Använd iTunes-sökning först:</strong> Rekommenderas! iTunes är mest tillförlitligt.
+                            Ger ca 2 sekunders väntetid per låt.</li>
+                        <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om
+                            alla låtar. <em>Undantag:</em> Låtar som du manuellt godkänt eller avvisat är skyddade
+                            ("Manuellt Låst") och skrivs aldrig över!</li>
                     </ul>
                     <h4>Smarta Filter (Automatiska neksanden):</h4>
                     <ul style="margin-bottom: 15px;">
                         <li>Årtal innan 1950 filtreras bort (ofta iTunes som gissar "1900").</li>
-                        <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).</li>
-                        <li>Låtar med "Remix/Remaster/Version" <strong>ELLER</strong> hopp bakåt >10 år (pga iTunes metadata-fel) får en varning (⚠️), blir orangea, och är <strong>avbockade som standard</strong> så du måste aktivt godkänna dem.</li>
+                        <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).
+                        </li>
+                        <li>Låtar med "Remix/Remaster/Version" <strong>ELLER</strong> hopp bakåt >10 år (pga iTunes
+                            metadata-fel) får en varning (⚠️), blir orangea, och är <strong>avbockade som
+                                standard</strong> så du måste aktivt godkänna dem.</li>
                     </ul>
                     <h4>När du sparar i tabellen:</h4>
                     <ul style="margin-bottom: 0;">
-                        <li><strong>Ikryssad ruta:</strong> Sparar det nya årtalet (du kan även ändra det manuellt i rutan) till databasen, och låser det i cachen.</li>
-                        <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys original-år till cachen och låser det för framtiden.</li>
-                        <li><strong>Låtar som inte dök upp:</strong> (Spotify & iTunes är överens) sparas automatiskt i cachen som "felfria" så vi slipper söka dem nästa gång.</li>
+                        <li><strong>Ikryssad ruta:</strong> Sparar det nya årtalet (du kan även ändra det manuellt i
+                            rutan) till databasen, och låser det i cachen.</li>
+                        <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys
+                            original-år till cachen och låser det för framtiden.</li>
+                        <li><strong>Låtar som inte dök upp:</strong> (Spotify & iTunes är överens) sparas automatiskt i
+                            cachen som "felfria" så vi slipper söka dem nästa gång.</li>
                     </ul>
                 </div>
 
-                <div style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+                <div
+                    style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
                     <label>
                         <input type="checkbox" id="useItunesCheckbox" checked>
-                        <span>Använd iTunes-sökning först <span style="color: var(--text-muted); font-size: 13px;">(Säkert, men tar längre tid pga fördröjning)</span></span>
+                        <span>Använd iTunes-sökning först <span
+                                style="color: var(--text-muted); font-size: 13px;">(Säkert, men tar längre tid pga
+                                fördröjning)</span></span>
                     </label>
                     <label style="margin-bottom: 0;">
                         <input type="checkbox" id="forceRescanCheckbox" checked>
-                        <span><span style="color: var(--danger);">Tvinga fullständig omskanning</span> <span style="color: var(--text-muted); font-size: 13px;">(Ignorera cache. Kostar API-anrop!)</span></span>
+                        <span><span style="color: var(--danger);">Tvinga fullständig omskanning</span> <span
+                                style="color: var(--text-muted); font-size: 13px;">(Ignorera cache. Kostar
+                                API-anrop!)</span></span>
                     </label>
                 </div>
 
-                <button id="cleanDatabaseBtn" class="btn-danger" style="margin-top: 20px; width: 100%; padding: 15px; font-size: 16px;">Städa Hela Databasen</button>
-                <p id="cleanStatus" style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
-                <div id="liveLog" style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;"></div>
+                <button id="cleanDatabaseBtn" class="btn-danger"
+                    style="margin-top: 20px; width: 100%; padding: 15px; font-size: 16px;">Städa Hela Databasen</button>
+                <p id="cleanStatus"
+                    style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
+                <div id="liveLog"
+                    style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;">
+                </div>
             </div>
 
             <!-- Review UI -->
             <div id="reviewContainer" class="card" style="display: none;">
                 <h3 style="color: var(--success);">Granska ändringar</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Markera de ändringar du vill spara till databasen. Du kan även redigera årtalet manuellt i tabellen.</p>
-                
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Markera de ändringar du vill spara till
+                    databasen. Du kan även redigera årtalet manuellt i tabellen.</p>
+
                 <div style="overflow-x: auto;">
                     <table id="reviewTable">
                         <thead>
@@ -696,8 +834,10 @@
                         <tbody id="reviewTableBody"></tbody>
                     </table>
                 </div>
-                
-                <button id="saveChangesBtn" class="btn-success" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 10px;">Godkänn och Spara markerade</button>
+
+                <button id="saveChangesBtn" class="btn-success"
+                    style="width: 100%; padding: 15px; font-size: 16px; margin-top: 10px;">Godkänn och Spara
+                    markerade</button>
             </div>
         </div>
     </div>
