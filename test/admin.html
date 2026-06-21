@@ -493,8 +493,12 @@
                                 }
                                 // Filter 2: Förslag >5 år nyare än Spotify = troligen nyutgåva, inte original
                                 else if (newYearNum > oldYearNum + 5) {
-                                    logToUI(`[FILTRERAD] ❌ Förslaget ${newYearStr} är ${newYearNum - oldYearNum} år nyare än Spotify (${oldYearStr}), ignorerar.`);
-                                    fixedBy = null;
+                                    if (fixedBy !== "AI") {
+                                        logToUI(`[FILTRERAD] ❌ Förslaget ${newYearStr} är ${newYearNum - oldYearNum} år nyare än Spotify (${oldYearStr}), ignorerar.`);
+                                        fixedBy = null;
+                                    } else {
+                                        logToUI(`[OK] ✅ AI godkänner ett hopp framåt (${oldYearNum} -> ${newYearNum}).`);
+                                    }
                                 }
                             }
 

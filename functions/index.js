@@ -294,7 +294,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_completion_tokens: 150
+        max_completion_tokens: 1000
       })
     });
     
