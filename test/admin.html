@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.020</title>
+    <title>Adminpanel 0.021</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -357,10 +357,17 @@
                             }
 
                             if (fixedBy && fixedBy !== "Manuellt Låst (Cache)") {
-                                // Filter 3: Flagga remixer/remasters som osäkra (men visa ändå)
+                                // Filter 3 & 4: Flagga osäkra förslag (men visa dem)
                                 const titleLower = track.title.toLowerCase();
                                 const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
-                                const warningFlag = isRemix ? '⚠️ ' : '';
+                                
+                                // Filter 4: Stort hopp bakåt (metadata-fel hos iTunes, t.ex. Bruce Springsteen 1966)
+                                const oldYearNum = parseInt(oldYearStr);
+                                const newYearNum = parseInt(newYearStr);
+                                const isSuspiciouslyOld = (oldYearNum - newYearNum > 10);
+                                
+                                const requiresManualReview = isRemix || isSuspiciouslyOld;
+                                const warningFlag = requiresManualReview ? '⚠️ ' : '';
 
                                 console.log(`[Förslag] ${warningFlag}${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
                                 proposedChanges.push({
@@ -371,7 +378,7 @@
                                     oldYear: oldYearStr,
                                     newYear: newYearStr,
                                     fixedBy: fixedBy,
-                                    isRemix: isRemix
+                                    requiresManualReview: requiresManualReview
                                 });
                             } else if (!verifiedTracks[trackId]) {
                                 // Låten är okej (iTunes håller med Spotify), vi lägger den i cachen för att slippa söka igen!
@@ -400,15 +407,17 @@
 
                         proposedChanges.forEach((change, index) => {
                             const tr = document.createElement("tr");
-                            if (change.isRemix) tr.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
-                            const remixIcon = change.isRemix ? '⚠️ ' : '';
-                            const defaultChecked = change.isRemix ? '' : 'checked';
+                            if (change.requiresManualReview) tr.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
+                            const warningIcon = change.requiresManualReview ? '⚠️ ' : '';
+                            const defaultChecked = change.requiresManualReview ? '' : 'checked';
+                            const inputColor = change.requiresManualReview ? '#fbbf24' : '#10b981';
+                            
                             tr.innerHTML = `
                                 <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
-                                <td>${remixIcon}${change.title}</td>
+                                <td>${warningIcon}${change.title}</td>
                                 <td>${change.artist}</td>
                                 <td>${change.oldYear}</td>
-                                <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${change.isRemix ? '#fbbf24' : '#10b981'}; padding: 6px; text-align: center;"></td>
+                                <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${inputColor}; padding: 6px; text-align: center;"></td>
                                 <td style="color: var(--text-muted);">${change.fixedBy}</td>
                             `;
                             tbody.appendChild(tr);
@@ -550,7 +559,7 @@
                     <ul style="margin-bottom: 15px;">
                         <li>Årtal innan 1950 filtreras bort (ofta iTunes som gissar "1900").</li>
                         <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).</li>
-                        <li>Låtar med "Remix/Remaster/Version" får en varning (⚠️), blir orangea, och är <strong>avbockade som standard</strong> så du måste aktivt godkänna dem.</li>
+                        <li>Låtar med "Remix/Remaster/Version" <strong>ELLER</strong> hopp bakåt >10 år (pga iTunes metadata-fel) får en varning (⚠️), blir orangea, och är <strong>avbockade som standard</strong> så du måste aktivt godkänna dem.</li>
                     </ul>
                     <h4>När du sparar i tabellen:</h4>
                     <ul style="margin-bottom: 0;">
