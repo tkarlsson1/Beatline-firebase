@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.018</title>
+    <title>Adminpanel 0.019</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
@@ -140,6 +140,7 @@
                     const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
                     let totalChecked = 0;
                     let proposedChanges = [];
+                    let tracksToCache = {}; // Håller koll på ALLA låtar som ska in i cachen
                     const useItunes = document.getElementById("useItunesCheckbox").checked;
                     const forceRescan = document.getElementById("forceRescanCheckbox").checked;
 
@@ -164,12 +165,20 @@
                             let fixedBy = null;
 
                             // Cache?
-                            if (!forceRescan && verifiedTracks[trackId] && String(verifiedTracks[trackId].year) !== oldYearStr) {
+                            // Respektera ALLTID manuellt låsta låtar, även vid Force Rescan!
+                            if (verifiedTracks[trackId] && verifiedTracks[trackId].manuallyVerified) {
                                 newYearStr = String(verifiedTracks[trackId].year);
-                                fixedBy = "Cache";
+                                fixedBy = "Manuellt Låst (Cache)";
+                                console.log(`[LÅST] ${track.title} har ett manuellt låst årtal i cachen (${newYearStr}).`);
+                            }
+                            else if (!forceRescan && verifiedTracks[trackId]) {
+                                if (String(verifiedTracks[trackId].year) !== oldYearStr) {
+                                    newYearStr = String(verifiedTracks[trackId].year);
+                                    fixedBy = "Cache";
+                                }
                             }
                             // iTunes?
-                            else if (forceRescan || !verifiedTracks[trackId]) {
+                            else {
                                 let skipAi = false;
                                 if (useItunes && window.itunesApi && window.itunesApi.getTrackInfo) {
                                     statusEl.innerHTML = `Söker via iTunes: "${track.title}"...`;
@@ -236,7 +245,7 @@
                                 }
                             }
 
-                            if (fixedBy) {
+                            if (fixedBy && fixedBy !== "Manuellt Låst (Cache)") {
                                 // Filter 3: Flagga remixer/remasters som osäkra (men visa ändå)
                                 const titleLower = track.title.toLowerCase();
                                 const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
@@ -253,11 +262,19 @@
                                     fixedBy: fixedBy,
                                     isRemix: isRemix
                                 });
+                            } else if (!verifiedTracks[trackId]) {
+                                // Låten är okej (iTunes håller med Spotify), vi lägger den i cachen för att slippa söka igen!
+                                tracksToCache[trackId] = {
+                                    title: track.title,
+                                    artist: track.artist,
+                                    year: oldYearStr,
+                                    manuallyVerified: false // Auto-verifierad
+                                };
                             }
 
                             // Sömn för att inte bli blockerad av iTunes rate limits (HTTP 429 Too Many Requests)
                             // Apple tillåter ca 20-30 requests per minut utan API-nyckel.
-                            if (useItunes && (forceRescan || !verifiedTracks[trackId])) {
+                            if (useItunes && (!verifiedTracks[trackId] || (forceRescan && !verifiedTracks[trackId].manuallyVerified))) {
                                 await new Promise(r => setTimeout(r, 2000));
                             }
                         }
@@ -281,7 +298,7 @@
                                 <td>${remixIcon}${change.title}</td>
                                 <td>${change.artist}</td>
                                 <td>${change.oldYear}</td>
-                                <td style="font-weight:bold; color:${change.isRemix ? 'orange' : 'green'};">${change.newYear}</td>
+                                <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 60px; font-weight:bold; color:${change.isRemix ? 'orange' : 'green'}; padding: 3px;"></td>
                                 <td>${change.fixedBy}</td>
                             `;
                             tbody.appendChild(tr);
@@ -301,40 +318,66 @@
 
                             // Gruppera ändringar per lista (undviker root-level permission_denied)
                             let updatesByList = {};
-                            let cacheUpdates = {};
                             let totalSaved = 0;
 
-                            document.querySelectorAll(".change-checkbox:checked").forEach(cb => {
+                            // Hantera listan med ändringar
+                            const checkboxes = document.querySelectorAll(".change-checkbox");
+                            const inputs = document.querySelectorAll(".manual-year-input");
+
+                            checkboxes.forEach((cb, i) => {
                                 const change = proposedChanges[cb.getAttribute("data-index")];
-                                if (!updatesByList[change.listName]) updatesByList[change.listName] = {};
-                                updatesByList[change.listName][`${change.trackId}/year`] = change.newYear;
-                                cacheUpdates[change.trackId] = {
-                                    title: change.title,
-                                    artist: change.artist,
-                                    year: change.newYear
-                                };
-                                totalSaved++;
+                                const finalYear = inputs[i].value.trim(); // Hämta värdet från input-fältet!
+
+                                if (cb.checked) {
+                                    // Godkänd! Spara till databasen och cachen med 'manuallyVerified'
+                                    if (!updatesByList[change.listName]) updatesByList[change.listName] = {};
+                                    updatesByList[change.listName][`${change.trackId}/year`] = finalYear;
+                                    
+                                    tracksToCache[change.trackId] = {
+                                        title: change.title,
+                                        artist: change.artist,
+                                        year: finalYear,
+                                        manuallyVerified: true // Skyddad mot Force Rescan!
+                                    };
+                                    totalSaved++;
+                                } else {
+                                    // Avvisad! Spara Spotify-året i cachen som 'manuallyVerified' för att låsa det.
+                                    tracksToCache[change.trackId] = {
+                                        title: change.title,
+                                        artist: change.artist,
+                                        year: change.oldYear, // Använd originalåret!
+                                        manuallyVerified: true // Skyddad mot framtida iTunes-gissningar
+                                    };
+                                }
                             });
 
-                            if (totalSaved > 0) {
-                                // Spara lista för lista
+                            if (totalSaved > 0 || Object.keys(tracksToCache).length > 0) {
+                                // Spara spellistor (bara de låtar som faktiskt ändrades)
                                 for (const [listName, listUpdates] of Object.entries(updatesByList)) {
                                     statusEl.innerHTML = `Sparar lista "${listName}"...`;
                                     await update(ref(db, `standardLists/${listName}/songs`), listUpdates);
                                 }
-                                // Spara cache
-                                for (const [trackId, trackData] of Object.entries(cacheUpdates)) {
+                                // Spara cachen (ALLA låtar: de ändrade, de avvisade, och de felfria!)
+                                statusEl.innerHTML = "Uppdaterar cachen...";
+                                for (const [trackId, trackData] of Object.entries(tracksToCache)) {
                                     await set(ref(db, `verifiedTracks/${trackId}`), trackData);
                                 }
-                                statusEl.innerHTML = `<span style="color:green">Sparade ${totalSaved} ändringar i databasen!</span>`;
+                                statusEl.innerHTML = `<span style="color:green">Sparade ${totalSaved} list-ändringar, och verifierade ${Object.keys(tracksToCache).length} låtar i cachen!</span>`;
                                 reviewContainer.style.display = "none";
                             } else {
-                                statusEl.innerHTML = "Inga ändringar markerade att spara.";
+                                statusEl.innerHTML = "Inga ändringar gjordes.";
                             }
                             btn.disabled = false;
                         };
                     } else {
-                        statusEl.innerHTML = `<strong>Klar!</strong> Inga felaktiga årtal hittades (gick igenom ${totalChecked} låtar).`;
+                        // Inga fel hittades alls, MEN vi vill ändå spara auto-verifierade låtar till cachen!
+                        if (Object.keys(tracksToCache).length > 0) {
+                            statusEl.innerHTML = "Sparar felfria låtar till cachen...";
+                            for (const [trackId, trackData] of Object.entries(tracksToCache)) {
+                                await set(ref(db, `verifiedTracks/${trackId}`), trackData);
+                            }
+                        }
+                        statusEl.innerHTML = `<strong>Klar!</strong> Inga felaktiga årtal hittades. Skannade ${totalChecked} låtar.`;
                         btn.disabled = false;
                     }
 
@@ -343,6 +386,12 @@
                     statusEl.innerHTML = `<span style="color:red">Fel: ${error.message}</span>`;
                     btn.disabled = false;
                 }
+            });
+
+            // Readme Toggle
+            document.getElementById("showReadmeBtn").addEventListener("click", () => {
+                const readme = document.getElementById("readmeContent");
+                readme.style.display = readme.style.display === "none" ? "block" : "none";
             });
 
         });
@@ -367,6 +416,29 @@
 
         <hr style="margin-top: 30px;">
         <h3>Städa Databasen (Rätta årtal)</h3>
+        <button id="showReadmeBtn" style="background-color: #5bc0de; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 4px; margin-bottom: 10px; font-weight: bold;">ℹ️ Hur funkar detta?</button>
+
+        <div id="readmeContent" style="display: none; background: #f9f9f9; padding: 15px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+            <h4 style="margin-top: 0; color: #333;">Så här fungerar städningen:</h4>
+            <ul style="margin-bottom: 15px;">
+                <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i <code>verifiedTracks</code> (cachen), söker den via iTunes (eller AI som sista utväg). Hittas ett nytt årtal föreslås det i tabellen.</li>
+                <li><strong>Använd iTunes-sökning först:</strong> Rekommenderas! iTunes är mest tillförlitligt. Ger ca 2 sekunders väntetid per låt för att inte bli blockerad av Apple.</li>
+                <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om alla låtar på nytt. <em>Undantag:</em> Låtar som du tidigare manuellt godkänt eller avvisat är skyddade ("Manuellt Låst") och skrivs inte över!</li>
+            </ul>
+            <h4 style="color: #333;">Smarta Filter (Förslag som automatiskt nekas):</h4>
+            <ul style="margin-bottom: 15px;">
+                <li>Årtal innan 1950 filtreras bort (ofta iTunes som gissar "1900").</li>
+                <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (dessa är ofta nyutgåvor).</li>
+                <li>Låtar med "Remix/Remaster/Version" får en varning (⚠️), blir orangea, och är <strong>avbockade som standard</strong> så du måste aktivt godkänna dem.</li>
+            </ul>
+            <h4 style="color: #333;">När du sparar i tabellen:</h4>
+            <ul style="margin-bottom: 0;">
+                <li><strong>Ikryssad ruta:</strong> Sparar det nya årtalet (du kan även ändra det manuellt i rutan) till databasen, och låser det i cachen.</li>
+                <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys original-år till cachen och låser det för framtiden (så iTunes slutar tjata om det).</li>
+                <li><strong>Låtar som inte dök upp:</strong> (dvs Spotify & iTunes är överens) sparas automatiskt i cachen som "felfria" så vi slipper söka dem nästa gång.</li>
+            </ul>
+        </div>
+
         <p>Gör igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
         <div style="margin-bottom: 10px;">
             <label style="cursor: pointer;">
