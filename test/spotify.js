@@ -107,6 +107,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     const totalTracks = trackKeys.length;
     let verifiedCount = 0;
     let aiCount = 0;
+    let aiErrors = 0;
     
     // Array to hold uncertain tracks for manual review
     const uncertainTracks = [];
@@ -189,6 +190,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
             }
           } catch (e) {
             console.warn("Kunde inte anropa Backend AI för", item.track.title, e);
+            aiErrors++;
           }
         });
         
@@ -218,8 +220,10 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     }
     if (progressContainer) progressContainer.style.display = 'none';
     
-    // 4. Visa Review Modal om vi hittade osäkra låtar
-    if (uncertainTracks.length > 0) {
+    // 4. Hantera resultat
+    if (aiErrors > 0) {
+      alert(`⚠️ Ett fel uppstod med AI-valideringen (t.ex. OpenAI-krediter slut) för ${aiErrors} låtar.\n\nDessa låtar sparades i din spellista med Spotifys original-årtal, men lades INTE till i den globala verifierade databasen.`);
+    } else if (uncertainTracks.length > 0) {
       openReviewPlaylistModal(uncertainTracks, playlistName);
     } else {
       alert(`Spellistan "${playlistName}" har lagts till! \nAlla låtar verifierades snyggt och prydligt.`);
