@@ -98,64 +98,80 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     // Array to hold uncertain tracks for manual review
     const uncertainTracks = [];
     
+    // Separera spår som behöver AI från de som finns i cachen
+    const tracksToAi = [];
+    
     for (let i = 0; i < totalTracks; i++) {
       const trackId = trackKeys[i];
       const track = tracks[trackId];
       
-      if (addBtn) addBtn.textContent = `Verifierar... ${i+1}/${totalTracks}`;
-      
-      // 1. Kolla cache (verifiedTracks)
       if (verifiedTracks[trackId] && verifiedTracks[trackId].year) {
         track.year = String(verifiedTracks[trackId].year);
         verifiedCount++;
-        continue;
+      } else {
+        tracksToAi.push({ id: trackId, track: track, index: i });
       }
+    }
+    
+    if (addBtn) addBtn.textContent = `Frågar AI om ${tracksToAi.length} nya låtar...`;
+    
+    // Kör AI-frågor i parallella batchar (t.ex. 5 åt gången) för att spara enormt med tid
+    const BATCH_SIZE = 5;
+    let processedAi = 0;
+    
+    if (window.firebaseFunctions && window.httpsCallable) {
+      const getSongYearAi = window.httpsCallable(window.firebaseFunctions, 'getSongYearAi');
       
-      // 2. Kolla AI (Vi skippar iTunes helt enligt plan!)
-      try {
-        if (addBtn) addBtn.textContent = `Frågar AI... ${i+1}/${totalTracks}`;
+      for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
+        const batch = tracksToAi.slice(i, i + BATCH_SIZE);
         
-        if (window.firebaseFunctions && window.httpsCallable) {
-          const getSongYearAi = window.httpsCallable(window.firebaseFunctions, 'getSongYearAi');
-          const result = await getSongYearAi({ title: track.title, artist: track.artist });
-          
-          if (result && result.data && result.data.year && result.data.year !== "UNKNOWN") {
-            const aiYear = parseInt(result.data.year, 10);
-            const spotifyYear = parseInt(track.year, 10);
-            
-            if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
-              const diff = Math.abs(spotifyYear - aiYear);
+        // Uppdatera UI
+        if (addBtn) addBtn.textContent = `Frågar AI... ${Math.min(i + BATCH_SIZE, tracksToAi.length)}/${tracksToAi.length}`;
+        
+        // Starta alla anrop i batchen parallellt
+        const batchPromises = batch.map(async (item) => {
+          try {
+            const result = await getSongYearAi({ title: item.track.title, artist: item.track.artist });
+            if (result && result.data && result.data.year && result.data.year !== "UNKNOWN") {
+              const aiYear = parseInt(result.data.year, 10);
+              const spotifyYear = parseInt(item.track.year, 10);
               
-              if (diff <= 1) {
-                // SÄKERT: Diff <= 1 (ofta Remaster). Auto-godkänn och spara i Cache.
-                track.year = String(aiYear);
-                aiCount++;
-                
-                // Spara till Cache direkt i bakgrunden
-                window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${trackId}`), {
-                  title: track.title,
-                  artist: track.artist,
-                  year: track.year,
-                  manuallyVerified: false
-                }).catch(e => console.warn("Kunde inte spara till cache", e));
-                
-              } else if (aiYear < spotifyYear) {
-                // OSÄKERT: AI föreslår ett mycket äldre år. Be användaren granska!
-                uncertainTracks.push({
-                  id: trackId,
-                  title: track.title,
-                  artist: track.artist,
-                  spotifyYear: track.year,
-                  aiYear: String(aiYear)
-                });
-                // Tills vidare använder vi Spotifys år i deras lokala lista ifall de avbryter
+              if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
+                const diff = Math.abs(spotifyYear - aiYear);
+                if (diff <= 1) {
+                  // SÄKERT: Auto-godkänn
+                  item.track.year = String(aiYear);
+                  aiCount++;
+                  
+                  // Spara till Cache i bakgrunden
+                  window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${item.id}`), {
+                    title: item.track.title,
+                    artist: item.track.artist,
+                    year: item.track.year,
+                    manuallyVerified: false
+                  }).catch(e => console.warn("Kunde inte spara till cache", e));
+                } else if (aiYear < spotifyYear) {
+                  // OSÄKERT: Lägg till i granskningslistan
+                  uncertainTracks.push({
+                    id: item.id,
+                    title: item.track.title,
+                    artist: item.track.artist,
+                    spotifyYear: item.track.year,
+                    aiYear: String(aiYear)
+                  });
+                }
               }
             }
+          } catch (e) {
+            console.warn("Kunde inte anropa Backend AI för", item.track.title, e);
           }
-        }
-      } catch (e) {
-        console.warn("Kunde inte anropa Backend AI för", track.title, e);
+        });
+        
+        // Vänta tills hela batchen är klar innan vi går vidare till nästa
+        await Promise.all(batchPromises);
       }
+    } else {
+      console.warn("Firebase Functions är inte initierat.");
     }
     
     console.log(`Validering klar: ${verifiedCount} från cache, ${aiCount} säkra från AI, ${uncertainTracks.length} osäkra.`);
