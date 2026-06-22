@@ -993,6 +993,26 @@
       const playlists = settings.playlists || [];
       const yearRange = settings.yearRange || { min: 1950, max: 2025 };
       
+      // Load active cooldowns for the host ONCE before loop
+      let activeCooldowns = {};
+      if (currentGameData && currentGameData.host) {
+        try {
+          const cooldownsRef = window.firebaseRef(window.firebaseDb, `users/${currentGameData.host}/cooldowns`);
+          const cooldownsSnap = await window.firebaseGet(cooldownsRef);
+          if (cooldownsSnap.exists()) {
+            const parsed = cooldownsSnap.val();
+            const now = Date.now();
+            for (const [id, expireTime] of Object.entries(parsed)) {
+              if (now < expireTime) {
+                activeCooldowns[id] = true;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('[Lobby] Kunde inte ladda cooldowns från Firebase', e);
+        }
+      }
+      
       // Load from standard lists and user playlists
       for (const playlistName of playlists) {
         // Try standard list first
@@ -1053,21 +1073,6 @@
               const verifiedTracksRef = window.firebaseRef(window.firebaseDb, 'verifiedTracks');
               const verifiedSnapshot = await window.firebaseGet(verifiedTracksRef);
               const verifiedTracks = verifiedSnapshot.exists() ? verifiedSnapshot.val() : {};
-              
-              // Load active cooldowns for the host
-              let activeCooldowns = {};
-              try {
-                const stored = localStorage.getItem('spoilerCooldowns');
-                if (stored) {
-                  const parsed = JSON.parse(stored);
-                  const now = Date.now();
-                  for (const [id, expireTime] of Object.entries(parsed)) {
-                    if (now < expireTime) {
-                      activeCooldowns[id] = true;
-                    }
-                  }
-                }
-              } catch (e) {}
               
               Object.entries(songs).forEach(([spotifyId, song]) => {
                 // Skipa om låten har en spoiler-spärr

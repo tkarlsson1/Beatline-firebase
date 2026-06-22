@@ -159,48 +159,60 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
           progressBar.style.width = `${percent}%`;
         }
         
-        // Starta alla anrop i batchen parallellt
-        const batchPromises = batch.map(async (item) => {
-          try {
-            const result = await getSongYearAi({ title: item.track.title, artist: item.track.artist });
-            if (result && result.data && result.data.year && result.data.year !== "UNKNOWN") {
-              const aiYear = parseInt(result.data.year, 10);
-              const spotifyYear = parseInt(item.track.year, 10);
+        // Skicka hela batchen till getSongYearsAiBatch
+        try {
+          const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch');
+          const batchPayload = batch.map(item => ({
+            id: item.id,
+            title: item.track.title,
+            artist: item.track.artist
+          }));
+          
+          const result = await getSongYearsAiBatch({ songs: batchPayload });
+          
+          if (result && result.data && Array.isArray(result.data.results)) {
+            const aiResults = result.data.results;
+            
+            for (const aiItem of aiResults) {
+              const originalItem = batch.find(b => b.id === aiItem.id);
+              if (!originalItem) continue;
               
-              if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
-                const diff = Math.abs(spotifyYear - aiYear);
-                if (diff <= 1) {
-                  // SÄKERT: Auto-godkänn
-                  item.track.year = String(aiYear);
-                  aiCount++;
-                  
-                  // Spara till Cache i bakgrunden
-                  window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${item.id}`), {
-                    title: item.track.title,
-                    artist: item.track.artist,
-                    year: item.track.year,
-                    manuallyVerified: false
-                  }).catch(e => console.warn("Kunde inte spara till cache", e));
-                } else if (aiYear < spotifyYear) {
-                  // OSÄKERT: Lägg till i granskningslistan
-                  uncertainTracks.push({
-                    id: item.id,
-                    title: item.track.title,
-                    artist: item.track.artist,
-                    spotifyYear: item.track.year,
-                    aiYear: String(aiYear)
-                  });
+              if (aiItem.year && aiItem.year !== "UNKNOWN") {
+                const aiYear = parseInt(aiItem.year, 10);
+                const spotifyYear = parseInt(originalItem.track.year, 10);
+                
+                if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
+                  const diff = Math.abs(spotifyYear - aiYear);
+                  if (diff <= 1) {
+                    // SÄKERT: Auto-godkänn
+                    originalItem.track.year = String(aiYear);
+                    aiCount++;
+                    
+                    // Spara till Cache i bakgrunden
+                    window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${originalItem.id}`), {
+                      title: originalItem.track.title,
+                      artist: originalItem.track.artist,
+                      year: originalItem.track.year,
+                      manuallyVerified: false
+                    }).catch(e => console.warn("Kunde inte spara till cache", e));
+                  } else if (aiYear < spotifyYear) {
+                    // OSÄKERT: Lägg till i granskningslistan
+                    uncertainTracks.push({
+                      id: originalItem.id,
+                      title: originalItem.track.title,
+                      artist: originalItem.track.artist,
+                      spotifyYear: originalItem.track.year,
+                      aiYear: String(aiYear)
+                    });
+                  }
                 }
               }
             }
-          } catch (e) {
-            console.warn("Kunde inte anropa Backend AI för", item.track.title, e);
-            aiErrors++;
           }
-        });
-        
-        // Vänta tills hela batchen är klar innan vi går vidare till nästa
-        await Promise.all(batchPromises);
+        } catch (e) {
+          console.warn("Kunde inte anropa Backend AI Batch", e);
+          aiErrors += batch.length;
+        }
       }
     } else {
       console.warn("Firebase Functions är inte initierat.");
@@ -376,16 +388,11 @@ function openReviewPlaylistModal(uncertainTracks, playlistName) {
       
       // 3. Lägg till Spoiler Cooldown
       if (cooldownIds.length > 0) {
-        let existingCooldowns = {};
-        try {
-          const stored = localStorage.getItem('spoilerCooldowns');
-          if (stored) existingCooldowns = JSON.parse(stored);
-        } catch (e) {}
-        
         const expireTime = Date.now() + (12 * 60 * 60 * 1000); // 12 timmar
-        cooldownIds.forEach(id => { existingCooldowns[id] = expireTime; });
+        const cooldownUpdates = {};
+        cooldownIds.forEach(id => { cooldownUpdates[id] = expireTime; });
         
-        localStorage.setItem('spoilerCooldowns', JSON.stringify(existingCooldowns));
+        await window.firebaseUpdate(window.firebaseRef(window.firebaseDb, `users/${userId}/cooldowns`), cooldownUpdates);
       }
       
       modal.style.display = "none";

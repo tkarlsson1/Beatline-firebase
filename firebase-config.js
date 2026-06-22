@@ -3,7 +3,7 @@
 // ============================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, push, update } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, push, update, get } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -56,6 +56,7 @@ let sourceFilteredSongs = [];
 let currentFilteredSongs = [];
 let shownSongs = [];
 let currentSong = null;
+let verifiedTracksCache = {};
 
 // ============================================
 // CREATE LOBBY FUNCTION
@@ -104,12 +105,13 @@ window.createLobby = async function(teamName) {
       return;
     }
     
-    // Läs in spoiler-spärrar (låtar användaren nyligen kollat årtal på)
+    // Läs in spoiler-spärrar från Firebase
     let activeCooldowns = {};
     try {
-      const stored = localStorage.getItem('spoilerCooldowns');
-      if (stored) {
-        const parsed = JSON.parse(stored);
+      const cooldownsRef = ref(db, `users/${auth.currentUser.uid}/cooldowns`);
+      const snapshot = await get(cooldownsRef);
+      if (snapshot.exists()) {
+        const parsed = snapshot.val();
         const now = Date.now();
         for (const [id, expireTime] of Object.entries(parsed)) {
           if (now < expireTime) {
@@ -118,7 +120,7 @@ window.createLobby = async function(teamName) {
         }
       }
     } catch (e) {
-      console.warn('Kunde inte läsa spoilerCooldowns', e);
+      console.warn('Kunde inte läsa spoilerCooldowns från Firebase', e);
     }
 
     // Filter songs based on selected playlists and year range (och spoiler-spärr)
@@ -266,6 +268,16 @@ function initDataListeners() {
       mergeSongs();
     }
   });
+
+  // Read verifiedTracks
+  onValue(ref(db, 'verifiedTracks'), (snapshot) => {
+    if (snapshot.exists()) {
+      verifiedTracksCache = snapshot.val();
+      mergeSongs();
+    } else {
+      verifiedTracksCache = {};
+    }
+  });
   
   // Read user playlists
   const userId = window.auth.currentUser.uid;
@@ -316,6 +328,13 @@ function mergeSongs() {
       const yearToUse = song.customYear ? song.customYear : song.year;
       merged[song.qr] = { ...song, year: yearToUse, source: [...song.source] };
     }
+  });
+  
+  // Apply verified tracks override
+  Object.keys(merged).forEach(qr => {
+      if (verifiedTracksCache[qr] && verifiedTracksCache[qr].year) {
+          merged[qr].year = verifiedTracksCache[qr].year;
+      }
   });
   
   songs = Object.values(merged);

@@ -329,3 +329,71 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
     throw new functions.https.HttpsError("internal", "An error occurred while estimating the year.");
   }
 });
+
+/**
+ * Callable: getSongYearsAiBatch
+ * Uses OpenAI to estimate the release years for a batch of songs.
+ * data: { songs: [{ id: string, title: string, artist: string }] }
+ */
+exports.getSongYearsAiBatch = functions.region("europe-west1").https.onCall(async (data, context) => {
+  const { songs } = data || {};
+  if (!Array.isArray(songs) || songs.length === 0) {
+    throw new functions.https.HttpsError("invalid-argument", "An array of songs is required.");
+  }
+  
+  const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
+  if (!apiKey) {
+    throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
+  }
+  
+  const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året låtarna gavs ut offentligt på singel eller studioalbum. Ignorera nyutgåvor, remasters, live-versioner och samlingsalbum. Svara alltid med det äldsta kända årtalet för originalinspelningen. VIKTIGT UNDANTAG: Om artistnamnet indikerar en cover, eller ett modernt samarbete/DJ-remix av en gammal låt, svara med årtalet för remixen/versionen. DU MÅSTE SVARA ENBART MED GILTIG JSON. Svara med en JSON-lista (Array) av objekt, där varje objekt har nycklarna: 'id' (samma id som skickades in) och 'year' (fyrsiffrigt årtal, eller null om osäker). Inget annat text-svar.";
+  
+  const userPrompt = "Analysera följande låtar och returnera JSON:\n" + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
+  
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-5.5",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        max_completion_tokens: 2000,
+        response_format: { type: "json_object" }
+      })
+    });
+    
+    if (!response.ok) {
+      functions.logger.error("OpenAI API error:", response.status, await response.text());
+      throw new functions.https.HttpsError("internal", "Failed to contact AI service.");
+    }
+    
+    const aiData = await response.json();
+    let aiText = aiData.choices?.[0]?.message?.content?.trim() || "[]";
+    
+    // Safety fallback if OpenAI returned { "songs": [...] } instead of array directly
+    let parsedJson;
+    try {
+      parsedJson = JSON.parse(aiText);
+      if (parsedJson && !Array.isArray(parsedJson)) {
+        // Find any array property inside the object
+        const arrProp = Object.values(parsedJson).find(Array.isArray);
+        if (arrProp) parsedJson = arrProp;
+        else parsedJson = [parsedJson]; // wrap it just in case
+      }
+    } catch (e) {
+      functions.logger.error("Failed to parse JSON from AI:", aiText);
+      return { results: [] };
+    }
+    
+    return { results: parsedJson };
+  } catch (error) {
+    functions.logger.error("Error during OpenAI batch fetch:", error);
+    throw new functions.https.HttpsError("internal", "An error occurred while estimating years.");
+  }
+});
