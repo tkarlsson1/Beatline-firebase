@@ -60,21 +60,34 @@ async function fetchSpotifyPlaylist(playlistUrl) {
 async function addPlaylistToFirebase(playlistName, playlistUrl) {
   try {
     const addBtn = document.getElementById("addPlaylistButton");
-    if (addBtn) addBtn.disabled = true;
+    const progressContainer = document.getElementById('importProgressContainer');
+    const progressText = document.getElementById('importProgressText');
+    const progressCount = document.getElementById('importProgressCount');
+    const progressBar = document.getElementById('importProgressBar');
+
+    if (addBtn) {
+      addBtn.disabled = true;
+      addBtn.textContent = 'Laddar låtar...';
+    }
     
-    console.log("Försöker hämta spellista:", playlistName);
-    if (addBtn) addBtn.textContent = "Hämtar från Spotify...";
+    if (progressContainer) {
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Hämtar från Spotify...';
+      progressCount.textContent = '';
+    }
     
     const tracks = await fetchSpotifyPlaylist(playlistUrl);
     
     if (!tracks || Object.keys(tracks).length === 0) {
       alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
       if (addBtn) { addBtn.disabled = false; addBtn.textContent = "Lägg till"; }
+      if (progressContainer) progressContainer.style.display = 'none';
       return;
     }
     
     // --- VERIFIERING VID UPPLADDNING ---
-    if (addBtn) addBtn.textContent = "Laddar cache...";
+    if (progressText) progressText.textContent = 'Laddar cache...';
     
     // Hämta verifiedTracks från Firebase
     let verifiedTracks = {};
@@ -113,7 +126,12 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       }
     }
     
-    if (addBtn) addBtn.textContent = `Frågar AI om ${tracksToAi.length} nya låtar...`;
+    if (progressText && tracksToAi.length > 0) {
+      progressText.textContent = 'Kör AI-validering...';
+      progressCount.textContent = `0 / ${tracksToAi.length}`;
+    }
+    
+    if (addBtn) addBtn.textContent = `AI granskar ${tracksToAi.length} låtar...`;
     
     // Kör AI-frågor i parallella batchar (t.ex. 5 åt gången) för att spara enormt med tid
     const BATCH_SIZE = 5;
@@ -125,8 +143,15 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
         const batch = tracksToAi.slice(i, i + BATCH_SIZE);
         
-        // Uppdatera UI
-        if (addBtn) addBtn.textContent = `Frågar AI... ${Math.min(i + BATCH_SIZE, tracksToAi.length)}/${tracksToAi.length}`;
+        // Uppdatera UI och Progress Bar
+        processedAi += batch.length;
+        if (progressCount) {
+          progressCount.textContent = `${processedAi} / ${tracksToAi.length}`;
+        }
+        if (progressBar) {
+          const percent = Math.round((processedAi / tracksToAi.length) * 100);
+          progressBar.style.width = `${percent}%`;
+        }
         
         // Starta alla anrop i batchen parallellt
         const batchPromises = batch.map(async (item) => {
@@ -175,7 +200,12 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     }
     
     console.log(`Validering klar: ${verifiedCount} från cache, ${aiCount} säkra från AI, ${uncertainTracks.length} osäkra.`);
-    if (addBtn) addBtn.textContent = "Sparar...";
+    
+    if (progressText) {
+      progressText.textContent = 'Sparar...';
+      if (progressCount) progressCount.textContent = '';
+      if (progressBar) progressBar.style.width = '100%';
+    }
     
     // 3. Spara spellistan till användarens konto
     const userId = window.auth.currentUser.uid;
@@ -186,6 +216,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       addBtn.disabled = false;
       addBtn.textContent = "Lägg till";
     }
+    if (progressContainer) progressContainer.style.display = 'none';
     
     // 4. Visa Review Modal om vi hittade osäkra låtar
     if (uncertainTracks.length > 0) {
@@ -198,9 +229,13 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     console.error("Fel vid lagring av spellista:", error);
     alert("Något gick fel vid lagring av spellistan.");
     const addBtn = document.getElementById("addPlaylistButton");
+    const progressContainer = document.getElementById("importProgressContainer");
     if (addBtn) {
       addBtn.disabled = false;
       addBtn.textContent = "Lägg till";
+    }
+    if (progressContainer) {
+      progressContainer.style.display = "none";
     }
   }
 }
