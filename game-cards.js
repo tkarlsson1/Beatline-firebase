@@ -968,7 +968,8 @@ function validateAndScoreCard(cardKey, card) {
         song: {
           year: validationData.placedCard.year,
           title: validationData.placedCard.title,
-          artist: validationData.placedCard.artist
+          artist: validationData.placedCard.artist,
+          spotifyId: validationData.placedCard.spotifyId || 'unknown'
         },
         
         // Can give bonus token only if correct
@@ -1306,7 +1307,8 @@ function validateChallenge() {
         song: {
           year: activeCard.year,
           title: activeCard.title,
-          artist: activeCard.artist
+          artist: activeCard.artist,
+          spotifyId: activeCard.spotifyId || 'unknown'
         },
         
         // Can give bonus token only if active team won
