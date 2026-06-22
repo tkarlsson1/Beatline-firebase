@@ -739,6 +739,16 @@ function renderValidationModal() {
       <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
     </div>
     
+    <div style="text-align: center; margin-bottom: 15px;">
+      <button 
+        class="validation-modal-btn report-btn" 
+        style="background-color: #f44336; padding: 5px 10px; font-size: 12px; width: auto; display: inline-block;"
+        onclick="reportTrack('${modal.song.spotifyId}', \`${escapeHtml(modal.song.title)}\`, \`${escapeHtml(modal.song.artist)}\`, '${modal.song.year}')"
+      >
+        🚩 Fel årtal?
+      </button>
+    </div>
+    
     <div class="validation-modal-buttons">
   `;
   

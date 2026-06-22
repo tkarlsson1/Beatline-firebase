@@ -122,6 +122,12 @@
             transform: translateY(-1px);
         }
 
+        .btn-clean { background-color: var(--danger); color: #fff; margin-left: 10px; }
+        .btn-clean:hover { background-color: #d32f2f; }
+
+        .btn-export { background-color: #2196F3; color: #fff; margin-left: 10px; }
+        .btn-export:hover { background-color: #1976D2; }
+
         .btn-info {
             background-color: #0ea5e9;
             color: white;
@@ -509,8 +515,9 @@
                                 const oldYearNum = parseInt(oldYearStr);
                                 const newYearNum = parseInt(newYearStr);
                                 const isSuspiciouslyOld = (oldYearNum - newYearNum > 5);
+                                const isSmallDiff = Math.abs(oldYearNum - newYearNum) <= 1;
 
-                                const requiresManualReview = isRemix || isSuspiciouslyOld;
+                                const requiresManualReview = (isRemix && !isSmallDiff) || isSuspiciouslyOld;
                                 const warningFlag = requiresManualReview ? '⚠️ ' : '';
 
                                 logToUI(`[Förslag] ${warningFlag}${track.title} | ${oldYearStr} -> ${newYearStr} (${fixedBy})`);
@@ -731,6 +738,168 @@
                 readme.style.display = readme.style.display === "none" ? "block" : "none";
             });
 
+            // ==========================================
+            // SPELARNAS RAPPORTER
+            // ==========================================
+            async function loadReportedTracks() {
+                const reportsContainer = document.getElementById("reportsContainer");
+                const tbody = document.getElementById("reportsTableBody");
+                tbody.innerHTML = "<tr><td colspan='4'>Laddar rapporter...</td></tr>";
+                reportsContainer.style.display = "block";
+
+                try {
+                    const snap = await get(ref(db, "reportedTracks"));
+                    if (!snap.exists()) {
+                        tbody.innerHTML = "<tr><td colspan='4' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
+                        return;
+                    }
+
+                    const reports = snap.val();
+                    tbody.innerHTML = "";
+                    let hasReports = false;
+
+                    for (const [trackId, data] of Object.entries(reports)) {
+                        hasReports = true;
+                        const dateStr = new Date(data.reportedAt).toLocaleString("sv-SE");
+                        
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td><strong>${data.title}</strong></td>
+                            <td>${data.artist}</td>
+                            <td><span style="color: #ef4444; font-weight: bold;">${data.year}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
+                            <td>
+                                <button class="btn-info scan-report-btn" data-id="${trackId}" data-title="${data.title.replace(/"/g, '&quot;')}" data-artist="${data.artist.replace(/"/g, '&quot;')}" data-year="${data.year}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI/iTunes</button>
+                                <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;" title="Ta bort rapport (ignorera)">🗑️</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+
+                    if (!hasReports) {
+                        tbody.innerHTML = "<tr><td colspan='4' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
+                    }
+
+                    // Bind Delete Buttons
+                    document.querySelectorAll(".delete-report-btn").forEach(btn => {
+                        btn.addEventListener("click", async (e) => {
+                            if (confirm("Är du säker på att du vill kasta denna rapport? (Inget ändras i spelet)")) {
+                                const tId = e.target.getAttribute("data-id");
+                                await set(ref(db, \`reportedTracks/\${tId}\`), null);
+                                loadReportedTracks();
+                            }
+                        });
+                    });
+
+                    // Bind Scan Buttons
+                    document.querySelectorAll(".scan-report-btn").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const trackId = e.target.getAttribute("data-id");
+                            const title = e.target.getAttribute("data-title");
+                            const artist = e.target.getAttribute("data-artist");
+                            const oldYear = e.target.getAttribute("data-year");
+                            scanSingleReport(trackId, title, artist, oldYear, e.target.closest("tr"));
+                        });
+                    });
+
+                } catch (err) {
+                    console.error("Fel vid hämtning av rapporter:", err);
+                    tbody.innerHTML = \`<tr><td colspan='4' style='color: red;'>Fel: \${err.message}</td></tr>\`;
+                }
+            }
+
+            async function scanSingleReport(trackId, title, artist, oldYear, trElement) {
+                const btn = trElement.querySelector(".scan-report-btn");
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "Skannar...";
+                btn.disabled = true;
+
+                try {
+                    let newYear = oldYear;
+                    let source = "";
+
+                    // Försök med iTunes först
+                    const itunesResult = await searchItunesFallback(title, artist);
+                    if (itunesResult && itunesResult.year && String(itunesResult.year) !== String(oldYear)) {
+                        newYear = String(itunesResult.year);
+                        source = "iTunes";
+                    } else {
+                        // Annars GPT
+                        btn.innerHTML = "Frågar AI...";
+                        const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
+                        const aiResult = await getSongYearAi({ title, artist });
+                        if (aiResult && aiResult.data && aiResult.data.year && aiResult.data.year !== "UNKNOWN") {
+                            newYear = String(aiResult.data.year);
+                            source = "AI";
+                        }
+                    }
+
+                    if (newYear !== oldYear) {
+                        trElement.innerHTML = \`
+                            <td><strong>\${title}</strong></td>
+                            <td>\${artist}</td>
+                            <td><del style="color: #ef4444;">\${oldYear}</del> ➡️ <strong style="color: #10b981;">\${newYear}</strong> <span style="font-size: 11px; color: var(--text-muted);">(\${source})</span></td>
+                            <td>
+                                <button class="btn-success approve-report-btn" data-id="\${trackId}" data-year="\${newYear}" data-title="\${title.replace(/"/g, '&quot;')}" data-artist="\${artist.replace(/"/g, '&quot;')}" style="padding: 6px 10px; font-size: 13px;">✅ Godkänn</button>
+                                <button class="btn-clean delete-report-btn" data-id="\${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;">Avbryt</button>
+                            </td>
+                        \`;
+
+                        // Bind Approve Button
+                        trElement.querySelector(".approve-report-btn").addEventListener("click", async (e) => {
+                            const approvedYear = e.target.getAttribute("data-year");
+                            e.target.innerHTML = "Sparar...";
+                            e.target.disabled = true;
+                            
+                            // 1. Spara i cachen (verifiedTracks)
+                            await set(ref(db, \`verifiedTracks/\${trackId}\`), {
+                                title: title,
+                                artist: artist,
+                                year: approvedYear,
+                                manuallyVerified: true
+                            });
+
+                            // 2. Vi uppdaterar standardLists också, för att vara säkra
+                            const listsSnap = await get(ref(db, "standardLists"));
+                            if (listsSnap.exists()) {
+                                const lists = listsSnap.val();
+                                for (const listName of Object.keys(lists)) {
+                                    if (lists[listName].songs && lists[listName].songs[trackId]) {
+                                        await set(ref(db, \`standardLists/\${listName}/songs/\${trackId}/year\`), approvedYear);
+                                    }
+                                }
+                            }
+
+                            // 3. Ta bort rapporten
+                            await set(ref(db, \`reportedTracks/\${trackId}\`), null);
+                            loadReportedTracks();
+                        });
+
+                        // Bind Cancel Button
+                        trElement.querySelector(".delete-report-btn").addEventListener("click", () => {
+                            loadReportedTracks();
+                        });
+                    } else {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        alert("Hittade inget nyare årtal varken via iTunes eller AI!");
+                    }
+
+                } catch (err) {
+                    console.error("Skanning misslyckades:", err);
+                    btn.innerHTML = "Fel!";
+                    setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
+                }
+            }
+
+            document.getElementById("refreshReportsBtn").addEventListener("click", loadReportedTracks);
+            
+            // Ladda rapporter vid inloggning
+            onAuthStateChanged(auth, (user) => {
+                if (user && user.email === ADMIN_EMAIL) {
+                    loadReportedTracks();
+                }
+            });
+
         });
     </script>
     <script src="listor/itunes-api.js"></script>
@@ -826,6 +995,28 @@
                     style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
                 <div id="liveLog"
                     style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;">
+                </div>
+            </div>
+
+            <!-- Reports UI -->
+            <div id="reportsContainer" class="card" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="color: #ef4444; margin: 0;">Spelarnas Rapporter 🚩</h3>
+                    <button id="refreshReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Låtar som spelarna har rapporterat inifrån spelet som felaktiga årtal.</p>
+                <div style="overflow-x: auto;">
+                    <table id="reportsTable">
+                        <thead>
+                            <tr>
+                                <th>Låt</th>
+                                <th>Artist</th>
+                                <th>Spelets År</th>
+                                <th>Handlingar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody"></tbody>
+                    </table>
                 </div>
             </div>
 
