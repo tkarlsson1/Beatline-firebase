@@ -1038,7 +1038,68 @@
         }
         
         // Also try user playlists (if host has custom playlists with same name)
-        // This would require knowing the userId, skip for now
+        if (currentGameData && currentGameData.host) {
+          const userRef = window.firebaseRef(
+            window.firebaseDb, 
+            `userPlaylists/${currentGameData.host}/${playlistName}/songs`
+          );
+          
+          try {
+            const snapshot = await window.firebaseGet(userRef);
+            if (snapshot.exists()) {
+              const songs = snapshot.val();
+              
+              // Load all verifiedTracks at once for better performance (if not already loaded)
+              const verifiedTracksRef = window.firebaseRef(window.firebaseDb, 'verifiedTracks');
+              const verifiedSnapshot = await window.firebaseGet(verifiedTracksRef);
+              const verifiedTracks = verifiedSnapshot.exists() ? verifiedSnapshot.val() : {};
+              
+              // Load active cooldowns for the host
+              let activeCooldowns = {};
+              try {
+                const stored = localStorage.getItem('spoilerCooldowns');
+                if (stored) {
+                  const parsed = JSON.parse(stored);
+                  const now = Date.now();
+                  for (const [id, expireTime] of Object.entries(parsed)) {
+                    if (now < expireTime) {
+                      activeCooldowns[id] = true;
+                    }
+                  }
+                }
+              } catch (e) {}
+              
+              Object.entries(songs).forEach(([spotifyId, song]) => {
+                // Skipa om låten har en spoiler-spärr
+                if (activeCooldowns[spotifyId]) {
+                  console.log(`[Lobby] Hoppar över låt pga spoiler-spärr: ${spotifyId}`);
+                  return;
+                }
+                
+                // Priority: verifiedTracks > customYear > original year
+                let year;
+                if (verifiedTracks[spotifyId] && verifiedTracks[spotifyId].year) {
+                  year = parseInt(verifiedTracks[spotifyId].year);
+                } else {
+                  year = parseInt(song.customYear || song.year);
+                }
+                
+                // Filter by year range
+                if (year >= yearRange.min && year <= yearRange.max) {
+                  allSongs.push({
+                    spotifyId,
+                    title: song.title,
+                    artist: song.artist,
+                    year: year
+                  });
+                }
+              });
+              console.log(`[Lobby] Loaded ${Object.keys(songs).length} songs from user list: ${playlistName}`);
+            }
+          } catch (error) {
+            console.warn(`[Lobby] Could not load user list ${playlistName}:`, error);
+          }
+        }
       }
       
       console.log(`[Lobby] Total songs before filtering: ${allSongs.length}`);
