@@ -229,6 +229,10 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       alert(`Spellistan "${playlistName}" har lagts till! \nAlla låtar verifierades snyggt och prydligt.`);
     }
     
+    // Rensa fälten
+    document.getElementById('playlistLinkInput').value = '';
+    document.getElementById('playlistNameInput').value = '';
+    
   } catch (error) {
     console.error("Fel vid lagring av spellista:", error);
     alert("Något gick fel vid lagring av spellistan.");
