@@ -784,7 +784,7 @@
                         btn.addEventListener("click", async (e) => {
                             if (confirm("Är du säker på att du vill kasta denna rapport? (Inget ändras i spelet)")) {
                                 const tId = e.target.getAttribute("data-id");
-                                await set(ref(db, \`reportedTracks/\${tId}\`), null);
+                                await set(ref(db, `reportedTracks/${tId}`), null);
                                 loadReportedTracks();
                             }
                         });
@@ -803,7 +803,7 @@
 
                 } catch (err) {
                     console.error("Fel vid hämtning av rapporter:", err);
-                    tbody.innerHTML = \`<tr><td colspan='4' style='color: red;'>Fel: \${err.message}</td></tr>\`;
+                    tbody.innerHTML = `<tr><td colspan='4' style='color: red;'>Fel: ${err.message}</td></tr>`;
                 }
             }
 
@@ -834,15 +834,15 @@
                     }
 
                     if (newYear !== oldYear) {
-                        trElement.innerHTML = \`
-                            <td><strong>\${title}</strong></td>
-                            <td>\${artist}</td>
-                            <td><del style="color: #ef4444;">\${oldYear}</del> ➡️ <strong style="color: #10b981;">\${newYear}</strong> <span style="font-size: 11px; color: var(--text-muted);">(\${source})</span></td>
+                        trElement.innerHTML = `
+                            <td><strong>${title}</strong></td>
+                            <td>${artist}</td>
+                            <td><del style="color: #ef4444;">${oldYear}</del> ➡️ <strong style="color: #10b981;">${newYear}</strong> <span style="font-size: 11px; color: var(--text-muted);">(${source})</span></td>
                             <td>
-                                <button class="btn-success approve-report-btn" data-id="\${trackId}" data-year="\${newYear}" data-title="\${title.replace(/"/g, '&quot;')}" data-artist="\${artist.replace(/"/g, '&quot;')}" style="padding: 6px 10px; font-size: 13px;">✅ Godkänn</button>
-                                <button class="btn-clean delete-report-btn" data-id="\${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;">Avbryt</button>
+                                <button class="btn-success approve-report-btn" data-id="${trackId}" data-year="${newYear}" data-title="${title.replace(/"/g, '&quot;')}" data-artist="${artist.replace(/"/g, '&quot;')}" style="padding: 6px 10px; font-size: 13px;">✅ Godkänn</button>
+                                <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;">Avbryt</button>
                             </td>
-                        \`;
+                        `;
 
                         // Bind Approve Button
                         trElement.querySelector(".approve-report-btn").addEventListener("click", async (e) => {
@@ -851,7 +851,7 @@
                             e.target.disabled = true;
                             
                             // 1. Spara i cachen (verifiedTracks)
-                            await set(ref(db, \`verifiedTracks/\${trackId}\`), {
+                            await set(ref(db, `verifiedTracks/${trackId}`), {
                                 title: title,
                                 artist: artist,
                                 year: approvedYear,
@@ -864,13 +864,13 @@
                                 const lists = listsSnap.val();
                                 for (const listName of Object.keys(lists)) {
                                     if (lists[listName].songs && lists[listName].songs[trackId]) {
-                                        await set(ref(db, \`standardLists/\${listName}/songs/\${trackId}/year\`), approvedYear);
+                                        await set(ref(db, `standardLists/${listName}/songs/${trackId}/year`), approvedYear);
                                     }
                                 }
                             }
 
                             // 3. Ta bort rapporten
-                            await set(ref(db, \`reportedTracks/\${trackId}\`), null);
+                            await set(ref(db, `reportedTracks/${trackId}`), null);
                             loadReportedTracks();
                         });
 
