@@ -244,10 +244,10 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-            authDomain: "notestreamfire.firebaseapp.com",
+            authDomain: "beatlinefirebase.firebaseapp.com",
             databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
-            projectId: "notestreamfire",
-            storageBucket: "notestreamfire.appspot.com",
+            projectId: "beatlinefirebase",
+            storageBucket: "beatlinefirebase.firebasestorage.app",
             messagingSenderId: "196231817325",
             appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
         };
@@ -780,13 +780,17 @@
                         const dateStr = new Date(data.reportedAt).toLocaleString("sv-SE");
                         const isFlagged = data.isFlagged ? '<span style="background:var(--warning); color:black; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">Flaggad</span>' : '';
                         
+                        const safeTitle = data.title || "Okänd titel";
+                        const safeArtist = data.artist || "Okänd artist";
+                        const safeYear = data.year || "?";
+
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
-                            <td><strong>${data.title}</strong>${isFlagged}</td>
-                            <td>${data.artist}</td>
-                            <td><span style="color: #ef4444; font-weight: bold;">${data.year}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
+                            <td><strong>${safeTitle}</strong>${isFlagged}</td>
+                            <td>${safeArtist}</td>
+                            <td><span style="color: #ef4444; font-weight: bold;">${safeYear}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
                             <td>
-                                <button class="btn-info scan-report-btn" data-id="${trackId}" data-title="${data.title.replace(/"/g, '&quot;')}" data-artist="${data.artist.replace(/"/g, '&quot;')}" data-year="${data.year}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI/iTunes</button>
+                                <button class="btn-info scan-report-btn" data-id="${trackId}" data-title="${safeTitle.replace(/"/g, '&quot;')}" data-artist="${safeArtist.replace(/"/g, '&quot;')}" data-year="${safeYear}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI/iTunes</button>
                                 <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;" title="Ta bort rapport (ignorera)">🗑️</button>
                             </td>
                         `;

@@ -2,7 +2,10 @@
   "functions": {
     "source": "functions"
   },
-  "database": {
-    "rules": "database.rules.json"
-  }
+  "database": [
+    {
+      "target": "notestreamfire",
+      "rules": "database.rules.json"
+    }
+  ]
 }

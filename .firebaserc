@@ -1,5 +1,15 @@
 {
   "projects": {
-    "default": "notestreamfire"
-  }
+    "default": "beatlinefirebase"
+  },
+  "targets": {
+    "beatlinefirebase": {
+      "database": {
+        "notestreamfire": [
+          "notestreamfire"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
