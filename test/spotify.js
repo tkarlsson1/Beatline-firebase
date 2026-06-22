@@ -43,6 +43,11 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     const response = await fetch(nextUrl, {
       headers: { "Authorization": `Bearer ${token}` }
     });
+    
+    if (!response.ok) {
+      throw new Error(`Spotify svarade med ett fel (Status: ${response.status}). Kontrollera att spellistan är offentlig (publik) och inte en personlig "Mix" skapad av Spotify.`);
+    }
+    
     const data = await response.json();
     data.items.forEach(item => {
       const trackId = item.track.id;
