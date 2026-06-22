@@ -283,6 +283,7 @@ function openReviewPlaylistModal(uncertainTracks, playlistName) {
         <span style="font-size: 0.75rem; color: #10b981; display: block;">AI Föreslår</span>
         <input type="text" class="review-year-input" data-id="${t.id}" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${t.artist.replace(/"/g, '&quot;')}" value="${t.aiYear}" style="width: 60px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid #10b981; background: #222; color: #10b981; font-weight: bold;">
       </div>
+      <a href="https://www.google.com/search?q=${encodeURIComponent(t.artist + ' ' + t.title + ' release year')}" target="_blank" style="text-decoration: none; font-size: 1.2rem; margin-left: 10px; opacity: 0.8; hover: opacity: 1;" title="Sök på Google">🔍</a>
     `;
     
     row.appendChild(info);
@@ -295,11 +296,24 @@ function openReviewPlaylistModal(uncertainTracks, playlistName) {
   const newSaveBtn = saveBtn.cloneNode(true);
   saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
   
+  // Hantera kryssrutan för dynamisk text
+  const checkbox = document.getElementById("disableCooldownCheckbox");
+  checkbox.checked = false; // Återställ alltid till av
+  newSaveBtn.textContent = "Spara Årtal & Aktivera Spärr";
+  
+  checkbox.onchange = (e) => {
+    if (e.target.checked) {
+      newSaveBtn.textContent = "Spara Årtal";
+    } else {
+      newSaveBtn.textContent = "Spara Årtal & Aktivera Spärr";
+    }
+  };
+  
   newSaveBtn.addEventListener("click", async () => {
     newSaveBtn.disabled = true;
     newSaveBtn.textContent = "Sparar...";
     
-    const disableCooldown = document.getElementById("disableCooldownCheckbox").checked;
+    const disableCooldown = checkbox.checked;
     const inputs = document.querySelectorAll(".review-year-input");
     const userId = window.auth.currentUser.uid;
     
