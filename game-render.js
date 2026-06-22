@@ -26,8 +26,14 @@ function updateGameView() {
   // Update action buttons
   updateActionButtons();
   
+  // Render challenge button (if Timer 2 is active)
+  renderChallengeButton();
+  
+  // Render validation modal (if active)
+  renderValidationModal();
+  
   // Initialize scores based on revealed cards (only once at game start)
-  if (!hasInitializedScores && currentGameData.status === 'playing' && isHost) {
+  if (!hasInitializedScores && currentGameData.status === 'playing') {
     hasInitializedScores = true;
     console.log('[Game] Initializing scores based on revealed cards');
     
@@ -73,26 +79,6 @@ function updateGameView() {
     } else {
       pauseBtn.style.display = 'inline-block';
       resumeBtn.style.display = 'none';
-    }
-    
-    // Check if validation trigger changed (non-host validated their card)
-    if (currentGameData.validationTrigger && currentGameData.validationTrigger !== lastValidationTrigger) {
-      console.log('[Host] Validation trigger detected:', currentGameData.validationTrigger);
-      lastValidationTrigger = currentGameData.validationTrigger;
-      
-      // Start Timer 4 after validation from non-host
-      console.log('[Host] Starting Timer 4 after non-host validation');
-      const nextTeamId = currentGameData.currentTeam;
-      if (nextTeamId && !currentGameData.timerState) {
-        // Only start if no timer is currently active
-        console.log('[Host] Starting between_songs timer for:', nextTeamId);
-        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
-        
-        // Clear the trigger
-        const clearUpdates = {};
-        clearUpdates[`games/${gameId}/validationTrigger`] = null;
-        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), clearUpdates);
-      }
     }
   }
   
@@ -280,6 +266,25 @@ function renderTimeline() {
     renderPreviewCard(previewCard, teamColorHex);
   }
   
+  // Check if we need to render a challenging card (during Timer 3)
+  if (currentGameData.timerState === 'challenge_placement' && 
+      currentGameData.challengeState && 
+      currentGameData.challengeState.challengingCard) {
+    
+    const challengingCard = currentGameData.challengeState.challengingCard;
+    const challengingTeamId = currentGameData.challengeState.challengingTeam;
+    const challengingTeam = currentTeams[challengingTeamId];
+    
+    if (challengingCard.position !== undefined && challengingTeam) {
+      // Get challenging team's color
+      const challengingTeamColor = challengingTeam.color || 'blue';
+      const challengingColorObj = TEAM_COLORS.find(c => c.name === challengingTeamColor);
+      const challengingColorHex = challengingColorObj ? challengingColorObj.hex : '#0B939C';
+      
+      renderPreviewCard(challengingCard, challengingColorHex);
+    }
+  }
+  
   // Auto-scroll to center card when team changes
   if (currentTeamId !== previousCurrentTeam) {
     console.log('[Timeline] Team changed from', previousCurrentTeam, 'to', currentTeamId, '- auto-scrolling to center');
@@ -295,14 +300,20 @@ function renderTimeline() {
         const middleIndex = Math.floor(allCards.length / 2);
         const middleCard = allCards[middleIndex];
         
-        if (middleCard) {
+        if (middleCard && timelineContainer) {
           console.log('[Timeline] Scrolling to middle card at index', middleIndex, 'of', allCards.length, 'cards');
           
-          // Scroll middle card to center of viewport
-          middleCard.scrollIntoView({
-            behavior: 'smooth',
-            inline: 'center',
-            block: 'nearest'
+          // Calculate the position to scroll to
+          const cardRect = middleCard.getBoundingClientRect();
+          const containerRect = timelineContainer.getBoundingClientRect();
+          const cardCenter = middleCard.offsetLeft + (cardRect.width / 2);
+          const containerCenter = containerRect.width / 2;
+          const scrollPosition = cardCenter - containerCenter;
+          
+          // Scroll to position
+          timelineContainer.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
           });
         }
       }
@@ -314,8 +325,13 @@ function renderPreviewCard(card, teamColorHex) {
   const container = document.getElementById('timeline');
   const position = card.position;
   
-  // Check if this is my card (so I can drag it)
-  const isMyCard = (teamId === currentGameData.currentTeam);
+  // Check if this is my card:
+  // 1. Normal gameplay: I'm the active team
+  // 2. Challenge mode: I'm the challenging team
+  const isMyCard = (teamId === currentGameData.currentTeam) || 
+                   (currentGameData.timerState === 'challenge_placement' && 
+                    currentGameData.challengeState && 
+                    currentGameData.challengeState.challengingTeam === teamId);
   
   const previewCard = document.createElement('div');
   previewCard.className = 'card preview-card';
@@ -367,8 +383,20 @@ function renderCurrentCard() {
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Only show current card if it's my turn AND we're in guessing state (not pause)
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
+  // Show current card if:
+  // 1. It's my turn AND we're in guessing state (normal gameplay)
+  // 2. OR we're in challenge_placement AND I'm the challenging team
+  // 3. OR Timer 2 (challenge_window) AND I'm NOT the active team (for UTMANA button)
+  
+  const isMyTurn = (currentTeamId === teamId && timerState === 'guessing');
+  const isChallengingTeam = (
+    timerState === 'challenge_placement' && 
+    currentGameData.challengeState && 
+    currentGameData.challengeState.challengingTeam === teamId
+  );
+  const isChallengeWindow = (timerState === 'challenge_window' && currentTeamId !== teamId);
+  
+  if (!isMyTurn && !isChallengingTeam && !isChallengeWindow) {
     container.style.visibility = 'hidden';
     return;
   }
@@ -382,7 +410,15 @@ function renderCurrentCard() {
   
   container.style.visibility = 'visible';
   
-  // Create card element
+  // BUGFIX PROBLEM 4: During challenge window (Timer 2), don't create card for non-active teams
+  // The UTMANA button will be shown instead by updateActionButtons()
+  if (isChallengeWindow) {
+    const cardContainer = document.getElementById('currentCard');
+    cardContainer.innerHTML = '';  // Clear any existing card
+    return;  // Don't create a new card
+  }
+  
+  // Create card element (for active team or challenging team)
   const cardDiv = document.createElement('div');
   cardDiv.className = 'card blank-card';
   cardDiv.id = 'draggableCard';
@@ -424,23 +460,70 @@ function updateActionButtons() {
   const currentTeamId = currentGameData.currentTeam;
   const timerState = currentGameData.timerState;
   
-  // Buttons are now inside currentCardContainer, no need to show/hide separately
-  // Just update button states
-  
   const changeCardBtn = document.getElementById('changeCardBtn');
   const lockInBtn = document.getElementById('lockInBtn');
+  const cardContainer = document.getElementById('currentCard');
   
-  if (!changeCardBtn || !lockInBtn) return;
+  if (!changeCardBtn || !lockInBtn || !cardContainer) return;
   
-  // Only enable buttons if it's my turn AND we're in guessing state
-  if (currentTeamId !== teamId || timerState !== 'guessing') {
+  // BUGFIX PROBLEM 4: During Timer 2 (challenge window), show UTMANA centered
+  if (timerState === 'challenge_window') {
+    const alreadyChallenged = currentGameData.challengeState && currentGameData.challengeState.isActive;
+    
+    // Don't show to active team or if already challenged
+    if (currentTeamId === teamId || alreadyChallenged) {
+      changeCardBtn.style.display = 'none';
+      lockInBtn.style.display = 'none';
+      cardContainer.style.display = 'none';
+      return;
+    }
+    
+    // Show UTMANA button centered across entire grid
+    changeCardBtn.style.display = 'inline-block';
+    changeCardBtn.style.gridColumn = '1 / -1';  // Span all columns
+    changeCardBtn.style.justifySelf = 'center'; // Center in grid
+    changeCardBtn.style.height = '48px';  // Match card height to prevent container jump
+    changeCardBtn.textContent = 'UTMANA (1 🎫)';
+    changeCardBtn.onclick = challengeCard;
+    
+    // Enable if team has tokens
+    const hasTokens = myTeam && myTeam.tokens > 0;
+    changeCardBtn.disabled = !hasTokens;
+    
+    // Hide other elements
+    lockInBtn.style.display = 'none';
+    cardContainer.style.display = 'none';
+    return;
+  }
+  
+  // Reset to normal state (not challenge window)
+  changeCardBtn.style.display = 'inline-block';
+  changeCardBtn.style.gridColumn = '';  // Reset to default (1 column)
+  changeCardBtn.style.justifySelf = '';  // Reset to CSS default
+  changeCardBtn.style.height = '';  // Reset to CSS default height
+  changeCardBtn.textContent = 'BYT LÅT';
+  changeCardBtn.onclick = changeCard;
+  lockInBtn.style.display = 'inline-block';
+  cardContainer.style.display = 'flex';  // Show card container
+  
+  // Check if we're in challenge mode and I'm the challenging team
+  const isChallengingTeam = (
+    timerState === 'challenge_placement' && 
+    currentGameData.challengeState && 
+    currentGameData.challengeState.challengingTeam === teamId
+  );
+  
+  // Normal gameplay: only enable if it's my turn AND guessing state
+  const isMyTurn = (currentTeamId === teamId && timerState === 'guessing');
+  
+  if (!isMyTurn && !isChallengingTeam) {
     changeCardBtn.disabled = true;
     lockInBtn.disabled = true;
     return;
   }
   
-  // Change card button - enable if team has tokens
-  if (myTeam && myTeam.tokens > 0) {
+  // Change card button - enable if team has tokens (not available during challenge)
+  if (isMyTurn && myTeam && myTeam.tokens > 0) {
     changeCardBtn.disabled = false;
   } else {
     changeCardBtn.disabled = true;
@@ -455,52 +538,57 @@ function updateActionButtons() {
 }
 
 // ============================================
+// CHALLENGE BUTTON
+// ============================================
+function renderChallengeButton() {
+  // BUGFIX PROBLEM 4: Challenge button is now handled in updateActionButtons()
+  // This function is kept for backwards compatibility but does nothing
+  const container = document.getElementById('challengeButtonContainer');
+  
+  if (container) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+  }
+  
+  return;
+}
+
+// ============================================
 // DROP POSITION & INDICATORS
 // ============================================
 function getDropPositionFromCoords(x, y) {
-  // Find which position in timeline based on x coordinate
-  // Position is based on actual index in DOM, not dataset.position
-  const timeline = document.getElementById('timeline');
-  const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
-  
-  if (cards.length === 0) {
-    return 0;
-  }
-  
-  // Check if before first card
-  const firstCard = cards[0];
-  const firstRect = firstCard.getBoundingClientRect();
-  if (x < firstRect.left + firstRect.width / 2) {
-    return 0;
-  }
-  
-  // Check if after last card
-  const lastCard = cards[cards.length - 1];
-  const lastRect = lastCard.getBoundingClientRect();
-  if (x > lastRect.right - lastRect.width / 2) {
+    // Find which position in timeline based on x,y coordinates
+    // Position is based on actual index in DOM, not dataset.position
+    const timeline = document.getElementById('timeline');
+    const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
+    
+    if (cards.length === 0) {
+      return 0;
+    }
+    
+    // Iterate through all cards to find where we are dropping (supports multi-row flex-wrap)
+    for (let i = 0; i < cards.length; i++) {
+      const rect = cards[i].getBoundingClientRect();
+      
+      // Are we roughly on the same row? (Generous vertical margin of 60px for touch screens)
+      const onSameRow = y >= rect.top - 60 && y <= rect.bottom + 60;
+      
+      if (onSameRow) {
+        // If we are to the left of the card's center, insert before it
+        const cardCenter = rect.left + rect.width / 2;
+        if (x < cardCenter) {
+          return i;
+        }
+      } else if (y < rect.top - 60) {
+        // We are strictly above this row, meaning we should be inserted before this card
+        // This handles dropping at the end of the previous row
+        return i;
+      }
+    }
+    
+    // Default to after last card
     return cards.length;
   }
-  
-  // Check between cards
-  for (let i = 0; i < cards.length - 1; i++) {
-    const currentCard = cards[i];
-    const nextCard = cards[i + 1];
-    
-    const currentRect = currentCard.getBoundingClientRect();
-    const nextRect = nextCard.getBoundingClientRect();
-    
-    const currentCenter = currentRect.left + currentRect.width / 2;
-    const nextCenter = nextRect.left + nextRect.width / 2;
-    
-    // If x is between current card center and next card center
-    if (x >= currentCenter && x < nextCenter) {
-      return i + 1;
-    }
-  }
-  
-  // Default to after last card
-  return cards.length;
-}
 
 function showDynamicDropIndicator(x, y) {
   // Remove existing indicator
@@ -527,6 +615,7 @@ function showDynamicDropIndicator(x, y) {
     border-radius: 2px;
     box-shadow: 0 0 10px #4CAF50;
     animation: pulse 1s infinite;
+    pointer-events: none;
   `;
   
   // Add arrow indicator
@@ -564,5 +653,140 @@ function clearDynamicDropIndicator() {
     indicator.remove();
   }
 }
+
+// ============================================
+// VALIDATION MODAL RENDERING
+// ============================================
+function renderValidationModal() {
+  const container = document.getElementById('validationModalContainer');
+  const gameContainer = document.getElementById('gameContainer');
+  
+  if (!container || !gameContainer) {
+    console.warn('[Game] Modal containers not found');
+    return;
+  }
+  
+  const modal = currentGameData.validationModal;
+  
+  // Check if modal should be visible
+  if (!modal || !modal.isVisible) {
+    // Hide modal and remove blur
+    container.innerHTML = '';
+    gameContainer.classList.remove('modal-active');
+    return;
+  }
+  
+  console.log('[Game] Rendering validation modal:', modal);
+  
+  // Add blur class to game container
+  gameContainer.classList.add('modal-active');
+  
+  // Determine title and subtitle based on result
+  let titleText = '';
+  let titleClass = '';
+  let subtitleText = '';
+  
+  if (modal.challengingTeamId) {
+    // Challenge scenario
+    if (modal.result === 'active_correct') {
+      titleText = `✅ ${escapeHtml(modal.activeTeamName)} HADE RÄTT!`;
+      titleClass = 'correct';
+      subtitleText = `${escapeHtml(modal.challengingTeamName)} förlorade utmaningen`;
+    } else if (modal.result === 'challenging_won') {
+      titleText = `✅ ${escapeHtml(modal.challengingTeamName)} VANN UTMANINGEN!`;
+      titleClass = 'correct';
+      subtitleText = `${escapeHtml(modal.activeTeamName)} placerade fel`;
+    } else {
+      // both_wrong
+      titleText = `❌ BÅDA LAGEN HADE FEL`;
+      titleClass = 'wrong';
+      subtitleText = `${escapeHtml(modal.activeTeamName)} och ${escapeHtml(modal.challengingTeamName)}`;
+    }
+  } else {
+    // Normal validation (no challenge)
+    if (modal.result === 'active_correct') {
+      titleText = `✅ ${escapeHtml(modal.activeTeamName)} FICK KORTET!`;
+      titleClass = 'correct';
+      subtitleText = '';
+    } else {
+      titleText = `❌ ${escapeHtml(modal.activeTeamName)} PLACERADE FEL`;
+      titleClass = 'wrong';
+      subtitleText = '';
+    }
+  }
+  
+  // Build modal HTML
+  let modalHTML = `
+    <div class="validation-modal-overlay">
+      <div class="validation-modal">
+        <div class="validation-modal-title ${titleClass}">
+          ${titleText}
+        </div>
+  `;
+  
+  if (subtitleText) {
+    modalHTML += `
+      <div class="validation-modal-subtitle">
+        ${subtitleText}
+      </div>
+    `;
+  }
+  
+  modalHTML += `
+    <div class="validation-modal-song">
+      <div class="validation-modal-song-year">${modal.song.year}</div>
+      <div class="validation-modal-song-title">${escapeHtml(modal.song.title)}</div>
+      <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
+    </div>
+    
+    <div style="text-align: center; margin-bottom: 15px;">
+      <button 
+        class="validation-modal-btn report-btn" 
+        style="background-color: #f44336; padding: 5px 10px; font-size: 12px; width: auto; display: inline-block;"
+        onclick="reportTrack('${modal.song.spotifyId}', \`${escapeHtml(modal.song.title)}\`, \`${escapeHtml(modal.song.artist)}\`, '${modal.song.year}')"
+      >
+        🚩 Fel årtal?
+      </button>
+    </div>
+    
+    <div class="validation-modal-buttons">
+  `;
+  
+  // Show +TOKEN button only if canGiveToken and not already given
+  if (modal.canGiveToken && !modal.tokenGiven) {
+    modalHTML += `
+      <button 
+        class="validation-modal-btn token" 
+        onclick="giveTokenToActiveTeam()"
+        ${modal.isProcessing ? 'disabled' : ''}
+      >
+        🎫 +TOKEN
+      </button>
+    `;
+  }
+  
+  // Show NÄSTA LÅT button (always visible)
+  modalHTML += `
+    <button 
+      class="validation-modal-btn next" 
+      onclick="closeValidationModal()"
+      ${modal.isProcessing ? 'disabled' : ''}
+    >
+      NÄSTA LÅT →
+    </button>
+  `;
+  
+  modalHTML += `
+    </div>
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = modalHTML;
+  
+  console.log('[Game] Validation modal rendered');
+}
+
+console.log('[Game] Render module loaded');
 
 console.log('[Game] Render module loaded');
