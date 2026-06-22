@@ -830,6 +830,41 @@
                 }
             }
 
+            async function searchItunesFallback(title, artist) {
+                if (!title || !artist) return null;
+                try {
+                    const cleanTitle = title.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').trim();
+                    const query = encodeURIComponent(`${artist} ${cleanTitle}`);
+                    const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=15`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    
+                    if (!data.results || data.results.length === 0) return null;
+                    
+                    let earliestYear = null;
+                    data.results.forEach(result => {
+                        const trackLower = result.trackName.toLowerCase();
+                        const artistLower = result.artistName.toLowerCase();
+                        if (trackLower.includes('karaoke') || artistLower.includes('karaoke') || 
+                            artistLower.includes('tribute') || artistLower.includes('cover')) {
+                            return;
+                        }
+                        if (result.releaseDate) {
+                            const year = parseInt(result.releaseDate.substring(0, 4));
+                            if (!earliestYear || year < earliestYear) earliestYear = year;
+                        }
+                    });
+                    
+                    if (earliestYear) {
+                        return { year: earliestYear };
+                    }
+                    return null;
+                } catch (e) {
+                    console.error("iTunes fel:", e);
+                    return null;
+                }
+            }
+
             async function scanSingleReport(trackId, title, artist, oldYear, trElement) {
                 const btn = trElement.querySelector(".scan-report-btn");
                 const originalText = btn.innerHTML;
