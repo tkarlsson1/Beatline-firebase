@@ -134,8 +134,8 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     
     if (addBtn) addBtn.textContent = `AI granskar ${tracksToAi.length} låtar...`;
     
-    // Kör AI-frågor i parallella batchar (t.ex. 5 åt gången) för att spara enormt med tid
-    const BATCH_SIZE = 5;
+    // Kör AI-frågor i parallella batchar (t.ex. 25 åt gången) för att spara enormt med tid
+    const BATCH_SIZE = 25;
     let processedAi = 0;
     
     if (window.firebaseFunctions && window.httpsCallable) {
