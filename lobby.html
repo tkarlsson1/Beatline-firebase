@@ -334,7 +334,7 @@
     <!-- Error State -->
     <div id="errorState" class="error-message" style="display: none;">
       <p id="errorMessage"></p>
-      <button onclick="window.location.href='/test/'" class="start-button">Tillbaka till start</button>
+      <button onclick="window.location.href='/'" class="start-button">Tillbaka till start</button>
     </div>
     
     <!-- Host View -->
@@ -560,7 +560,7 @@
       document.getElementById('pinDisplay').textContent = gameData.pin;
       
       // Generate QR code
-      const joinUrl = `https://www.notestream.se/test/join.html?game=${gameId}`;
+      const joinUrl = `https://www.notestream.se/join.html?game=${gameId}`;
       document.getElementById('joinUrl').textContent = joinUrl;
       generateLobbyQRCode(gameId, 'qrCodeElement');
       
