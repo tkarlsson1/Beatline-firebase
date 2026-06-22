@@ -17,10 +17,10 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
-  authDomain: "beatlinefirebase.firebaseapp.com",
+  authDomain: "notestreamfire.firebaseapp.com",
   databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
-  projectId: "beatlinefirebase",
-  storageBucket: "beatlinefirebase.firebasestorage.app",
+  projectId: "notestreamfire",
+  storageBucket: "notestreamfire.appspot.com",
   messagingSenderId: "196231817325",
   appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
 };

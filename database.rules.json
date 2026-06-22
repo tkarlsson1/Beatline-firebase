@@ -1,7 +1,19 @@
 {
   "rules": {
-    ".read": "auth != null",
+    ".read": false,
     ".write": false,
+    "games": {
+      ".read": true,
+      ".write": true
+    },
+    "reportedTracks": {
+      ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      ".write": true
+    },
+    "flaggedTracks": {
+      ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      ".write": true
+    },
     "standardLists": {
       ".read": true,
       ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
@@ -10,7 +22,7 @@
       }
     },
     "verifiedTracks": {
-      ".read": "auth != null",
+      ".read": true,
       ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'"
     },
     "userPlaylists": {
