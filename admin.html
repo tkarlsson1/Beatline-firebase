@@ -748,23 +748,41 @@
                 reportsContainer.style.display = "block";
 
                 try {
-                    const snap = await get(ref(db, "reportedTracks"));
-                    if (!snap.exists()) {
+                    const snapReports = await get(ref(db, "reportedTracks"));
+                    const snapFlagged = await get(ref(db, "flaggedTracks"));
+                    
+                    let reports = {};
+                    if (snapReports.exists()) {
+                        reports = { ...snapReports.val() };
+                    }
+                    if (snapFlagged.exists()) {
+                        const flagged = snapFlagged.val();
+                        for (const [id, data] of Object.entries(flagged)) {
+                            reports[id] = {
+                                title: data.title,
+                                artist: data.artist,
+                                year: data.oldYear,
+                                reportedAt: data.flaggedAt || new Date().toISOString(),
+                                isFlagged: true
+                            };
+                        }
+                    }
+
+                    if (Object.keys(reports).length === 0) {
                         tbody.innerHTML = "<tr><td colspan='4' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
                         return;
                     }
-
-                    const reports = snap.val();
                     tbody.innerHTML = "";
                     let hasReports = false;
 
                     for (const [trackId, data] of Object.entries(reports)) {
                         hasReports = true;
                         const dateStr = new Date(data.reportedAt).toLocaleString("sv-SE");
+                        const isFlagged = data.isFlagged ? '<span style="background:var(--warning); color:black; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">Flaggad</span>' : '';
                         
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
-                            <td><strong>${data.title}</strong></td>
+                            <td><strong>${data.title}</strong>${isFlagged}</td>
                             <td>${data.artist}</td>
                             <td><span style="color: #ef4444; font-weight: bold;">${data.year}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
                             <td>
@@ -785,6 +803,7 @@
                             if (confirm("Är du säker på att du vill kasta denna rapport? (Inget ändras i spelet)")) {
                                 const tId = e.target.getAttribute("data-id");
                                 await set(ref(db, `reportedTracks/${tId}`), null);
+                                await set(ref(db, `flaggedTracks/${tId}`), null);
                                 loadReportedTracks();
                             }
                         });
@@ -869,8 +888,9 @@
                                 }
                             }
 
-                            // 3. Ta bort rapporten
+                            // 3. Ta bort rapporten och flaggan
                             await set(ref(db, `reportedTracks/${trackId}`), null);
+                            await set(ref(db, `flaggedTracks/${trackId}`), null);
                             loadReportedTracks();
                         });
 
