@@ -288,8 +288,13 @@ function openReviewPlaylistModal(uncertainTracks, playlistName) {
       </div>
       <div style="font-size: 1.2rem;">➡️</div>
       <div style="text-align: center;">
-        <span style="font-size: 0.75rem; color: #10b981; display: block;">AI Föreslår</span>
-        <input type="text" class="review-year-input" data-id="${t.id}" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${t.artist.replace(/"/g, '&quot;')}" value="${t.aiYear}" style="width: 60px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid #10b981; background: #222; color: #10b981; font-weight: bold;">
+        <span style="font-size: 0.75rem; color: #10b981; display: block;">AI Föreslog</span>
+        <span style="color: #10b981; font-weight: bold;">${t.aiYear}</span>
+      </div>
+      <div style="font-size: 1.2rem;">➡️</div>
+      <div style="text-align: center;">
+        <span style="font-size: 0.75rem; color: #fff; display: block;">Ditt val</span>
+        <input type="text" class="review-year-input" data-id="${t.id}" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${t.artist.replace(/"/g, '&quot;')}" value="${t.aiYear}" style="width: 60px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid #fff; background: #222; color: #fff; font-weight: bold;">
       </div>
       <a href="https://www.google.com/search?q=${encodeURIComponent(t.artist + ' ' + t.title + ' release year')}" target="_blank" style="text-decoration: none; font-size: 1.2rem; margin-left: 10px; opacity: 0.8; hover: opacity: 1;" title="Sök på Google">🔍</a>
     `;
