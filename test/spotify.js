@@ -93,8 +93,10 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     const trackKeys = Object.keys(tracks);
     const totalTracks = trackKeys.length;
     let verifiedCount = 0;
-    let itunesCount = 0;
     let aiCount = 0;
+    
+    // Array to hold uncertain tracks for manual review
+    const uncertainTracks = [];
     
     for (let i = 0; i < totalTracks; i++) {
       const trackId = trackKeys[i];
@@ -109,73 +111,217 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
         continue;
       }
       
-      // 2. Kolla iTunes API
-      let usedItunes = false;
+      // 2. Kolla AI (Vi skippar iTunes helt enligt plan!)
       try {
-        if (window.itunesApi) {
-          const itunesData = await window.itunesApi.searchTrack(track.title, track.artist);
-          if (itunesData && itunesData.releaseYear) {
-            const itunesYear = parseInt(itunesData.releaseYear);
-            const spotifyYear = parseInt(track.year);
-            // Om iTunes har ett äldre årtal, lita på iTunes
-            if (!isNaN(itunesYear) && !isNaN(spotifyYear) && itunesYear < spotifyYear) {
-              track.year = String(itunesYear);
-              itunesCount++;
-              usedItunes = true;
-            }
-          }
-          // Liten paus för att inte överbelasta iTunes API
-          await new Promise(r => setTimeout(r, 100));
-        }
-      } catch (e) {
-        console.warn("iTunes API sökning misslyckades för", track.title);
-      }
-      
-      // 3. Kolla AI via Backend (getSongYearAi) om varken Cache eller iTunes lyckades
-      if (!usedItunes && !verifiedTracks[trackId]) {
-        try {
-          if (addBtn) addBtn.textContent = `Frågar AI... ${i+1}/${totalTracks}`;
+        if (addBtn) addBtn.textContent = `Frågar AI... ${i+1}/${totalTracks}`;
+        
+        if (window.firebaseFunctions && window.httpsCallable) {
+          const getSongYearAi = window.httpsCallable(window.firebaseFunctions, 'getSongYearAi');
+          const result = await getSongYearAi({ title: track.title, artist: track.artist });
           
-          if (window.firebaseFunctions && window.httpsCallable) {
-            const getSongYearAi = window.httpsCallable(window.firebaseFunctions, 'getSongYearAi');
-            const result = await getSongYearAi({ title: track.title, artist: track.artist });
+          if (result && result.data && result.data.year && result.data.year !== "UNKNOWN") {
+            const aiYear = parseInt(result.data.year, 10);
+            const spotifyYear = parseInt(track.year, 10);
             
-            if (result && result.data && result.data.year) {
-              const aiYear = parseInt(result.data.year, 10);
-              const spotifyYear = parseInt(track.year);
-              if (!isNaN(aiYear) && !isNaN(spotifyYear) && aiYear < spotifyYear) {
+            if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
+              const diff = Math.abs(spotifyYear - aiYear);
+              
+              if (diff <= 1) {
+                // SÄKERT: Diff <= 1 (ofta Remaster). Auto-godkänn och spara i Cache.
                 track.year = String(aiYear);
                 aiCount++;
+                
+                // Spara till Cache direkt i bakgrunden
+                window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${trackId}`), {
+                  title: track.title,
+                  artist: track.artist,
+                  year: track.year,
+                  manuallyVerified: false
+                }).catch(e => console.warn("Kunde inte spara till cache", e));
+                
+              } else if (aiYear < spotifyYear) {
+                // OSÄKERT: AI föreslår ett mycket äldre år. Be användaren granska!
+                uncertainTracks.push({
+                  id: trackId,
+                  title: track.title,
+                  artist: track.artist,
+                  spotifyYear: track.year,
+                  aiYear: String(aiYear)
+                });
+                // Tills vidare använder vi Spotifys år i deras lokala lista ifall de avbryter
               }
             }
-          } else {
-            console.warn("Firebase Functions är inte initierat.");
           }
-        } catch (e) {
-          console.warn("Kunde inte anropa Backend AI för", track.title, e);
         }
+      } catch (e) {
+        console.warn("Kunde inte anropa Backend AI för", track.title, e);
       }
     }
     
-    console.log(`Validering klar: ${verifiedCount} från cache, ${itunesCount} korrigerade via iTunes, ${aiCount} korrigerade via AI.`);
+    console.log(`Validering klar: ${verifiedCount} från cache, ${aiCount} säkra från AI, ${uncertainTracks.length} osäkra.`);
     if (addBtn) addBtn.textContent = "Sparar...";
-    // -----------------------------------
     
+    // 3. Spara spellistan till användarens konto
     const userId = window.auth.currentUser.uid;
     const userPlaylistsRef = window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}`);
     await window.firebaseSet(userPlaylistsRef, { songs: tracks });
     
-    alert(`Spellistan "${playlistName}" har lagts till i dina spellistor! \n(Verifierades: ${verifiedCount} db, ${itunesCount} iTunes, ${aiCount} AI)`);
+    if (addBtn) {
+      addBtn.disabled = false;
+      addBtn.textContent = "Lägg till";
+    }
+    
+    // 4. Visa Review Modal om vi hittade osäkra låtar
+    if (uncertainTracks.length > 0) {
+      openReviewPlaylistModal(uncertainTracks, playlistName);
+    } else {
+      alert(`Spellistan "${playlistName}" har lagts till! \nAlla låtar verifierades snyggt och prydligt.`);
+    }
+    
   } catch (error) {
     console.error("Fel vid lagring av spellista:", error);
     alert("Något gick fel vid lagring av spellistan.");
-  } finally {
     const addBtn = document.getElementById("addPlaylistButton");
     if (addBtn) {
       addBtn.disabled = false;
       addBtn.textContent = "Lägg till";
     }
   }
+}
+
+// ============================================
+// REVIEW PLAYLIST MODAL LOGIC
+// ============================================
+function openReviewPlaylistModal(uncertainTracks, playlistName) {
+  const modal = document.getElementById("reviewPlaylistModal");
+  const listContainer = document.getElementById("reviewPlaylistList");
+  
+  if (!modal || !listContainer) return;
+  
+  listContainer.innerHTML = "";
+  
+  uncertainTracks.forEach((t, i) => {
+    const row = document.createElement("div");
+    row.style.padding = "10px";
+    row.style.borderBottom = i < uncertainTracks.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none";
+    row.style.display = "flex";
+    row.style.justifyContent = "space-between";
+    row.style.alignItems = "center";
+    row.style.flexWrap = "wrap";
+    row.style.gap = "10px";
+    
+    const info = document.createElement("div");
+    info.style.flex = "1";
+    info.style.minWidth = "200px";
+    info.innerHTML = `
+      <strong style="font-size: 1.1rem; display: block;">${t.title}</strong>
+      <span style="font-size: 0.9rem; color: #aaa;">${t.artist}</span>
+    `;
+    
+    const years = document.createElement("div");
+    years.style.display = "flex";
+    years.style.alignItems = "center";
+    years.style.gap = "15px";
+    years.innerHTML = `
+      <div style="text-align: center;">
+        <span style="font-size: 0.75rem; color: #aaa; display: block;">Spotify</span>
+        <span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${t.spotifyYear}</span>
+      </div>
+      <div style="font-size: 1.2rem;">➡️</div>
+      <div style="text-align: center;">
+        <span style="font-size: 0.75rem; color: #10b981; display: block;">AI Föreslår</span>
+        <input type="text" class="review-year-input" data-id="${t.id}" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${t.artist.replace(/"/g, '&quot;')}" value="${t.aiYear}" style="width: 60px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid #10b981; background: #222; color: #10b981; font-weight: bold;">
+      </div>
+    `;
+    
+    row.appendChild(info);
+    row.appendChild(years);
+    listContainer.appendChild(row);
+  });
+  
+  // Bind spara-knappen
+  const saveBtn = document.getElementById("saveReviewPlaylistBtn");
+  const newSaveBtn = saveBtn.cloneNode(true);
+  saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+  
+  newSaveBtn.addEventListener("click", async () => {
+    newSaveBtn.disabled = true;
+    newSaveBtn.textContent = "Sparar...";
+    
+    const disableCooldown = document.getElementById("disableCooldownCheckbox").checked;
+    const inputs = document.querySelectorAll(".review-year-input");
+    const userId = window.auth.currentUser.uid;
+    
+    // Förbered sparning till Cache och Spellista
+    const cacheUpdates = {};
+    const playlistUpdates = {};
+    const cooldownIds = [];
+    
+    inputs.forEach(input => {
+      const trackId = input.getAttribute("data-id");
+      const title = input.getAttribute("data-title");
+      const artist = input.getAttribute("data-artist");
+      const chosenYear = input.value.trim();
+      
+      // Spara till Cache
+      cacheUpdates[trackId] = {
+        title: title,
+        artist: artist,
+        year: chosenYear,
+        manuallyVerified: true
+      };
+      
+      // Spara till användarens nyligen importerade spellista
+      playlistUpdates[`${trackId}/year`] = chosenYear;
+      
+      if (!disableCooldown) {
+        cooldownIds.push(trackId);
+      }
+    });
+    
+    try {
+      // 1. Spara till Cache
+      for (const [tId, tData] of Object.entries(cacheUpdates)) {
+        await window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${tId}`), tData);
+      }
+      
+      // 2. Uppdatera spelarens spellista med de nya årtalen
+      const userListRef = window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}/songs`);
+      for (const [tId, newYear] of Object.entries(playlistUpdates)) {
+        await window.firebaseSet(window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}/songs/${tId}/year`), newYear);
+      }
+      
+      // 3. Lägg till Spoiler Cooldown
+      if (cooldownIds.length > 0) {
+        let existingCooldowns = {};
+        try {
+          const stored = localStorage.getItem('spoilerCooldowns');
+          if (stored) existingCooldowns = JSON.parse(stored);
+        } catch (e) {}
+        
+        const expireTime = Date.now() + (12 * 60 * 60 * 1000); // 12 timmar
+        cooldownIds.forEach(id => { existingCooldowns[id] = expireTime; });
+        
+        localStorage.setItem('spoilerCooldowns', JSON.stringify(existingCooldowns));
+      }
+      
+      modal.style.display = "none";
+      alert("Tack! Årtalen är sparade." + (!disableCooldown ? "\n\nDessa låtar kommer nu döljas från spelet i 12 timmar för att du inte ska kunna fuska! 😉" : ""));
+      
+    } catch (e) {
+      console.error("Fel vid sparande av review:", e);
+      alert("Något gick fel när vi sparade. Försök igen.");
+      newSaveBtn.disabled = false;
+      newSaveBtn.textContent = "Spara Årtal & Aktivera Spärr";
+    }
+  });
+  
+  // Bind close-knapp
+  document.getElementById("closeReviewPlaylist").onclick = () => {
+    modal.style.display = "none";
+  };
+  
+  modal.style.display = "block";
 }
 
 // Initialize Spotify handlers

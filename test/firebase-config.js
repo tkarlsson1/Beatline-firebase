@@ -104,10 +104,31 @@ window.createLobby = async function(teamName) {
       return;
     }
     
-    // Filter songs based on selected playlists and year range
-    const availableSongs = sourceFilteredSongs.filter(song =>
-      parseInt(song.year) >= startYear && parseInt(song.year) <= endYear
-    );
+    // Läs in spoiler-spärrar (låtar användaren nyligen kollat årtal på)
+    let activeCooldowns = {};
+    try {
+      const stored = localStorage.getItem('spoilerCooldowns');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const now = Date.now();
+        for (const [id, expireTime] of Object.entries(parsed)) {
+          if (now < expireTime) {
+            activeCooldowns[id] = true;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Kunde inte läsa spoilerCooldowns', e);
+    }
+
+    // Filter songs based on selected playlists and year range (och spoiler-spärr)
+    const availableSongs = sourceFilteredSongs.filter(song => {
+      if (activeCooldowns[song.qr]) {
+        console.log(`[Lobby] Hoppar över låt pga spoiler-spärr: ${song.qr}`);
+        return false;
+      }
+      return parseInt(song.year) >= startYear && parseInt(song.year) <= endYear;
+    });
     
     console.log('[Firebase] Available songs:', availableSongs.length);
     
