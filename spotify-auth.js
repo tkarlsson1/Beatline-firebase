@@ -4,7 +4,7 @@
 
 const SPOTIFY_CONFIG = {
   clientId: '3033344ef55647b8b70ef1dccfa7e65f',
-  redirectUri: 'https://www.notestream.se/callback',
+  redirectUri: 'https://www.notestream.se/callback.html',
   scopes: [
     'streaming',
     'user-read-email',

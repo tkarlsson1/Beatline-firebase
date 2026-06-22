@@ -162,7 +162,7 @@
       <li>Select your app (or create one if needed)</li>
       <li>Click "Settings" button</li>
       <li>Find "Redirect URIs" section</li>
-      <li>Add EXACTLY: <code id="uriToCopy">https://www.notestream.se/callback</code> <button class="copy-btn" onclick="copyUri()">Copy URI</button></li>
+      <li>Add EXACTLY: <code id="uriToCopy">https://www.notestream.se/callback.html</code> <button class="copy-btn" onclick="copyUri()">Copy URI</button></li>
       <li>Click "Add" button</li>
       <li>Scroll down and click "Save" button</li>
       <li>Verify the URI appears in the list (no trailing slashes!)</li>
@@ -210,7 +210,7 @@
 
   <script src="spotify-auth.js"></script>
   <script>
-    const EXPECTED_REDIRECT_URI = 'https://www.notestream.se/callback';
+    const EXPECTED_REDIRECT_URI = 'https://www.notestream.se/callback.html';
 
     function loadConfig() {
       if (!window.SPOTIFY_CONFIG) {
