@@ -235,6 +235,93 @@
         .flex-row input {
             flex: 1;
         }
+
+        /* Nytt Navbar & Flik-system */
+        .admin-navbar {
+            display: none; /* Dold fram tills inloggad */
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 5px;
+            overflow-x: auto;
+            margin: -20px -20px 30px -20px; /* Kompensera container-padding */
+        }
+
+        .nav-tab {
+            padding: 16px 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .stat-card p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -268,12 +355,60 @@
                     if (user.email === ADMIN_EMAIL) {
                         document.getElementById("adminLoginForm").style.display = "none";
                         document.getElementById("adminContent").style.display = "block";
+                        document.getElementById("adminNavbar").style.display = "flex";
+                        
+                        // Ladda inledande data för dashboard
+                        loadDashboardStats();
                     } else {
                         alert("Du har inte behörighet att använda denna sida.");
                         window.location.href = "index.html";
                     }
                 }
             });
+
+            // Flik-navigering
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Ta bort active från alla flikar och innehåll
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+
+                    // Aktivera vald flik och dess innehåll
+                    tab.classList.add('active');
+                    const targetId = tab.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+
+                    // Ladda specifik data för fliken
+                    if (targetId === 'tab-dashboard') loadDashboardStats();
+                    if (targetId === 'tab-playlists') loadPlaylists();
+                    if (targetId === 'tab-reports') loadReportedTracks();
+                    if (targetId === 'tab-users') loadUsers();
+                });
+            });
+
+            // Dummy-funktioner tills vi implementerar dem ordentligt
+            function loadDashboardStats() {
+                get(ref(db, 'verifiedTracks')).then(snap => {
+                    document.getElementById("statVerified").textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
+                });
+                get(ref(db, 'standardLists')).then(snap => {
+                    document.getElementById("statPlaylists").textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
+                });
+                get(ref(db, 'users')).then(snap => {
+                    document.getElementById("statUsers").textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
+                });
+            }
+
+            function loadPlaylists() {
+                // Byggs i nästa steg
+            }
+            
+            function loadUsers() {
+                // Byggs senare
+            }
 
             document.getElementById("adminLoginBtn").addEventListener("click", () => {
                 const email = document.getElementById("adminEmail").value;
@@ -1159,135 +1294,186 @@
                 aria-label="Logga in">Logga in</button>
         </div>
 
+        <div id="adminNavbar" class="admin-navbar">
+            <button class="nav-tab active" data-target="tab-dashboard">📊 Översikt</button>
+            <button class="nav-tab" data-target="tab-playlists">🎵 Standardlistor</button>
+            <button class="nav-tab" data-target="tab-database">🗄️ Databas</button>
+            <button class="nav-tab" data-target="tab-reports">🚩 Flaggat</button>
+            <button class="nav-tab" data-target="tab-users">👥 Användare</button>
+        </div>
+
         <div id="adminContent" style="display: none;">
-
-            <div class="card">
-                <h3>Lägg till spellista</h3>
-                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Klistra in en länk till en
-                    Spotify-spellista för att lägga till den i spelet.</p>
-                <div class="flex-row">
-                    <input type="text" id="standardPlaylistLink" placeholder="Spotify-länk">
-                    <input type="text" id="standardPlaylistName"
-                        placeholder="Spellistans namn (t.ex. 'Sommarhits 2024')">
-                    <button id="addStandardPlaylistButton" class="btn-success" style="white-space: nowrap;"
-                        aria-label="Lägg till">Lägg till</button>
-                </div>
-                <!-- Progress UI för AI-laddning -->
-                <div id="importProgressContainer" style="display: none; margin-top: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; color: var(--text-muted);">
-                        <span id="importProgressText">Hämtar från Spotify...</span>
-                        <span id="importProgressCount"></span>
+            
+            <!-- TAB: ÖVERSIKT -->
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <h3 id="statVerified">...</h3>
+                        <p>Verifierade Låtar</p>
                     </div>
-                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                        <div id="importProgressBar" style="width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease;"></div>
+                    <div class="stat-card">
+                        <h3 id="statPlaylists">...</h3>
+                        <p>Standardlistor</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statUsers">...</h3>
+                        <p>Användare</p>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="margin: 0;">Städa Databasen (Rätta årtal)</h3>
-                    <button id="showReadmeBtn" class="btn-info">ℹ️ Hur funkar detta?</button>
+            <!-- TAB: STANDARDLISTOR -->
+            <div id="tab-playlists" class="tab-content">
+                <div class="card">
+                    <h3>Lägg till spellista</h3>
+                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Klistra in en länk till en Spotify-spellista för att lägga till den i spelet.</p>
+                    <div class="flex-row">
+                        <input type="text" id="standardPlaylistLink" placeholder="Spotify-länk">
+                        <input type="text" id="standardPlaylistName" placeholder="Spellistans namn (t.ex. 'Sommarhits 2024')">
+                        <button id="addStandardPlaylistButton" class="btn-success" style="white-space: nowrap;" aria-label="Lägg till">Lägg till</button>
+                    </div>
+                    <!-- Progress UI för AI-laddning -->
+                    <div id="importProgressContainer" style="display: none; margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; color: var(--text-muted);">
+                            <span id="importProgressText">Hämtar från Spotify...</span>
+                            <span id="importProgressCount"></span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                            <div id="importProgressBar" style="width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
                 </div>
-                <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Går igenom alla låtar i
-                    StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
-
-                <div id="readmeContent"
-                    style="display: none; padding: 20px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
-                    <h4 style="margin-top: 0;">Så här fungerar städningen:</h4>
-                    <ul style="margin-bottom: 15px;">
-                        <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i
-                            <code>verifiedTracks</code> (cachen), söker den via AI. Hittas ett nytt årtal
-                            föreslås det i tabellen.</li>
-                        <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om
-                            alla låtar. <em>Undantag:</em> Låtar som du manuellt godkänt eller avvisat är skyddade
-                            ("Manuellt Låst") och skrivs aldrig över!</li>
-                    </ul>
-                    <h4>Smarta Filter (Automatiska neksanden):</h4>
-                    <ul style="margin-bottom: 15px;">
-                        <li>Årtal innan 1950 filtreras bort.</li>
-                        <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).
-                        </li>
-                    </ul>
-                    <h4>När du sparar i tabellen:</h4>
-                    <ul style="margin-bottom: 0;">
-                        <li><strong>Ikryssad ruta:</strong> Sparar det nya årtalet (du kan även ändra det manuellt i
-                            rutan) till databasen, och låser det i cachen.</li>
-                        <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys
-                            original-år till cachen och låser det för framtiden.</li>
-                        <li><strong>Låtar som inte dök upp:</strong> (Spotify & AI är överens) sparas automatiskt i
-                            cachen som "felfria" så vi slipper söka dem nästa gång.</li>
-                    </ul>
-                </div>
-
-                <div
-                    style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
-                    <label style="margin-bottom: 0;">
-                        <input type="checkbox" id="forceRescanCheckbox" checked>
-                        <span><span style="color: var(--danger);">Tvinga fullständig omskanning</span> <span
-                                style="color: var(--text-muted); font-size: 13px;">(Ignorera cache. Kostar
-                                API-anrop!)</span></span>
-                    </label>
-                </div>
-
-                <button id="cleanDatabaseBtn" class="btn-danger"
-                    style="margin-top: 20px; width: 100%; padding: 15px; font-size: 16px;">Städa Hela Databasen</button>
-                <p id="cleanStatus"
-                    style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
-                <div id="liveLog"
-                    style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;">
+                
+                <div class="card">
+                    <h3>Befintliga Standardlistor</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="playlistsTable">
+                            <thead>
+                                <tr>
+                                    <th>Namn</th>
+                                    <th>Antal Låtar</th>
+                                    <th>Handlingar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="playlistsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- Reports UI -->
-            <div id="reportsContainer" class="card" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="color: #ef4444; margin: 0;">Spelarnas Rapporter 🚩</h3>
-                    <button id="refreshReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
+            <!-- TAB: DATABAS -->
+            <div id="tab-database" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Städa Databasen (Rätta årtal)</h3>
+                        <button id="showReadmeBtn" class="btn-info">ℹ️ Hur funkar detta?</button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Går igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
+
+                    <div id="readmeContent" style="display: none; padding: 20px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
+                        <h4 style="margin-top: 0;">Så här fungerar städningen:</h4>
+                        <ul style="margin-bottom: 15px;">
+                            <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i <code>verifiedTracks</code> (cachen), söker den via AI. Hittas ett nytt årtal föreslås det i tabellen.</li>
+                            <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om alla låtar. <em>Undantag:</em> Låtar som du manuellt godkänt eller avvisat är skyddade ("Manuellt Låst") och skrivs aldrig över!</li>
+                        </ul>
+                        <h4>Smarta Filter (Automatiska neksanden):</h4>
+                        <ul style="margin-bottom: 15px;">
+                            <li>Årtal innan 1950 filtreras bort.</li>
+                            <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).</li>
+                        </ul>
+                        <h4>När du sparar i tabellen:</h4>
+                        <ul style="margin-bottom: 0;">
+                            <li><strong>Ikryssad ruta:</strong> Sparar det nya årtalet (du kan även ändra det manuellt i rutan) till databasen, och låser det i cachen.</li>
+                            <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys original-år till cachen och låser det för framtiden.</li>
+                            <li><strong>Låtar som inte dök upp:</strong> (Spotify & AI är överens) sparas automatiskt i cachen som "felfria" så vi slipper söka dem nästa gång.</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+                        <label style="margin-bottom: 0;">
+                            <input type="checkbox" id="forceRescanCheckbox" checked>
+                            <span><span style="color: var(--danger);">Tvinga fullständig omskanning</span> <span style="color: var(--text-muted); font-size: 13px;">(Ignorera cache. Kostar API-anrop!)</span></span>
+                        </label>
+                    </div>
+
+                    <button id="cleanDatabaseBtn" class="btn-danger" style="margin-top: 20px; width: 100%; padding: 15px; font-size: 16px;">Städa Hela Databasen</button>
+                    <p id="cleanStatus" style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
+                    <div id="liveLog" style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;">
+                    </div>
                 </div>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Låtar som spelarna har rapporterat inifrån spelet som felaktiga årtal.</p>
-                <div style="overflow-x: auto;">
-                    <table id="reportsTable">
-                        <thead>
-                            <tr>
-                                <th>Låt</th>
-                                <th>Artist</th>
-                                <th>Spelets År</th>
-                                <th>Handlingar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportsTableBody"></tbody>
-                    </table>
+
+                <!-- Review UI för databas-rensaren -->
+                <div id="reviewContainer" class="card" style="display: none;">
+                    <h3 style="color: var(--success);">Granska ändringar</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Markera de ändringar du vill spara till databasen. Du kan även redigera årtalet manuellt i tabellen.</p>
+                    <div style="overflow-x: auto;">
+                        <table id="reviewTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" checked></th>
+                                    <th>Låt</th>
+                                    <th>Artist</th>
+                                    <th>Gammalt År</th>
+                                    <th>Nytt År</th>
+                                    <th>Källa</th>
+                                    <th>Handlingar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviewTableBody"></tbody>
+                        </table>
+                    </div>
+                    <button id="saveChangesBtn" class="btn-success" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 10px;">Godkänn och Spara markerade</button>
                 </div>
             </div>
 
-            <!-- Review UI -->
-            <div id="reviewContainer" class="card" style="display: none;">
-                <h3 style="color: var(--success);">Granska ändringar</h3>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">Markera de ändringar du vill spara till
-                    databasen. Du kan även redigera årtalet manuellt i tabellen.</p>
-
-                <div style="overflow-x: auto;">
-                    <table id="reviewTable">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" checked></th>
-                                <th>Låt</th>
-                                <th>Artist</th>
-                                <th>Gammalt År</th>
-                                <th>Nytt År</th>
-                                <th>Källa</th>
-                                <th>Handlingar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reviewTableBody"></tbody>
-                    </table>
+            <!-- TAB: RAPPORTER -->
+            <div id="tab-reports" class="tab-content">
+                <div id="reportsContainer" class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="color: #ef4444; margin: 0;">Spelarnas Rapporter 🚩</h3>
+                        <button id="refreshReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
+                    </div>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Låtar som spelarna har rapporterat inifrån spelet som felaktiga årtal.</p>
+                    <div style="overflow-x: auto;">
+                        <table id="reportsTable">
+                            <thead>
+                                <tr>
+                                    <th>Antal</th>
+                                    <th>Låt</th>
+                                    <th>Artist</th>
+                                    <th>Spelets År</th>
+                                    <th>Handlingar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-
-                <button id="saveChangesBtn" class="btn-success"
-                    style="width: 100%; padding: 15px; font-size: 16px; margin-top: 10px;">Godkänn och Spara
-                    markerade</button>
             </div>
+
+            <!-- TAB: ANVÄNDARE -->
+            <div id="tab-users" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Användarhantering</h3>
+                        <button id="refreshUsersBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>E-post</th>
+                                    <th>UID</th>
+                                    <th>Skapad</th>
+                                    <th>Handlingar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
