@@ -891,28 +891,42 @@
                         }
                     }
 
-                    if (newYear !== oldYear) {
-                        trElement.innerHTML = `
-                            <td><strong>${title}</strong></td>
-                            <td>${artist}</td>
-                            <td><del style="color: #ef4444;">${oldYear}</del> ➡️ <strong style="color: #10b981;">${newYear}</strong> <span style="font-size: 11px; color: var(--text-muted);">(${source})</span></td>
-                            <td>
-                                <button class="btn-success approve-report-btn" data-id="${trackId}" data-year="${newYear}" data-title="${title.replace(/"/g, '&quot;')}" data-artist="${artist.replace(/"/g, '&quot;')}" style="padding: 6px 10px; font-size: 13px;">✅ Godkänn</button>
-                                <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;">Avbryt</button>
-                            </td>
-                        `;
+                    const googleQuery = encodeURIComponent(`${artist} ${title} release year`);
+                    let yearHtml = `<div style="display:flex; align-items:center; gap:10px;">
+                        <del style="color: var(--text-muted); font-size:12px;">${oldYear}</del> 
+                        <input type="number" class="manual-year-input-${trackId}" value="${newYear}" style="width: 70px; font-weight:bold; padding: 6px; text-align: center; border-radius:4px; border:1px solid #ccc; background:var(--bg-secondary); color:var(--text-main);">
+                        <span style="font-size: 11px; color: var(--text-muted);">(${source || 'Ingen ändring hittades'})</span>
+                    </div>`;
 
-                        // Bind Approve Button
-                        trElement.querySelector(".approve-report-btn").addEventListener("click", async (e) => {
-                            const approvedYear = e.target.getAttribute("data-year");
-                            e.target.innerHTML = "Sparar...";
-                            e.target.disabled = true;
-                            
-                            // 1. Spara i cachen (verifiedTracks)
-                            await set(ref(db, `verifiedTracks/${trackId}`), {
+                    trElement.innerHTML = `
+                        <td><strong>${title}</strong></td>
+                        <td>${artist}</td>
+                        <td>${yearHtml}</td>
+                        <td style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
+                            <button class="btn-success approve-report-btn" data-id="${trackId}" data-title="${title.replace(/"/g, '&quot;')}" data-artist="${artist.replace(/"/g, '&quot;')}" style="padding: 6px 10px; font-size: 13px; margin: 0;">✅ Spara</button>
+                            <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Radera rapport">🗑️</button>
+                        </td>
+                    `;
+
+                    // Bind Approve Button
+                    trElement.querySelector(".approve-report-btn").addEventListener("click", async (e) => {
+                        const inputField = trElement.querySelector(`.manual-year-input-${trackId}`);
+                        const finalYear = inputField.value;
+                        if (!finalYear) {
+                            alert("Ange ett giltigt årtal");
+                            return;
+                        }
+
+                        e.target.innerHTML = "Sparar...";
+                        e.target.disabled = true;
+                        
+                        try {
+                            // 1. Spara till verifiedTracks
+                            await set(ref(db, 'verifiedTracks/' + trackId), {
                                 title: title,
                                 artist: artist,
-                                year: approvedYear,
+                                year: finalYear,
                                 manuallyVerified: true
                             });
 
