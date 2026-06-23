@@ -13,13 +13,13 @@
   // FIREBASE CONFIGURATION
   // ============================================
   const firebaseConfig = {
-    apiKey: "AIzaSyBXN-CC7IMMHaNII4bY-4gmXpT07T2L7LI",
-    authDomain: "notestreamfire.firebaseapp.com",
+    apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
+    authDomain: "beatlinefirebase.firebaseapp.com",
     databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app",
-    projectId: "notestreamfire",
-    storageBucket: "notestreamfire.firebasestorage.app",
-    messagingSenderId: "562105927159",
-    appId: "1:562105927159:web:f6d8f91e19f0eef1b87a06"
+    projectId: "beatlinefirebase",
+    storageBucket: "beatlinefirebase.firebasestorage.app",
+    messagingSenderId: "196231817325",
+    appId: "1:196231817325:web:d5603a36a9c2c5f247f764"
   };
   
   // ============================================
