@@ -395,7 +395,21 @@
                     document.getElementById("statVerified").textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
                 });
                 get(ref(db, 'standardLists')).then(snap => {
-                    document.getElementById("statPlaylists").textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
+                    if (snap.exists()) {
+                        const lists = snap.val();
+                        document.getElementById("statPlaylists").textContent = Object.keys(lists).length;
+                        
+                        let totalSongs = 0;
+                        for (const key in lists) {
+                            if (lists[key].songs) {
+                                totalSongs += Object.keys(lists[key].songs).length;
+                            }
+                        }
+                        document.getElementById("statPlaylistsTotalSongs").textContent = `(${totalSongs} låtar totalt)`;
+                    } else {
+                        document.getElementById("statPlaylists").textContent = 0;
+                        document.getElementById("statPlaylistsTotalSongs").textContent = `(0 låtar totalt)`;
+                    }
                 });
                 get(ref(db, 'users')).then(snap => {
                     document.getElementById("statUsers").textContent = snap.exists() ? Object.keys(snap.val()).length : 0;
@@ -1717,6 +1731,7 @@
                     <div class="stat-card">
                         <h3 id="statPlaylists">...</h3>
                         <p>Standardlistor</p>
+                        <p id="statPlaylistsTotalSongs" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; margin-top: 5px; font-weight: normal; letter-spacing: normal;">(... låtar totalt)</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="statUsers">...</h3>
