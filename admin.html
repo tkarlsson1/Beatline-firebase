@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.029</title>
+    <title>Adminpanel 0.030</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -840,9 +840,24 @@
                     const data = await res.json();
                     
                     if (!data.results || data.results.length === 0) return null;
+
+                    const normalizeStr = (str) => str ? str.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').trim() : '';
+                    const searchT = normalizeStr(cleanTitle);
+                    const searchA = normalizeStr(artist);
+                    
+                    // Filtrera resultaten så att artist och titel faktiskt matchar
+                    const matchingResults = data.results.filter(result => {
+                        const resT = normalizeStr(result.trackName);
+                        const resA = normalizeStr(result.artistName);
+                        const titleMatch = resT.includes(searchT) || searchT.includes(resT);
+                        const artistMatch = resA.includes(searchA) || searchA.includes(resA);
+                        return titleMatch && artistMatch;
+                    });
+
+                    if (matchingResults.length === 0) return null; // Om iTunes inte hittar exakt låt, överlåt till AI
                     
                     let earliestYear = null;
-                    data.results.forEach(result => {
+                    matchingResults.forEach(result => {
                         const trackLower = result.trackName.toLowerCase();
                         const artistLower = result.artistName.toLowerCase();
                         if (trackLower.includes('karaoke') || artistLower.includes('karaoke') || 
