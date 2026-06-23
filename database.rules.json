@@ -27,12 +27,15 @@
     },
     "users": {
       ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         ".write": "auth != null && auth.uid == $uid"
       }
     },
     "userPlaylists": {
+      ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         ".write": "auth != null && auth.uid == $uid",
