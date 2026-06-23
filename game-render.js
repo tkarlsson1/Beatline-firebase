@@ -790,8 +790,6 @@ function renderValidationModal() {
   console.log('[Game] Validation modal rendered');
 }
 
-}
-
 // ============================================
 // GAME OVER MODAL RENDER
 // ============================================
