@@ -13,6 +13,7 @@ Denna fil innehåller kritiska systemregler och kontext för AI-assistenter som 
 - **Versionsnummer i HTML:** Så fort vi gör *någon* förändring i kodbasen ska versionsnumret i `<title>`-taggen uppdateras i **både** `index.html` och `admin.html` samtidigt, oavsett vilken av filerna som redigerades. Detta är kritiskt för att användaren ska kunna verifiera att pushen gått igenom på båda ställena.
 - **Service Worker Cache:** Vid ändringar i klientfiler ska cache-versionen i `service-worker.js` (variabeln `NS_CACHE`) alltid bumpas för att tvinga fram en uppdatering hos klienterna.
 - **Automatiska Pushar:** Varje gång vi slutfört en ändring och uppdaterat versionsnumren, ska du köra `git add .`, `git commit -m "beskrivning"` och `git push` för att pusha koden till GitHub, eftersom detta automatiskt triggar en deploy till live-miljön (notestream.se).
+- **Firebase Deploy:** Om ändringar görs i Firebase-specifika konfigurationsfiler (som `database.rules.json` eller `firebase.json`) ska dessa dessutom deployas direkt till Firebase via `firebase deploy --only database` (eller motsvarande för funktioner).
 
 ## 4. Kodningsfilosofi & Felsökning
 - **Helhetssyn:** Innan du fixar ett `ReferenceError` (t.ex. en saknad funktion), stanna upp och kontrollera om funktionen faktiskt *ska* finnas, eller om felet beror på att gammal kod ligger kvar efter en ombyggnation. Skriv inte blind kod för att lappa krascher utan att förstå kontexten.
