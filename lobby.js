@@ -22,7 +22,7 @@ const TEAM_COLORS = [
 const TIMER_LIMITS = {
   guess: { min: 15, max: 360, default: 90 },
   challenge: { min: 5, max: 60, default: 10 },
-  placeChallenge: { min: 5, max: 60, default: 60 },
+  placeChallenge: { min: 5, max: 60, default: 20 },
   pauseBetweenSongs: { min: 0, max: 60, default: 5 }
 };
 

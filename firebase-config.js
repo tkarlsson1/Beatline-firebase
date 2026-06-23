@@ -164,7 +164,7 @@ window.createLobby = async function(teamName) {
         timers: {
           guess: 90,
           challenge: 10,
-          placeChallenge: 60,
+          placeChallenge: 20,
           pauseBetweenSongs: 5
         }
       },
