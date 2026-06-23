@@ -711,6 +711,19 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       console.log("Inloggad användare:", user.email);
+      
+      // Spara/uppdatera användardata i databasen (för admin-verktyg)
+      try {
+        const dateString = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        update(ref(db, `users/${user.uid}`), {
+          email: user.email,
+          lastLogin: new Date().toISOString()
+        });
+        set(ref(db, `users/${user.uid}/logins/${dateString}`), true);
+      } catch(e) {
+        console.error("Kunde inte spara inloggningsstatistik:", e);
+      }
+
       document.getElementById("loginModal").style.display = "none";
       document.getElementById("registerModal").style.display = "none";
       initDataListeners();

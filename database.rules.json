@@ -26,6 +26,7 @@
       ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'"
     },
     "users": {
+      ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         ".write": "auth != null && auth.uid == $uid"

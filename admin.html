@@ -403,11 +403,413 @@
             }
 
             function loadPlaylists() {
-                // Byggs i nästa steg
+                const tbody = document.getElementById("playlistsTableBody");
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Laddar spellistor...</td></tr>';
+
+                get(ref(db, 'standardLists')).then(snap => {
+                    tbody.innerHTML = '';
+                    if (!snap.exists()) {
+                        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Inga spellistor inlagda ännu.</td></tr>';
+                        return;
+                    }
+
+                    const lists = snap.val();
+                    for (const [listName, listData] of Object.entries(lists)) {
+                        const songCount = listData.songs ? Object.keys(listData.songs).length : 0;
+                        const tr = document.createElement("tr");
+
+                        tr.innerHTML = `
+                            <td style="font-weight: 500;">${listName}</td>
+                            <td>${songCount} låtar</td>
+                            <td style="display: flex; gap: 8px;">
+                                <button class="btn-info view-btn" data-id="${listName}" style="padding: 6px 12px; font-size: 13px;">🔍 Visa Låtar</button>
+                                <button class="btn-secondary rename-btn" data-id="${listName}" style="padding: 6px 12px; font-size: 13px;">✏️ Döp om</button>
+                                <button class="btn-danger delete-btn" data-id="${listName}" style="padding: 6px 12px; font-size: 13px;">🗑️ Ta bort</button>
+                            </td>
+                        `;
+                        
+                        // Ta bort spellista
+                        tr.querySelector(".delete-btn").addEventListener("click", async (e) => {
+                            const name = e.target.getAttribute("data-id");
+                            if (confirm(`Är du helt säker på att du vill radera spellistan "${name}"? Detta går inte att ångra!`)) {
+                                try {
+                                    await set(ref(db, `standardLists/${name}`), null);
+                                    loadPlaylists(); // Ladda om
+                                    loadDashboardStats();
+                                } catch (err) {
+                                    alert("Fel vid borttagning: " + err);
+                                }
+                            }
+                        });
+
+                        // Döp om spellista
+                        tr.querySelector(".rename-btn").addEventListener("click", async (e) => {
+                            const oldName = e.target.getAttribute("data-id");
+                            const newName = prompt("Ange nytt namn för spellistan:", oldName);
+                            if (newName && newName.trim() !== "" && newName !== oldName) {
+                                try {
+                                    const dataSnap = await get(ref(db, `standardLists/${oldName}`));
+                                    if (dataSnap.exists()) {
+                                        await set(ref(db, `standardLists/${newName}`), dataSnap.val());
+                                        await set(ref(db, `standardLists/${oldName}`), null);
+                                        loadPlaylists();
+                                    }
+                                } catch (err) {
+                                    alert("Fel vid namnbyte: " + err);
+                                }
+                            }
+                        });
+
+                        // Visa detaljer
+                        tr.querySelector(".view-btn").addEventListener("click", (e) => {
+                            const name = e.target.getAttribute("data-id");
+                            openPlaylistDetailsModal(name, listData.songs || {});
+                        });
+
+                        tbody.appendChild(tr);
+                    }
+                }).catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">Kunde inte hämta listor: ${err.message}</td></tr>`;
+                });
+            }
+            
+            function openPlaylistDetailsModal(playlistName, songsObj) {
+                const modal = document.getElementById("playlistDetailsModal");
+                document.getElementById("detailsModalTitle").textContent = `Låtar i: ${playlistName}`;
+                const tbody = document.getElementById("detailsModalList");
+                tbody.innerHTML = "";
+                
+                document.getElementById("closeDetailsModal").onclick = () => {
+                    modal.style.display = "none";
+                };
+
+                for (const [trackId, track] of Object.entries(songsObj)) {
+                    const tr = document.createElement("tr");
+                    const googleQuery = encodeURIComponent(`${track.artist} ${track.title} release year`);
+                    
+                    tr.innerHTML = `
+                        <td style="font-weight: 500;">${track.title}</td>
+                        <td style="color: var(--text-muted);">${track.artist}</td>
+                        <td>
+                            <input type="number" class="edit-year-input" data-track="${trackId}" value="${track.year}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-weight: bold;">
+                        </td>
+                        <td style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn-success save-year-btn" style="padding: 6px 10px; font-size: 13px; display: none;">Spara</button>
+                            <button class="btn-primary ai-scan-btn" data-track="${trackId}" style="padding: 6px 10px; font-size: 13px;">🤖 AI-Sök</button>
+                            <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
+                            <button class="btn-danger del-track-btn" data-track="${trackId}" style="padding: 6px 10px; font-size: 13px;">🗑️ Ta bort</button>
+                        </td>
+                    `;
+
+                    const input = tr.querySelector(".edit-year-input");
+                    const saveBtn = tr.querySelector(".save-year-btn");
+
+                    // Visa Spara-knappen om värdet ändras
+                    input.addEventListener("input", () => {
+                        saveBtn.style.display = "inline-block";
+                    });
+
+                    // Spara nytt årtal
+                    saveBtn.addEventListener("click", async () => {
+                        const newYear = input.value;
+                        try {
+                            saveBtn.textContent = "...";
+                            saveBtn.disabled = true;
+                            // Spara i standardList
+                            await set(ref(db, `standardLists/${playlistName}/songs/${trackId}/year`), newYear);
+                            // Spara i cache!
+                            await set(ref(db, `verifiedTracks/${trackId}`), {
+                                title: track.title,
+                                artist: track.artist,
+                                year: newYear,
+                                manuallyVerified: true,
+                                sourceList: playlistName
+                            });
+                            // Ta ev bort flaggningar (om det finns)
+                            await set(ref(db, `flaggedTracks/${trackId}`), null);
+                            
+                            saveBtn.style.display = "none";
+                            saveBtn.textContent = "Spara";
+                            saveBtn.disabled = false;
+                            input.style.borderColor = "var(--success)";
+                            setTimeout(() => input.style.borderColor = "var(--border)", 2000);
+                        } catch (err) {
+                            alert("Kunde inte spara årtal: " + err);
+                            saveBtn.textContent = "Spara";
+                            saveBtn.disabled = false;
+                        }
+                    });
+
+                    // Ta bort låt från listan
+                    tr.querySelector(".del-track-btn").addEventListener("click", async () => {
+                        if (confirm(`Vill du ta bort "${track.title}" från listan?`)) {
+                            try {
+                                await set(ref(db, `standardLists/${playlistName}/songs/${trackId}`), null);
+                                tr.remove();
+                            } catch (err) {
+                                alert("Kunde inte ta bort låten: " + err);
+                            }
+                        }
+                    });
+
+                    // AI Scan funktion
+                    tr.querySelector(".ai-scan-btn").addEventListener("click", async (e) => {
+                        const btn = e.target;
+                        btn.disabled = true;
+                        btn.textContent = "Söker...";
+                        try {
+                            const getSongYearsAiBatch = httpsCallable(functions, 'getSongYearsAiBatch');
+                            const payload = {
+                                songs: [{ id: trackId, title: track.title, artist: track.artist }]
+                            };
+                            const result = await getSongYearsAiBatch(payload);
+                            
+                            if (result && result.data && result.data.results && result.data.results.length > 0) {
+                                const aiResult = result.data.results[0];
+                                if (aiResult.year !== "UNKNOWN") {
+                                    input.value = aiResult.year;
+                                    saveBtn.style.display = "inline-block"; // Trigger save button
+                                    btn.textContent = "AI Hittade!";
+                                    btn.style.background = "var(--success)";
+                                } else {
+                                    btn.textContent = "Kunde ej hitta";
+                                    btn.style.background = "var(--danger)";
+                                }
+                            } else {
+                                btn.textContent = "Fel!";
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            btn.textContent = "Fel!";
+                        }
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.textContent = "🤖 AI-Sök";
+                            btn.style.background = "var(--primary)";
+                        }, 3000);
+                    });
+
+                    tbody.appendChild(tr);
+                }
+
+                modal.style.display = "block";
             }
             
             function loadUsers() {
-                // Byggs senare
+                const tbody = document.getElementById("usersTableBody");
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Laddar användare...</td></tr>';
+
+                get(ref(db, 'users')).then(snap => {
+                    tbody.innerHTML = '';
+                    if (!snap.exists()) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Inga användare hittades.</td></tr>';
+                        return;
+                    }
+
+                    const users = snap.val();
+                    for (const [uid, data] of Object.entries(users)) {
+                        const email = data.email || "Okänd e-post";
+                        const lastLoginRaw = data.lastLogin || "";
+                        const lastLogin = lastLoginRaw ? new Date(lastLoginRaw).toLocaleString("sv-SE") : "Aldrig";
+                        
+                        // Räkna inloggningsdagar
+                        const loginsObj = data.logins || {};
+                        const loginDaysCount = Object.keys(loginsObj).length;
+                        
+                        // Formatera historik för tooltip/alert
+                        let historyStr = "";
+                        if(loginDaysCount > 0) {
+                            historyStr = Object.keys(loginsObj).sort().reverse().join("\\n");
+                        } else {
+                            historyStr = "Ingen historik";
+                        }
+
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td style="font-weight: 500;">${email}</td>
+                            <td style="color: var(--text-muted); font-size: 13px; font-family: monospace;">${uid}</td>
+                            <td>${lastLogin}</td>
+                            <td>
+                                <button class="btn-info view-history-btn" style="padding: 6px 12px; font-size: 13px;" data-history="${historyStr}">📅 Historik (${loginDaysCount} dgr)</button>
+                                <button class="btn-danger delete-user-btn" data-uid="${uid}" style="padding: 6px 12px; font-size: 13px; margin-left: 5px;">🗑️ Ta bort data</button>
+                            </td>
+                        `;
+                        
+                        tr.querySelector(".view-history-btn").addEventListener("click", (e) => {
+                            const hist = e.target.getAttribute("data-history");
+                            alert("Inloggningshistorik (unika dagar):\\n\\n" + hist);
+                        });
+
+                        tr.querySelector(".delete-user-btn").addEventListener("click", async (e) => {
+                            const delUid = e.target.getAttribute("data-uid");
+                            if (confirm(\`Är du helt säker på att du vill radera all speldata för användaren \${delUid}? Detta går inte att ångra!\`)) {
+                                try {
+                                    await set(ref(db, \`users/\${delUid}\`), null);
+                                    await set(ref(db, \`userPlaylists/\${delUid}\`), null);
+                                    tr.remove();
+                                    loadDashboardStats();
+                                } catch(err) {
+                                    alert("Fel vid borttagning: " + err.message);
+                                }
+                            }
+                        });
+
+                        tbody.appendChild(tr);
+                    }
+                }).catch(err => {
+                    tbody.innerHTML = \`<tr><td colspan="4" style="text-align: center; color: red;">Kunde inte hämta användare: \${err.message}</td></tr>\`;
+                });
+            }
+
+            // Cache Search Logic
+            document.getElementById("cacheSearchBtn").addEventListener("click", performCacheSearch);
+            document.getElementById("cacheSearchInput").addEventListener("keypress", (e) => {
+                if (e.key === 'Enter') performCacheSearch();
+            });
+
+            async function performCacheSearch() {
+                const query = document.getElementById("cacheSearchInput").value.trim().toLowerCase();
+                const btn = document.getElementById("cacheSearchBtn");
+                const tbody = document.getElementById("cacheSearchTableBody");
+                const container = document.getElementById("cacheSearchResultsContainer");
+
+                if (!query) {
+                    alert("Skriv in något att söka på.");
+                    return;
+                }
+
+                btn.textContent = "Söker...";
+                btn.disabled = true;
+                container.style.display = "block";
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Hämtar data...</td></tr>';
+
+                try {
+                    const snap = await get(ref(db, 'verifiedTracks'));
+                    if (!snap.exists()) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Cachen är tom.</td></tr>';
+                        btn.textContent = "Sök";
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    const tracks = snap.val();
+                    let results = [];
+
+                    for (const [id, t] of Object.entries(tracks)) {
+                        const searchString = `${t.title} ${t.artist} ${t.year} ${id}`.toLowerCase();
+                        if (searchString.includes(query)) {
+                            results.push({ id, ...t });
+                        }
+                    }
+
+                    if (results.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Inga träffar hittades.</td></tr>';
+                        btn.textContent = "Sök";
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // Sortera resultat (exakt titel-match först, sen alfabetiskt)
+                    results.sort((a, b) => {
+                        const aTitle = (a.title || "").toLowerCase();
+                        const bTitle = (b.title || "").toLowerCase();
+                        if (aTitle === query) return -1;
+                        if (bTitle === query) return 1;
+                        return aTitle.localeCompare(bTitle);
+                    });
+
+                    // Begränsa till max 100 träffar för att undvika frysning
+                    if (results.length > 100) {
+                        results = results.slice(0, 100);
+                        // Visa notis om trunkering?
+                    }
+
+                    tbody.innerHTML = '';
+                    results.forEach(track => {
+                        const tr = document.createElement("tr");
+                        const statusTag = track.manuallyVerified ? 
+                            '<span style="background:var(--success); padding:2px 6px; border-radius:4px; font-size:10px; color:#fff;">Låst</span>' : 
+                            '<span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:10px; color:#ccc;">Auto</span>';
+                        
+                        tr.innerHTML = `
+                            <td style="font-weight: 500;">${track.title || "Okänd"}</td>
+                            <td style="color: var(--text-muted);">${track.artist || "Okänd"}</td>
+                            <td>
+                                <input type="number" class="cache-year-input" data-track="${track.id}" value="${track.year || ""}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-weight: bold;">
+                            </td>
+                            <td>${statusTag}</td>
+                            <td style="display: flex; gap: 8px;">
+                                <button class="btn-success cache-save-btn" style="padding: 6px 10px; font-size: 13px; display: none;">Spara</button>
+                                <button class="btn-danger cache-del-btn" data-track="${track.id}" style="padding: 6px 10px; font-size: 13px;">🗑️ Ta bort</button>
+                            </td>
+                        `;
+
+                        const input = tr.querySelector(".cache-year-input");
+                        const saveBtn = tr.querySelector(".cache-save-btn");
+
+                        input.addEventListener("input", () => {
+                            saveBtn.style.display = "inline-block";
+                        });
+
+                        saveBtn.addEventListener("click", async () => {
+                            saveBtn.disabled = true;
+                            saveBtn.textContent = "...";
+                            try {
+                                await update(ref(db, `verifiedTracks/${track.id}`), {
+                                    year: input.value,
+                                    manuallyVerified: true
+                                });
+                                // Uppdatera även i alla standardlistor där den ingår
+                                await updatePlaylistsWithNewYear(track.id, input.value);
+                                
+                                saveBtn.style.display = "none";
+                                saveBtn.disabled = false;
+                                saveBtn.textContent = "Spara";
+                                input.style.borderColor = "var(--success)";
+                                setTimeout(() => input.style.borderColor = "var(--border)", 2000);
+                            } catch (e) {
+                                alert("Kunde inte spara: " + e.message);
+                                saveBtn.disabled = false;
+                                saveBtn.textContent = "Spara";
+                            }
+                        });
+
+                        tr.querySelector(".cache-del-btn").addEventListener("click", async () => {
+                            if (confirm(`Vill du verkligen ta bort "${track.title}" från Cachen? Den kommer läsas in igen vid nästa städning om den finns i en lista.`)) {
+                                try {
+                                    await set(ref(db, `verifiedTracks/${track.id}`), null);
+                                    tr.remove();
+                                } catch (e) {
+                                    alert("Misslyckades: " + e.message);
+                                }
+                            }
+                        });
+
+                        tbody.appendChild(tr);
+                    });
+
+                } catch (err) {
+                    alert("Fel vid sökning: " + err.message);
+                } finally {
+                    btn.textContent = "Sök";
+                    btn.disabled = false;
+                }
+            }
+
+            async function updatePlaylistsWithNewYear(trackId, newYear) {
+                const snap = await get(ref(db, 'standardLists'));
+                if (snap.exists()) {
+                    const lists = snap.val();
+                    const updates = {};
+                    for (const [listName, listData] of Object.entries(lists)) {
+                        if (listData.songs && listData.songs[trackId]) {
+                            updates[`standardLists/${listName}/songs/${trackId}/year`] = newYear;
+                        }
+                    }
+                    if (Object.keys(updates).length > 0) {
+                        await update(ref(db), updates);
+                    }
+                }
             }
 
             document.getElementById("adminLoginBtn").addEventListener("click", () => {
@@ -1129,6 +1531,7 @@
 
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
+                            <td style="font-weight:bold; font-size: 1.2rem; text-align: center; color: var(--warning);">1</td>
                             <td><strong>${safeTitle}</strong>${isFlagged}</td>
                             <td>${safeArtist}</td>
                             <td><span style="color: #ef4444; font-weight: bold;">${safeYear}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
@@ -1363,6 +1766,29 @@
 
             <!-- TAB: DATABAS -->
             <div id="tab-database" class="tab-content">
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Sök i Databasen (Cache)</h3>
+                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Sök fram specifika låtar från hela cachen för att snabbt redigera deras årtal.</p>
+                    <div class="flex-row" style="margin-bottom: 15px;">
+                        <input type="text" id="cacheSearchInput" placeholder="Sök på artist, låttitel eller årtal...">
+                        <button id="cacheSearchBtn" class="btn-info" style="white-space: nowrap;">Sök</button>
+                    </div>
+                    <div style="overflow-y: auto; max-height: 400px; display: none;" id="cacheSearchResultsContainer">
+                        <table id="cacheSearchTable">
+                            <thead style="position: sticky; top: 0; background: var(--card-bg); z-index: 10;">
+                                <tr>
+                                    <th>Låt</th>
+                                    <th>Artist</th>
+                                    <th>År</th>
+                                    <th>Status</th>
+                                    <th>Handlingar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cacheSearchTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h3 style="margin: 0;">Städa Databasen (Rätta årtal)</h3>
@@ -1516,6 +1942,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Playlist Details Modal -->
+    <div id="playlistDetailsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto;">
+        <div style="max-width: 900px; margin: 40px auto; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
+                <h3 id="detailsModalTitle" style="margin: 0; font-size: 1.5rem; color: #fff;">Låtar i spellistan</h3>
+                <button id="closeDetailsModal" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 0 10px;">&times;</button>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Låt</th>
+                                <th>Artist</th>
+                                <th>År</th>
+                                <th>Handlingar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsModalList">
+                            <!-- Låtar laddas in här via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
