@@ -44,7 +44,7 @@ function reportTrack(spotifyId, title, artist, year) {
   
   window.firebaseSet(reportRef, reportData)
     .then(() => {
-      showNotification('Låten har rapporterats till spelledaren! Tack!', 'success');
+      showNotification('Låten har rapporterats till admin! Tack!', 'success');
       // Hide the report button so they can't spam it
       const reportBtns = document.querySelectorAll('.report-btn');
       reportBtns.forEach(btn => btn.style.display = 'none');

@@ -64,8 +64,6 @@ function handleDrop(e) {
   
   // Save preview card to Firebase so all players can see it
   savePendingCard(position);
-  
-  showNotification(`Kort placerat vid position ${position}`, 'success');
 }
 
 // ============================================
@@ -199,8 +197,6 @@ function handleTouchEnd(e) {
   
   // Save preview card to Firebase so all players can see it
   savePendingCard(position);
-  
-  showNotification(`Kort placerat vid position ${position}`, 'success');
   
   e.preventDefault();
 }
