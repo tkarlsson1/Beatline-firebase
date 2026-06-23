@@ -32,6 +32,9 @@ function updateGameView() {
   // Render validation modal (if active)
   renderValidationModal();
   
+  // Render game over modal (if phase is gameOver)
+  renderGameOverModal();
+  
   // Initialize scores based on revealed cards (only once at game start)
   if (!hasInitializedScores && currentGameData.status === 'playing') {
     hasInitializedScores = true;
@@ -787,6 +790,61 @@ function renderValidationModal() {
   console.log('[Game] Validation modal rendered');
 }
 
-console.log('[Game] Render module loaded');
+}
+
+// ============================================
+// GAME OVER MODAL RENDER
+// ============================================
+function renderGameOverModal() {
+  const container = document.getElementById('gameOverModalContainer');
+  if (!container) return;
+  
+  if (currentGameData.phase !== 'gameOver') {
+    container.innerHTML = '';
+    return;
+  }
+  
+  const winnerId = currentGameData.winner;
+  const winnerTeam = currentTeams[winnerId];
+  const winnerName = winnerTeam ? winnerTeam.name : 'Okänt lag';
+  
+  let modalHTML = `
+    <div class="validation-modal-overlay">
+      <div class="validation-modal-content" style="text-align: center; border: 3px solid #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);">
+        <h1 style="font-size: 3rem; color: #ff00ff; margin-bottom: 10px;">🏆 SPEL AVSLUTAT 🏆</h1>
+        <h2 style="font-size: 2rem; margin-bottom: 20px;">Vinnare: <span style="color: #00ffff;">${escapeHtml(winnerName)}</span></h2>
+        
+        <p style="font-size: 1.2rem; color: #aaa; margin-bottom: 30px;">
+          Tack för att ni spelade NoteStream!
+        </p>
+  `;
+  
+  if (isHost) {
+    modalHTML += `
+      <div class="validation-modal-buttons" style="justify-content: center;">
+        <button 
+          class="validation-modal-btn token" 
+          onclick="continuePlaying()"
+          style="width: 100%; max-width: 300px;"
+        >
+          🎮 FORTSÄTT SPELA
+        </button>
+      </div>
+    `;
+  } else {
+    modalHTML += `
+      <p style="color: #666; font-style: italic;">
+        Väntar på att host ska välja nästa steg...
+      </p>
+    `;
+  }
+  
+  modalHTML += `
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = modalHTML;
+}
 
 console.log('[Game] Render module loaded');

@@ -186,4 +186,64 @@ function setupListeners() {
   });
 }
 
+// ============================================
+// GAME OVER LOGIC
+// ============================================
+window.checkAndApplyWinCondition = async function(updates, nextIndex) {
+  if (nextIndex !== 0) return false;
+  
+  const pointsToWin = currentGameData.settings?.pointsToWin || 11;
+  
+  // Fetch latest teams to be 100% sure we have correct timelines
+  const snapshot = await window.firebaseGet(window.firebaseRef(window.firebaseDb, `games/${gameId}/teams`));
+  if (!snapshot.exists()) return false;
+  
+  const teamsData = snapshot.val();
+  
+  let maxScore = -1;
+  let teamsWithMax = [];
+  
+  Object.keys(teamsData).forEach(tId => {
+    const team = teamsData[tId];
+    // Score is number of cards in timeline
+    const score = team.timeline ? Object.keys(team.timeline).length : 0;
+    
+    if (score > maxScore) {
+      maxScore = score;
+      teamsWithMax = [tId];
+    } else if (score === maxScore) {
+      teamsWithMax.push(tId);
+    }
+  });
+  
+  console.log(`[Game] Win Check: maxScore=${maxScore}, pointsToWin=${pointsToWin}`);
+  
+  if (maxScore >= pointsToWin && teamsWithMax.length === 1) {
+    // We have a unique winner!
+    console.log(`[Game] 🏆 GAME OVER! Winner: ${teamsWithMax[0]}`);
+    updates[`games/${gameId}/phase`] = 'gameOver';
+    updates[`games/${gameId}/winner`] = teamsWithMax[0];
+    updates[`games/${gameId}/timerState`] = null; // stop any timers
+    
+    // We should NOT advance the turn or song if game is over
+    delete updates[`games/${gameId}/currentTeam`];
+    delete updates[`games/${gameId}/currentSongIndex`];
+    delete updates[`games/${gameId}/currentSong`];
+    
+    return true; // Game is over
+  }
+  
+  // No winner yet (or tie -> sudden death)
+  if (maxScore >= pointsToWin && teamsWithMax.length > 1) {
+    console.log(`[Game] ⚔️ SUDDEN DEATH! Tie between: ${teamsWithMax.join(', ')}`);
+  }
+  
+  // Advance round as normal
+  const newRound = (currentGameData.currentRound || 0) + 1;
+  updates[`games/${gameId}/currentRound`] = newRound;
+  console.log('[Game] New round:', newRound);
+  
+  return false;
+};
+
 console.log('[Game] Init module loaded');

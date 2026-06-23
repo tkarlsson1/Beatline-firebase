@@ -1405,25 +1405,22 @@ function closeValidationModal() {
         updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
       });
       
-      // Increment round if we wrapped around
-      if (nextIndex === 0) {
-        const newRound = (currentGameData.currentRound || 0) + 1;
-        updates[`games/${gameId}/currentRound`] = newRound;
-        console.log('[Game] New round:', newRound);
-      }
-      
-      console.log('[Game] Applying', Object.keys(updates).length, 'updates...');
-      
-      return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates);
+      // Check win condition (handles round increment internally)
+      return window.checkAndApplyWinCondition(updates, nextIndex).then(isGameOver => {
+        console.log('[Game] Applying', Object.keys(updates).length, 'updates...');
+        return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates).then(() => isGameOver);
+      });
     })
-    .then(() => {
+    .then((isGameOver) => {
       console.log('[Game] ✅ Modal closed, game state updated');
       
-      // Start Timer 4 (between songs)
-      // BUGFIX (Problem 1): Use nextTeamId calculated at the start (not recalculated)
-      console.log('[Game] Starting Timer 4 for next team:', nextTeamId);
-      
-      startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      if (!isGameOver) {
+        // Start Timer 4 (between songs)
+        // BUGFIX (Problem 1): Use nextTeamId calculated at the start (not recalculated)
+        console.log('[Game] Starting Timer 4 for next team:', nextTeamId);
+        
+        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      }
       
       console.log('[Game] ========== CLOSE VALIDATION MODAL END ==========');
     })
@@ -1593,18 +1590,16 @@ function transitionAfterChallenge() {
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
   updates[`games/${gameId}/currentSong`] = nextSong;
   
-  // Increment round if we wrapped around
-  if (nextIndex === 0) {
-    const newRound = (currentGameData.currentRound || 0) + 1;
-    updates[`games/${gameId}/currentRound`] = newRound;
-    console.log('[Game] New round:', newRound);
-  }
-  
-  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-    .then(() => {
+  // Check win condition (handles round increment internally)
+  window.checkAndApplyWinCondition(updates, nextIndex).then(isGameOver => {
+    return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates).then(() => isGameOver);
+  })
+    .then((isGameOver) => {
       console.log('[Game] Transitioned to next team');
-      // Start Timer 4 (between songs)
-      startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      if (!isGameOver) {
+        // Start Timer 4 (between songs)
+        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      }
     })
     .catch((error) => {
       console.error('[Game] Error transitioning:', error);
@@ -1655,16 +1650,15 @@ function nextTeam() {
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
   updates[`games/${gameId}/currentSong`] = nextSong;
   
-  // Increment round if we wrapped around
-  if (nextIndex === 0) {
-    const newRound = (currentGameData.currentRound || 0) + 1;
-    updates[`games/${gameId}/currentRound`] = newRound;
-    console.log('[Game] New round:', newRound);
-  }
-  
-  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-    .then(() => {
+  // Check win condition (handles round increment internally)
+  window.checkAndApplyWinCondition(updates, nextIndex).then(isGameOver => {
+    return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates).then(() => isGameOver);
+  })
+    .then((isGameOver) => {
       console.log('[Game] Team switched successfully');
+      if (!isGameOver) {
+        // If not game over, timers could be started here (not currently doing it in nextTeam)
+      }
     })
     .catch((error) => {
       console.error('[Game] Error switching team:', error);

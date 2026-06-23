@@ -537,19 +537,17 @@ function skipTurn() {
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
   updates[`games/${gameId}/currentSong`] = nextSong;
   
-  // Increment round if we wrapped around
-  if (nextIndex === 0) {
-    const newRound = (currentGameData.currentRound || 0) + 1;
-    updates[`games/${gameId}/currentRound`] = newRound;
-  }
-  
-  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
-    .then(() => {
+  // Check win condition (handles round increment internally)
+  window.checkAndApplyWinCondition(updates, nextIndex).then(isGameOver => {
+    return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates).then(() => isGameOver);
+  })
+    .then((isGameOver) => {
       console.log('[Timer] Turn skipped, starting pause timer');
       
-      // Start Timer 4 (pause) - show who's next
-      
-      startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      if (!isGameOver) {
+        // Start Timer 4 (pause) - show who's next
+        startTimer("between_songs", (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      }
     })
     .catch((error) => {
       console.error('[Timer] Error skipping turn:', error);

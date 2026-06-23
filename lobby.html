@@ -413,6 +413,14 @@
             </div>
             <div class="timer-error" id="timerPauseError"></div>
           </div>
+          
+          <div class="timer-input-group" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <label>Poäng för att vinna:</label>
+            <div class="timer-input-wrapper">
+              <input type="number" id="pointsToWin" min="1" max="50" value="11">
+              <span>kort</span>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -571,6 +579,12 @@
         document.getElementById('timerChallenge').value = timers.challenge || 10;
         document.getElementById('timerPlace').value = timers.placeChallenge || 20;
         document.getElementById('timerPause').value = timers.pauseBetweenSongs || 10;
+      }
+      
+      if (gameData.settings && gameData.settings.pointsToWin) {
+        document.getElementById('pointsToWin').value = gameData.settings.pointsToWin;
+      } else {
+        document.getElementById('pointsToWin').value = 11;
       }
       
       // Setup timer input listeners
@@ -786,6 +800,17 @@
           updateTimer(type, input.value, id);
         });
       });
+      
+      // Setup pointsToWin
+      const pointsInput = document.getElementById('pointsToWin');
+      const updatePoints = () => {
+        let val = parseInt(pointsInput.value);
+        if (isNaN(val) || val < 1) val = 11;
+        const ref = window.firebaseRef(window.firebaseDb, `games/${gameId}/settings/pointsToWin`);
+        window.firebaseSet(ref, val);
+      };
+      pointsInput.addEventListener('change', updatePoints);
+      pointsInput.addEventListener('blur', updatePoints);
     }
     
     function updateTimer(timerType, value, inputId) {
@@ -826,6 +851,13 @@
       if (timers.placeChallenge) document.getElementById('timerPlace').value = timers.placeChallenge;
       if (timers.pauseBetweenSongs) document.getElementById('timerPause').value = timers.pauseBetweenSongs;
     }
+    
+    // Also update pointsToWin if updated remotely
+    window.firebaseOnValue(window.firebaseRef(window.firebaseDb, `games/${gameId}/settings/pointsToWin`), (snap) => {
+      if (snap.exists()) {
+        document.getElementById('pointsToWin').value = snap.val();
+      }
+    });
     
     function updateStartButton() {
       const startBtn = document.getElementById('startGameBtn');

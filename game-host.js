@@ -135,21 +135,81 @@ function forceNextTeam() {
     updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
   });
   
-  // Increment round if we wrapped around
-  if (nextIndex === 0) {
-    const newRound = (currentGameData.currentRound || 0) + 1;
-    updates[`games/${gameId}/currentRound`] = newRound;
+  // Check win condition (handles round increment internally)
+  window.checkAndApplyWinCondition(updates, nextIndex).then(isGameOver => {
+    return window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates).then(() => isGameOver);
+  })
+    .then((isGameOver) => {
+      console.log('[Host] Forced next team');
+      
+      if (!isGameOver) {
+        // Start Timer 4 (pause between songs)
+        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
+      }
+    })
+    .catch((error) => {
+      console.error('[Host] Error forcing next team:', error);
+    });
+}
+
+// Continue playing after game over
+function continuePlaying() {
+  console.log('[Host] Continuing game after win');
+  
+  if (!isHost) {
+    console.warn('[Host] Not host, cannot continue');
+    return;
   }
+  
+  // Calculate next team and song
+  const teamIds = Object.keys(currentTeams);
+  const currentTeamId = currentGameData.currentTeam;
+  const currentIndex = teamIds.indexOf(currentTeamId);
+  const nextIndex = (currentIndex + 1) % teamIds.length;
+  const nextTeamId = teamIds[nextIndex];
+  
+  const currentSongIndex = currentGameData.currentSongIndex || 0;
+  const nextSongIndex = currentSongIndex + 1;
+  const songs = currentGameData.songs || [];
+  
+  if (nextSongIndex >= songs.length) {
+    console.warn('[Host] No more songs in deck!');
+    showNotification('Inga fler låtar!', 'error');
+    return;
+  }
+  
+  const nextSong = songs[nextSongIndex];
+  const newRound = (currentGameData.currentRound || 0) + 1;
+  
+  // Update pointsToWin so the game doesn't immediately end again
+  const currentPointsToWin = currentGameData.settings?.pointsToWin || 11;
+  
+  // Get max score to ensure we set pointsToWin above it
+  let maxScore = -1;
+  Object.keys(currentTeams).forEach(tId => {
+    const score = currentTeams[tId].timeline ? Object.keys(currentTeams[tId].timeline).length : 0;
+    if (score > maxScore) maxScore = score;
+  });
+  
+  const newPointsToWin = Math.max(currentPointsToWin, maxScore) + 1;
+  
+  const updates = {};
+  updates[`games/${gameId}/phase`] = 'playing';
+  updates[`games/${gameId}/winner`] = null;
+  updates[`games/${gameId}/settings/pointsToWin`] = newPointsToWin;
+  updates[`games/${gameId}/currentTeam`] = nextTeamId;
+  updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
+  updates[`games/${gameId}/currentSong`] = nextSong;
+  updates[`games/${gameId}/currentRound`] = newRound;
   
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
     .then(() => {
-      console.log('[Host] Forced next team');
-      
+      console.log('[Host] Game continued, new points to win:', newPointsToWin);
       // Start Timer 4 (pause between songs)
       startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
     })
     .catch((error) => {
-      console.error('[Host] Error forcing next team:', error);
+      console.error('[Host] Error continuing game:', error);
     });
 }
 
