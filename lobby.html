@@ -575,10 +575,10 @@
       // Set timer values from settings
       if (gameData.settings && gameData.settings.timers) {
         const timers = gameData.settings.timers;
-        document.getElementById('timerGuess').value = timers.guess || 90;
-        document.getElementById('timerChallenge').value = timers.challenge || 10;
-        document.getElementById('timerPlace').value = timers.placeChallenge || 20;
-        document.getElementById('timerPause').value = timers.pauseBetweenSongs || 10;
+        document.getElementById('timerGuess').value = timers.guess !== undefined ? timers.guess : 90;
+        document.getElementById('timerChallenge').value = timers.challenge !== undefined ? timers.challenge : 10;
+        document.getElementById('timerPlace').value = timers.placeChallenge !== undefined ? timers.placeChallenge : 60;
+        document.getElementById('timerPause').value = timers.pauseBetweenSongs !== undefined ? timers.pauseBetweenSongs : 5;
       }
       
       if (gameData.settings && gameData.settings.pointsToWin) {
@@ -846,10 +846,10 @@
     }
     
     function updateTimerInputsFromFirebase(timers) {
-      if (timers.guess) document.getElementById('timerGuess').value = timers.guess;
-      if (timers.challenge) document.getElementById('timerChallenge').value = timers.challenge;
-      if (timers.placeChallenge) document.getElementById('timerPlace').value = timers.placeChallenge;
-      if (timers.pauseBetweenSongs) document.getElementById('timerPause').value = timers.pauseBetweenSongs;
+      if (timers.guess !== undefined) document.getElementById('timerGuess').value = timers.guess;
+      if (timers.challenge !== undefined) document.getElementById('timerChallenge').value = timers.challenge;
+      if (timers.placeChallenge !== undefined) document.getElementById('timerPlace').value = timers.placeChallenge;
+      if (timers.pauseBetweenSongs !== undefined) document.getElementById('timerPause').value = timers.pauseBetweenSongs;
     }
     
     // Also update pointsToWin if updated remotely
