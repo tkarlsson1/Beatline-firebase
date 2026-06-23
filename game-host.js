@@ -181,22 +181,10 @@ function continuePlaying() {
   const nextSong = songs[nextSongIndex];
   const newRound = (currentGameData.currentRound || 0) + 1;
   
-  // Update pointsToWin so the game doesn't immediately end again
-  const currentPointsToWin = currentGameData.settings?.pointsToWin || 11;
-  
-  // Get max score to ensure we set pointsToWin above it
-  let maxScore = -1;
-  Object.keys(currentTeams).forEach(tId => {
-    const score = currentTeams[tId].timeline ? Object.keys(currentTeams[tId].timeline).length : 0;
-    if (score > maxScore) maxScore = score;
-  });
-  
-  const newPointsToWin = Math.max(currentPointsToWin, maxScore) + 1;
-  
   const updates = {};
   updates[`games/${gameId}/phase`] = 'playing';
   updates[`games/${gameId}/winner`] = null;
-  updates[`games/${gameId}/settings/pointsToWin`] = newPointsToWin;
+  updates[`games/${gameId}/settings/gameOverDisabled`] = true;
   updates[`games/${gameId}/currentTeam`] = nextTeamId;
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
   updates[`games/${gameId}/currentSong`] = nextSong;
@@ -204,7 +192,7 @@ function continuePlaying() {
   
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
     .then(() => {
-      console.log('[Host] Game continued, new points to win:', newPointsToWin);
+      console.log('[Host] Game continued, win condition disabled');
       // Start Timer 4 (pause between songs)
       startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, nextTeamId);
     })

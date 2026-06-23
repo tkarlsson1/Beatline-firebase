@@ -192,6 +192,13 @@ function setupListeners() {
 window.checkAndApplyWinCondition = async function(updates, nextIndex) {
   if (nextIndex !== 0) return false;
   
+  if (currentGameData.settings?.gameOverDisabled) {
+    // Round still increments
+    const newRound = (currentGameData.currentRound || 0) + 1;
+    updates[`games/${gameId}/currentRound`] = newRound;
+    return false;
+  }
+  
   const pointsToWin = currentGameData.settings?.pointsToWin || 11;
   
   // Fetch latest teams to be 100% sure we have correct timelines
