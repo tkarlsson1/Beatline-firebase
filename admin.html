@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.031</title>
+    <title>Adminpanel 0.032</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -385,7 +385,6 @@
                     let totalChecked = 0;
                     let proposedChanges = [];
                     let tracksToCache = {}; // Håller koll på ALLA låtar som ska in i cachen
-                    const useItunes = document.getElementById("useItunesCheckbox").checked;
                     const forceRescan = document.getElementById("forceRescanCheckbox").checked;
 
                     // Setup Live Review Table
@@ -409,7 +408,7 @@
                         }
                     }
 
-                    const CONCURRENCY = useItunes ? 1 : 5; // iTunes tvingar 1 (pga rate limits), AI tillåter 5 parallella!
+                    const CONCURRENCY = 5; // AI tillåter 5 parallella
                     let currentTaskIndex = 0;
                     let completedTasks = 0;
 
@@ -439,51 +438,28 @@
                                     fixedBy = "Cache";
                                 }
                             }
-                            // iTunes?
+                            // AI
                             else {
-                                let skipAi = false;
-                                if (useItunes && window.itunesApi && window.itunesApi.getTrackInfo) {
-                                    logToUI(`[iTunes-Sökning] Letar efter "${track.artist} - ${track.title}"...`);
-                                    const itunesResult = await window.itunesApi.getTrackInfo(track.artist, track.title);
+                                try {
+                                    logToUI(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
+                                    const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
+                                    if (aiResult && aiResult.data && aiResult.data.year) {
+                                        const aiYear = String(aiResult.data.year).trim();
+                                        logToUI(`[AI-Svar] GPT-5.5 svarade: ${aiYear} (Nuvarande: ${oldYearStr})`);
 
-                                    if (itunesResult && itunesResult.found && itunesResult.year) {
-                                        skipAi = true; // Hittades i iTunes, avbryt AI-fallback
-                                        const itunesYear = itunesResult.year;
-                                        if (String(itunesYear) !== oldYearStr) {
-                                            newYearStr = String(itunesYear);
-                                            fixedBy = "iTunes";
-                                            logToUI(`[JUSTERING] 🍏 iTunes hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
+                                        if (aiYear !== "UNKNOWN" && aiYear !== oldYearStr) {
+                                            newYearStr = aiYear;
+                                            fixedBy = "AI";
+                                            logToUI(`[JUSTERING] 🔥 AI hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
+                                        } else if (aiYear === oldYearStr) {
+                                            logToUI(`[OK] AI bekräftar att ${oldYearStr} redan är rätt.`);
                                         } else {
-                                            logToUI(`[OK] 🍏 iTunes bekräftar att ${oldYearStr} redan är rätt.`);
+                                            logToUI(`[OKÄNT] AI kunde inte hitta årtalet.`);
                                         }
-                                    } else {
-                                        logToUI(`[iTunes] Låten hittades inte i iTunes. Går över till AI...`);
                                     }
-                                }
-
-                                // AI? (Bara om iTunes var avstängt, eller om iTunes misslyckades)
-                                if (!fixedBy && !skipAi) {
-                                    try {
-                                        logToUI(`[AI-Fråga] Skickar "${track.artist} - ${track.title}" till GPT-5.5...`);
-                                        const aiResult = await getSongYearAi({ title: track.title, artist: track.artist });
-                                        if (aiResult && aiResult.data && aiResult.data.year) {
-                                            const aiYear = String(aiResult.data.year).trim();
-                                            logToUI(`[AI-Svar] GPT-5.5 svarade: ${aiYear} (Nuvarande: ${oldYearStr})`);
-
-                                            if (aiYear !== "UNKNOWN" && aiYear !== oldYearStr) {
-                                                newYearStr = aiYear;
-                                                fixedBy = "AI";
-                                                logToUI(`[JUSTERING] 🔥 AI hittade nytt årtal: ${oldYearStr} -> ${newYearStr}`);
-                                            } else if (aiYear === oldYearStr) {
-                                                logToUI(`[OK] AI bekräftar att ${oldYearStr} redan är rätt.`);
-                                            } else {
-                                                logToUI(`[OKÄNT] AI kunde inte hitta årtalet.`);
-                                            }
-                                        }
-                                    } catch (e) {
-                                        console.warn("AI anrop misslyckades för", track.title, e);
-                                        logToUI(`[FEL] AI-anrop misslyckades för ${track.title}`);
-                                    }
+                                } catch (e) {
+                                    console.warn("AI anrop misslyckades för", track.title, e);
+                                    logToUI(`[FEL] AI-anrop misslyckades för ${track.title}`);
                                 }
                             }
 
@@ -599,8 +575,7 @@
 
                             completedTasks++;
                             
-                            // Sömn för att inte bli blockerad av iTunes rate limits
-                            if (useItunes && (!verifiedTracks[trackId] || (forceRescan && !verifiedTracks[trackId].manuallyVerified))) {
+                            if (!verifiedTracks[trackId] || (forceRescan && !verifiedTracks[trackId].manuallyVerified)) {
                                 await new Promise(r => setTimeout(r, 2000));
                             }
                         }
@@ -790,7 +765,7 @@
                             <td>${safeArtist}</td>
                             <td><span style="color: #ef4444; font-weight: bold;">${safeYear}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
                             <td>
-                                <button class="btn-info scan-report-btn" data-id="${trackId}" data-title="${safeTitle.replace(/"/g, '&quot;')}" data-artist="${safeArtist.replace(/"/g, '&quot;')}" data-year="${safeYear}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI/iTunes</button>
+                                <button class="btn-info scan-report-btn" data-id="${trackId}" data-title="${safeTitle.replace(/"/g, '&quot;')}" data-artist="${safeArtist.replace(/"/g, '&quot;')}" data-year="${safeYear}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI</button>
                                 <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;" title="Ta bort rapport (ignorera)">🗑️</button>
                             </td>
                         `;
@@ -936,7 +911,7 @@
 
         });
     </script>
-    <script src="listor/itunes-api.js?v=0.799"></script>
+
 </head>
 
 <body>
@@ -979,22 +954,17 @@
                     <h4 style="margin-top: 0;">Så här fungerar städningen:</h4>
                     <ul style="margin-bottom: 15px;">
                         <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i
-                            <code>verifiedTracks</code> (cachen), söker den via iTunes (eller AI). Hittas ett nytt årtal
+                            <code>verifiedTracks</code> (cachen), söker den via AI. Hittas ett nytt årtal
                             föreslås det i tabellen.</li>
-                        <li><strong>Använd iTunes-sökning först:</strong> Rekommenderas! iTunes är mest tillförlitligt.
-                            Ger ca 2 sekunders väntetid per låt.</li>
                         <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om
                             alla låtar. <em>Undantag:</em> Låtar som du manuellt godkänt eller avvisat är skyddade
                             ("Manuellt Låst") och skrivs aldrig över!</li>
                     </ul>
                     <h4>Smarta Filter (Automatiska neksanden):</h4>
                     <ul style="margin-bottom: 15px;">
-                        <li>Årtal innan 1950 filtreras bort (ofta iTunes som gissar "1900").</li>
+                        <li>Årtal innan 1950 filtreras bort.</li>
                         <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).
                         </li>
-                        <li>Låtar med "Remix/Remaster/Version" <strong>ELLER</strong> hopp bakåt >10 år (pga iTunes
-                            metadata-fel) får en varning (⚠️), blir orangea, och är <strong>avbockade som
-                                standard</strong> så du måste aktivt godkänna dem.</li>
                     </ul>
                     <h4>När du sparar i tabellen:</h4>
                     <ul style="margin-bottom: 0;">
@@ -1002,19 +972,13 @@
                             rutan) till databasen, och låser det i cachen.</li>
                         <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys
                             original-år till cachen och låser det för framtiden.</li>
-                        <li><strong>Låtar som inte dök upp:</strong> (Spotify & iTunes är överens) sparas automatiskt i
+                        <li><strong>Låtar som inte dök upp:</strong> (Spotify & AI är överens) sparas automatiskt i
                             cachen som "felfria" så vi slipper söka dem nästa gång.</li>
                     </ul>
                 </div>
 
                 <div
                     style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
-                    <label>
-                        <input type="checkbox" id="useItunesCheckbox" checked>
-                        <span>Använd iTunes-sökning först <span
-                                style="color: var(--text-muted); font-size: 13px;">(Säkert, men tar längre tid pga
-                                fördröjning)</span></span>
-                    </label>
                     <label style="margin-bottom: 0;">
                         <input type="checkbox" id="forceRescanCheckbox" checked>
                         <span><span style="color: var(--danger);">Tvinga fullständig omskanning</span> <span
