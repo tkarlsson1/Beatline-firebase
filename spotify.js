@@ -11,23 +11,25 @@ async function getBackendSpotifyToken() {
     return cachedToken;
   }
   try {
-    console.log("Begär nytt token via backend...");
-    const response = await fetch('https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken', {
-      method: 'POST'
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP-fel: ${response.status}`);
+    console.log("Begär nytt token via Firebase backend...");
+    const getSpotifyTokenFn = window.httpsCallable(window.firebaseFunctions, 'getSpotifyToken');
+    const result = await getSpotifyTokenFn();
+    const data = result.data;
+    
+    if (!data || !data.access_token) {
+        throw new Error("Invalid response from token function");
     }
-    const data = await response.json();
+    
     const token = data.access_token;
-    const expiresIn = data.expires_in;
+    const expiresIn = data.expires_in || 3600;
     const expiryTime = Date.now() + (expiresIn * 1000) - (60 * 1000);
+    
     localStorage.setItem('spotifyToken', token);
     localStorage.setItem('spotifyTokenExpiry', expiryTime.toString());
-    console.log("Hämtat nytt token via backend:", token);
+    console.log("Hämtat nytt token via Firebase backend:", token);
     return token;
   } catch (error) {
-    console.error("Fel vid hämtning av token via backend:", error);
+    console.error("Fel vid hämtning av token via Firebase backend:", error);
     return null;
   }
 }

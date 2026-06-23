@@ -1,7 +1,7 @@
 // Spotify Helper - Uses backend token service (same as main game)
 // No user authentication required
 
-const BACKEND_TOKEN_URL = 'https://api-grl2mze3sa-uc.a.run.app/getSpotifyToken';
+// No user authentication required
 
 // Token cache
 let cachedToken = null;
@@ -17,17 +17,11 @@ async function getBackendSpotifyToken() {
   }
 
   try {
-    const response = await fetch(BACKEND_TOKEN_URL, {
-      method: 'POST'
-    });
-
-    if (!response.ok) {
-      throw new Error(`Token request failed: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const getSpotifyTokenFn = window.httpsCallable(window.firebaseFunctions, 'getSpotifyToken');
+    const result = await getSpotifyTokenFn();
+    const data = result.data;
     
-    if (!data.access_token) {
+    if (!data || !data.access_token) {
       throw new Error('No access token in response');
     }
     
@@ -35,7 +29,7 @@ async function getBackendSpotifyToken() {
     // Cache for slightly less than expires_in to be safe
     tokenExpiry = Date.now() + ((data.expires_in - 60) * 1000);
     
-    console.log('✅ Backend Spotify token retrieved');
+    console.log('✅ Backend Spotify token retrieved via Firebase');
     return cachedToken;
     
   } catch (error) {
