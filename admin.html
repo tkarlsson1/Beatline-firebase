@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.049</title>
+    <title>Notestream Admin v0.050</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -405,10 +405,10 @@
                                 totalSongs += Object.keys(lists[key].songs).length;
                             }
                         }
-                        document.getElementById("statPlaylistsTotalSongs").textContent = `(${totalSongs} låtar totalt)`;
+                        document.getElementById("statTotalSongs").textContent = `(${totalSongs} låtar totalt)`;
                     } else {
                         document.getElementById("statPlaylists").textContent = 0;
-                        document.getElementById("statPlaylistsTotalSongs").textContent = `(0 låtar totalt)`;
+                        document.getElementById("statTotalSongs").textContent = `(0 låtar totalt)`;
                     }
                 });
                 get(ref(db, 'users')).then(snap => {
@@ -1727,11 +1727,11 @@
                     <div class="stat-card">
                         <h3 id="statVerified">...</h3>
                         <p>Verifierade Låtar</p>
+                        <p id="statTotalSongs" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; margin-top: 5px; font-weight: normal; letter-spacing: normal;">(... låtar totalt)</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="statPlaylists">...</h3>
                         <p>Standardlistor</p>
-                        <p id="statPlaylistsTotalSongs" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; margin-top: 5px; font-weight: normal; letter-spacing: normal;">(... låtar totalt)</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="statUsers">...</h3>
