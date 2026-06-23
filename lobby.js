@@ -20,10 +20,10 @@ const TEAM_COLORS = [
 
 // Timer limits (in seconds)
 const TIMER_LIMITS = {
-  guess: { min: 30, max: 360, default: 90 },
-  challenge: { min: 5, max: 30, default: 10 },
-  placeChallenge: { min: 10, max: 60, default: 20 },
-  pauseBetweenSongs: { min: 5, max: 60, default: 10 }
+  guess: { min: 15, max: 360, default: 90 },
+  challenge: { min: 5, max: 60, default: 10 },
+  placeChallenge: { min: 5, max: 60, default: 60 },
+  pauseBetweenSongs: { min: 0, max: 60, default: 5 }
 };
 
 // Max teams allowed
