@@ -619,7 +619,7 @@
                         // Formatera historik för tooltip/alert
                         let historyStr = "";
                         if(loginDaysCount > 0) {
-                            historyStr = Object.keys(loginsObj).sort().reverse().join("\\n");
+                            historyStr = Object.keys(loginsObj).sort().reverse().join("\n");
                         } else {
                             historyStr = "Ingen historik";
                         }
@@ -637,15 +637,15 @@
                         
                         tr.querySelector(".view-history-btn").addEventListener("click", (e) => {
                             const hist = e.target.getAttribute("data-history");
-                            alert("Inloggningshistorik (unika dagar):\\n\\n" + hist);
+                            alert("Inloggningshistorik (unika dagar):\n\n" + hist);
                         });
 
                         tr.querySelector(".delete-user-btn").addEventListener("click", async (e) => {
                             const delUid = e.target.getAttribute("data-uid");
-                            if (confirm(\`Är du helt säker på att du vill radera all speldata för användaren \${delUid}? Detta går inte att ångra!\`)) {
+                            if (confirm(`Är du helt säker på att du vill radera all speldata för användaren ${delUid}? Detta går inte att ångra!`)) {
                                 try {
-                                    await set(ref(db, \`users/\${delUid}\`), null);
-                                    await set(ref(db, \`userPlaylists/\${delUid}\`), null);
+                                    await set(ref(db, `users/${delUid}`), null);
+                                    await set(ref(db, `userPlaylists/${delUid}`), null);
                                     tr.remove();
                                     loadDashboardStats();
                                 } catch(err) {
@@ -657,7 +657,7 @@
                         tbody.appendChild(tr);
                     }
                 }).catch(err => {
-                    tbody.innerHTML = \`<tr><td colspan="4" style="text-align: center; color: red;">Kunde inte hämta användare: \${err.message}</td></tr>\`;
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Kunde inte hämta användare: ${err.message}</td></tr>`;
                 });
             }
 
