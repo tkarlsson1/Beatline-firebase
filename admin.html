@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.030</title>
+    <title>Adminpanel 0.031</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -830,55 +830,7 @@
                 }
             }
 
-            async function searchItunesFallback(title, artist) {
-                if (!title || !artist) return null;
-                try {
-                    const cleanTitle = title.replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').trim();
-                    const query = encodeURIComponent(`${artist} ${cleanTitle}`);
-                    const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=15`;
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    
-                    if (!data.results || data.results.length === 0) return null;
 
-                    const normalizeStr = (str) => str ? str.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').trim() : '';
-                    const searchT = normalizeStr(cleanTitle);
-                    const searchA = normalizeStr(artist);
-                    
-                    // Filtrera resultaten så att artist och titel faktiskt matchar
-                    const matchingResults = data.results.filter(result => {
-                        const resT = normalizeStr(result.trackName);
-                        const resA = normalizeStr(result.artistName);
-                        const titleMatch = resT.includes(searchT) || searchT.includes(resT);
-                        const artistMatch = resA.includes(searchA) || searchA.includes(resA);
-                        return titleMatch && artistMatch;
-                    });
-
-                    if (matchingResults.length === 0) return null; // Om iTunes inte hittar exakt låt, överlåt till AI
-                    
-                    let earliestYear = null;
-                    matchingResults.forEach(result => {
-                        const trackLower = result.trackName.toLowerCase();
-                        const artistLower = result.artistName.toLowerCase();
-                        if (trackLower.includes('karaoke') || artistLower.includes('karaoke') || 
-                            artistLower.includes('tribute') || artistLower.includes('cover')) {
-                            return;
-                        }
-                        if (result.releaseDate) {
-                            const year = parseInt(result.releaseDate.substring(0, 4));
-                            if (!earliestYear || year < earliestYear) earliestYear = year;
-                        }
-                    });
-                    
-                    if (earliestYear) {
-                        return { year: earliestYear };
-                    }
-                    return null;
-                } catch (e) {
-                    console.error("iTunes fel:", e);
-                    return null;
-                }
-            }
 
             async function scanSingleReport(trackId, title, artist, oldYear, trElement) {
                 const btn = trElement.querySelector(".scan-report-btn");
@@ -890,20 +842,13 @@
                     let newYear = oldYear;
                     let source = "";
 
-                    // Försök med iTunes först
-                    const itunesResult = await searchItunesFallback(title, artist);
-                    if (itunesResult && itunesResult.year && String(itunesResult.year) !== String(oldYear)) {
-                        newYear = String(itunesResult.year);
-                        source = "iTunes";
-                    } else {
-                        // Annars GPT
-                        btn.innerHTML = "Frågar AI...";
-                        const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
-                        const aiResult = await getSongYearAi({ title, artist });
-                        if (aiResult && aiResult.data && aiResult.data.year && aiResult.data.year !== "UNKNOWN") {
-                            newYear = String(aiResult.data.year);
-                            source = "AI";
-                        }
+                    // Endast GPT
+                    btn.innerHTML = "Frågar AI...";
+                    const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
+                    const aiResult = await getSongYearAi({ title, artist });
+                    if (aiResult && aiResult.data && aiResult.data.year && aiResult.data.year !== "UNKNOWN") {
+                        newYear = String(aiResult.data.year);
+                        source = "AI";
                     }
 
                     const googleQuery = encodeURIComponent(`${artist} ${title} release year`);
