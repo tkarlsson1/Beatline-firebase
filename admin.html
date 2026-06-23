@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.050</title>
+    <title>Notestream Admin v0.051</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -399,13 +399,14 @@
                         const lists = snap.val();
                         document.getElementById("statPlaylists").textContent = Object.keys(lists).length;
                         
-                        let totalSongs = 0;
+                        const uniqueSongs = new Set();
                         for (const key in lists) {
                             if (lists[key].songs) {
-                                totalSongs += Object.keys(lists[key].songs).length;
+                                Object.keys(lists[key].songs).forEach(trackId => uniqueSongs.add(trackId));
                             }
                         }
-                        document.getElementById("statTotalSongs").textContent = `(${totalSongs} låtar totalt)`;
+                        const totalSongs = uniqueSongs.size;
+                        document.getElementById("statTotalSongs").textContent = `(${totalSongs} unika låtar totalt)`;
                     } else {
                         document.getElementById("statPlaylists").textContent = 0;
                         document.getElementById("statTotalSongs").textContent = `(0 låtar totalt)`;
