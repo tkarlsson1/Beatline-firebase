@@ -423,7 +423,7 @@ function changeCard() {
     })
     .then(() => {
       console.log('[Game] ✅ Card swapped successfully');
-      showNotification('🔄 Ny låt! Lyssna noga...', 'success');
+      showNotification('Ny låt! Lyssna noga...', 'success');
       
       // Wait for Firebase propagation (200ms)
       console.log('[Game] ⏳ Waiting for Firebase propagation (200ms)...');
@@ -450,7 +450,7 @@ function changeCard() {
       console.error('[Game] Error details:', error);
       console.error('[Game] Error message:', error.message);
       
-      showNotification('❌ Kunde inte byta kort - försök igen', 'error');
+      showNotification('Kunde inte byta kort - försök igen', 'error');
       
       console.log('[Game] ========== BYT KORT FAILED ==========');
     })
@@ -544,7 +544,7 @@ function challengeCard() {
       console.log('[Game] ✅ Challenge registered successfully!');
       console.log('[Game] 🎬 Starting Timer 3 (challenge_placement)...');
       
-      showNotification('💥 UTMANING! Placera ditt kort!', 'success');
+      showNotification('UTMANING! Placera ditt kort!', 'success');
       
       // Start Timer 3 (challenge placement)
       const placeChallengeTime = (currentGameData.placeChallengeTime || 20) * 1000;
@@ -560,7 +560,7 @@ function challengeCard() {
       console.error('[Game] Error code:', error.code);
       console.error('[Game] Updates that failed:', updates);
       
-      showNotification('❌ Kunde inte utmana - försök igen', 'error');
+      showNotification('Kunde inte utmana - försök igen', 'error');
       
       // Recovery: Try to restore token if Firebase update failed
       console.log('[Game] 🔧 Attempting token recovery...');
@@ -636,7 +636,7 @@ function lockInPlacement(targetTeamId = null) {
     window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
       .then(() => {
         console.log('[Game] Challenging card locked, timer stopped');
-        showNotification('💥 Challenge-kort låst! Validerar...', 'success');
+        showNotification('Challenge-kort låst! Validerar...', 'success');
         placementPosition = null;
         isLockingInPlacement = false;
         
@@ -898,7 +898,7 @@ function validateAndScoreCard(cardKey, card) {
         // Check for winner (11 cards)
         if (newScore >= 11) {
           console.log('[Game] Team reached 11 cards! Potential winner!');
-          showNotification('🎉 11 KORT! Du kan vinna!', 'success');
+          showNotification('11 KORT! Du kan vinna!', 'success');
         } else {
           showNotification('✓ RÄTT! Kortet behålls!', 'success');
         }

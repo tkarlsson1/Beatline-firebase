@@ -510,7 +510,7 @@ function onTimerExpired() {
 function skipTurn() {
   console.log('[Timer] Skipping turn for team:', currentGameData.currentTeam);
   
-  showNotification('⏱️ Tiden är ute! Turen hoppar över', 'info');
+  showNotification('Tiden är ute! Turen hoppar över', 'info');
   
   // Move to next team immediately, but start with Timer 4 (pause)
   const teamIds = Object.keys(currentTeams);

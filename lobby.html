@@ -340,7 +340,7 @@
     <!-- Host View -->
     <div id="hostView" style="display: none;">
       <div class="lobby-header">
-        <h1>🎮 NOTESTREAM LOBBY</h1>
+        <h1>NOTESTREAM LOBBY</h1>
       </div>
       
       <div class="game-info">
@@ -348,35 +348,35 @@
           <div class="info-label">Game ID</div>
           <div class="info-value">
             <span id="gameIdDisplay"></span>
-            <button class="copy-btn" onclick="copyGameId()">📋</button>
+            <button class="copy-btn" onclick="copyGameId()">Kopiera</button>
           </div>
         </div>
         <div class="info-item">
           <div class="info-label">PIN</div>
           <div class="info-value">
             <span id="pinDisplay"></span>
-            <button class="copy-btn" onclick="copyPIN()">📋</button>
+            <button class="copy-btn" onclick="copyPIN()">Kopiera</button>
           </div>
         </div>
       </div>
       
       <div class="qr-section">
         <div id="qrCodeElement"></div>
-        <p>📱 Scanna QR-koden eller gå till:</p>
+        <p>Scanna QR-koden eller gå till:</p>
         <div class="join-url" id="joinUrl"></div>
       </div>
       
       <hr class="section-divider">
       
       <div class="teams-section">
-        <h2>👥 LAG I LOBBYN (<span id="teamCountHost">0</span>)</h2>
+        <h2>LAG I LOBBYN (<span id="teamCountHost">0</span>)</h2>
         <div id="teamListHost" class="team-list"></div>
       </div>
       
       <hr class="section-divider">
       
       <div class="settings-section">
-        <h2>⚙️ INSTÄLLNINGAR</h2>
+        <h2>INSTÄLLNINGAR</h2>
         <div class="timer-settings">
           <div class="timer-input-group">
             <label>Gissning:</label>
@@ -432,7 +432,7 @@
     <!-- Player View -->
     <div id="playerView" style="display: none;">
       <div class="lobby-header">
-        <h1>🎮 VÄNTAR PÅ START...</h1>
+        <h1>VÄNTAR PÅ START...</h1>
       </div>
       
       <div class="game-info">
@@ -447,7 +447,7 @@
       <hr class="section-divider">
       
       <div class="teams-section">
-        <h2>👥 LAG I LOBBYN (<span id="teamCountPlayer">0</span>)</h2>
+        <h2>LAG I LOBBYN (<span id="teamCountPlayer">0</span>)</h2>
         <div id="teamListPlayer" class="team-list"></div>
       </div>
       
@@ -697,7 +697,7 @@
               <div class="team-tokens">${team.tokens} tokens</div>
             </div>
           </div>
-          ${!team.host ? `<button class="kick-btn" onclick="kickTeam('${teamIdKey}')">❌ Kicka</button>` : ''}
+          ${!team.host ? `<button class="kick-btn" onclick="kickTeam('${teamIdKey}')">Kicka</button>` : ''}
         `;
         
         container.appendChild(teamDiv);
