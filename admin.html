@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Adminpanel 0.028</title>
+    <title>Adminpanel 0.029</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -936,7 +936,7 @@
                                 const lists = listsSnap.val();
                                 for (const listName of Object.keys(lists)) {
                                     if (lists[listName].songs && lists[listName].songs[trackId]) {
-                                        await set(ref(db, `standardLists/${listName}/songs/${trackId}/year`), approvedYear);
+                                        await set(ref(db, `standardLists/${listName}/songs/${trackId}/year`), finalYear);
                                     }
                                 }
                             }
@@ -945,17 +945,18 @@
                             await set(ref(db, `reportedTracks/${trackId}`), null);
                             await set(ref(db, `flaggedTracks/${trackId}`), null);
                             loadReportedTracks();
-                        });
+                        } catch (err) {
+                            console.error("Fel vid sparande:", err);
+                            alert("Fel: " + err.message);
+                            e.target.innerHTML = "✅ Spara";
+                            e.target.disabled = false;
+                        }
+                    });
 
-                        // Bind Cancel Button
-                        trElement.querySelector(".delete-report-btn").addEventListener("click", () => {
-                            loadReportedTracks();
-                        });
-                    } else {
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                        alert("Hittade inget nyare årtal varken via iTunes eller AI!");
-                    }
+                    // Bind Cancel Button
+                    trElement.querySelector(".delete-report-btn").addEventListener("click", () => {
+                        loadReportedTracks();
+                    });
 
                 } catch (err) {
                     console.error("Skanning misslyckades:", err);
