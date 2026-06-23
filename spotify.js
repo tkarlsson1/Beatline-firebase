@@ -36,7 +36,12 @@ async function getBackendSpotifyToken() {
 
 async function fetchSpotifyPlaylist(playlistUrl) {
   console.log("fetchSpotifyPlaylist: Playlist URL mottagen:", playlistUrl);
-  const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
+  let playlistId = playlistUrl.trim();
+  if (playlistId.includes("/playlist/")) {
+      playlistId = playlistId.split("/playlist/")[1].split("?")[0];
+  } else if (playlistId.includes("spotify:playlist:")) {
+      playlistId = playlistId.split("spotify:playlist:")[1].split("?")[0];
+  }
   console.log("fetchSpotifyPlaylist: Extraherat playlist-ID:", playlistId);
   const token = await getBackendSpotifyToken();
   let tracks = {};

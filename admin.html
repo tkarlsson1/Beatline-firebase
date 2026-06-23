@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Beatline Admin v0.044</title>
+    <title>Beatline Admin v0.045</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -553,7 +553,12 @@
             }
 
             async function fetchSpotifyPlaylist(playlistUrl) {
-                const playlistId = playlistUrl.split("/playlist/")[1].split("?")[0];
+                let playlistId = playlistUrl.trim();
+                if (playlistId.includes("/playlist/")) {
+                    playlistId = playlistId.split("/playlist/")[1].split("?")[0];
+                } else if (playlistId.includes("spotify:playlist:")) {
+                    playlistId = playlistId.split("spotify:playlist:")[1].split("?")[0];
+                }
                 const token = await getBackendSpotifyToken();
                 let tracks = {};
                 let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
