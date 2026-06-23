@@ -317,7 +317,11 @@ function mergeSongs() {
   
   // Process standard lists first
   standardSongs.forEach(song => {
-    merged[song.qr] = { ...song, source: [...song.source] };
+    if (merged[song.qr]) {
+      merged[song.qr].source = [...new Set([...merged[song.qr].source, ...song.source])];
+    } else {
+      merged[song.qr] = { ...song, source: [...song.source] };
+    }
   });
   
   // Then process user playlists
@@ -498,7 +502,7 @@ window.updateYearSelection = function() {
     const optionEnd = document.createElement("option");
     optionEnd.value = year;
     optionEnd.textContent = year;
-    if (year === 2025) optionEnd.selected = true;
+    if (year === thisYear) optionEnd.selected = true;
     endYearDropdown.appendChild(optionEnd);
     
     // Hover effects
