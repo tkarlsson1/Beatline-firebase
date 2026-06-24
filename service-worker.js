@@ -1,6 +1,6 @@
 // service-worker.js (consolidated)
 // Notestream PWA — unified cache & offline fallback
-const NS_CACHE = 'ns-appshell-v1-2026-06-23-v20';
+const NS_CACHE = 'ns-appshell-v1-2026-06-24-v21';
 const NS_ASSETS = [
   '/', '/index.html', '/manifest.json',
   '/offline.html',

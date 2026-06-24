@@ -166,59 +166,76 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
           progressBar.style.width = `${percent}%`;
         }
         
-        // Skicka hela batchen till getSongYearsAiBatch
-        try {
-          const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch');
-          const batchPayload = batch.map(item => ({
-            id: item.id,
-            title: item.track.title,
-            artist: item.track.artist
-          }));
+        // Skicka hela batchen till getSongYearsAiBatch med retry-logik
+        const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch');
+        const batchPayload = batch.map(item => ({
+          id: item.id,
+          title: item.track.title,
+          artist: item.track.artist
+        }));
+
+        let success = false;
+        let retries = 0;
+        const MAX_RETRIES = 3;
+        let result = null;
+
+        while (!success && retries < MAX_RETRIES) {
+          try {
+            result = await getSongYearsAiBatch({ songs: batchPayload });
+            success = true;
+          } catch (e) {
+            retries++;
+            const errMsg = e.message || String(e);
+            console.warn(`[AI Retry] Batch misslyckades (försök ${retries}/${MAX_RETRIES}): ${errMsg}`);
+            if (retries < MAX_RETRIES) {
+              if (progressText) progressText.textContent = `AI-fel – försöker igen om 5s (${retries}/${MAX_RETRIES})...`;
+              await new Promise(r => setTimeout(r, 5000));
+            } else {
+              console.error(`[AI] Batch misslyckades permanent efter ${MAX_RETRIES} försök. Felmeddelande: ${errMsg}`);
+              aiErrors += batch.length;
+            }
+          }
+        }
+
+        if (success && result && result.data && Array.isArray(result.data.results)) {
+          if (progressText) progressText.textContent = 'Kör AI-validering...';
+          const aiResults = result.data.results;
           
-          const result = await getSongYearsAiBatch({ songs: batchPayload });
-          
-          if (result && result.data && Array.isArray(result.data.results)) {
-            const aiResults = result.data.results;
+          for (const aiItem of aiResults) {
+            const originalItem = batch.find(b => b.id === aiItem.id);
+            if (!originalItem) continue;
             
-            for (const aiItem of aiResults) {
-              const originalItem = batch.find(b => b.id === aiItem.id);
-              if (!originalItem) continue;
+            if (aiItem.year && aiItem.year !== "UNKNOWN") {
+              const aiYear = parseInt(aiItem.year, 10);
+              const spotifyYear = parseInt(originalItem.track.year, 10);
               
-              if (aiItem.year && aiItem.year !== "UNKNOWN") {
-                const aiYear = parseInt(aiItem.year, 10);
-                const spotifyYear = parseInt(originalItem.track.year, 10);
-                
-                if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
-                  const diff = Math.abs(spotifyYear - aiYear);
-                  if (diff <= 1) {
-                    // SÄKERT: Auto-godkänn
-                    originalItem.track.year = String(aiYear);
-                    aiCount++;
-                    
-                    // Spara till Cache i bakgrunden
-                    window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${originalItem.id}`), {
-                      title: originalItem.track.title,
-                      artist: originalItem.track.artist,
-                      year: originalItem.track.year,
-                      manuallyVerified: false
-                    }).catch(e => console.warn("Kunde inte spara till cache", e));
-                  } else if (aiYear < spotifyYear) {
-                    // OSÄKERT: Lägg till i granskningslistan
-                    uncertainTracks.push({
-                      id: originalItem.id,
-                      title: originalItem.track.title,
-                      artist: originalItem.track.artist,
-                      spotifyYear: originalItem.track.year,
-                      aiYear: String(aiYear)
-                    });
-                  }
+              if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
+                const diff = Math.abs(spotifyYear - aiYear);
+                if (diff <= 1) {
+                  // SÄKERT: Auto-godkänn
+                  originalItem.track.year = String(aiYear);
+                  aiCount++;
+                  
+                  // Spara till Cache i bakgrunden
+                  window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${originalItem.id}`), {
+                    title: originalItem.track.title,
+                    artist: originalItem.track.artist,
+                    year: originalItem.track.year,
+                    manuallyVerified: false
+                  }).catch(e => console.warn("Kunde inte spara till cache", e));
+                } else if (aiYear < spotifyYear) {
+                  // OSÄKERT: Lägg till i granskningslistan
+                  uncertainTracks.push({
+                    id: originalItem.id,
+                    title: originalItem.track.title,
+                    artist: originalItem.track.artist,
+                    spotifyYear: originalItem.track.year,
+                    aiYear: String(aiYear)
+                  });
                 }
               }
             }
           }
-        } catch (e) {
-          console.warn("Kunde inte anropa Backend AI Batch", e);
-          aiErrors += batch.length;
         }
       }
     } else {

@@ -294,13 +294,14 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_completion_tokens: 1000
+        // max_completion_tokens är borttagen för att undvika begränsningar
       })
     });
     
     if (!response.ok) {
-      functions.logger.error("OpenAI API returned an error:", response.status, await response.text());
-      throw new functions.https.HttpsError("internal", "Failed to contact AI service.");
+      const errText = await response.text();
+      functions.logger.error("OpenAI API error:", response.status, errText);
+      throw new functions.https.HttpsError("internal", `OpenAI API Error ${response.status}: ${errText}`);
     }
     
     const aiData = await response.json();
@@ -363,14 +364,15 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").https.onCall(asyn
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        max_completion_tokens: 2000,
+        // max_completion_tokens är borttagen för att tillåta obegränsade batchstorlekar
         response_format: { type: "json_object" }
       })
     });
     
     if (!response.ok) {
-      functions.logger.error("OpenAI API error:", response.status, await response.text());
-      throw new functions.https.HttpsError("internal", "Failed to contact AI service.");
+      const errText = await response.text();
+      functions.logger.error("OpenAI API error:", response.status, errText);
+      throw new functions.https.HttpsError("internal", `OpenAI API Error ${response.status}: ${errText}`);
     }
     
     const aiData = await response.json();
