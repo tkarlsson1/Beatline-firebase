@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
+  <style>
+    @keyframes ns-spin { to { transform: rotate(360deg); } }
+    .import-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: ns-spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+  </style>
   <meta charset="UTF-8" />
   <meta name="description" content="Årsquiz om låtar – spela, gissa och redigera årtal.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +23,7 @@
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
   <meta name="twitter:card" content="summary_large_image">
   
-  <title>Notestream 0.824</title>
+  <title>Notestream 0.825</title>
   
   <!-- Favicon and manifest -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -88,14 +99,12 @@
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn">
         <button id="addPlaylistButton">Lägg till</button>
         
-        <!-- Progress bar container (hidden by default) -->
-        <div id="importProgressContainer" style="display: none; margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.85rem; color: #fff;">
-            <span id="importProgressText">Förbereder...</span>
-            <span id="importProgressCount">0/0</span>
-          </div>
-          <div style="width: 100%; background: #444; border-radius: 4px; height: 8px; overflow: hidden;">
-            <div id="importProgressBar" style="width: 0%; height: 100%; background: #1DB954; transition: width 0.3s ease;"></div>
+        <!-- Progress container (hidden by default) -->
+        <div id="importProgressContainer" style="display: none; margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px 14px;">
+          <div id="importProgressInfo" style="font-size: 0.85rem; color: #ccc; margin-bottom: 8px;"></div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="importSpinner" class="import-spinner" style="display: none;"></div>
+            <span id="importProgressText" style="font-size: 0.85rem; color: #fff;">Förbereder...</span>
           </div>
         </div>
       </div>
@@ -248,7 +257,7 @@
   <script src="spotify-player.js?v=0.799"></script>
 
   <!-- Spotify Integration (Playlist Import) -->
-  <script src="spotify.js?v=0.805"></script>
+  <script src="spotify.js?v=0.806"></script>
 
   <!-- UI Event Handlers -->
   <script src="ui-events.js?v=0.799"></script>

@@ -74,8 +74,10 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     const addBtn = document.getElementById("addPlaylistButton");
     const progressContainer = document.getElementById('importProgressContainer');
     const progressText = document.getElementById('importProgressText');
-    const progressCount = document.getElementById('importProgressCount');
+    const progressInfo = document.getElementById('importProgressInfo');
     const progressBar = document.getElementById('importProgressBar');
+    const progressCount = document.getElementById('importProgressCount');
+    const spinner = document.getElementById('importSpinner');
 
     if (addBtn) {
       addBtn.disabled = true;
@@ -84,9 +86,10 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     
     if (progressContainer) {
       progressContainer.style.display = 'block';
-      progressBar.style.width = '0%';
+      if (progressInfo) progressInfo.textContent = '';
+      if (progressBar) progressBar.style.width = '0%';
+      if (progressCount) progressCount.textContent = '';
       progressText.textContent = 'Hämtar spellista från Spotify...';
-      progressCount.textContent = '';
     }
     
     const tracks = await fetchSpotifyPlaylist(playlistUrl);
@@ -139,14 +142,18 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       }
     }
     
-    if (progressText && tracksToAi.length > 0) {
-      progressText.textContent = 'Kvalitetssäkrar årtalen...';
-      progressCount.textContent = `${verifiedCount} / ${totalTracks}`;
+    // Visa info-raden i 2 sekunder innan spinner startar
+    if (tracksToAi.length > 0) {
+      if (progressInfo) progressInfo.textContent = `${verifiedCount} av ${totalTracks} låtar finns redan i databasen. Kvalitetssäkrar de övriga ${tracksToAi.length}...`;
+      if (progressText) progressText.textContent = '';
+      await new Promise(r => setTimeout(r, 2000));
+      if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
+      if (spinner) spinner.style.display = 'block';
     }
-    
+
     if (addBtn) addBtn.textContent = 'Importerar spellista...';
     
-    // Kör AI-frågor i parallella batchar (t.ex. 25 åt gången) för att spara enormt med tid
+    // Kör AI-frågor i batchar
     const BATCH_SIZE = 25;
     let processedAi = 0;
     
@@ -155,21 +162,6 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       
       for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
         const batch = tracksToAi.slice(i, i + BATCH_SIZE);
-        
-        // Starta fake-progress (Apple-baren)
-        if (progressText) {
-          progressText.textContent = 'Kvalitetssäkrar årtalen...';
-        }
-        
-        let currentPercent = Math.round((processedAi / tracksToAi.length) * 100);
-        const targetPercent = Math.round(((processedAi + batch.length) / tracksToAi.length) * 100);
-        
-        const fakeProgressInterval = setInterval(() => {
-          if (currentPercent < targetPercent - 2) { // Stanna precis innan 100% av batchens mål
-            currentPercent += 1;
-            if (progressBar) progressBar.style.width = `${currentPercent}%`;
-          }
-        }, 400); // tickar upp 1% varje 0.4s (tar ca 35s från 0 till 90)
 
         // Skicka hela batchen till getSongYearsAiBatch med retry-logik
         const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch', { timeout: 540000 });
@@ -192,22 +184,16 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
             retries++;
             const errMsg = e.message || String(e);
             console.warn(`[AI Retry] Batch misslyckades (försök ${retries}/${MAX_RETRIES}): ${errMsg}`);
-            if (retries < MAX_RETRIES) {
-              if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
-              await new Promise(r => setTimeout(r, 5000));
-            } else {
+            if (retries >= MAX_RETRIES) {
               console.error(`[AI] Batch misslyckades permanent efter ${MAX_RETRIES} försök. Felmeddelande: ${errMsg}`);
               aiErrors += batch.length;
+            } else {
+              await new Promise(r => setTimeout(r, 5000));
             }
           }
         }
-        
-        // Stanna fake-progress och snap:a till rätt värde
-        clearInterval(fakeProgressInterval);
+
         processedAi += batch.length;
-        
-        if (progressCount) progressCount.textContent = `${verifiedCount + processedAi} / ${totalTracks}`;
-        if (progressBar) progressBar.style.width = `${Math.round(((verifiedCount + processedAi) / totalTracks) * 100)}%`;
 
         if (success && result && result.data && Array.isArray(result.data.results)) {
           if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
@@ -271,7 +257,10 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       addBtn.disabled = false;
       addBtn.textContent = "Lägg till";
     }
-    if (progressContainer) progressContainer.style.display = 'none';
+    const container = document.getElementById('importProgressContainer');
+    const sp = document.getElementById('importSpinner');
+    if (sp) sp.style.display = 'none';
+    if (container) container.style.display = 'none';
     
     // 4. Hantera resultat
     if (aiErrors > 0) {
