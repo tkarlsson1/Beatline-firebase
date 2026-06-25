@@ -167,7 +167,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
         }
         
         // Skicka hela batchen till getSongYearsAiBatch med retry-logik
-        const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch');
+        const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch', { timeout: 540000 });
         const batchPayload = batch.map(item => ({
           id: item.id,
           title: item.track.title,
