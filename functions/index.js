@@ -336,7 +336,7 @@ exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (dat
  * Uses OpenAI to estimate the release years for a batch of songs.
  * data: { songs: [{ id: string, title: string, artist: string }] }
  */
-exports.getSongYearsAiBatch = functions.region("europe-west1").https.onCall(async (data, context) => {
+exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB" }).https.onCall(async (data, context) => {
   const { songs } = data || {};
   if (!Array.isArray(songs) || songs.length === 0) {
     throw new functions.https.HttpsError("invalid-argument", "An array of songs is required.");

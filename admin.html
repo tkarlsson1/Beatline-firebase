@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.052</title>
+    <title>Notestream Admin v0.053</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1276,6 +1276,8 @@
 
                         if (success) {
                             // Behandla aiResults
+                            let batchAdjustments = 0;
+                            let batchUnknown = 0;
                             for (const aiItem of aiResults) {
                                 const task = batch.find(b => b.trackId === aiItem.id);
                                 if (!task) continue;
@@ -1290,6 +1292,7 @@
                                     if (aiYear !== oldYearStr) {
                                         newYearStr = aiYear;
                                         fixedBy = "AI";
+                                        batchAdjustments++;
                                         logToUI(`[JUSTERING] 🔥 AI hittade nytt årtal för "${track.title}": ${oldYearStr} -> ${newYearStr}`);
                                     } else {
                                         tracksToCache[trackId] = {
@@ -1300,7 +1303,7 @@
                                         };
                                     }
                                 } else {
-                                    logToUI(`[OKÄNT] AI kunde inte hitta årtalet för "${track.title}".`);
+                                    batchUnknown++;
                                 }
                                 
                                 // === SMARTA FILTER ===
@@ -1403,6 +1406,7 @@
                                     tbody.appendChild(tr);
                                 }
                             }
+                            logToUI(`[BATCH ${batchNum}/${totalBatches}] ✅ Klar – ${aiResults.length} låtar analyserade, ${batchAdjustments} justeringar${batchUnknown > 0 ? `, ${batchUnknown} okända` : ''}.`);
                         }
 
                         completedTasks += batch.length;
