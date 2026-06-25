@@ -347,9 +347,9 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
   }
   
-  const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året låtarna gavs ut offentligt på singel eller studioalbum. Ignorera nyutgåvor, remasters, live-versioner och samlingsalbum. Svara alltid med det äldsta kända årtalet för originalinspelningen. VIKTIGT UNDANTAG: Om artistnamnet indikerar en cover, eller ett modernt samarbete/DJ-remix av en gammal låt, svara med årtalet för remixen/versionen. DU MÅSTE SVARA ENBART MED GILTIG JSON. Svara med en JSON-lista (Array) av objekt, där varje objekt har nycklarna: 'id' (samma id som skickades in) och 'year' (fyrsiffrigt årtal, eller null om osäker). Inget annat text-svar.";
+  const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året låtarna gavs ut offentligt på singel eller studioalbum. Ignorera nyutgåvor, remasters, live-versioner och samlingsalbum. Svara alltid med det äldsta kända årtalet för originalinspelningen. VIKTIGT UNDANTAG: Om artistnamnet indikerar en cover, eller ett modernt samarbete/DJ-remix av en gammal låt, svara med årtalet för remixen/versionen. DU MÅSTE SVARA ENBART MED ETT GILTIGT JSON-OBJEKT med nyckeln 'songs' som innehåller en array. Exempel: {\"songs\": [{\"id\": \"ID_HäR\", \"year\": 1975}, {\"id\": \"ANNAT_ID\", \"year\": null}]}. Du MÅSTE inkludera ALLA låtar du får in i svaret, inte bara några få.";
   
-  const userPrompt = "Analysera följande låtar och returnera JSON:\n" + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
+  const userPrompt = `Analysera ALLA följande ${songs.length} låtar och returnera ett JSON-objekt med nyckeln 'songs' som innehåller en array med ${songs.length} objekt (ett per låt):\n` + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
   
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -376,17 +376,25 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
     }
     
     const aiData = await response.json();
-    let aiText = aiData.choices?.[0]?.message?.content?.trim() || "[]";
+    let aiText = aiData.choices?.[0]?.message?.content?.trim() || "{}";
+    functions.logger.info(`[getSongYearsAiBatch] Rå AI-svar (${songs.length} låtar skickade): ${aiText.substring(0, 500)}`);
     
-    // Safety fallback if OpenAI returned { "songs": [...] } instead of array directly
+    // Parsa JSON-svaret och hitta songs-arrayen
     let parsedJson;
     try {
       parsedJson = JSON.parse(aiText);
-      if (parsedJson && !Array.isArray(parsedJson)) {
-        // Find any array property inside the object
+      if (Array.isArray(parsedJson)) {
+        // Top-level array (oväntat men hanterbart)
+      } else if (parsedJson && typeof parsedJson === 'object') {
+        // Leta efter en array-property (förväntat: { "songs": [...] })
         const arrProp = Object.values(parsedJson).find(Array.isArray);
-        if (arrProp) parsedJson = arrProp;
-        else parsedJson = [parsedJson]; // wrap it just in case
+        if (arrProp) {
+          parsedJson = arrProp;
+        } else {
+          // Enstaka objekt - logga och returnera tomt
+          functions.logger.warn("[getSongYearsAiBatch] AI returnerade ett enstaka objekt istället för array:", aiText);
+          parsedJson = [];
+        }
       }
     } catch (e) {
       functions.logger.error("Failed to parse JSON from AI:", aiText);
