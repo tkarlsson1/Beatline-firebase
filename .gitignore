@@ -1,5 +1,9 @@
 functions/.env
 
+# Node dependencies
+node_modules/
+functions/node_modules/
+
 # Lokala IDE-inställningar
 .claude/
 
