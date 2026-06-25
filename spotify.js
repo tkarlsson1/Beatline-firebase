@@ -351,18 +351,9 @@ function openReviewPlaylistModal(uncertainTracks, playlistName) {
   const newSaveBtn = saveBtn.cloneNode(true);
   saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
   
-  // Hantera kryssrutan för dynamisk text
   const checkbox = document.getElementById("disableCooldownCheckbox");
-  checkbox.checked = false; // Återställ alltid till av
-  newSaveBtn.textContent = "Spara Årtal & Aktivera Spärr";
-  
-  checkbox.onchange = (e) => {
-    if (e.target.checked) {
-      newSaveBtn.textContent = "Spara Årtal";
-    } else {
-      newSaveBtn.textContent = "Spara Årtal & Aktivera Spärr";
-    }
-  };
+  checkbox.checked = false;
+  newSaveBtn.textContent = "Spara årtal";
   
   newSaveBtn.addEventListener("click", async () => {
     newSaveBtn.disabled = true;

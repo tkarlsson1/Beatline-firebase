@@ -23,7 +23,7 @@
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
   <meta name="twitter:card" content="summary_large_image">
   
-  <title>Notestream 0.826</title>
+  <title>Notestream 0.827</title>
   
   <!-- Favicon and manifest -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -212,9 +212,7 @@
       <span id="closeReviewPlaylist" class="closeBtn" aria-label="Stäng">&times;</span>
       <h2 style="color: #ef4444; margin-top:0;">⚠️ AI-Granskning</h2>
       <p style="opacity:.9; margin-top:.5rem; font-size: 0.95rem;">
-        Vi hittade några låtar där AI:n tror att Spotifys årtal kan vara fel (skillnad på mer än 1 år).<br>
-        Granska och spara årtalen nedan. <br><br>
-        <strong>Magi:</strong> För att du inte ska få en orättvis fördel (spoilers!) kommer de låtar du tittar på nu att <strong>döljas från spelet under de närmsta 12 timmarna</strong>.
+        Några låtar hittades där du behöver manuellt kontrollera årtalet. Tryck på förstoringsglaset för att söka upp rätt år.
       </p>
       
       <div id="reviewPlaylistList" style="margin-top: 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden;">
@@ -224,11 +222,11 @@
       <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <label style="display: flex; align-items: center; font-size: 0.9rem; cursor: pointer; color: #aaa;">
           <input type="checkbox" id="disableCooldownCheckbox" style="margin-right: 8px; accent-color: #ef4444;">
-          Spärra inte dessa låtar (jag litar på mitt minne)
+          Dölj inte dessa låtar
         </label>
         
         <button id="saveReviewPlaylistBtn" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
-          Spara Årtal & Aktivera Spärr
+          Spara årtal
         </button>
       </div>
     </div>
@@ -257,7 +255,7 @@
   <script src="spotify-player.js?v=0.799"></script>
 
   <!-- Spotify Integration (Playlist Import) -->
-  <script src="spotify.js?v=0.806"></script>
+  <script src="spotify.js?v=0.807"></script>
 
   <!-- UI Event Handlers -->
   <script src="ui-events.js?v=0.799"></script>
