@@ -1,1 +1,11 @@
 functions/.env
+
+# Lokala IDE-inställningar
+.claude/
+
+# Temporära datafiler
+temp_tracks.json
+all_songs_review.json
+
+# GIMP-källfiler (stora, inget värde i repo)
+*.xcf
