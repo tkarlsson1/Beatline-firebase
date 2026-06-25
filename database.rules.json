@@ -40,7 +40,7 @@
         ".read": "auth != null && auth.uid == $uid",
         ".write": "auth != null && auth.uid == $uid",
         "$playlistId": {
-          ".validate": "newData.hasChildren(['title','tracks'])"
+          ".validate": "newData.hasChildren(['songs'])"
         }
       }
     }
