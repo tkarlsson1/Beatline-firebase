@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.058</title>
+    <title>Notestream Admin v0.059</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -925,7 +925,7 @@
                 addBtn.textContent = `AI granskar ${tracksToAi.length} låtar...`;
                 const BATCH_SIZE = 25;
                 let processedAi = 0;
-                const getSongYearsAiBatch = httpsCallable(functions, 'getSongYearsAiBatch');
+                const getSongYearsAiBatch = httpsCallable(functions, 'getSongYearsAiBatch', { timeout: 540000 });
 
                 for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
                     const batch = tracksToAi.slice(i, i + BATCH_SIZE);
@@ -933,48 +933,64 @@
                     progressCount.textContent = `${processedAi} / ${tracksToAi.length}`;
                     progressBar.style.width = `${Math.round((processedAi / tracksToAi.length) * 100)}%`;
 
-                    try {
-                        const batchPayload = batch.map(item => ({
-                            id: item.id,
-                            title: item.track.title,
-                            artist: item.track.artist
-                        }));
-                        const result = await getSongYearsAiBatch({ songs: batchPayload });
-                        if (result && result.data && Array.isArray(result.data.results)) {
-                            const aiResults = result.data.results;
-                            for (const aiItem of aiResults) {
-                                const originalItem = batch.find(b => b.id === aiItem.id);
-                                if (!originalItem) continue;
-                                if (aiItem.year && aiItem.year !== "UNKNOWN") {
-                                    const aiYear = parseInt(aiItem.year, 10);
-                                    const spotifyYear = parseInt(originalItem.track.year, 10);
-                                    if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
-                                        const diff = Math.abs(spotifyYear - aiYear);
-                                        if (diff <= 1) {
-                                            originalItem.track.year = String(aiYear);
-                                            aiCount++;
-                                            set(ref(db, `verifiedTracks/${originalItem.id}`), {
-                                                title: originalItem.track.title,
-                                                artist: originalItem.track.artist,
-                                                year: originalItem.track.year,
-                                                manuallyVerified: false
-                                            }).catch(e => console.warn("Kunde inte spara till cache", e));
-                                        } else if (aiYear < spotifyYear) {
-                                            uncertainTracks.push({
-                                                id: originalItem.id,
-                                                title: originalItem.track.title,
-                                                artist: originalItem.track.artist,
-                                                spotifyYear: originalItem.track.year,
-                                                aiYear: String(aiYear)
-                                            });
-                                        }
+                    const batchPayload = batch.map(item => ({
+                        id: item.id,
+                        title: item.track.title,
+                        artist: item.track.artist
+                    }));
+
+                    let success = false;
+                    let retries = 0;
+                    const MAX_RETRIES = 3;
+                    let result = null;
+
+                    while (!success && retries < MAX_RETRIES) {
+                        try {
+                            result = await getSongYearsAiBatch({ songs: batchPayload });
+                            success = true;
+                        } catch (e) {
+                            retries++;
+                            console.warn(`[AI Retry] Batch misslyckades (försök ${retries}/${MAX_RETRIES}):`, e.message);
+                            if (retries >= MAX_RETRIES) {
+                                console.error(`[AI] Batch misslyckades permanent efter ${MAX_RETRIES} försök.`);
+                                aiErrors += batch.length;
+                            } else {
+                                await new Promise(r => setTimeout(r, 5000));
+                            }
+                        }
+                    }
+
+                    if (success && result && result.data && Array.isArray(result.data.results)) {
+                        const aiResults = result.data.results;
+                        for (const aiItem of aiResults) {
+                            const originalItem = batch.find(b => b.id === aiItem.id);
+                            if (!originalItem) continue;
+                            if (aiItem.year && aiItem.year !== "UNKNOWN") {
+                                const aiYear = parseInt(aiItem.year, 10);
+                                const spotifyYear = parseInt(originalItem.track.year, 10);
+                                if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
+                                    const diff = Math.abs(spotifyYear - aiYear);
+                                    if (diff <= 1) {
+                                        originalItem.track.year = String(aiYear);
+                                        aiCount++;
+                                        set(ref(db, `verifiedTracks/${originalItem.id}`), {
+                                            title: originalItem.track.title,
+                                            artist: originalItem.track.artist,
+                                            year: originalItem.track.year,
+                                            manuallyVerified: false
+                                        }).catch(e => console.warn("Kunde inte spara till cache", e));
+                                    } else if (aiYear < spotifyYear) {
+                                        uncertainTracks.push({
+                                            id: originalItem.id,
+                                            title: originalItem.track.title,
+                                            artist: originalItem.track.artist,
+                                            spotifyYear: originalItem.track.year,
+                                            aiYear: String(aiYear)
+                                        });
                                     }
                                 }
                             }
                         }
-                    } catch (e) {
-                        console.warn("Backend AI Batch fel", e);
-                        aiErrors += batch.length;
                     }
                 }
 
