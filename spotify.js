@@ -156,16 +156,23 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
         const batch = tracksToAi.slice(i, i + BATCH_SIZE);
         
-        // Uppdatera UI och Progress Bar
-        processedAi += batch.length;
-        if (progressCount) {
-          progressCount.textContent = `${processedAi} / ${tracksToAi.length}`;
-        }
-        if (progressBar) {
-          const percent = Math.round((processedAi / tracksToAi.length) * 100);
-          progressBar.style.width = `${percent}%`;
+        // Starta fake-progress (Apple-baren)
+        if (progressText) {
+          const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+          const totalBatches = Math.ceil(tracksToAi.length / BATCH_SIZE);
+          progressText.textContent = `Analyserar batch ${batchNum} av ${totalBatches} med AI... (tar upp till 30s)`;
         }
         
+        let currentPercent = Math.round((processedAi / tracksToAi.length) * 100);
+        const targetPercent = Math.round(((processedAi + batch.length) / tracksToAi.length) * 100);
+        
+        const fakeProgressInterval = setInterval(() => {
+          if (currentPercent < targetPercent - 2) { // Stanna precis innan 100% av batchens mål
+            currentPercent += 1;
+            if (progressBar) progressBar.style.width = `${currentPercent}%`;
+          }
+        }, 400); // tickar upp 1% varje 0.4s (tar ca 35s från 0 till 90)
+
         // Skicka hela batchen till getSongYearsAiBatch med retry-logik
         const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch', { timeout: 540000 });
         const batchPayload = batch.map(item => ({
@@ -196,6 +203,13 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
             }
           }
         }
+        
+        // Stanna fake-progress och snap:a till rätt värde
+        clearInterval(fakeProgressInterval);
+        processedAi += batch.length;
+        
+        if (progressCount) progressCount.textContent = `${processedAi} / ${tracksToAi.length}`;
+        if (progressBar) progressBar.style.width = `${Math.round((processedAi / tracksToAi.length) * 100)}%`;
 
         if (success && result && result.data && Array.isArray(result.data.results)) {
           if (progressText) progressText.textContent = 'Kör AI-validering...';
