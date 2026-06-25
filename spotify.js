@@ -79,13 +79,13 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
 
     if (addBtn) {
       addBtn.disabled = true;
-      addBtn.textContent = 'Laddar låtar...';
+      addBtn.textContent = 'Importerar spellista...';
     }
     
     if (progressContainer) {
       progressContainer.style.display = 'block';
       progressBar.style.width = '0%';
-      progressText.textContent = 'Hämtar från Spotify...';
+      progressText.textContent = 'Hämtar spellista från Spotify...';
       progressCount.textContent = '';
     }
     
@@ -99,7 +99,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     }
     
     // --- VERIFIERING VID UPPLADDNING ---
-    if (progressText) progressText.textContent = 'Laddar cache...';
+    if (progressText) progressText.textContent = 'Kontrollerar kända låtar...';
     
     // Hämta verifiedTracks från Firebase
     let verifiedTracks = {};
@@ -140,11 +140,11 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     }
     
     if (progressText && tracksToAi.length > 0) {
-      progressText.textContent = 'Kör AI-validering...';
-      progressCount.textContent = `0 / ${tracksToAi.length}`;
+      progressText.textContent = 'Kvalitetssäkrar årtalen...';
+      progressCount.textContent = `${verifiedCount} / ${totalTracks}`;
     }
     
-    if (addBtn) addBtn.textContent = `AI granskar ${tracksToAi.length} låtar...`;
+    if (addBtn) addBtn.textContent = 'Importerar spellista...';
     
     // Kör AI-frågor i parallella batchar (t.ex. 25 åt gången) för att spara enormt med tid
     const BATCH_SIZE = 25;
@@ -158,9 +158,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
         
         // Starta fake-progress (Apple-baren)
         if (progressText) {
-          const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-          const totalBatches = Math.ceil(tracksToAi.length / BATCH_SIZE);
-          progressText.textContent = `Analyserar batch ${batchNum} av ${totalBatches} med AI... (tar upp till 30s)`;
+          progressText.textContent = 'Kvalitetssäkrar årtalen...';
         }
         
         let currentPercent = Math.round((processedAi / tracksToAi.length) * 100);
@@ -195,7 +193,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
             const errMsg = e.message || String(e);
             console.warn(`[AI Retry] Batch misslyckades (försök ${retries}/${MAX_RETRIES}): ${errMsg}`);
             if (retries < MAX_RETRIES) {
-              if (progressText) progressText.textContent = `AI-fel – försöker igen om 5s (${retries}/${MAX_RETRIES})...`;
+              if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
               await new Promise(r => setTimeout(r, 5000));
             } else {
               console.error(`[AI] Batch misslyckades permanent efter ${MAX_RETRIES} försök. Felmeddelande: ${errMsg}`);
@@ -208,11 +206,11 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
         clearInterval(fakeProgressInterval);
         processedAi += batch.length;
         
-        if (progressCount) progressCount.textContent = `${processedAi} / ${tracksToAi.length}`;
-        if (progressBar) progressBar.style.width = `${Math.round((processedAi / tracksToAi.length) * 100)}%`;
+        if (progressCount) progressCount.textContent = `${verifiedCount + processedAi} / ${totalTracks}`;
+        if (progressBar) progressBar.style.width = `${Math.round(((verifiedCount + processedAi) / totalTracks) * 100)}%`;
 
         if (success && result && result.data && Array.isArray(result.data.results)) {
-          if (progressText) progressText.textContent = 'Kör AI-validering...';
+          if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
           const aiResults = result.data.results;
           
           for (const aiItem of aiResults) {
@@ -277,11 +275,11 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     
     // 4. Hantera resultat
     if (aiErrors > 0) {
-      alert(`⚠️ Ett fel uppstod med AI-valideringen (t.ex. OpenAI-krediter slut) för ${aiErrors} låtar.\n\nDessa låtar sparades i din spellista med Spotifys original-årtal, men lades INTE till i den globala verifierade databasen.`);
+      alert(`"${playlistName}" har lagts till med ${totalTracks} låtar.\n\nNågra låtar kunde inte kvalitetssäkras och har importerats med Spotifys ursprungliga årtal.`);
     } else if (uncertainTracks.length > 0) {
       openReviewPlaylistModal(uncertainTracks, playlistName);
     } else {
-      alert(`Spellistan "${playlistName}" har lagts till! \nAlla låtar verifierades snyggt och prydligt.`);
+      alert(`"${playlistName}" har lagts till med ${totalTracks} låtar.`);
     }
     
     // Rensa fälten
