@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const { MUSIC_YEAR_SYSTEM_PROMPT } = require("./prompts");
 
 // Test-RTDB (NOTESTREAM): inte live
 admin.initializeApp({
@@ -269,18 +270,15 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
   if (!title || !artist) {
     throw new functions.https.HttpsError("invalid-argument", "Title and artist are required.");
   }
-  
-  // Try to get API key from environment variable (v2/secrets) or config (v1)
+
   const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
-  
   if (!apiKey) {
     functions.logger.error("OpenAI API key is missing in Firebase environment!");
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
   }
-  
-  const systemPrompt = "Du är en strikt musikhistoriker. Ditt enda jobb är att identifiera det absolut första året en specifik låt gavs ut offentligt på singel eller studioalbum. Du MÅSTE ignorera nyutgåvor, remasters, live-versioner och samlingsalbum (Greatest Hits). Svara alltid med det äldsta kända årtalet för originalinspelningen. VIKTIGT UNDANTAG: Om artistnamnet indikerar en cover, eller ett modernt samarbete/DJ-remix av en gammal låt (t.ex. Kygo, Whitney Houston - Higher Love), så MÅSTE du svara med årtalet för just den specifika remixen/versionen, INTE originalets årtal.";
-  const userPrompt = `Analysera kortfattat låten '${title}' av artisten '${artist}'. Identifiera när den spelades in, om det är en cover/remix, och när den släpptes första gången. Avsluta sedan ditt svar med exakt: 'ÅR: 19XX' (där 19XX är det fyrsiffriga årtalet). Om du är osäker, svara UNKNOWN.`;
-  
+
+  const userPrompt = `Analysera låten '${title}' av artisten '${artist}' och returnera ett JSON-objekt med nyckeln 'year' (heltal) eller null om du är osäker. Exempel: {"year": 1983} eller {"year": null}.`;
+
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -291,40 +289,34 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
       body: JSON.stringify({
         model: "gpt-5.5",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: MUSIC_YEAR_SYSTEM_PROMPT },
           { role: "user", content: userPrompt }
         ],
-        // max_completion_tokens är borttagen för att undvika begränsningar
+        response_format: { type: "json_object" }
       })
     });
-    
+
     if (!response.ok) {
       const errText = await response.text();
       functions.logger.error("OpenAI API error:", response.status, errText);
       throw new functions.https.HttpsError("internal", `OpenAI API Error ${response.status}: ${errText}`);
     }
-    
-    const aiData = await response.json();
-    const aiText = aiData.choices?.[0]?.message?.content?.trim() || "";
-    
-    // Extract a 4 digit year from the final answer "ÅR: 19XX"
-    let aiYearMatch = aiText.match(/ÅR:\s*(19\d{2}|20\d{2})/i);
-    
-    // Fallback: get the LAST 4-digit number in the text if "ÅR:" is missing
-    if (!aiYearMatch) {
-      const allYears = aiText.match(/\b(19\d{2}|20\d{2})\b/g);
-      if (allYears && allYears.length > 0) {
-        aiYearMatch = [null, allYears[allYears.length - 1]];
-      }
-    }
 
-    if (aiYearMatch && aiYearMatch[1]) {
-      const aiYear = parseInt(aiYearMatch[1], 10);
-      return { year: aiYear };
-    } else {
-      functions.logger.warn(`OpenAI could not determine a valid year. Response: ${aiText}`);
+    const aiData = await response.json();
+    const aiText = aiData.choices?.[0]?.message?.content?.trim() || "{}";
+    functions.logger.info(`[getSongYearAi] Svar för '${title}' av '${artist}': ${aiText}`);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(aiText);
+    } catch (e) {
+      functions.logger.warn(`[getSongYearAi] Kunde inte parsa JSON: ${aiText}`);
       return { year: null };
     }
+
+    const year = parsed.year ? parseInt(parsed.year, 10) : null;
+    return { year: isNaN(year) ? null : year };
+
   } catch (error) {
     functions.logger.error("Error during OpenAI fetch:", error);
     throw new functions.https.HttpsError("internal", "An error occurred while estimating the year.");
@@ -347,7 +339,7 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
   }
   
-  const systemPrompt = "Du är en musikdatabasexpert med djup kunskap om musikhistoria. Ditt enda jobb är att för varje given kombination av ARTIST + TITEL identifiera vilket år låten gavs ut första gången på singel eller studioalbum av just den angivna artisten.\n\nREGLER – följ dessa i ordning:\n\n1. ARTIST ÄR FACIT. Titeln ensam räcker inte. Använd alltid ARTIST + TITEL tillsammans för att identifiera rätt låt. Förväxla aldrig en version gjord av en annan artist som råkar ha samma titel.\n\n2. ARTISTFORMAT. Artister kan listas med kommatecken (t.ex. \"Kygo, Whitney Houston\" eller \"Teddybears, Desmond Forster\"). Det betyder samarbete/feature. Sök primärt på den FÖRSTA artisten. Om det inte ger ett tydligt svar, använd hela artist-strängen för att hitta rätt version.\n\n3. COVERS OCH REMIXES. Om den angivna artisten har gjort en cover eller remix av en äldre låt, returnera årtalet då JUST DENNA ARTIST gav ut sin version – inte originalartistens år.\n\n4. TITELTILLÄGG. Om titeln innehåller fraser som \"- Remaster\", \"(Live)\", \"(Radio Edit)\", \"(Single Version)\", \"(Acoustic)\", \"(Deluxe)\", eller ett årtal i parentes/bindestreck – ignorera dessa tillägg och hitta originalinspelningens år istället.\n\n5. IGNORERA. Räkna aldrig nyutgåvor, remasters, live-versioner eller samlingsalbum som utgivningsår. Hitta det ursprungliga singel- eller studioalbumsläppet.\n\n6. DEBUT-BIAS. Förväxla aldrig när en artist grundades, debuterade eller fick sitt genombrott med när en specifik låt släpptes. Varje låt har sitt eget utgivningsår.\n\n7. BATCH-ISOLERING. Behandla varje låt helt separat och oberoende. Låt inte din bedömning av en låt påverka en annan i samma lista.\n\n8. UNKNOWN-TRÖSKEL. Du måste ha konkret, specifik kunskap om just denna artist + låt-kombination för att returnera ett år. Om du är ens lite osäker – returnera null. Ett null-svar är alltid bättre än ett felaktigt år.\n\nSVARSFORMAT: Svara ENBART med ett giltigt JSON-objekt med nyckeln 'songs' som innehåller en array. Exempel: {\"songs\": [{\"id\": \"ID_HäR\", \"year\": 1975}, {\"id\": \"ANNAT_ID\", \"year\": null}]}. Du MÅSTE inkludera ALLA låtar du fick i svaret, inte bara några.";
+  const systemPrompt = MUSIC_YEAR_SYSTEM_PROMPT;
   
   const userPrompt = `Analysera ALLA följande ${songs.length} låtar och returnera ett JSON-objekt med nyckeln 'songs' som innehåller en array med ${songs.length} objekt (ett per låt):\n` + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
   
