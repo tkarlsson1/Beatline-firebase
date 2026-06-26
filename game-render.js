@@ -812,9 +812,7 @@ function renderGameOverModal() {
         <h1 style="font-size: 3rem; color: #ff00ff; margin-bottom: 10px;">🏆 SPEL AVSLUTAT 🏆</h1>
         <h2 style="font-size: 2rem; margin-bottom: 20px;">Vinnare: <span style="color: #00ffff;">${escapeHtml(winnerName)}</span></h2>
         
-        <p style="font-size: 1.2rem; color: #aaa; margin-bottom: 30px;">
-          Tack för att ni spelade Notestream!
-        </p>
+
   `;
   
   if (isHost) {
