@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.062</title>
+    <title>Notestream Admin v0.063</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1660,7 +1660,12 @@
                                 const tId = e.target.getAttribute("data-id");
                                 await set(ref(db, `reportedTracks/${tId}`), null);
                                 await set(ref(db, `flaggedTracks/${tId}`), null);
-                                loadReportedTracks();
+                                e.target.closest("tr").remove();
+                                // Visa tom-meddelande om inga rader kvar
+                                const tbody = document.getElementById("reportsTableBody");
+                                if (!tbody.querySelector("tr")) {
+                                    tbody.innerHTML = "<tr><td colspan='5' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
+                                }
                             }
                         });
                     });
@@ -1753,10 +1758,14 @@
                                 }
                             }
 
-                            // 3. Ta bort rapporten och flaggan
+                            // 3. Ta bort rapporten och flaggan från Firebase + raden ur DOM
                             await set(ref(db, `reportedTracks/${trackId}`), null);
                             await set(ref(db, `flaggedTracks/${trackId}`), null);
-                            loadReportedTracks();
+                            trElement.remove();
+                            const tbody = document.getElementById("reportsTableBody");
+                            if (!tbody.querySelector("tr")) {
+                                tbody.innerHTML = "<tr><td colspan='5' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
+                            }
                         } catch (err) {
                             console.error("Fel vid sparande:", err);
                             alert("Fel: " + err.message);
@@ -1778,6 +1787,32 @@
             }
 
             document.getElementById("refreshReportsBtn").addEventListener("click", loadReportedTracks);
+
+            document.getElementById("scanAllReportsBtn").addEventListener("click", async () => {
+                const rows = document.querySelectorAll("#reportsTableBody tr");
+                const toScan = [];
+                rows.forEach(tr => {
+                    const btn = tr.querySelector(".scan-report-btn");
+                    if (btn) toScan.push(tr); // Bara oskannade rader har scan-knappen
+                });
+                if (toScan.length === 0) return;
+                const scanAllBtn = document.getElementById("scanAllReportsBtn");
+                scanAllBtn.disabled = true;
+                scanAllBtn.textContent = `Skannar 0/${toScan.length}...`;
+                for (let i = 0; i < toScan.length; i++) {
+                    const tr = toScan[i];
+                    const btn = tr.querySelector(".scan-report-btn");
+                    if (!btn) continue; // Redan skannad
+                    const trackId = btn.getAttribute("data-id");
+                    const title   = btn.getAttribute("data-title");
+                    const artist  = btn.getAttribute("data-artist");
+                    const oldYear = btn.getAttribute("data-year");
+                    await scanSingleReport(trackId, title, artist, oldYear, tr);
+                    scanAllBtn.textContent = `Skannar ${i + 1}/${toScan.length}...`;
+                }
+                scanAllBtn.disabled = false;
+                scanAllBtn.innerHTML = "⚡ Skanna alla med AI";
+            });
             
             // Ladda rapporter vid inloggning
             onAuthStateChanged(auth, (user) => {
@@ -1977,7 +2012,10 @@
                 <div id="reportsContainer" class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h3 style="color: #ef4444; margin: 0;">Spelarnas Rapporter 🚩</h3>
-                        <button id="refreshReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="scanAllReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px; background: #7c3aed;">⚡ Skanna alla med AI</button>
+                            <button id="refreshReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
+                        </div>
                     </div>
                     <p style="color: var(--text-muted); margin-bottom: 20px;">Låtar som spelarna har rapporterat inifrån spelet som felaktiga årtal.</p>
                     <div style="overflow-x: auto;">
