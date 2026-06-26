@@ -119,9 +119,16 @@ function initializeGame() {
     
     console.log('[Game] Game data loaded:', gameData);
     
-    // Check if game is in playing status
+    // Check if game is finished (truly over)
+    if (gameData.status === 'finished' || gameData.status === 'ended') {
+      showError('Spelet är avslutat');
+      return;
+    }
+    
+    // Game not started yet – keep spinner and wait for next update
     if (gameData.status !== 'playing') {
-      showError('Spelet har inte startat eller är avslutat');
+      document.getElementById('loadingState').style.display = 'block';
+      document.getElementById('loadingState').querySelector('p').textContent = 'Väntar på att spelet startar...';
       return;
     }
     
