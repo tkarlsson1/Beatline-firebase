@@ -57,6 +57,8 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     
     const data = await response.json();
     data.items.forEach(item => {
+      // Bug #6: Skip null tracks (local files, deleted songs)
+      if (!item.track || !item.track.id) return;
       const trackId = item.track.id;
       tracks[trackId] = {
         title: item.track.name,
@@ -248,9 +250,13 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       if (progressBar) progressBar.style.width = '100%';
     }
     
-    // 3. Spara spellistan till användarens konto
+    // Bug #7: Sanitera förbjudna Firebase-tecken i spellistenamnet
+    const safePlaylistName = playlistName.replace(/[.#$\[\]/]/g, '_');
+    if (safePlaylistName !== playlistName) {
+      console.warn(`Spellistenamn sanererat: "${playlistName}" → "${safePlaylistName}"`);
+    }
     const userId = window.auth.currentUser.uid;
-    const userPlaylistsRef = window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}`);
+    const userPlaylistsRef = window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${safePlaylistName}`);
     await window.firebaseSet(userPlaylistsRef, { songs: tracks });
     
     if (addBtn) {

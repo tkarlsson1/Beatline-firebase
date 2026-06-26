@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.060</title>
+    <title>Notestream Admin v0.061</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -848,7 +848,12 @@
             });
 
             document.getElementById("addStandardPlaylistButton").addEventListener("click", async () => {
-                const playlistName = document.getElementById("standardPlaylistName").value.trim();
+                const rawPlaylistName = document.getElementById("standardPlaylistName").value.trim();
+                // Bug #7: Sanitera förbjudna Firebase-tecken (.#$[]/)
+                const playlistName = rawPlaylistName.replace(/[.#$\[\]/]/g, '_');
+                if (playlistName !== rawPlaylistName) {
+                    console.warn(`Spellistenamn sanererat: "${rawPlaylistName}" → "${playlistName}"`);
+                }
                 const playlistLink = document.getElementById("standardPlaylistLink").value.trim();
                 if (!playlistName || !playlistLink) {
                     alert("Fyll i både spellistans namn och länk!");
@@ -1123,6 +1128,8 @@
                     });
                     const data = await response.json();
                     data.items.forEach(item => {
+                        // Bug #6: Skip null tracks (local files, deleted songs)
+                        if (!item.track || !item.track.id) return;
                         const trackId = item.track.id;
                         tracks[trackId] = {
                             title: item.track.name,
