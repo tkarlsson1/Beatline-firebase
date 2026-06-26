@@ -201,4 +201,76 @@ function continuePlaying() {
     });
 }
 
+// Restart game – keep songs deck, continue from where we left off
+function restartGame() {
+  console.log('[Host] Restarting game');
+
+  if (!isHost) {
+    console.warn('[Host] Not host, cannot restart');
+    return;
+  }
+
+  const songs = currentGameData.songs || [];
+  const teamIds = Object.keys(currentTeams);
+  const numTeams = teamIds.length;
+
+  // New start: one past the last played song
+  const newStartIndex = (currentGameData.currentSongIndex || 0) + 1;
+
+  // Each team gets the next sequential song as their starting card
+  const firstGameplayIndex = newStartIndex + numTeams;
+
+  if (firstGameplayIndex >= songs.length) {
+    showNotification('Inga fler låtar kvar i leken för en omstart!', 'error');
+    return;
+  }
+
+  // Pick a new random starting team
+  const newStartingTeamId = teamIds[Math.floor(Math.random() * numTeams)];
+
+  const updates = {};
+
+  // Reset game state
+  updates[`games/${gameId}/status`] = 'playing';
+  updates[`games/${gameId}/winner`] = null;
+  updates[`games/${gameId}/phase`] = null;
+  updates[`games/${gameId}/currentRound`] = 1;
+  updates[`games/${gameId}/currentTeam`] = newStartingTeamId;
+  updates[`games/${gameId}/startingTeam`] = newStartingTeamId;
+  updates[`games/${gameId}/currentSongIndex`] = firstGameplayIndex;
+  updates[`games/${gameId}/currentSong`] = songs[firstGameplayIndex];
+  updates[`games/${gameId}/challengeState`] = null;
+  updates[`games/${gameId}/timerState`] = null;
+  updates[`games/${gameId}/timerStartTime`] = null;
+  updates[`games/${gameId}/timerDuration`] = null;
+  updates[`games/${gameId}/settings/gameOverDisabled`] = false;
+
+  // Reset each team: new starting card + clear score and pending
+  teamIds.forEach((tId, i) => {
+    const startingCard = songs[newStartIndex + i];
+    updates[`games/${gameId}/teams/${tId}/score`] = 0;
+    updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
+    updates[`games/${gameId}/teams/${tId}/timeline`] = {
+      0: {
+        spotifyId: startingCard.spotifyId,
+        title: startingCard.title,
+        artist: startingCard.artist,
+        year: startingCard.year,
+        position: 0,
+        revealed: true
+      }
+    };
+  });
+
+  window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
+    .then(() => {
+      console.log('[Host] Game restarted from song index', firstGameplayIndex);
+      startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, newStartingTeamId);
+    })
+    .catch((error) => {
+      console.error('[Host] Error restarting game:', error);
+      showNotification('Kunde inte starta om spelet', 'error');
+    });
+}
+
 console.log('[Game] Host module loaded');

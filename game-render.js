@@ -817,13 +817,27 @@ function renderGameOverModal() {
   
   if (isHost) {
     modalHTML += `
-      <div class="validation-modal-buttons" style="justify-content: center;">
+      <div class="validation-modal-buttons" style="justify-content: center; flex-direction: column; gap: 12px; align-items: center;">
         <button 
           class="validation-modal-btn token" 
           onclick="continuePlaying()"
           style="width: 100%; max-width: 300px;"
         >
           🎮 FORTSÄTT SPELA
+        </button>
+        <button 
+          class="validation-modal-btn" 
+          onclick="restartGame()"
+          style="width: 100%; max-width: 300px; background: #1a1a2e; border: 2px solid #00ffff; color: #00ffff;"
+        >
+          🔄 STARTA OM (samma inställningar)
+        </button>
+        <button 
+          class="validation-modal-btn" 
+          onclick="window.location.href='/'"
+          style="width: 100%; max-width: 300px; background: #1a1a2e; border: 2px solid #666; color: #aaa;"
+        >
+          🏠 ÅTERGÅ TILL STARTSIDA
         </button>
       </div>
     `;
@@ -832,6 +846,12 @@ function renderGameOverModal() {
       <p style="color: #666; font-style: italic;">
         Väntar på att host ska välja nästa steg...
       </p>
+      <button 
+        onclick="window.location.href='/'"
+        style="margin-top: 16px; background: transparent; border: 1px solid #444; color: #666; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;"
+      >
+        🏠 Lämna spelet
+      </button>
     `;
   }
   
