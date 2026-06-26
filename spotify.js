@@ -36,12 +36,29 @@ async function getBackendSpotifyToken() {
 
 async function fetchSpotifyPlaylist(playlistUrl) {
   console.log("fetchSpotifyPlaylist: Playlist URL mottagen:", playlistUrl);
-  let playlistId = playlistUrl.trim();
+  let input = playlistUrl.trim();
+
+  // Bug #9: Detektera fel URL-typ innan API-anrop
+  if (input.includes("/album/") || input.includes("spotify:album:")) {
+    throw new Error("Det där är en albumlänk, inte en spellista.\n\nGå till en Spotify-spellista, kopiera dess länk och försök igen.");
+  }
+  if (input.includes("/track/") || input.includes("spotify:track:")) {
+    throw new Error("Det där är en låtlänk, inte en spellista.\n\nGå till en Spotify-spellista, kopiera dess länk och försök igen.");
+  }
+
+  let playlistId = input;
   if (playlistId.includes("/playlist/")) {
       playlistId = playlistId.split("/playlist/")[1].split("?")[0];
   } else if (playlistId.includes("spotify:playlist:")) {
       playlistId = playlistId.split("spotify:playlist:")[1].split("?")[0];
   }
+
+  // Spotify-genererade listor (Discover Weekly, Daily Mix, Release Radar etc.)
+  // har alltid ID som börjar med 37i9dQ
+  if (playlistId.startsWith("37i9dQ")) {
+    throw new Error("Det här är en personlig spellista genererad av Spotify (t.ex. Discover Weekly, Daily Mix eller Release Radar).\n\nSådana listor är privata och kan inte importeras. Skapa en egen spellista i Spotify, lägg till låtarna och importera den istället.");
+  }
+
   console.log("fetchSpotifyPlaylist: Extraherat playlist-ID:", playlistId);
   const token = await getBackendSpotifyToken();
   let tracks = {};
@@ -52,7 +69,10 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     });
     
     if (!response.ok) {
-      throw new Error(`Spotify svarade med ett fel (Status: ${response.status}). Kontrollera att spellistan är offentlig (publik) och inte en personlig "Mix" skapad av Spotify.`);
+      if (response.status === 403 || response.status === 404) {
+        throw new Error("Spellistan är privat eller finns inte.\n\nSe till att spellistan är publik i Spotify: öppna spellistan → klicka de tre prickarna (···) → Dela → markera 'Offentlig'.");
+      }
+      throw new Error(`Spotify svarade med ett oväntat fel (Status: ${response.status}). Kontrollera att länken är korrekt och försök igen.`);
     }
     
     const data = await response.json();
