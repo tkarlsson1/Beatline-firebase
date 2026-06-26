@@ -3,7 +3,7 @@
   "short_name": "NStream",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#0a0a0a",
   "theme_color": "#000000",
   "id": "/",
   "description": "En progressiv webbapp för hantering av innehåll.",

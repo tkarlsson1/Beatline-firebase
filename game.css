@@ -2,6 +2,12 @@
    NOTESTREAM - GAME STYLES
    ============================================ */
 
+/* Svart html-rot – Android navigation bar hämtar färg härifrån i landscape */
+html {
+  background-color: #0a0a0a;
+  color-scheme: dark;
+}
+
 /* Game container - allow scrolling for testing */
 body {
   margin: 0;
