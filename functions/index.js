@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const { MUSIC_YEAR_SYSTEM_PROMPT } = require("./prompts");
+const { MUSIC_YEAR_SINGLE_PROMPT, MUSIC_YEAR_BATCH_PROMPT } = require("./prompts");
 
 // Test-RTDB (NOTESTREAM): inte live
 admin.initializeApp({
@@ -289,7 +289,7 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
       body: JSON.stringify({
         model: "gpt-5.5",
         messages: [
-          { role: "system", content: MUSIC_YEAR_SYSTEM_PROMPT },
+          { role: "system", content: MUSIC_YEAR_SINGLE_PROMPT },
           { role: "user", content: userPrompt }
         ],
         response_format: { type: "json_object" }
@@ -339,7 +339,7 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
   }
   
-  const systemPrompt = MUSIC_YEAR_SYSTEM_PROMPT;
+  const systemPrompt = MUSIC_YEAR_BATCH_PROMPT;
   
   const userPrompt = `Analysera ALLA följande ${songs.length} låtar och returnera ett JSON-objekt med nyckeln 'songs' som innehåller en array med ${songs.length} objekt (ett per låt):\n` + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
   
