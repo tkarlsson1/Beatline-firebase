@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.059</title>
+    <title>Notestream Admin v0.060</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -406,10 +406,10 @@
                             }
                         }
                         const totalSongs = uniqueSongs.size;
-                        document.getElementById("statTotalSongs").textContent = `(${totalSongs} unika låtar totalt)`;
+                        document.getElementById("statTotalSongs").textContent = totalSongs;
                     } else {
                         document.getElementById("statPlaylists").textContent = 0;
-                        document.getElementById("statTotalSongs").textContent = `(0 låtar totalt)`;
+                        document.getElementById("statTotalSongs").textContent = 0;
                     }
                 });
                 get(ref(db, 'users')).then(snap => {
@@ -1786,9 +1786,12 @@
             <div id="tab-dashboard" class="tab-content active">
                 <div class="stat-grid">
                     <div class="stat-card">
+                        <h3 id="statTotalSongs">...</h3>
+                        <p>Låtar i standardlistor</p>
+                    </div>
+                    <div class="stat-card">
                         <h3 id="statVerified">...</h3>
-                        <p>Verifierade Låtar</p>
-                        <p id="statTotalSongs" style="font-size: 0.85rem; color: var(--text-muted); text-transform: none; margin-top: 5px; font-weight: normal; letter-spacing: normal;">(... låtar totalt)</p>
+                        <p>I årtalsverifieringscachen</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="statPlaylists">...</h3>
