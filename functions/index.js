@@ -264,7 +264,7 @@ exports.cleanupOldGames = functions.region("europe-west1").pubsub
  * Uses OpenAI to estimate the release year of a song.
  * data: { title: string, artist: string }
  */
-exports.getSongYearAi = functions.region("europe-west1").https.onCall(async (data, context) => {
+exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSeconds: 120, memory: "256MB" }).https.onCall(async (data, context) => {
   const { title, artist } = data || {};
   if (!title || !artist) {
     throw new functions.https.HttpsError("invalid-argument", "Title and artist are required.");
