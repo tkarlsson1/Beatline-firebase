@@ -248,7 +248,7 @@ function restartGame() {
   // Reset each team: new starting card + clear score and pending
   teamIds.forEach((tId, i) => {
     const startingCard = songs[newStartIndex + i];
-    updates[`games/${gameId}/teams/${tId}/score`] = 0;
+    updates[`games/${gameId}/teams/${tId}/score`] = 1;
     updates[`games/${gameId}/teams/${tId}/pendingCard`] = null;
     updates[`games/${gameId}/teams/${tId}/timeline`] = {
       0: {
