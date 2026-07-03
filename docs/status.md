@@ -3,12 +3,13 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.833 |
-| admin.html | 0.062 |
+| index.html (spelet) | 0.834 |
+| admin.html | 0.063 |
 | spotify.js | 0.807 |
-| service-worker | v38 |
+| service-worker | v39 |
 | Firebase Functions Node runtime | 20 (1st Gen) |
 | AI-modell | gpt-5.5 |
+| functions/prompts.js | Delad prompt, v1 |
 
 ---
 
@@ -29,6 +30,12 @@
 | 2026-06-26 | Bugg #6 – null-track guard: Spotify-listor med lokala/borttagna låtar kraschar inte | 0.832 |
 | 2026-06-26 | Bugg #7 – Firebase-tecken (.#$[]) i spellistenamn saneras automatiskt till _ | 0.832 |
 | 2026-06-26 | Bugg #9 – separata felmeddelanden: albumlänk, låtlänk, Spotify-genererad lista, privat lista | 0.833 |
+| 2026-06-26 | Android vit navigation bar – manifest background_color + color-scheme: dark + html background | 0.834 |
+| 2026-06-26 | getSongYearAi – lade till runWith 120s timeout (fixar CORS/503 vid cold start) | Functions |
+| 2026-06-26 | Extraherade delad prompt till functions/prompts.js – regel 6 (samlingsalbum-spärr) tillagd | Functions |
+| 2026-06-26 | getSongYearAi – uppgraderad till JSON-format + delade prompt (samma standard som batch) | Functions |
+| 2026-06-26 | prompts.js – separata SINGLE/BATCH-prompts: batch-isolering och format-instruktioner rätt placerade | Functions |
+| 2026-06-26 | Admin – "Skanna alla med AI"-knapp + godkännande/radering tar bort rad utan att ladda om listan | 0.063 |
 
 ---
 
@@ -38,7 +45,7 @@
 | # | Problem | Deadline |
 |---|---|---|
 | 1 | **Node.js 20 deprecated** – uppgradera till 22 | 30 okt 2026 |
-| 2 | **firebase-functions SDK 4.6.0** – uppgradera till >=5.1.0 | Samma |
+| 2 | **firebase-functions SDK 4.9.0** – uppgradera till >=5.1.0 | Samma |
 | 3 | **functions.config() deprecated** – migrera till params-paketet | Mars 2027 |
 
 ### Buggar
@@ -73,3 +80,18 @@
 | J | Höj auto-accept-gränsen till ±2 år (8-regelspromten är pålitligare) |
 | K | Rensa `listor/`-katalogen – dead code från gamla verktyg |
 | L | Deduplera `verifiedTracks` mot `standardLists` |
+
+---
+
+## Prompt-arkitektur (functions/prompts.js)
+
+```
+BASE_RULES  (regler 1–8, gemensamma)
+     │
+     ├── + format {"year": ...}         →  MUSIC_YEAR_SINGLE_PROMPT  (getSongYearAi)
+     │
+     └── + regel 9 (batch-isolering)
+         + format {"songs": [...]}      →  MUSIC_YEAR_BATCH_PROMPT   (getSongYearsAiBatch)
+```
+
+Uppdatera ENBART `functions/prompts.js` – deploya sedan berörda funktioner.
