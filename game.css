@@ -338,6 +338,12 @@ body {
   touch-action: none;  /* Blockera scroll för kortet som ska flyttas */
 }
 
+/* Active team's own placed card waiting for validation (not draggable) */
+.card.own-unrevealed-card {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
 .card.dragging {
   opacity: 0.5;
   transform: rotate(5deg);

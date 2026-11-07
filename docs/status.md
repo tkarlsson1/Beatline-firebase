@@ -3,10 +3,12 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.834 |
-| admin.html | 0.063 |
+| index.html (spelet) | 0.835 |
+| admin.html | 0.064 |
 | spotify.js | 0.807 |
-| service-worker | v39 |
+| game-cards.js / game-render.js (game.html) | 0.835 |
+| game.css | v49 |
+| service-worker | v40 |
 | Firebase Functions Node runtime | 20 (1st Gen) |
 | AI-modell | gpt-5.5 |
 | functions/prompts.js | Delad prompt, v1 |
@@ -36,6 +38,10 @@
 | 2026-06-26 | getSongYearAi – uppgraderad till JSON-format + delade prompt (samma standard som batch) | Functions |
 | 2026-06-26 | prompts.js – separata SINGLE/BATCH-prompts: batch-isolering och format-instruktioner rätt placerade | Functions |
 | 2026-06-26 | Admin – "Skanna alla med AI"-knapp + godkännande/radering tar bort rad utan att ladda om listan | 0.063 |
+| 2026-11-07 | Utmaning – utmanarens kort visades ett steg fel på aktiva lagets skärm (aktiva lagets dolda kort räknades inte där) | 0.835 |
+| 2026-11-07 | Utmaning – utlagt men olåst utmanarkort räknas när Timer 3 går ut (gav tidigare "placerade inget kort") | 0.835 |
+| 2026-11-07 | Flytt av kort med touch rensar inte längre kortet i Firebase när draget börjar (kortet försvann under draget och layouten flyttade sig) | 0.835 |
+| 2026-11-07 | Utmanarens kort går inte längre att dra från aktiva lagets enhet; LÅS SVAR utan kort skriver inget | 0.835 |
 
 ---
 
@@ -56,6 +62,8 @@
 | 10 | Ingen validering på år-input i review-modalen – kan spara "abc" till cachen | Medel | Öppen |
 | 11 | Ingen överskrivningsvarning – lista med befintligt namn skrivs över utan fråga | Låg | Öppen |
 | 12 | Spotify-token kan gå ut vid import >60 min → 401-fel utan retry | Låg | Öppen |
+| 13 | Paus under Timer 2/3 – "Fortsätt" startar alltid Timer 1, `challengeState` ligger kvar → aktiva laget kan lägga ett andra kort och spelet stannar vid nästa Timer 2 | Medel | Öppen |
+| 14 | Dubbelvalidering av utmaning om hostens klocka går >~1 s före utmanarens – hostens backup validerar samtidigt, andra körningen byter lag/låt en extra gång och `isValidatingChallenge` fastnar | Låg | Öppen (ej verifierad) |
 
 ---
 

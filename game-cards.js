@@ -26,9 +26,8 @@ function handlePreviewDragStart(e) {
   draggedCard = e.target;
   e.target.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
-  
-  // Clear current placement position so we can set a new one
-  placementPosition = null;
+
+  // Keep placementPosition: the card stays at its saved position until a new drop is saved
 }
 
 function handleDragEnd(e) {
@@ -110,11 +109,13 @@ function handlePreviewTouchStart(e) {
   
   isDragging = true;
   draggedCard = e.currentTarget;
-  
-  // Clear pending card from Firebase when starting to drag
-  clearPendingCard();
-  placementPosition = null;
-  
+
+  // Do NOT clear the card in Firebase here. Clearing it removed the card from every
+  // screen during the drag (a challenge validated in that window saw no card) and
+  // shifted the timeline layout under the finger, so the drop could land one slot off.
+  // The card keeps its saved position until handleTouchEnd saves the new one,
+  // the same way mouse dragging works.
+
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -257,47 +258,6 @@ function savePendingCard(position) {
     })
     .catch((error) => {
       console.error('[Game] Error saving pending card:', error);
-    });
-}
-
-function clearPendingCard() {
-  console.log('[Game] Clearing pending card from Firebase');
-  
-  // Check if we're in challenge mode
-  if (currentGameData.timerState === 'challenge_placement' && 
-      currentGameData.challengeState &&
-      currentGameData.challengeState.challengingTeam === teamId) {
-    
-    console.log('[Game] Challenge mode: clearing challengeState.challengingCard');
-    
-    const challengingCardRef = window.firebaseRef(
-      window.firebaseDb, 
-      `games/${gameId}/challengeState/challengingCard`
-    );
-    
-    window.firebaseSet(challengingCardRef, null)
-      .then(() => {
-        console.log('[Game] Challenging card cleared');
-      })
-      .catch((error) => {
-        console.error('[Game] Error clearing challenging card:', error);
-      });
-    
-    return;
-  }
-  
-  // Normal mode: clear team's pendingCard
-  const pendingCardRef = window.firebaseRef(
-    window.firebaseDb, 
-    `games/${gameId}/teams/${teamId}/pendingCard`
-  );
-  
-  window.firebaseSet(pendingCardRef, null)
-    .then(() => {
-      console.log('[Game] Pending card cleared');
-    })
-    .catch((error) => {
-      console.error('[Game] Error clearing pending card:', error);
     });
 }
 
@@ -620,7 +580,14 @@ function lockInPlacement(targetTeamId = null) {
       currentGameData.challengeState.challengingTeam === teamId) {
     
     console.log('[Game] Challenge mode: locking challenging card and triggering validation');
-    
+
+    // Writing challengingCard/locked when no card exists would create a card without position
+    if (!isChallengingCardPlaced(currentGameData.challengeState.challengingCard)) {
+      showNotification('Placera kortet först!', 'error');
+      isLockingInPlacement = false;
+      return;
+    }
+
     const updates = {};
     
     // Lock the card
@@ -1017,6 +984,16 @@ function validateAndScoreCard(cardKey, card) {
 }
 
 // ============================================
+// HELPER: HAS CHALLENGING TEAM PLACED A CARD?
+// A card counts as placed as soon as it has a position in the timeline,
+// whether the challenger pressed LÅS SVAR or Timer 3 ran out
+// (same rule as Timer 1, which auto-locks a placed pending card).
+// ============================================
+function isChallengingCardPlaced(challengingCard) {
+  return !!challengingCard && typeof challengingCard.position === 'number';
+}
+
+// ============================================
 // VALIDATE CHALLENGE
 // Called when Timer 3 expires
 // ============================================
@@ -1118,8 +1095,8 @@ function validateChallenge() {
     
     // Check if challenging team placed a card
     const challengingCard = challengeState.challengingCard;
-    
-    if (challengingCard && challengingCard.locked) {
+
+    if (isChallengingCardPlaced(challengingCard)) {
       console.log('[Game] 🎯 Validating challenging team card...');
       console.log('[Game] Challenging card:', challengingCard.year, challengingCard.title, 'at position', challengingCard.position);
       
@@ -1249,7 +1226,7 @@ function validateChallenge() {
     result = 'active_correct';
   } else {
     const challengingCard = challengeState.challengingCard;
-    if (challengingCard && challengingCard.locked && challengingCorrect) {
+    if (isChallengingCardPlaced(challengingCard) && challengingCorrect) {
       // Challenging team was correct
       result = 'challenging_won';
     } else {

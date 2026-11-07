@@ -226,16 +226,19 @@ function renderTimeline() {
   
   // Just render cards, no drop zones (they appear dynamically during drag)
   timelineCards.forEach((card) => {
-    // Check if this is my preview card
+    // My own placed-but-unrevealed card (active team, waiting for validation)
     const isMyCard = (teamId === currentTeamId) && !card.revealed;
-    
+
     const cardDiv = document.createElement('div');
     cardDiv.className = 'card';
     cardDiv.dataset.position = card.position;
-    
-    // Add preview-card class if this is my card
+
+    // This is a real timeline card, so it must NOT get the preview-card class.
+    // Positions are counted against '.card:not(.preview-card)' on every device. Giving it
+    // preview-card only on the active team's device made that device count one card fewer,
+    // so the challenger's card was drawn one slot to the right there.
     if (isMyCard) {
-      cardDiv.classList.add('preview-card');
+      cardDiv.classList.add('own-unrevealed-card');
     }
     
     // Different border styles for revealed vs preview cards
@@ -266,7 +269,7 @@ function renderTimeline() {
   // (happens when dragging or after placing card but before revealing)
   const previewCard = displayTeam.pendingCard;
   if (previewCard && previewCard.position !== undefined) {
-    renderPreviewCard(previewCard, teamColorHex);
+    renderPreviewCard(previewCard, teamColorHex, currentTeamId);
   }
   
   // Check if we need to render a challenging card (during Timer 3)
@@ -284,7 +287,7 @@ function renderTimeline() {
       const challengingColorObj = TEAM_COLORS.find(c => c.name === challengingTeamColor);
       const challengingColorHex = challengingColorObj ? challengingColorObj.hex : '#0B939C';
       
-      renderPreviewCard(challengingCard, challengingColorHex);
+      renderPreviewCard(challengingCard, challengingColorHex, challengingTeamId);
     }
   }
   
@@ -324,17 +327,14 @@ function renderTimeline() {
   }
 }
 
-function renderPreviewCard(card, teamColorHex) {
+function renderPreviewCard(card, teamColorHex, ownerTeamId) {
   const container = document.getElementById('timeline');
   const position = card.position;
-  
-  // Check if this is my card:
-  // 1. Normal gameplay: I'm the active team
-  // 2. Challenge mode: I'm the challenging team
-  const isMyCard = (teamId === currentGameData.currentTeam) || 
-                   (currentGameData.timerState === 'challenge_placement' && 
-                    currentGameData.challengeState && 
-                    currentGameData.challengeState.challengingTeam === teamId);
+
+  // Only the team that owns this preview may move it:
+  // pendingCard belongs to the active team, challengingCard to the challenging team.
+  // (Previously the active team could also drag the challenger's card.)
+  const isMyCard = ownerTeamId === teamId;
   
   const previewCard = document.createElement('div');
   previewCard.className = 'card preview-card';
