@@ -99,6 +99,26 @@ if (typeof window !== 'undefined') {
 }
 
 // ============================================
+// FULLSCREEN (Android)
+// ============================================
+// Browsers only allow requestFullscreen from a user gesture, so a touch on the game page
+// enters fullscreen (hides the address bar and Android's status/navigation bars).
+// Every touch checks again, so fullscreen comes back if the player leaves it.
+// Touch only: a host using a mouse on a computer is not forced into fullscreen.
+// iPhone Safari has no requestFullscreen for normal elements, so nothing happens there.
+function enterFullscreenOnTouch() {
+  const root = document.documentElement;
+  if (document.fullscreenElement || typeof root.requestFullscreen !== 'function') {
+    return;
+  }
+  root.requestFullscreen({ navigationUI: 'hide' }).catch((error) => {
+    console.warn('[Game] Fullscreen request failed:', error);
+  });
+}
+
+document.addEventListener('touchend', enterFullscreenOnTouch, { passive: true });
+
+// ============================================
 // GAME INITIALIZATION
 // ============================================
 function initializeGame() {

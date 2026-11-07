@@ -3,12 +3,13 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.835 |
-| admin.html | 0.064 |
+| index.html (spelet) | 0.836 |
+| admin.html | 0.065 |
 | spotify.js | 0.807 |
 | game-cards.js / game-render.js (game.html) | 0.835 |
+| game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v40 |
+| service-worker | v41 |
 | Firebase Functions Node runtime | 20 (1st Gen) |
 | AI-modell | gpt-5.5 |
 | functions/prompts.js | Delad prompt, v1 |
@@ -42,6 +43,7 @@
 | 2026-11-07 | Utmaning – utlagt men olåst utmanarkort räknas när Timer 3 går ut (gav tidigare "placerade inget kort") | 0.835 |
 | 2026-11-07 | Flytt av kort med touch rensar inte längre kortet i Firebase när draget börjar (kortet försvann under draget och layouten flyttade sig) | 0.835 |
 | 2026-11-07 | Utmanarens kort går inte längre att dra från aktiva lagets enhet; LÅS SVAR utan kort skriver inget | 0.835 |
+| 2026-11-07 | Helskärm på Android – första touch på spelsidan begär helskärm (döljer adressfält + systemfält). Finns inte på iPhone | 0.836 |
 
 ---
 
