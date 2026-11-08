@@ -13,3 +13,6 @@ all_songs_review.json
 
 # GIMP-källfiler (stora, inget värde i repo)
 *.xcf
+
+# Lokala anteckningar som inte ska vara publika
+docs/sakerhet-lokal.md
