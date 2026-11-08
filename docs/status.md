@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.838 |
-| admin.html | 0.067 |
+| index.html (spelet) | 0.839 |
+| admin.html | 0.068 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v42 |
+| service-worker | v43 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | gpt-5.5 |
 | functions/prompts.js | Delad prompt, v1 |
@@ -50,6 +50,7 @@
 | 2026-11-08 | Escaping av data från databasen i admin (rapporter, användare), lobby (tokens, kicka-knapp) och spel (poäng, tokens, årtal, rapportknapp) | 0.837 / 0.066 |
 | 2026-11-08 | Functions: Node 22, inloggning krävs för AI-funktionerna och `getSpotifyToken`, max 500 låtar per batchanrop och max 300 tecken per titel/artist | Functions |
 | 2026-11-08 | Functions: oanvända `hostStart` borttagen ur koden och raderad i Firebase | 0.838 |
+| 2026-11-08 | Admin, rapporter: papperskorgen på en skannad rad raderar nu rapporten (laddade tidigare om hela listan, raderade inget och kastade alla skanningar). Skannade rader behåller kolumnen "Antal". "Skanna alla" hoppar över rader som raderats under skanningen | 0.068 |
 
 ---
 
