@@ -3,8 +3,8 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.837 |
-| admin.html | 0.066 |
+| index.html (spelet) | 0.838 |
+| admin.html | 0.067 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
@@ -49,6 +49,7 @@
 | 2026-11-08 | Databasregler: spel kan bara läsas/skrivas per spel-id (inte hela `games`), `flaggedTracks` bara admin, `reportedTracks` valideras och kan inte raderas av andra än admin | Regler |
 | 2026-11-08 | Escaping av data från databasen i admin (rapporter, användare), lobby (tokens, kicka-knapp) och spel (poäng, tokens, årtal, rapportknapp) | 0.837 / 0.066 |
 | 2026-11-08 | Functions: Node 22, inloggning krävs för AI-funktionerna och `getSpotifyToken`, max 500 låtar per batchanrop och max 300 tecken per titel/artist | Functions |
+| 2026-11-08 | Functions: oanvända `hostStart` borttagen ur koden och raderad i Firebase | 0.838 |
 
 ---
 
@@ -127,7 +128,7 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |
 | O | Hela spelnoden lyssnas på och hela vyn ritas om vid varje ändring. Valideringsrutan skapas om, så animationen spelas igen vid varje skrivning (ej verifierat) |
 | P | Stora bilder: `logga.png` på startsidan är 490 KB, `icon.png` 358 KB |
-| Q | Död kod och gammal text: `hostStart` i functions anropas aldrig, game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, admin-texten för "Städa databasen" nämner fortfarande iTunes |
+| Q | Död kod och gammal text: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, admin-texten för "Städa databasen" nämner fortfarande iTunes |
 
 ---
 
