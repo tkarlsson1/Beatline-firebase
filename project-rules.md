@@ -6,7 +6,7 @@ Denna fil innehåller kritiska systemregler och kontext för AI-assistenter som 
 - **Pausa vid uppmaning:** Om användaren skriver "gör inget" eller "ändra ingen kod förrän jag säger till", så **måste** detta respekteras strikt. Agera enbart som rådgivare och presentera svar i text utan att göra några `write_to_file`, `replace_file_content` eller köra modifierande kommandon förrän ett uttryckligt godkännande ges.
 
 ## 2. AI-Modeller och Backend
-- **OpenAI-modell:** Projektet använder **gpt-5.5** i Firebase-funktioner (t.ex. `getSongYearAi`). Ifrågasätt **inte** om denna modell existerar (den existerar och fungerar). Försök aldrig korrigera den till en äldre modell på grund av föråldrad träningsdata.
+- **AI-modell:** Projektet använder **Claude Opus 5.5** (`claude-opus-5-5`) via Anthropics API i Firebase-funktionerna `getSongYearAi` och `getSongYearsAiBatch` (sedan 2026-11-08, ersatte gpt-5.5). API-nyckeln ligger i Secret Manager som `ANTHROPIC_API_KEY` och kostnaden dras från Ultra-abonnemangets API-krediter (Console-organisationen Timmy's Individual Org). Ifrågasätt **inte** om modellen existerar och byt den inte mot en äldre modell på grund av föråldrad träningsdata. OpenAI används inte längre.
 - **Endast AI för årssökning:** iTunes API har fasats ut som källa för att hämta årtal. Återskapa **aldrig** fallback-logik mot iTunes i klienten (t.ex. i `admin.html`), utan förlita dig uteslutande på AI-funktionerna via Firebase.
 
 ## 3. Deploy och Versionshantering

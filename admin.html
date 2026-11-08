@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.068</title>
+    <title>Notestream Admin v0.069</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1297,7 +1297,7 @@
                         const totalBatches = Math.ceil(tasksToAi.length / BATCH_SIZE);
                         
                         statusEl.innerHTML = `Validerar batch ${batchNum} av ${totalBatches} (Totalt ${completedTasks} / ${tasksToAi.length} låtar)...`;
-                        logToUI(`\n[BATCH ${batchNum}/${totalBatches}] Skickar ${batch.length} låtar till OpenAI...`);
+                        logToUI(`\n[BATCH ${batchNum}/${totalBatches}] Skickar ${batch.length} låtar till Claude...`);
                         
                         const payload = batch.map(t => ({
                             id: t.trackId,
@@ -1724,7 +1724,7 @@
                     let newYear = oldYear;
                     let source = "";
 
-                    // Endast GPT
+                    // Endast AI (Claude via getSongYearAi)
                     btn.innerHTML = "Frågar AI...";
                     const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
                     const aiResult = await getSongYearAi({ title, artist });

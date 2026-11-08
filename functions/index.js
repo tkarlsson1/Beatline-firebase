@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const Anthropic = require("@anthropic-ai/sdk");
 const { MUSIC_YEAR_SINGLE_PROMPT, MUSIC_YEAR_BATCH_PROMPT } = require("./prompts");
 
 // Test-RTDB (NOTESTREAM): inte live
@@ -29,6 +30,106 @@ function isText(value, maxLength, allowEmpty) {
   if (typeof value !== "string" && typeof value !== "number") return false;
   const length = String(value).length;
   return length <= maxLength && (allowEmpty || length > 0);
+}
+
+// ─── Claude (Anthropic) ──────────────────────────────────────────────────────
+
+// All year lookups use Claude Opus 5.5. The API key is a Secret Manager secret that each AI
+// function binds with runWith({ secrets: [...] }), so only those functions can read it.
+const AI_MODEL = "claude-opus-5-5";
+const AI_SECRET = "ANTHROPIC_API_KEY";
+// Opus 5.5 always thinks; effort controls how much. medium is the model's default, set explicitly
+// so a changed default cannot change cost or behaviour unnoticed.
+const AI_EFFORT = "medium";
+
+// JSON schemas for structured output: the API only returns JSON that matches them, so the
+// answers no longer have to be searched for a year or an array.
+const NULLABLE_YEAR = { anyOf: [{ type: "integer" }, { type: "null" }] };
+const SINGLE_YEAR_SCHEMA = {
+  type: "object",
+  properties: { year: NULLABLE_YEAR },
+  required: ["year"],
+  additionalProperties: false
+};
+const BATCH_YEARS_SCHEMA = {
+  type: "object",
+  properties: {
+    songs: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { id: { type: "string" }, year: NULLABLE_YEAR },
+        required: ["id", "year"],
+        additionalProperties: false
+      }
+    }
+  },
+  required: ["songs"],
+  additionalProperties: false
+};
+
+function createAnthropicClient(timeoutMs) {
+  const apiKey = process.env[AI_SECRET];
+  if (!apiKey) {
+    functions.logger.error(`${AI_SECRET} is not available to this function.`);
+    throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
+  }
+  // One retry, with a timeout that lets both attempts finish before the function's own timeout
+  return new Anthropic({ apiKey, timeout: timeoutMs, maxRetries: 1 });
+}
+
+// Asks Claude once and returns the parsed JSON object, or null when there is no usable answer
+// (Claude declined, or the answer was cut off). The caller then treats the song(s) as unknown.
+async function askClaudeForJson(client, systemPrompt, userPrompt, schema, logLabel) {
+  const response = await client.beta.messages.create({
+    model: AI_MODEL,
+    max_tokens: 16000,
+    // If a safety classifier declines, the API re-runs the request on the fallback model
+    // Anthropic recommends for that category instead of returning the refusal
+    betas: ["server-side-fallback-2026-07-01"],
+    fallbacks: "default",
+    system: systemPrompt,
+    messages: [{ role: "user", content: userPrompt }],
+    output_config: {
+      effort: AI_EFFORT,
+      format: { type: "json_schema", schema }
+    }
+  });
+
+  if (response.model !== AI_MODEL) {
+    functions.logger.warn(`[${logLabel}] Answered by fallback model ${response.model}`);
+  }
+  if (response.stop_reason === "refusal") {
+    functions.logger.warn(`[${logLabel}] Claude declined`, response.stop_details || null);
+    return null;
+  }
+  if (response.stop_reason === "max_tokens") {
+    functions.logger.warn(`[${logLabel}] Answer was cut off at max_tokens`);
+    return null;
+  }
+
+  const textBlock = response.content.find(block => block.type === "text");
+  if (!textBlock) {
+    functions.logger.warn(`[${logLabel}] No text block in the answer (stop_reason: ${response.stop_reason})`);
+    return null;
+  }
+  try {
+    return JSON.parse(textBlock.text);
+  } catch (e) {
+    functions.logger.warn(`[${logLabel}] Could not parse JSON: ${textBlock.text.substring(0, 500)}`);
+    return null;
+  }
+}
+
+// Logs the real error and returns a generic one for the client, so API details never reach the browser
+function toAiHttpsError(error, logLabel, clientMessage) {
+  if (error instanceof functions.https.HttpsError) return error;
+  if (error instanceof Anthropic.APIError) {
+    functions.logger.error(`[${logLabel}] Anthropic API error ${error.status}:`, error.message);
+  } else {
+    functions.logger.error(`[${logLabel}] Unexpected error:`, error);
+  }
+  return new functions.https.HttpsError("internal", clientMessage);
 }
 
 /**
@@ -82,10 +183,10 @@ exports.cleanupOldGames = functions.region("europe-west1").pubsub
 
 /**
  * Callable: getSongYearAi
- * Uses OpenAI to estimate the release year of a song.
+ * Uses Claude to estimate the release year of a song.
  * data: { title: string, artist: string }
  */
-exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSeconds: 120, memory: "256MB" }).https.onCall(async (data, context) => {
+exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSeconds: 120, memory: "256MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
   requireAuth(context);
 
   const { title, artist } = data || {};
@@ -93,64 +194,27 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
     throw new functions.https.HttpsError("invalid-argument", `Title and artist are required (max ${MAX_TEXT_LENGTH} characters).`);
   }
 
-  const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
-  if (!apiKey) {
-    functions.logger.error("OpenAI API key is missing in Firebase environment!");
-    throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
-  }
-
   const userPrompt = `Analysera låten '${title}' av artisten '${artist}' och returnera ett JSON-objekt med nyckeln 'year' (heltal) eller null om du är osäker. Exempel: {"year": 1983} eller {"year": null}.`;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-5.5",
-        messages: [
-          { role: "system", content: MUSIC_YEAR_SINGLE_PROMPT },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" }
-      })
-    });
+    // Two attempts of at most 55 s each fit inside the function's 120 s timeout
+    const client = createAnthropicClient(55000);
+    const parsed = await askClaudeForJson(client, MUSIC_YEAR_SINGLE_PROMPT, userPrompt, SINGLE_YEAR_SCHEMA, "getSongYearAi");
+    functions.logger.info(`[getSongYearAi] Svar för '${title}' av '${artist}': ${JSON.stringify(parsed)}`);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      functions.logger.error("OpenAI API error:", response.status, errText);
-      throw new functions.https.HttpsError("internal", `OpenAI API Error ${response.status}: ${errText}`);
-    }
-
-    const aiData = await response.json();
-    const aiText = aiData.choices?.[0]?.message?.content?.trim() || "{}";
-    functions.logger.info(`[getSongYearAi] Svar för '${title}' av '${artist}': ${aiText}`);
-
-    let parsed;
-    try {
-      parsed = JSON.parse(aiText);
-    } catch (e) {
-      functions.logger.warn(`[getSongYearAi] Kunde inte parsa JSON: ${aiText}`);
-      return { year: null };
-    }
-
-    const year = parsed.year ? parseInt(parsed.year, 10) : null;
-    return { year: isNaN(year) ? null : year };
-
+    const year = parsed && Number.isInteger(parsed.year) ? parsed.year : null;
+    return { year };
   } catch (error) {
-    functions.logger.error("Error during OpenAI fetch:", error);
-    throw new functions.https.HttpsError("internal", "An error occurred while estimating the year.");
+    throw toAiHttpsError(error, "getSongYearAi", "An error occurred while estimating the year.");
   }
 });
 
 /**
  * Callable: getSongYearsAiBatch
- * Uses OpenAI to estimate the release years for a batch of songs.
+ * Uses Claude to estimate the release years for a batch of songs.
  * data: { songs: [{ id: string, title: string, artist: string }] }
  */
-exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB" }).https.onCall(async (data, context) => {
+exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
   requireAuth(context);
 
   const { songs } = data || {};
@@ -170,69 +234,19 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
     throw new functions.https.HttpsError("invalid-argument", `Every song needs an id, and title/artist may be at most ${MAX_TEXT_LENGTH} characters.`);
   }
 
-  const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
-  if (!apiKey) {
-    throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
-  }
-  
-  const systemPrompt = MUSIC_YEAR_BATCH_PROMPT;
-  
   const userPrompt = `Analysera ALLA följande ${songs.length} låtar och returnera ett JSON-objekt med nyckeln 'songs' som innehåller en array med ${songs.length} objekt (ett per låt):\n` + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
-  
+
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Authorization": `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-5.5",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        // max_completion_tokens är borttagen för att tillåta obegränsade batchstorlekar
-        response_format: { type: "json_object" }
-      })
-    });
-    
-    if (!response.ok) {
-      const errText = await response.text();
-      functions.logger.error("OpenAI API error:", response.status, errText);
-      throw new functions.https.HttpsError("internal", `OpenAI API Error ${response.status}: ${errText}`);
-    }
-    
-    const aiData = await response.json();
-    let aiText = aiData.choices?.[0]?.message?.content?.trim() || "{}";
-    functions.logger.info(`[getSongYearsAiBatch] Rå AI-svar (${songs.length} låtar skickade): ${aiText.substring(0, 500)}`);
-    
-    // Parsa JSON-svaret och hitta songs-arrayen
-    let parsedJson;
-    try {
-      parsedJson = JSON.parse(aiText);
-      if (Array.isArray(parsedJson)) {
-        // Top-level array (oväntat men hanterbart)
-      } else if (parsedJson && typeof parsedJson === 'object') {
-        // Leta efter en array-property (förväntat: { "songs": [...] })
-        const arrProp = Object.values(parsedJson).find(Array.isArray);
-        if (arrProp) {
-          parsedJson = arrProp;
-        } else {
-          // Enstaka objekt - logga och returnera tomt
-          functions.logger.warn("[getSongYearsAiBatch] AI returnerade ett enstaka objekt istället för array:", aiText);
-          parsedJson = [];
-        }
-      }
-    } catch (e) {
-      functions.logger.error("Failed to parse JSON from AI:", aiText);
-      return { results: [] };
-    }
-    
-    return { results: parsedJson };
+    // Two attempts of at most 250 s each fit inside the function's 540 s timeout
+    const client = createAnthropicClient(250000);
+    const parsed = await askClaudeForJson(client, MUSIC_YEAR_BATCH_PROMPT, userPrompt, BATCH_YEARS_SCHEMA, "getSongYearsAiBatch");
+
+    // Same shape as before ({ results: [{ id, year }] }), so the admin page and the import are unchanged
+    const results = parsed && Array.isArray(parsed.songs) ? parsed.songs : [];
+    functions.logger.info(`[getSongYearsAiBatch] ${results.length} svar för ${songs.length} skickade låtar: ${JSON.stringify(results).substring(0, 500)}`);
+    return { results };
   } catch (error) {
-    functions.logger.error("Error during OpenAI batch fetch:", error);
-    throw new functions.https.HttpsError("internal", "An error occurred while estimating years.");
+    throw toAiHttpsError(error, "getSongYearsAiBatch", "An error occurred while estimating years.");
   }
 });
 

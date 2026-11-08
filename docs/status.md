@@ -3,16 +3,16 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.839 |
-| admin.html | 0.068 |
+| index.html (spelet) | 0.840 |
+| admin.html | 0.069 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v43 |
+| service-worker | v44 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
-| AI-modell | gpt-5.5 |
+| AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 |
 
 ---
@@ -51,6 +51,7 @@
 | 2026-11-08 | Functions: Node 22, inloggning krävs för AI-funktionerna och `getSpotifyToken`, max 500 låtar per batchanrop och max 300 tecken per titel/artist | Functions |
 | 2026-11-08 | Functions: oanvända `hostStart` borttagen ur koden och raderad i Firebase | 0.838 |
 | 2026-11-08 | Admin, rapporter: papperskorgen på en skannad rad raderar nu rapporten (laddade tidigare om hela listan, raderade inget och kastade alla skanningar). Skannade rader behåller kolumnen "Antal". "Skanna alla" hoppar över rader som raderats under skanningen | 0.068 |
+| 2026-11-08 | AI bytt från gpt-5.5 (OpenAI) till Claude Opus 5.5 i `getSongYearAi` och `getSongYearsAiBatch`: officiella SDK:n `@anthropic-ai/sdk`, JSON-svar enligt schema, effort medium, server-side fallback vid nekande. Nyckeln i Secret Manager (`ANTHROPIC_API_KEY`), kostnaden dras från Ultra-krediterna. Samma prompt och samma svarsformat mot klienterna | 0.840 / Functions |
 
 ---
 
@@ -61,7 +62,7 @@
 |---|---|---|
 | 1 | **Node.js runtime** – uppgraderad från 20 (avvecklad 30 okt 2026) till 22, deployad 2026-11-08 (alla fem funktioner kör nodejs22). Node 22 är sista Node-versionen för 1st gen och avvecklas 2027-10-31 – därefter krävs 2nd gen (docs.cloud.google.com/functions/docs/runtime-support) | 31 okt 2027 |
 | 2 | **firebase-functions SDK 4.9.0** – senaste är 7.4.0. v6 bytte standardimporten till v2-API:t (nuvarande kod kräver då `firebase-functions/v1`), v7 tog bort `functions.config()` | Samma som 1 |
-| 3 | **functions.config() deprecated** – nya deployer med det misslyckas efter mars 2027 och API:t finns inte i SDK v7. OpenAI-nyckeln och Spotify-hemligheten ligger där idag – migrera till Secret Manager (`firebase functions:config:export`, `defineJsonSecret`) | Mars 2027 |
+| 3 | **functions.config() deprecated** – nya deployer med det misslyckas efter mars 2027 och API:t finns inte i SDK v7. Spotify-hemligheten ligger där idag (AI-nyckeln ligger redan i Secret Manager) – migrera till Secret Manager (`firebase functions:config:export`, `defineJsonSecret`) | Mars 2027 |
 
 ### Säkerhet
 Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och inte pushas.

@@ -1,10 +1,13 @@
 {
   "name": "functions",
   "version": "1.0.0",
-  "engines": { "node": "22" },
+  "engines": {
+    "node": "22"
+  },
   "main": "index.js",
   "type": "commonjs",
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
     "firebase-admin": "^12.5.0",
     "firebase-functions": "^4.6.0"
   }
