@@ -695,12 +695,19 @@
             <div class="team-color-indicator" style="background: ${colorHex};"></div>
             <div class="team-details">
               <div class="team-name">${escapeHtml(team.name)} ${team.host ? '(Du)' : ''}</div>
-              <div class="team-tokens">${team.tokens} tokens</div>
+              <div class="team-tokens">${escapeHtml(String(team.tokens))} tokens</div>
             </div>
           </div>
-          ${!team.host ? `<button class="kick-btn" onclick="kickTeam('${teamIdKey}')">Kicka</button>` : ''}
+          ${!team.host ? `<button class="kick-btn">Kicka</button>` : ''}
         `;
-        
+
+        // The team key comes from the database, so it is passed through a listener instead of
+        // being written into an inline onclick, where a crafted key could run as code
+        const kickBtn = teamDiv.querySelector('.kick-btn');
+        if (kickBtn) {
+          kickBtn.addEventListener('click', () => kickTeam(teamIdKey));
+        }
+
         container.appendChild(teamDiv);
       });
       
@@ -733,7 +740,7 @@
             <div class="team-color-indicator" style="background: ${colorHex};"></div>
             <div class="team-details">
               <div class="team-name">${escapeHtml(team.name)} ${teamIdKey === teamId ? '(Du)' : ''}</div>
-              <div class="team-tokens">${team.tokens} tokens</div>
+              <div class="team-tokens">${escapeHtml(String(team.tokens))} tokens</div>
             </div>
           </div>
         `;

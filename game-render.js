@@ -173,8 +173,8 @@ function renderTeamHeader() {
       <div class="team-color-dot" style="background: ${colorHex};"></div>
       <div class="team-name">${escapeHtml(team.name)}</div>
       <div class="team-stats">
-        <span class="team-score">🎵 ${team.score || 0}</span>
-        <span class="team-tokens">🎫 ${team.tokens || 0}</span>
+        <span class="team-score">🎵 ${escapeHtml(team.score || 0)}</span>
+        <span class="team-tokens">🎫 ${escapeHtml(team.tokens || 0)}</span>
       </div>
     `;
     
@@ -246,7 +246,7 @@ function renderTimeline() {
       // Revealed card - show year and info
       cardDiv.style.border = `6px solid ${teamColorHex}`;
       cardDiv.innerHTML = `
-      <div class="card-year">${card.year}</div>
+      <div class="card-year">${escapeHtml(card.year)}</div>
       <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
     `;
     } else {
@@ -737,16 +737,16 @@ function renderValidationModal() {
   
   modalHTML += `
     <div class="validation-modal-song">
-      <div class="validation-modal-song-year">${modal.song.year}</div>
+      <div class="validation-modal-song-year">${escapeHtml(modal.song.year)}</div>
       <div class="validation-modal-song-title">${escapeHtml(modal.song.title)}</div>
       <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
     </div>
     
     <div style="text-align: center; margin-bottom: 15px;">
-      <button 
-        class="validation-modal-btn report-btn" 
+      <button
+        id="reportTrackBtn"
+        class="validation-modal-btn report-btn"
         style="background-color: #f44336; padding: 5px 10px; font-size: 12px; width: auto; display: inline-block;"
-        onclick="reportTrack('${modal.song.spotifyId}', \`${escapeHtml(modal.song.title)}\`, \`${escapeHtml(modal.song.artist)}\`, '${modal.song.year}')"
       >
         🚩 Fel årtal?
       </button>
@@ -786,7 +786,17 @@ function renderValidationModal() {
   `;
   
   container.innerHTML = modalHTML;
-  
+
+  // Song data comes from the database. Passing it through a listener instead of an inline
+  // onclick means quotes or backticks in a title can neither break the button nor run as code.
+  const reportBtn = document.getElementById('reportTrackBtn');
+  if (reportBtn) {
+    const song = modal.song;
+    reportBtn.addEventListener('click', () => {
+      reportTrack(song.spotifyId, song.title, song.artist, song.year);
+    });
+  }
+
   console.log('[Game] Validation modal rendered');
 }
 

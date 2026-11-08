@@ -3,16 +3,29 @@
     ".read": false,
     ".write": false,
     "games": {
-      ".read": true,
-      ".write": true
+      "$gameId": {
+        ".read": true,
+        ".write": true
+      }
     },
     "reportedTracks": {
       ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
-      ".write": true
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      "$trackId": {
+        ".write": "newData.exists()",
+        ".validate": "newData.hasChildren(['spotifyId', 'title', 'artist', 'year', 'reportedAt'])",
+        "spotifyId": { ".validate": "newData.isString() && newData.val().length <= 64" },
+        "title": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "artist": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "year": { ".validate": "(newData.isString() && newData.val().length <= 10) || newData.isNumber()" },
+        "reportedAt": { ".validate": "newData.isNumber()" },
+        "reportedByTeam": { ".validate": "newData.isString() && newData.val().length <= 100" },
+        "$other": { ".validate": false }
+      }
     },
     "flaggedTracks": {
       ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
-      ".write": true
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'"
     },
     "standardLists": {
       ".read": true,

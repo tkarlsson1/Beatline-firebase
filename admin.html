@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.065</title>
+    <title>Notestream Admin v0.066</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -346,6 +346,17 @@
 
         const ADMIN_EMAIL = "timmykarlsson@gmail.com"; // Din admin-mail!
 
+        // Escapes text before it is put into innerHTML, as element content or in a quoted attribute.
+        // Reports and user data can be written by others, so they must never be inserted as raw HTML.
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("adminLoginForm").style.display = "block";
             document.getElementById("adminContent").style.display = "none";
@@ -641,12 +652,12 @@
 
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
-                            <td style="font-weight: 500;">${email}</td>
-                            <td style="color: var(--text-muted); font-size: 13px; font-family: monospace;">${uid}</td>
-                            <td>${lastLogin}</td>
+                            <td style="font-weight: 500;">${escapeHtml(email)}</td>
+                            <td style="color: var(--text-muted); font-size: 13px; font-family: monospace;">${escapeHtml(uid)}</td>
+                            <td>${escapeHtml(lastLogin)}</td>
                             <td>
-                                <button class="btn-info view-history-btn" style="padding: 6px 12px; font-size: 13px;" data-history="${historyStr}">📅 Historik (${loginDaysCount} dgr)</button>
-                                <button class="btn-danger delete-user-btn" data-uid="${uid}" style="padding: 6px 12px; font-size: 13px; margin-left: 5px;">🗑️ Ta bort data</button>
+                                <button class="btn-info view-history-btn" style="padding: 6px 12px; font-size: 13px;" data-history="${escapeHtml(historyStr)}">📅 Historik (${loginDaysCount} dgr)</button>
+                                <button class="btn-danger delete-user-btn" data-uid="${escapeHtml(uid)}" style="padding: 6px 12px; font-size: 13px; margin-left: 5px;">🗑️ Ta bort data</button>
                             </td>
                         `;
                         
@@ -1638,12 +1649,12 @@
                         const tr = document.createElement("tr");
                         tr.innerHTML = `
                             <td style="font-weight:bold; font-size: 1.2rem; text-align: center; color: var(--warning);">1</td>
-                            <td><strong>${safeTitle}</strong>${isFlagged}</td>
-                            <td>${safeArtist}</td>
-                            <td><span style="color: #ef4444; font-weight: bold;">${safeYear}</span><br><span style="font-size: 11px; color: var(--text-muted);">${dateStr}</span></td>
+                            <td><strong>${escapeHtml(safeTitle)}</strong>${isFlagged}</td>
+                            <td>${escapeHtml(safeArtist)}</td>
+                            <td><span style="color: #ef4444; font-weight: bold;">${escapeHtml(safeYear)}</span><br><span style="font-size: 11px; color: var(--text-muted);">${escapeHtml(dateStr)}</span></td>
                             <td>
-                                <button class="btn-info scan-report-btn" data-id="${trackId}" data-title="${safeTitle.replace(/"/g, '&quot;')}" data-artist="${safeArtist.replace(/"/g, '&quot;')}" data-year="${safeYear}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI</button>
-                                <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;" title="Ta bort rapport (ignorera)">🗑️</button>
+                                <button class="btn-info scan-report-btn" data-id="${escapeHtml(trackId)}" data-title="${escapeHtml(safeTitle)}" data-artist="${escapeHtml(safeArtist)}" data-year="${escapeHtml(safeYear)}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI</button>
+                                <button class="btn-clean delete-report-btn" data-id="${escapeHtml(trackId)}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;" title="Ta bort rapport (ignorera)">🗑️</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -1710,19 +1721,19 @@
 
                     const googleQuery = encodeURIComponent(`${artist} ${title} release year`);
                     let yearHtml = `<div style="display:flex; align-items:center; gap:10px;">
-                        <del style="color: var(--text-muted); font-size:12px;">${oldYear}</del> 
-                        <input type="number" class="manual-year-input-${trackId}" value="${newYear}" style="width: 70px; font-weight:bold; padding: 6px; text-align: center; border-radius:4px; border:1px solid #ccc; background:var(--bg-secondary); color:var(--text-main);">
+                        <del style="color: var(--text-muted); font-size:12px;">${escapeHtml(oldYear)}</del>
+                        <input type="number" class="manual-year-input-${escapeHtml(trackId)}" value="${escapeHtml(newYear)}" style="width: 70px; font-weight:bold; padding: 6px; text-align: center; border-radius:4px; border:1px solid #ccc; background:var(--bg-secondary); color:var(--text-main);">
                         <span style="font-size: 11px; color: var(--text-muted);">(${source || 'Ingen ändring hittades'})</span>
                     </div>`;
 
                     trElement.innerHTML = `
-                        <td><strong>${title}</strong></td>
-                        <td>${artist}</td>
+                        <td><strong>${escapeHtml(title)}</strong></td>
+                        <td>${escapeHtml(artist)}</td>
                         <td>${yearHtml}</td>
                         <td style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
-                            <button class="btn-success approve-report-btn" data-id="${trackId}" data-title="${title.replace(/"/g, '&quot;')}" data-artist="${artist.replace(/"/g, '&quot;')}" style="padding: 6px 10px; font-size: 13px; margin: 0;">✅ Spara</button>
-                            <button class="btn-clean delete-report-btn" data-id="${trackId}" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Radera rapport">🗑️</button>
+                            <button class="btn-success approve-report-btn" data-id="${escapeHtml(trackId)}" data-title="${escapeHtml(title)}" data-artist="${escapeHtml(artist)}" style="padding: 6px 10px; font-size: 13px; margin: 0;">✅ Spara</button>
+                            <button class="btn-clean delete-report-btn" data-id="${escapeHtml(trackId)}" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Radera rapport">🗑️</button>
                         </td>
                     `;
 

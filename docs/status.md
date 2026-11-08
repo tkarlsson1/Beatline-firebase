@@ -3,14 +3,15 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.836 |
-| admin.html | 0.065 |
+| index.html (spelet) | 0.837 |
+| admin.html | 0.066 |
 | spotify.js | 0.807 |
-| game-cards.js / game-render.js (game.html) | 0.835 |
+| game-cards.js (game.html) | 0.835 |
+| game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v41 |
-| Firebase Functions Node runtime | 20 (1st Gen) |
+| service-worker | v42 |
+| Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | gpt-5.5 |
 | functions/prompts.js | Delad prompt, v1 |
 
@@ -44,6 +45,10 @@
 | 2026-11-07 | Flytt av kort med touch rensar inte längre kortet i Firebase när draget börjar (kortet försvann under draget och layouten flyttade sig) | 0.835 |
 | 2026-11-07 | Utmanarens kort går inte längre att dra från aktiva lagets enhet; LÅS SVAR utan kort skriver inget | 0.835 |
 | 2026-11-07 | Helskärm på Android – första touch på spelsidan begär helskärm (döljer adressfält + systemfält). Finns inte på iPhone | 0.836 |
+| 2026-11-08 | Eruda (mobilkonsol) borttagen från game.html | 0.837 |
+| 2026-11-08 | Databasregler: spel kan bara läsas/skrivas per spel-id (inte hela `games`), `flaggedTracks` bara admin, `reportedTracks` valideras och kan inte raderas av andra än admin | Regler |
+| 2026-11-08 | Escaping av data från databasen i admin (rapporter, användare), lobby (tokens, kicka-knapp) och spel (poäng, tokens, årtal, rapportknapp) | 0.837 / 0.066 |
+| 2026-11-08 | Functions: Node 22, inloggning krävs för AI-funktionerna och `getSpotifyToken`, max 500 låtar per batchanrop och max 300 tecken per titel/artist | Functions |
 
 ---
 
@@ -52,7 +57,7 @@
 ### Kritiska (deadline)
 | # | Problem | Deadline |
 |---|---|---|
-| 1 | **Node.js 20 avvecklad 30 okt 2026** – efter avvecklingen går functions inte att deploya eller uppdatera, och befintliga funktioner "may be disabled" (docs.cloud.google.com/functions/docs/runtime-support, kontrollerat 2026-11-08). `functions/package.json` har `"node": "20"`. Uppgradera till 22 – sista Node-versionen för 1st gen, avvecklas 2027-10-31, därefter krävs 2nd gen | Passerad |
+| 1 | **Node.js runtime** – uppgraderad från 20 (avvecklad 30 okt 2026) till 22, deployad 2026-11-08 (alla fem funktioner kör nodejs22). Node 22 är sista Node-versionen för 1st gen och avvecklas 2027-10-31 – därefter krävs 2nd gen (docs.cloud.google.com/functions/docs/runtime-support) | 31 okt 2027 |
 | 2 | **firebase-functions SDK 4.9.0** – senaste är 7.4.0. v6 bytte standardimporten till v2-API:t (nuvarande kod kräver då `firebase-functions/v1`), v7 tog bort `functions.config()` | Samma som 1 |
 | 3 | **functions.config() deprecated** – nya deployer med det misslyckas efter mars 2027 och API:t finns inte i SDK v7. OpenAI-nyckeln och Spotify-hemligheten ligger där idag – migrera till Secret Manager (`firebase functions:config:export`, `defineJsonSecret`) | Mars 2027 |
 
@@ -69,8 +74,8 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | 12 | Spotify-token kan gå ut vid import >60 min → 401-fel utan retry | Låg | Öppen |
 | 13 | Paus under Timer 2/3 – "Fortsätt" startar alltid Timer 1, `challengeState` ligger kvar → aktiva laget kan lägga ett andra kort och spelet stannar vid nästa Timer 2 | Medel | Öppen |
 | 14 | Dubbelvalidering av utmaning om hostens klocka går >~1 s före utmanarens – hostens backup validerar samtidigt, andra körningen byter lag/låt en extra gång och `isValidatingChallenge` fastnar | Låg | Öppen (ej verifierad) |
-| 15 | Musiken har pausat två gånger när första kortet drogs i ett nytt spel. Ingen kod i spelet pausar Spotify och SDK:n lyssnar inte på touch. Fungerade när kortet drogs på samma enhet som spelar musiken. Att testa: dra på en annan enhet med Eruda-konsolen öppen på musikenheten (leta efter `Playback state` med `paused: true`), och kontrollera om samma Spotify-konto spelar på en annan enhet samtidigt | Låg | Öppen (ej reproducerad) |
-| 16 | Vid LÅS SVAR på hostens telefon (den som spelar musiken) har låten börjat om, kortet gått att dra igen och ett spökkort legat kvar. Hänt minst två gånger, även före helskärmsändringen (0.836). Koden kan inte starta samma låt två gånger under en sidladdning (`currentPlayingTrackId`), så troligast laddades hostens sida om strax efter låsningen: startpausen (Timer 4, game-render.js) körs igen och skriver över Timer 2, Timer 1 startar för samma lag och låt, och det låsta kortet valideras aldrig eftersom `window.pendingValidationCard` bara finns i den gamla sidans minne. Att helskärmen låg kvar utesluter inte omladdning – nästa touch begär helskärm igen. Orsak till omladdningen okänd (ej verifierat: Chromes dra-ned-för-att-uppdatera). Androids bakåt-gest är troligen inte orsaken: hostens lobby-URL saknar teamId, så vägen via lobbyn slutar i "Ditt lag finns inte i spelet" i stället för ett omstartat spel. Att testa: visas "NÄSTA TUR: eget lag" ~10 s innan låten börjar om? Ha Eruda öppen på hosten – tom logg från före låsningen betyder omladdning. Separat bekräftad lucka: mellan LÅS SVAR och Firebase-bekräftelsen är det fortfarande Timer 1, så kortet kan dras igen och LÅS SVAR är aktiv (`lockInPlacement`, game-cards.js) | Medel | Öppen (ej reproducerad) |
+| 15 | Musiken har pausat två gånger när första kortet drogs i ett nytt spel. Ingen kod i spelet pausar Spotify och SDK:n lyssnar inte på touch. Fungerade när kortet drogs på samma enhet som spelar musiken. Att testa: dra på en annan enhet med musikenhetens konsol öppen via `chrome://inspect` på en dator (telefonen ansluten med USB), leta efter `Playback state` med `paused: true`,, och kontrollera om samma Spotify-konto spelar på en annan enhet samtidigt | Låg | Öppen (ej reproducerad) |
+| 16 | Vid LÅS SVAR på hostens telefon (den som spelar musiken) har låten börjat om, kortet gått att dra igen och ett spökkort legat kvar. Hänt minst två gånger, även före helskärmsändringen (0.836). Koden kan inte starta samma låt två gånger under en sidladdning (`currentPlayingTrackId`), så troligast laddades hostens sida om strax efter låsningen: startpausen (Timer 4, game-render.js) körs igen och skriver över Timer 2, Timer 1 startar för samma lag och låt, och det låsta kortet valideras aldrig eftersom `window.pendingValidationCard` bara finns i den gamla sidans minne. Att helskärmen låg kvar utesluter inte omladdning – nästa touch begär helskärm igen. Orsak till omladdningen okänd (ej verifierat: Chromes dra-ned-för-att-uppdatera). Androids bakåt-gest är troligen inte orsaken: hostens lobby-URL saknar teamId, så vägen via lobbyn slutar i "Ditt lag finns inte i spelet" i stället för ett omstartat spel. Att testa: visas "NÄSTA TUR: eget lag" ~10 s innan låten börjar om? Ha hostens konsol öppen via `chrome://inspect` på en dator (telefonen ansluten med USB) – tom logg från före låsningen betyder omladdning. Separat bekräftad lucka: mellan LÅS SVAR och Firebase-bekräftelsen är det fortfarande Timer 1, så kortet kan dras igen och LÅS SVAR är aktiv (`lockInPlacement`, game-cards.js) | Medel | Öppen (ej reproducerad) |
 | 22 | Hostens reserv tar bara över när timern redan har stoppats (game-timers.js `updateTimer`). Somnar eller tappar det aktiva lagets telefon uppkopplingen under Timer 1 står spelet på 0:00. Timer 2 har ingen reserv. Om hosten låser kortet åt laget ligger `pendingValidationCard` på hosten, men Timer 2 hanteras av lagets telefon, som inte hittar kortet – spelet stannar | Hög | Öppen |
 | 23 | "Nästa →" under Timer 2/3 lämnar det låsta kortet ovänt i tidslinjen för alltid (game-host.js `forceNextTeam`). Vinstkontrollen räknar alla kort i tidslinjen, även ovända (game-init.js `checkAndApplyWinCondition`) – spökkort ger poäng, gäller även #16 | Hög | Öppen |
 | 24 | Slut på kortleken låser spelet: `closeValidationModal` (game-cards.js) avbryter utan lagbyte, Timer 4 startar ändå, valideringsrutan fastnar i "bearbetar" och "Nästa →" vägrar så länge rutan är öppen. Kan hända med små spellistor eller många BYT LÅT | Hög | Öppen |
@@ -81,7 +86,7 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | 29 | "Starta om" nollställer inte tokens (game-host.js `restartGame`) | Låg | Öppen |
 | 30 | En paus på 0 s blir 10 s, eftersom koden använder `betweenSongsTime \|\| 10` (game-render.js, lobby.html) | Låg | Öppen |
 | 31 | `reportedByTeam` blir alltid "Unknown" – `teamId` är en `let` och finns inte på `window` (game-utils.js `reportTrack`) | Låg | Öppen |
-| 32 | En titel med `"` (t.ex. "Heroes") bryter rapportknappens onclick i valideringsrutan – `escapeHtml` escapar inte citattecken (game-render.js) | Låg | Öppen |
+| 32 | En titel med `"` (t.ex. "Heroes") bryter rapportknappens onclick i valideringsrutan – `escapeHtml` escapar inte citattecken (game-render.js) | Låg | Åtgärdad (0.837) – knappen får låtdatan via en lyssnare |
 | 33 | Spotify-spelaren startar bara om access-tokenen gäller (spotify-player.js), refresh-tokenen används aldrig vid sidladdning. Öppnas spelet mer än en timme efter senaste förnyelsen blir det ingen musik och inget felmeddelande | Medel | Öppen |
 | 34 | Startkort dras med återläggning och tas inte bort ur kortleken (lobby.html). Två lag kan få samma startkort, och ett startkort kan komma igen som låt att placera | Medel | Öppen |
 | 35 | Samma låt kan hamna två gånger i kortleken om den finns i två valda listor (lobby.html) | Medel | Öppen (ej verifierad) |

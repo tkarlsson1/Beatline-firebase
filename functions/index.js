@@ -8,6 +8,29 @@ admin.initializeApp({
 });
 const db = admin.database();
 
+// Limits for the paid AI functions. 500 songs matches the highest batch size the admin
+// cleanup allows (batchSizeInput max="500"); the imports send 25 at a time.
+const MAX_SONGS_PER_BATCH = 500;
+const MAX_TEXT_LENGTH = 300;
+const MAX_ID_LENGTH = 100;
+
+// The AI and Spotify functions cost money or rate limit, so only signed-in users may call them.
+// The admin page and the playlist import both run while signed in, and the callable SDK sends
+// the user's ID token automatically.
+function requireAuth(context) {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Sign-in required.");
+  }
+}
+
+// Accepts strings (and numbers, e.g. a song titled 1999) up to maxLength characters.
+// allowEmpty is used for batch songs, so one track with an empty artist does not reject the whole batch.
+function isText(value, maxLength, allowEmpty) {
+  if (typeof value !== "string" && typeof value !== "number") return false;
+  const length = String(value).length;
+  return length <= maxLength && (allowEmpty || length > 0);
+}
+
 /**
  * Callable: hostStart
  * data: { gameId: string }
@@ -266,9 +289,11 @@ exports.cleanupOldGames = functions.region("europe-west1").pubsub
  * data: { title: string, artist: string }
  */
 exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSeconds: 120, memory: "256MB" }).https.onCall(async (data, context) => {
+  requireAuth(context);
+
   const { title, artist } = data || {};
-  if (!title || !artist) {
-    throw new functions.https.HttpsError("invalid-argument", "Title and artist are required.");
+  if (!isText(title, MAX_TEXT_LENGTH, false) || !isText(artist, MAX_TEXT_LENGTH, false)) {
+    throw new functions.https.HttpsError("invalid-argument", `Title and artist are required (max ${MAX_TEXT_LENGTH} characters).`);
   }
 
   const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
@@ -329,11 +354,25 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
  * data: { songs: [{ id: string, title: string, artist: string }] }
  */
 exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB" }).https.onCall(async (data, context) => {
+  requireAuth(context);
+
   const { songs } = data || {};
   if (!Array.isArray(songs) || songs.length === 0) {
     throw new functions.https.HttpsError("invalid-argument", "An array of songs is required.");
   }
-  
+  if (songs.length > MAX_SONGS_PER_BATCH) {
+    throw new functions.https.HttpsError("invalid-argument", `At most ${MAX_SONGS_PER_BATCH} songs per call.`);
+  }
+  const hasInvalidSong = songs.some(s =>
+    !s ||
+    !isText(s.id, MAX_ID_LENGTH, false) ||
+    !isText(s.title, MAX_TEXT_LENGTH, true) ||
+    !isText(s.artist, MAX_TEXT_LENGTH, true)
+  );
+  if (hasInvalidSong) {
+    throw new functions.https.HttpsError("invalid-argument", `Every song needs an id, and title/artist may be at most ${MAX_TEXT_LENGTH} characters.`);
+  }
+
   const apiKey = process.env.OPENAI_API_KEY || functions.config().openai?.key;
   if (!apiKey) {
     throw new functions.https.HttpsError("failed-precondition", "AI configuration is missing.");
@@ -405,6 +444,8 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
  * Hämtar Spotify access token via Client Credentials flow.
  */
 exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (data, context) => {
+  requireAuth(context);
+
   const clientId = process.env.SPOTIFY_CLIENT_ID || functions.config().spotify?.client_id;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET || functions.config().spotify?.client_secret;
 
