@@ -1,0 +1,37 @@
+{
+ "id": "46q5BtHso0ECuTKeq70ZhW",
+ "userMessage": "Titel: How Bizarre\nArtist: OMC\nSpotifys album: How Bizarre (Deluxe)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1996\nSpotifys år: 1996",
+ "responseText": "{\"year\":1995,\"explanation\":\"Singeln gavs ut i Nya Zeeland redan 1995. Spotifys år 1996 kommer från albumet How Bizarre, här i en senare deluxeutgåva.\",\"confidence\":\"medium\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1488,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1488,
+    "output_tokens": 276,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 276,
+  "output_tokens_details": {
+   "thinking_tokens": 189
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

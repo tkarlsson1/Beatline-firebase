@@ -1,0 +1,83 @@
+{
+ "id": "5YuLlTsWYK9uslUdGM83dJ",
+ "userMessage": "Titel: Ingen sommar utan reggae\nArtist: Markoolio\nSpotifys album: Värsta Plattan\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2007-10-01\nSpotifys år: 2007",
+ "responseText": "Spotifys år stämmer i det här fallet. Låten kom på singel 2007, samma år som albumet Värsta plattan. Det här säger källorna:\n\n- Enligt engelska Wikipedia är låten en pop-reggae-låt inspirerad av Bob Marley som släpptes i april 2007 och toppade Swedish Singles Chart i 5 veckor. Låten kommer från albumet Värsta plattan.\n- Discogs listar CD-singeln Ariola – 88697089032 · CD, Single · Sweden · Released: 2007.\n- Albumet Värsta plattan kom också 2007. Därför finns ingen tidigare utgåva som skulle ge ett annat år.\n\når: 2007\nkälla: https://en.wikipedia.org/wiki/Ingen_sommar_utan_reggae\nförklaring: Markoolio släppte låten på singel i april 2007, och den låg sedan fem veckor som etta på den svenska singellistan.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14562,
+  "output_tokens": 606,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Markoolio \"Ingen sommar utan reggae\" singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.amazon.com/Ingen-sommar-utan-reggae-Markoolio/dp/B075GJ9797",
+   "title": "Ingen sommar utan reggae by Markoolio on Amazon Music - Amazon.com",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/album/ingen-sommar-utan-reggae-single/253096001",
+   "title": "Ingen Sommar utan Reggae - Single - Album by Markoolio - Apple Music",
+   "pageAge": "7101 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/7vXZ9OtcbNMCVEuQqmrdS2",
+   "title": "Ingen sommar utan reggae - song and lyrics by Markoolio",
+   "pageAge": "5258 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/song/396672171/ingen-sommar-utan-reggae",
+   "title": "Ingen Sommar Utan Reggae - Markoolio: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "7164 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/5YuLlTsWYK9uslUdGM83dJ",
+   "title": "Ingen sommar utan reggae - song and lyrics by Markoolio",
+   "pageAge": "6984 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Ingen_sommar_utan_reggae",
+   "title": "Ingen sommar utan reggae",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/4VaOFGmlPu7Vljv1bLHZRh",
+   "title": "Ingen sommar utan reggae - Single by Markoolio",
+   "pageAge": "7101 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/4420897-Markoolio-Och-Hans-J%C3%A4mrare-Ingen-Sommar-Utan-Reggae",
+   "title": "Markoolio Och Hans Jämrare",
+   "pageAge": "2637 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/4420897-Markoolio-Ingen-Sommar-Utan-Reggae",
+   "title": "Markoolio Och Hans Jämrare",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.youtube.com/browse/MPREb_W3lAMZR4ATN",
+   "title": "Ingen sommar utan reggae",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Ingen_sommar_utan_reggae",
+   "title": "Ingen sommar utan reggae",
+   "citedText": "[pop](https://en.wikipedia.org/wiki/Pop_music)– [reggae](https://en.wikipedia.org/wiki/Reggae) tune inspired by [Bob Marley](https://en.wikipedia.org/..."
+  },
+  {
+   "url": "https://www.discogs.com/release/4420897-Markoolio-Och-Hans-J%C3%A4mrare-Ingen-Sommar-Utan-Reggae",
+   "title": "Markoolio Och Hans Jämrare",
+   "citedText": "Label:: Ariola – 88697089032 · **Format:: CD, Single** · Country:: Sweden · Released:: 2007 · Genre:: Electronic, Reggae, Pop · Style:: Reggae-Pop\n\n# ..."
+  }
+ ]
+}

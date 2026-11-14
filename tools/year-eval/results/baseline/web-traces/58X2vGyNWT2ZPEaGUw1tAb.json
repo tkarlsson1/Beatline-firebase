@@ -1,0 +1,78 @@
+{
+ "id": "58X2vGyNWT2ZPEaGUw1tAb",
+ "userMessage": "Titel: Kung för en dag\nArtist: Magnus Uggla\nSpotifys album: Uggla Box\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2008-01-01\nSpotifys år: 2008",
+ "responseText": "Låten kom 1997, alltså inte 2008 som Spotify visar. Spotifys datum gäller samlingen Uggla Box.\n\n- Engelska Wikipedia beskriver låten som en singel av Magnus Uggla från albumet Karaoke, utgiven 1997, och andra spåret på hans album Karaoke från 1997.\n- Albumet Karaoke var ett studioalbum av Magnus Uggla, utgivet den 22 oktober 1997.\n- Senare har låten kommit ut igen på samlingar, bland annat Klassiska mästerverk (2002) och Uggla Box (2008).\n\nSingeln och albumet kom båda 1997.\n\når: 1997\nkälla: https://en.wikipedia.org/wiki/Kung_f%C3%B6r_en_dag\nförklaring: Låten gavs ut som singel 1997 och fanns med på Magnus Ugglas studioalbum Karaoke från samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16402,
+  "output_tokens": 545,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Magnus Uggla \"Kung för en dag\" låt"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.deezer.com/en/track/9793245",
+   "title": "Magnus Uggla - Kung för en dag: listen with lyrics",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Kung_f%C3%B6r_en_dag",
+   "title": "Kung f%C3%B6r en dag",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.karafun.com/karaoke/magnus-uggla/kung-for-en-dag/",
+   "title": "Karaoke Kung för en dag - Video with Lyrics - Magnus Uggla",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Trubaduren",
+   "title": "Trubaduren",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/song/417247914/kung-f%C3%B6r-en-dag",
+   "title": "Kung för en dag - Magnus Uggla: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "6710 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Karaoke_(album)",
+   "title": "Karaoke (album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Klassiska_m%C3%A4sterverk",
+   "title": "Klassiska m%C3%A4sterverk",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Jag_skiter",
+   "title": "Jag skiter",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/P%C3%A4rlor_%C3%A5t_svinen",
+   "title": "P%C3%A4rlor %C3%A5t svinen",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Kung_f%C3%B6r_en_dag",
+   "title": "Kung f%C3%B6r en dag",
+   "citedText": "Single by Magnus Uggla\n\nfrom the album Karaoke\n- Released: 1997\n- Genre: Pop rock\n- Songwriters: Anders Henriksson Magnus Uggla\n\nMagnus Uggla singles ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Karaoke_(album)",
+   "title": "Karaoke (album)",
+   "citedText": "Studio album by Magnus Uggla\n- Released: 22 October 1997\n- Recorded: Mid 1997\n- Length: 42:39\n- Label: Columbia\n- Producer: Anders Glenmark\n\nMagnus Ug..."
+  }
+ ]
+}

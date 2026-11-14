@@ -1,0 +1,37 @@
+{
+ "id": "50nfwKoDiSYg8zOCREWAm5",
+ "userMessage": "Titel: Shivers\nArtist: Ed Sheeran\nSpotifys album: =\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2021-10-25\nSpotifys år: 2021",
+ "responseText": "{\"year\":2021,\"explanation\":\"Singeln gavs ut i september 2021 och låten finns på albumet = från samma år, så Spotifys år stämmer.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1483,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1483,
+    "output_tokens": 66,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 66,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,83 @@
+{
+ "id": "1gihuPhrLraKYrJMAEONyc",
+ "userMessage": "Titel: Feel So Close - Radio Edit\nArtist: Calvin Harris\nSpotifys album: 18 Months\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2012-10-29\nSpotifys år: 2012",
+ "responseText": "Spotify anger albumets år, 2012, men låten gavs ut som singel redan året innan. Enligt engelska Wikipedia är \"Feel So Close\" den andra singeln från hans tredje studioalbum, 18 Months (2012), och singeln kom ut den 19 augusti 2011. Wikipedias sida om albumet säger detsamma: den andra singeln \"Feel So Close\" gavs ut den 19 augusti 2011 och nådde andraplatsen i Storbritannien och Irland. Discogs listar också en digital singel från 2011. \"Radio Edit\" i titeln ändrar inte året.\n\når: 2011\nkälla: https://en.wikipedia.org/wiki/Feel_So_Close\nförklaring: \"Feel So Close\" kom ut som singel den 19 augusti 2011, mer än ett år före albumet 18 Months från 2012.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15582,
+  "output_tokens": 453,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Calvin Harris Feel So Close single released 2011"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Feel_So_Close",
+   "title": "Feel So Close",
+   "pageAge": null
+  },
+  {
+   "url": "https://calvin-harris.fandom.com/wiki/Feel_So_Close",
+   "title": "Feel So Close",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.albumoftheyear.org/album/200725-calvin-harris-feel-so-close.php",
+   "title": "Calvin Harris - Feel So Close (Single) - Reviews - Album of The Year",
+   "pageAge": "30 days ago"
+  },
+  {
+   "url": "https://edmidentity.com/2019/05/09/calvin-harris-feel-so-close-tbt/",
+   "title": "Take It Back To 2011 And \"Feel So Close\" To Calvin Harris",
+   "pageAge": "2402 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Bounce_(Calvin_Harris_song)",
+   "title": "Bounce (Calvin Harris song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/18_Months",
+   "title": "18 Months",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/3350657-Calvin-Harris-Feel-So-Close",
+   "title": "Calvin Harris",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Summer_(Calvin_Harris_song)",
+   "title": "Summer (Calvin Harris song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Feels_(song)",
+   "title": "Feels (song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Feel_So_Close",
+   "title": "Feel So Close",
+   "citedText": "Single by Calvin Harris\n\n- Released: 19 August 2011\n\n- Songwriter: Calvin Harris\n- Producer: Calvin Harris\n\nCalvin Harris singles chronology\n| \"Bounce..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/18_Months",
+   "title": "18 Months",
+   "citedText": "[[19]](./18_Months#cite_note-AUS-singles-24) The second single \" [Feel So Close](https://en.wikipedia.org/wiki/Feel_So_Close)\" was released on 19 Augu..."
+  },
+  {
+   "url": "https://www.discogs.com/release/3350657-Calvin-Harris-Feel-So-Close",
+   "title": "Calvin Harris",
+   "citedText": "# Calvin Harris – Feel So Close\nCalvin Harris - Feel So Close album cover\n\n- **Label:**: Columbia – none, Sony Music – none\n- **Format:**: File, MP3, ..."
+  }
+ ]
+}

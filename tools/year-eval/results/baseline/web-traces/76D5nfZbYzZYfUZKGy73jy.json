@@ -1,0 +1,83 @@
+{
+ "id": "76D5nfZbYzZYfUZKGy73jy",
+ "userMessage": "Titel: 7 Seconds (feat. Neneh Cherry)\nArtist: Youssou N'Dour, Neneh Cherry\nSpotifys album: 7 Seconds: The Best Of Youssou N'Dour\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2004\nSpotifys år: 2004",
+ "responseText": "Låten kom ut 1994. Spotifys år 2004 kommer från samlingsskivan *The Best Of Youssou N'Dour*. Enligt engelska Wikipedia gavs \"7 Seconds\" ut som singel av Youssou N'Dour och Neneh Cherry den 7 juni 1994. Låten finns också på N'Dours studioalbum *The Guide (Wommat)*, som enligt Wikipedia släpptes den 11 juli 1994. Singeln och albumet kom alltså samma år. Discogs anger också 1994 för flera singelutgåvor, bland annat en brittisk CD-singel på Chaos/Columbia.\n\når: 1994\nkälla: https://en.wikipedia.org/wiki/7_Seconds_(song)\nförklaring: Youssou N'Dour och Neneh Cherry gav ut \"7 Seconds\" som singel i juni 1994, och samma år kom den på N'Dours album The Guide (Wommat).\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16404,
+  "output_tokens": 480,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "7 Seconds Youssou N'Dour Neneh Cherry single released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/7_Seconds_(song)",
+   "title": "7 Seconds (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/360495/all",
+   "title": "Performance: 7 Seconds by Youssou N'dour & Neneh Cherry",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/song/197999529/7-seconds-feat-neneh-cherry",
+   "title": "7 Seconds (feat. Neneh Cherry) - Youssou N'Dour: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "11866 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/181768-Youssou-NDour-Neneh-Cherry-7-Seconds",
+   "title": "Youssou N'Dour & Neneh Cherry",
+   "pageAge": "172 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/98244-Youssou-NDour-Neneh-Cherry-7-Seconds",
+   "title": "Youssou N'Dour & Neneh Cherry",
+   "pageAge": "339 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/166345-Youssou-NDour-Neneh-Cherry-7-Seconds",
+   "title": "Youssou N'Dour & Neneh Cherry",
+   "pageAge": "242 days ago"
+  },
+  {
+   "url": "https://songoftheday.ca/2023/04/03/7-seconds/",
+   "title": "7 Seconds",
+   "pageAge": "1304 days ago"
+  },
+  {
+   "url": "https://multimedia-english.com/print/preview/7-seconds-5461",
+   "title": "Preview",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Guide_(Wommat)",
+   "title": "The Guide (Wommat)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/7_Seconds_(song)",
+   "title": "7 Seconds (song)",
+   "citedText": "Single by Youssou N'Dour and Neneh Cherry\n\n- Released: 7 June 1994\n\n- Songwriters: Neneh Cherry; Youssou N'Dour; Cameron McVey; Jonathan Sharp;\n\nYouss..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Guide_(Wommat)",
+   "title": "The Guide (Wommat)",
+   "citedText": "Studio album by Youssou N'Dour\n- Released: 11 July 1994\n\nYoussou N'Dour chronology\n\n[Youssou N'Dour](https://en.wikipedia.org/wiki/Youssou_N'Dour).\n\n"
+  },
+  {
+   "url": "https://www.discogs.com/release/98244-Youssou-NDour-Neneh-Cherry-7-Seconds",
+   "title": "Youssou N'Dour & Neneh Cherry",
+   "citedText": "… Label:: Chaos (3) – 660508 2, Columbia – 660508 2 · Format:: CD, Single · Country:: UK · **Released:: 1994** · Genre:: Electronic, Hip Hop · Style::..."
+  }
+ ]
+}

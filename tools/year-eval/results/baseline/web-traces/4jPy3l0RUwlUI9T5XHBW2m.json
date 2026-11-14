@@ -1,0 +1,78 @@
+{
+ "id": "4jPy3l0RUwlUI9T5XHBW2m",
+ "userMessage": "Titel: Mood (feat. iann dior)\nArtist: 24kGoldn, iann dior\nSpotifys album: El Dorado\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2021-03-26\nSpotifys år: 2021",
+ "responseText": "Spotify anger 2021 eftersom spåret ligger på albumet El Dorado. Låten kom ut på singel redan året innan, alltså är rätt år 2020. \"Mood\" är utgiven den 24 juli 2020 genom Columbia Records, som första singel från 24kGoldns debutalbum El Dorado (2021). Wikipedias artikel om albumet anger samma datum: studioalbumet kom ut den 26 mars 2021, och singeln \"Mood\" den 24 juli 2020.\n\når: 2020\nkälla: https://en.wikipedia.org/wiki/Mood_(24kGoldn_song)\nförklaring: \"Mood\" kom ut på singel den 24 juli 2020, flera månader före albumet El Dorado (2021).\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14650,
+  "output_tokens": 397,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Mood 24kGoldn iann dior single released 2020"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Mood_(24kGoldn_song)",
+   "title": "Mood (24kGoldn song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.fandom.com/wiki/Mood_(song)",
+   "title": "Mood (song) - Music Wiki - Fandom",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://ianndior.fandom.com/wiki/Mood",
+   "title": "Mood",
+   "pageAge": "113 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/El_Dorado_(24kGoldn_album)",
+   "title": "El Dorado (24kGoldn album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/24kGoldn",
+   "title": "24kGoldn",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q97691641",
+   "title": "Mood - Wikidata",
+   "pageAge": "2304 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/4YMnOf4a7obOcN1Gy2QEuM",
+   "title": "Listen to Mood (feat. iann dior) - Single by 24kGoldn",
+   "pageAge": "2304 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/mood-feat-iann-dior/1721058309",
+   "title": "Mood (feat. iann dior) - Song by 24kGoldn - Apple Music",
+   "pageAge": "2304 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/18400069-24kGoldn-Ft-Iann-Dior-Mood",
+   "title": "24kGoldn Ft. Iann Dior",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Mood_(24kGoldn_song)",
+   "title": "Mood (24kGoldn song)",
+   "citedText": "It was released on July 24, 2020, through Records and [Columbia Records](https://en.wikipedia.org/wiki/Columbia_Records), as the lead single from 24kG..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/El_Dorado_(24kGoldn_album)",
+   "title": "El Dorado (24kGoldn album)",
+   "citedText": "Studio album by 24kGoldn\n- Released: March 26, 2021\n- Genres: Pop; alternative rock; hip-hop;\n\n24kGoldn chronology\n\n- \"Mood\" Released: July 24, 2020; ..."
+  }
+ ]
+}

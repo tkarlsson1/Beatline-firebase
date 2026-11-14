@@ -1,0 +1,154 @@
+{
+ "id": "6SluaPiV04KOaRTOIScoff",
+ "userMessage": "Titel: Show Me Love - Radio Version\nArtist: Robyn\nSpotifys album: Robyn Is Here\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 1995-10-13\nSpotifys år: 1995",
+ "responseText": "Rätt år är **1997**, inte 1995 som Spotify anger.\n\n**Singeln:** Låten gavs först ut i Sverige i februari 1997 som den fjärde singeln från debutalbumet Robyn Is Here (1995). Wikipedias albumsida anger datumet: \"Show Me Love\" Released: 24 February 1997.\n\n**Varför inte 1995:** Albumet kom visserligen 13 oktober 1995, men låten verkar inte ha funnits med på den första svenska utgåvan. Wikipedia listar låten bara under International edition and Swedish reissue. MusicBrainz säger om nyutgåvan att den has different cover art and includes \"Show Me Love\", och anger att inspelningen har ℗ BMG Sweden AB (in 1997). Spotifys datum gäller alltså albumets första utgåva, inte låten.\n\n**Källorna säger olika:** Songfacts påstår att låten först fanns med på Robyns debutalbum Robyn Is Here från 1995 men inte gavs ut som singel förrän 1997. Det stämmer inte med låtlistorna ovan, så jag går efter Wikipedia och MusicBrainz. Wikipedia anger singeldatumet uttryckligen, så stödet är tydligt.\n\nLåten ska inte blandas ihop med Robin S. version: 1993 års singel \"Show Me Love\" har samma titel, men de två låtarna har inget med varandra att göra.\n\når: 1997\nkälla: https://en.wikipedia.org/wiki/Show_Me_Love_(Robyn_song)\nförklaring: Robyns \"Show Me Love\" kom på singel i Sverige i februari 1997 och fanns inte med på den första utgåvan av Robyn Is Here från 1995.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 36683,
+  "output_tokens": 1446,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 2
+ },
+ "requests": 1,
+ "queries": [
+  "Robyn \"Show Me Love\" song Robyn Is Here released",
+  "Robyn Is Here original Swedish release 1995 tracklist \"Show Me Love\" added reissue"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Show_Me_Love_(Robyn_song)",
+   "title": "Show Me Love (Robyn song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.songfacts.com/facts/robyn/show-me-love",
+   "title": "Show Me Love by Robyn - Songfacts",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Robyn_Is_Here",
+   "title": "Robyn Is Here",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Do_You_Really_Want_Me_(Show_Respect)",
+   "title": "Do You Really Want Me (Show Respect)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Do_You_Know_(What_It_Takes)",
+   "title": "Do You Know (What It Takes)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Robyn",
+   "title": "Robyn",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/6SluaPiV04KOaRTOIScoff",
+   "title": "Show Me Love - Radio Version - song and lyrics by Robyn",
+   "pageAge": "11355 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Electric_(Robyn_song)",
+   "title": "Electric (Robyn song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/You%27ve_Got_That_Somethin%27",
+   "title": "You%27ve Got That Somethin%27",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Robyn_Is_Here",
+   "title": "Robyn Is Here",
+   "pageAge": null
+  },
+  {
+   "url": "https://musicbrainz.org/release/f7e736ff-7c01-4015-98ed-407550e812ba",
+   "title": "Release “Robyn Is Here” by Robyn - MusicBrainz",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Show_Me_Love_(Robyn_song)",
+   "title": "Show Me Love (Robyn song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Do_You_Know_(What_It_Takes)",
+   "title": "Do You Know (What It Takes)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.qobuz.com/us-en/album/robyn-is-here-robyn/0078636747729",
+   "title": "Robyn Is Here, Robyn - Qobuz",
+   "pageAge": "11640 days ago"
+  },
+  {
+   "url": "https://www.amazon.com/Robyn-Here/dp/B00TGVI95W",
+   "title": "Robyn Is Here : Robyn: Digital Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Do_You_Really_Want_Me_(Show_Respect)",
+   "title": "Do You Really Want Me (Show Respect)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/You%27ve_Got_That_Somethin%27",
+   "title": "You%27ve Got That Somethin%27",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/O_Baby_(Robyn_song)",
+   "title": "O Baby (Robyn song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Show_Me_Love_(Robyn_song)",
+   "title": "Show Me Love (Robyn song)",
+   "citedText": "from the album Robyn Is Here\n\n| \"Do You Know (What It Takes)\" (1996) | \"Show Me Love\" (1997) | \"Electric\" (1999) |\n\n| \"Do You Know (What It Takes)\" (1..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Robyn_Is_Here",
+   "title": "Robyn Is Here",
+   "citedText": "- Released: 13 October 1995\n\n|  | Robyn Is Here (1995) | My Truth (1999) |\n\nSingles from Robyn Is Here\n- \"You've Got That Somethin'\" Released: 1995; \"..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Robyn_Is_Here",
+   "title": "Robyn Is Here",
+   "citedText": "- Released: 13 October 1995\n\n|  | Robyn Is Here (1995) | My Truth (1999) |\n\nSingles from Robyn Is Here\n- \"You've Got That Somethin'\" Released: 1995; \"..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Robyn_Is_Here",
+   "title": "Robyn Is Here",
+   "citedText": "Robyn Is Here – Original Swedish release\n\n| \"Do You Really Want Me (Show Respect)\" | Robyn; Lindström; Ekhé; | 4:25 |\n\n| \"Here We Go\" | Robyn; Anders ..."
+  },
+  {
+   "url": "https://musicbrainz.org/release/f7e736ff-7c01-4015-98ed-407550e812ba",
+   "title": "Release “Robyn Is Here” by Robyn - MusicBrainz",
+   "citedText": "It has different cover art and **includes \"Show Me Love**\". "
+  },
+  {
+   "url": "https://musicbrainz.org/release/f7e736ff-7c01-4015-98ed-407550e812ba",
+   "title": "Release “Robyn Is Here” by Robyn - MusicBrainz",
+   "citedText": "## Tracklist\n\n| 6 | Show Me Love phonographic copyright (℗) by: BMG Sweden AB (in 1997) recording of: Show Me Love writer: Max Martin (Swedish record ..."
+  },
+  {
+   "url": "https://www.songfacts.com/facts/robyn/show-me-love",
+   "title": "Show Me Love by Robyn - Songfacts",
+   "citedText": "The song first appeared on Robyn's 1995 debut album Robyn Is Here but **wasn't released as a single until 1997** after her song \"Do You Know (What It ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Show_Me_Love_(Robyn_song)",
+   "title": "Show Me Love (Robyn song)",
+   "citedText": ")'s 1993 single \" [Show Me Love](https://en.wikipedia.org/wiki/Show_Me_Love_(Robin_S._song))\" because of identical song titles and similar first names..."
+  }
+ ]
+}

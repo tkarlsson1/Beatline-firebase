@@ -1,0 +1,78 @@
+{
+ "id": "3zz9eYWluKY5AsvtMXFL9K",
+ "userMessage": "Titel: Pumped Up\nArtist: Klingande\nSpotifys album: The Album\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2019-11-15\nSpotifys år: 2019",
+ "responseText": "Klingandes \"Pumped Up\" kom ut som singel 2017, inte 2019. 2019 är året för albumet \"The Album\" som Spotify visar. Enligt Discogs gavs singeln ut digitalt av Ultra Records med releasedatum 8 september 2017. Apple Music anger samma datum. Wikipedia nämner också Klingandes singel \"Pumped Up\" från 2017, och skriver att låten är en nytolkning av Foster the Peoples \"Pumped Up Kicks\". Originalet från 2010 påverkar inte svaret, eftersom det är Klingandes egen version som räknas.\n\når: 2017\nkälla: https://www.discogs.com/release/11974657-Klingande-Pumped-Up\nförklaring: Klingandes \"Pumped Up\", en tolkning av \"Pumped Up Kicks\", kom ut som singel den 8 september 2017.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15921,
+  "output_tokens": 497,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Klingande Pumped Up single release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.shazam.com/en-us/song/1274213305/pumped-up",
+   "title": "Pumped Up - Klingande: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "3354 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1300074980/pumped-up-ryan-riback-remix",
+   "title": "Pumped Up (Ryan Riback Remix) - Klingande: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "3311 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/11974657-Klingande-Pumped-Up",
+   "title": "Klingande",
+   "pageAge": "3354 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/11202862-Klingande-Pumped-Up",
+   "title": "Klingande",
+   "pageAge": "1533 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/11858088-Klingande-Pumped-Up-Ryan-Riback-Remix",
+   "title": "Klingande",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/eg/album/pumped-up-single/1274213304",
+   "title": "Pumped Up - Single - Album by Klingande - Apple Music",
+   "pageAge": "3354 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Klingande",
+   "title": "Klingande",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Riva_(Restart_the_Game)",
+   "title": "Riva (Restart the Game)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Pump_Up_the_Jam_(album)",
+   "title": "Pump Up the Jam (album)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/11974657-Klingande-Pumped-Up",
+   "title": "Klingande",
+   "citedText": "… Label:: Ultra Records – none · Format:: File, FLAC, Single · Country:: Europe · **Released:: Sep 8, 2017** · Genre:: Electronic · Style:: Tropical H..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Klingande",
+   "title": "Klingande",
+   "citedText": "[[14]](./Klingande#cite_note-14)\nKlingande's 2017 single \"Pumped Up\", featuring uncredited vocals from\n\n(The song is a reinterpretation of \" [Pumped U..."
+  }
+ ]
+}

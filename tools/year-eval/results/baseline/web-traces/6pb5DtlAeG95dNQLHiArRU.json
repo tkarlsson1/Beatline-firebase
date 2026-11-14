@@ -1,0 +1,83 @@
+{
+ "id": "6pb5DtlAeG95dNQLHiArRU",
+ "userMessage": "Titel: Rock My Body\nArtist: R3HAB, INNA, Sash!\nSpotifys album: Rock My Body (with INNA & Sash!)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2023-04-28\nSpotifys år: 2023",
+ "responseText": "Källorna stämmer överens med Spotify: låten kom som singel 2023. Den engelska Wikipediasidan om R3hab säger att han släppte singeln \"Rock My Body\" den 28 april 2023, i samarbete med den rumänska sångerskan Inna och de tyska producenterna Sash!. Discogs anger samma datum: Spinnin' Records, Nederländerna, släppt 28 april 2023.\n\nDet kan bli diskussion vid bordet eftersom låten bygger på en äldre låt. Singeln lånar från Sash!:s hitsingel \"Ecuador\" från 1997. Enligt reglerna för covers och remakes räknas ändå året då just den här versionen gavs ut, alltså 2023. Remixerna kom också 2023, så de ändrar inte heller året.\n\når: 2023\nkälla: https://en.wikipedia.org/wiki/R3hab\nförklaring: R3HAB, INNA och Sash! gav ut \"Rock My Body\" som singel den 28 april 2023, en nyinspelning som lånar från Sash!:s \"Ecuador\" från 1997.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15922,
+  "output_tokens": 574,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "R3HAB INNA Sash! Rock My Body release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://audiomack.com/officialr3hab/song/rock-my-body-4302820",
+   "title": "Rock My Body by R3HAB, INNA, Sash!: Listen on Audiomack",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1680572128/rock-my-body",
+   "title": "Rock My Body - R3HAB, Inna & Sash!: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "1305 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/27212799-R3hab-Inna-Sash-Rock-My-Body",
+   "title": "R3hab, Inna, Sash!",
+   "pageAge": "1296 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/30093518-R3hab-Inna-Sash-Rock-My-Body-The-Remixes",
+   "title": "R3hab, Inna, Sash!",
+   "pageAge": "1163 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/28060872-R3hab-Inna-Sash-Rock-My-Body-WW-x-R3hab-VIP-Remix-Extended-Mix",
+   "title": "R3hab, Inna, Sash!",
+   "pageAge": "1191 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/R3hab",
+   "title": "R3hab",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Sash!",
+   "title": "Sash!",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=aYCuEONIIDM",
+   "title": "R3HAB, INNA, Sash!",
+   "pageAge": "1295 days ago"
+  },
+  {
+   "url": "https://digitalmusicpool.com/track/rock-my-body",
+   "title": "Rock My Body - R3HAB, INNA, Sash! - Digital Music Pool",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/R3hab",
+   "title": "R3hab",
+   "citedText": "- R3hab in 2024\n\nBackground information\n\n- Website: r3hab.com\n\n[[5]](./R3hab#cite_note-:0-5)\n\n[[5]](./R3hab#cite_note-:0-5) [[6]](./R3hab#cite_note-6)..."
+  },
+  {
+   "url": "https://www.discogs.com/release/27212799-R3hab-Inna-Sash-Rock-My-Body",
+   "title": "R3hab, Inna, Sash!",
+   "citedText": "Label:: Spinnin' Records – none · Format:: File, FLAC, Single, Hi-Res 24-Bit 44.1 kHz · Country:: Netherlands · **Released:: Apr 28, 2023** · Genre:: ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/R3hab",
+   "title": "R3hab",
+   "citedText": "[[12]](./R3hab#cite_note-12) [[13]](./R3hab#cite_note-13) The single interpolates Sash!'s 1997 hit single \" [Ecuador](https://en.wikipedia.org/wiki/Ec..."
+  }
+ ]
+}

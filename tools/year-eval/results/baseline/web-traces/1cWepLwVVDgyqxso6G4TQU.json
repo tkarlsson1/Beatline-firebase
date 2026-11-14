@@ -1,0 +1,88 @@
+{
+ "id": "1cWepLwVVDgyqxso6G4TQU",
+ "userMessage": "Titel: Thinking out Loud - Alex Adair Remix\nArtist: Ed Sheeran, Alex Adair\nSpotifys album: Thinking Out Loud (Alex Adair Remix)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2014-11-07\nSpotifys år: 2014",
+ "responseText": "Alex Adair-remixen av Ed Sheerans ”Thinking Out Loud” kom ut 2014. Eftersom det är en remix räknas året då just remixversionen gavs ut, och det året stämmer med Spotify.\n\nMusiktjänsterna anger olika datum, men alla ligger 2014. Apple Music listar singeln med datumet 24 September 2014. Qobuz anger att den Released on 07/11/2014 by Atlantic Records UK, alltså 7 november 2014, samma datum som Spotify. Qobuz anger också Alex Adair som remixare och upphovsrätten ℗ 2014 Asylum Records UK, a Warner Music UK Company. Originallåten kom också 2014. Enligt Wikipedia blev den tillgänglig on 18 June 2014. Därför finns det ingen äldre version som skulle kunna ge ett annat år.\n\nJag hittade ingen Wikipedia- eller Discogs-sida som tar upp remixen särskilt. Källorna är musiktjänsternas egna produktsidor. Där står utgivningen uttryckligen, så stödet räknas ändå som tydligt.\n\når: 2014\nkälla: https://music.apple.com/in/album/thinking-out-loud-alex-adair-remix-single/937851661\nförklaring: Alex Adairs remix av Ed Sheerans \"Thinking Out Loud\" gavs ut som singel 2014, samma år som originallåten.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 13882,
+  "output_tokens": 832,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Ed Sheeran Thinking Out Loud Alex Adair Remix release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://play.anghami.com/album/1153024",
+   "title": "Thinking Out Loud (Alex Adair Remix) by Ed Sheeran",
+   "pageAge": "4390 days ago"
+  },
+  {
+   "url": "https://www.qobuz.com/gb-en/album/thinking-out-loud-ed-sheeran/0825646172986",
+   "title": "Thinking Out Loud (Alex Adair Remix), Ed Sheeran - Qobuz",
+   "pageAge": "4390 days ago"
+  },
+  {
+   "url": "https://play.anghami.com/song/10862681",
+   "title": "Ed Sheeran - Thinking out Loud (Alex Adair Remix)",
+   "pageAge": "4390 days ago"
+  },
+  {
+   "url": "https://readdork.com/lyrics/ed-sheeran-thinking-out-loud-alex-adair-remix",
+   "title": "Thinking Out Loud (Alex Adair Remix) Lyrics — Ed Sheeran",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/1cWepLwVVDgyqxso6G4TQU",
+   "title": "Thinking out Loud - Alex Adair Remix - song and lyrics by Ed Sheeran, Alex Adair",
+   "pageAge": "4390 days ago"
+  },
+  {
+   "url": "https://music.apple.com/in/album/thinking-out-loud-alex-adair-remix-single/937851661",
+   "title": "Thinking Out Loud (Alex Adair Remix) - Single - Album by Ed Sheeran - Apple Music",
+   "pageAge": "4434 days ago"
+  },
+  {
+   "url": "https://www.deezer.com/en/track/89739391",
+   "title": "Ed Sheeran - Thinking out Loud (Alex Adair Remix)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Thinking_Out_Loud",
+   "title": "Thinking Out Loud",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I%27m_a_Mess_(Ed_Sheeran_song)",
+   "title": "I%27m a Mess (Ed Sheeran song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://music.apple.com/in/album/thinking-out-loud-alex-adair-remix-single/937851661",
+   "title": "Thinking Out Loud (Alex Adair Remix) - Single - Album by Ed Sheeran - Apple Music",
+   "citedText": "… **24 September 2014** 1 song, 3 minutes ℗ 2014 Warner Music UK Limited\n\nListen to Thinking Out Loud (Alex Adair Remix) - Single by Ed Sheeran on App..."
+  },
+  {
+   "url": "https://www.qobuz.com/gb-en/album/thinking-out-loud-ed-sheeran/0825646172986",
+   "title": "Thinking Out Loud (Alex Adair Remix), Ed Sheeran - Qobuz",
+   "citedText": "… **Released on 07/11/2014** by Atlantic Records UK · Main artists: Ed Sheeran · Genre: Pop\n\nListen to unlimited or download Thinking Out Loud (Alex A..."
+  },
+  {
+   "url": "https://www.qobuz.com/gb-en/album/thinking-out-loud-ed-sheeran/0825646172986",
+   "title": "Thinking Out Loud (Alex Adair Remix), Ed Sheeran - Qobuz",
+   "citedText": "# Thinking Out Loud (Alex Adair Remix)\nEd Sheeran\n\n- Released on 07/11/2014 by Atlantic Records UK\n- Main artists: Ed Sheeran\n- Genre: Pop\n\nThinking O..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Thinking_Out_Loud",
+   "title": "Thinking Out Loud",
+   "citedText": "[[15]](./Thinking_Out_Loud#cite_note-BBoard-Maloney-15) [[23]](./Thinking_Out_Loud#cite_note-23) \"Thinking Out Loud\" became available on 18 June 2014 ..."
+  }
+ ]
+}

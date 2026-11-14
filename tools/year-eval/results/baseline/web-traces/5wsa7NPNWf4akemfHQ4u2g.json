@@ -1,0 +1,98 @@
+{
+ "id": "5wsa7NPNWf4akemfHQ4u2g",
+ "userMessage": "Titel: go\nArtist: Cat Burns\nSpotifys album: early twenties\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2024-07-12\nSpotifys år: 2024",
+ "responseText": "Spotify visar 2024 eftersom spåret ligger på albumet *early twenties*. Låten gavs ändå först ut som singel 2020, så rätt år är 2020.\n\n- **Wikipedia:** Wikipedias sida om låten anger att singeln släpptes 31 July 2020. Låten fanns senare med på Burns's 2022 EP Emotionally Unavailable.\n- **Sound On Sound:** Tidningen bekräftar att in July 2020 a track called 'Go' was officially released, having previously been premiered on TikTok.\n- **Cat Burns själv:** I en intervju säger hon att hon released it July or August of 2020.\n\nLåten blev en stor hit först 2022, och det kan väcka diskussion vid bordet. Därför förklarar Wikipedia att den Originally released in 2020, \"Go\" later reached number two on the UK singles chart. Albumet *early twenties* kom först 12 July 2024.\n\når: 2020\nkälla: https://en.wikipedia.org/wiki/Go_(Cat_Burns_song)\nförklaring: \"Go\" gavs ut som singel av Cat Burns den 31 juli 2020, långt innan den kom med på albumet early twenties 2024.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14118,
+  "output_tokens": 698,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Cat Burns go song released 2020"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Go_(Cat_Burns_song)",
+   "title": "Go (Cat Burns song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://audiomack.com/catburns/song/go",
+   "title": "go by Cat Burns: Listen on Audiomack",
+   "pageAge": "2160 days ago"
+  },
+  {
+   "url": "https://www.soundonsound.com/techniques/inside-track-cat-burns-go",
+   "title": "Inside Track: Cat Burns 'Go'",
+   "pageAge": "1539 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Cat_Burns",
+   "title": "Cat Burns",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/song/go/1618963983",
+   "title": "go - Song by Cat Burns",
+   "pageAge": "2171 days ago"
+  },
+  {
+   "url": "https://music.apple.com/gb/song/go/1618963983",
+   "title": "go",
+   "pageAge": "2171 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/4U8NANRAK2soambLzCdqF4",
+   "title": "Go - song and lyrics by Cat Burns",
+   "pageAge": "2297 days ago"
+  },
+  {
+   "url": "https://www.deezer.com/en/track/1178693632",
+   "title": "Cat Burns - go",
+   "pageAge": null
+  },
+  {
+   "url": "http://www.womeninpop.com/news-home/interview-cat-burns",
+   "title": "INTERVIEW: Cat Burns on her slow burner hit 'Go': \"I want people to listen to my music and feel like I wrote that song directly for them.\" — Women In Pop",
+   "pageAge": "1661 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Go_(Cat_Burns_song)",
+   "title": "Go (Cat Burns song)",
+   "citedText": "Single by Cat Burns\n\n- Released: 31 July 2020\n\n- Songwriters: Cat Burns; George Morgan; Wille Tannergard; Jonah Stevens;\n\nCat Burns singles chronology..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Go_(Cat_Burns_song)",
+   "title": "Go (Cat Burns song)",
+   "citedText": "The song was included on Burns's 2022 EP Emotionally Unavailable.\n\n"
+  },
+  {
+   "url": "https://www.soundonsound.com/techniques/inside-track-cat-burns-go",
+   "title": "Inside Track: Cat Burns 'Go'",
+   "citedText": "Cat Burns signed a deal with RCA Records, and in **July 2020 a track called ‘Go’ was officially released**, having previously been premiered on TikTok..."
+  },
+  {
+   "url": "http://www.womeninpop.com/news-home/interview-cat-burns",
+   "title": "INTERVIEW: Cat Burns on her slow burner hit 'Go': \"I want people to listen to my music and feel like I wrote that song directly for them.\" — Women In Pop",
+   "citedText": "I released it July or August of 2020 and it did well, it got to a million streams. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Cat_Burns",
+   "title": "Cat Burns",
+   "citedText": "[[8]](./Cat_Burns#cite_note-8) Originally released in 2020, \"Go\" later reached number two on the [UK singles chart](https://en.wikipedia.org/wiki/UK_s..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Cat_Burns",
+   "title": "Cat Burns",
+   "citedText": "Burns has\n\n| Early Twenties | Released: 12 July 2024; Label: Since 93/RCA; Formats: Digital download, streaming; | 7 | 7 |\n\n| Adolescent | Released: 1..."
+  }
+ ]
+}

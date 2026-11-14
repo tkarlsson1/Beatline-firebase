@@ -1,0 +1,3182 @@
+{
+ "generatedAt": "2026-11-14T16:09:56.558Z",
+ "grossErrorYears": 2,
+ "cases": [
+  {
+   "id": "00IRhIiynu3eZjVaegnJ2h",
+   "group": "hand",
+   "title": "Dina färger var blå",
+   "artist": "Tommy Nilsson",
+   "albumName": "Det bästa med Tommy Nilsson",
+   "albumType": "compilation",
+   "releaseDate": "2006-08-30",
+   "spotifyYear": 2006,
+   "gameYears": [
+    2006
+   ],
+   "facitYears": [
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "02itaCXOdC54J0ISjqqFAp",
+   "group": "hand",
+   "title": "All Around The World (La La La)",
+   "artist": "R3HAB, A Touch Of Class",
+   "albumName": "All Around The World (La La La)",
+   "albumType": "single",
+   "releaseDate": "2019-04-05",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0AH6WMe3OlAlUb5miXt2FQ",
+   "group": "hand",
+   "title": "Only Girl (In The World)",
+   "artist": "Rihanna",
+   "albumName": "Loud",
+   "albumType": "album",
+   "releaseDate": "2010-11-16",
+   "spotifyYear": 2010,
+   "gameYears": [
+    2010
+   ],
+   "facitYears": [
+    2010
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0b18g3G5spr4ZCkz7Y6Q0Q",
+   "group": "hand",
+   "title": "Rasputin",
+   "artist": "Majestic, Boney M.",
+   "albumName": "Rasputin",
+   "albumType": "single",
+   "releaseDate": "2021-02-26",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0BZ5YlY2xnwfUmyGdiOMje",
+   "group": "hand",
+   "title": "Call on Me - Ryan Riback Remix",
+   "artist": "Starley, Ryan Riback",
+   "albumName": "One of One",
+   "albumType": "album",
+   "releaseDate": "2020-09-25",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0COid4yuRhbLqTkgzhu9k9",
+   "group": "hand",
+   "title": "In The Summertime",
+   "artist": "Shaggy, Rayvon",
+   "albumName": "The Best Of Shaggy",
+   "albumType": "compilation",
+   "releaseDate": "2008-01-01",
+   "spotifyYear": 2008,
+   "gameYears": [
+    2008
+   ],
+   "facitYears": [
+    1995
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0DmAvNCAK08oCi7miSZUIY",
+   "group": "hand",
+   "title": "Lasting Lover",
+   "artist": "Sigala, James Arthur",
+   "albumName": "Lasting Lover",
+   "albumType": "single",
+   "releaseDate": "2020-09-04",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0dw5l231SLoWyUU47On23b",
+   "group": "hand",
+   "title": "By The River",
+   "artist": "Klingande, Jamie N Commons",
+   "albumName": "The Album",
+   "albumType": "album",
+   "releaseDate": "2019-11-15",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0fsEFwLSJTSHSawhe864Cp",
+   "group": "hand",
+   "title": "Shots - Broiler Remix",
+   "artist": "Imagine Dragons, Broiler",
+   "albumName": "Smoke + Mirrors (Deluxe)",
+   "albumType": "album",
+   "releaseDate": "2015-05-11",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0GONea6G2XdnHWjNZd6zt3",
+   "group": "hand",
+   "title": "Summer Of '69",
+   "artist": "Bryan Adams",
+   "albumName": "Reckless (30th Anniversary / Deluxe Edition)",
+   "albumType": "album",
+   "releaseDate": "1984-11-05",
+   "spotifyYear": 1984,
+   "gameYears": [
+    1984
+   ],
+   "facitYears": [
+    1984
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0Gp23ds4JDUwan98IfNNL5",
+   "group": "hand",
+   "title": "Bittersweet Symphony",
+   "artist": "GAMPER & DADONI, Emily Roberts",
+   "albumName": "REVIVE",
+   "albumType": "album",
+   "releaseDate": "2024-11-22",
+   "spotifyYear": 2024,
+   "gameYears": [
+    2024
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": true
+  },
+  {
+   "id": "0h3Xy4V4apMraB5NuM8U7Z",
+   "group": "hand",
+   "title": "Stumblin' In",
+   "artist": "CYRIL",
+   "albumName": "Stumblin' In",
+   "albumType": "single",
+   "releaseDate": "2023-11-10",
+   "spotifyYear": 2023,
+   "gameYears": [
+    2023
+   ],
+   "facitYears": [
+    2023
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0HEmnAUT8PHznIAAmVXqFJ",
+   "group": "hand",
+   "title": "Faith - Remastered",
+   "artist": "George Michael",
+   "albumName": "Faith",
+   "albumType": "album",
+   "releaseDate": "1987-10-30",
+   "spotifyYear": 1987,
+   "gameYears": [
+    1987
+   ],
+   "facitYears": [
+    1987
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0JDp7p99FSja52T0YBLupR",
+   "group": "hand",
+   "title": "The botten is nådd",
+   "artist": "Timbuktu",
+   "albumName": "The botten is nådd",
+   "albumType": "album",
+   "releaseDate": "2003-06-02",
+   "spotifyYear": 2003,
+   "gameYears": [
+    2003
+   ],
+   "facitYears": [
+    2003
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0MteK167vtyb6hoJNC3Uz3",
+   "group": "two-source",
+   "title": "A Girl Like You",
+   "artist": "Edwyn Collins",
+   "albumName": "Gorgeous George",
+   "albumType": "album",
+   "releaseDate": "2011-10-19",
+   "spotifyYear": 2011,
+   "gameYears": [
+    2011
+   ],
+   "facitYears": [
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0nrRP2bk19rLc0orkWPQk2",
+   "group": "hand",
+   "title": "Wake Me Up",
+   "artist": "Avicii",
+   "albumName": "True",
+   "albumType": "album",
+   "releaseDate": "2013-09-16",
+   "spotifyYear": 2013,
+   "gameYears": [
+    2013
+   ],
+   "facitYears": [
+    2013
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0Ph6L4l8dYUuXFmb71Ajnd",
+   "group": "hand",
+   "title": "Livin' la Vida Loca",
+   "artist": "Ricky Martin",
+   "albumName": "Ricky Martin",
+   "albumType": "album",
+   "releaseDate": "1999",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0UeYCHOETPfai02uskjJ3x",
+   "group": "two-source",
+   "title": "Shooting Stars",
+   "artist": "Bag Raiders",
+   "albumName": "Bag Raiders (Deluxe)",
+   "albumType": "album",
+   "releaseDate": "2011-01-01",
+   "spotifyYear": 2011,
+   "gameYears": [
+    2011
+   ],
+   "facitYears": [
+    2008
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0Ui05Ov0s4PnRc4JI3Pilg",
+   "group": "hand",
+   "title": "My Favourite Game",
+   "artist": "The Cardigans",
+   "albumName": "Gran Turismo (Remastered)",
+   "albumType": "album",
+   "releaseDate": "1998-01-01",
+   "spotifyYear": 1998,
+   "gameYears": [
+    1998
+   ],
+   "facitYears": [
+    1998
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0VjIjW4GlUZAMYd2vXMi3b",
+   "group": "hand",
+   "title": "Blinding Lights",
+   "artist": "The Weeknd",
+   "albumName": "After Hours",
+   "albumType": "album",
+   "releaseDate": "2020-03-20",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2019,
+    2020
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "0wnKNQ5YfXy1QTVC8yjkaq",
+   "group": "hand",
+   "title": "Hos dig är jag underbar",
+   "artist": "Patrik Isaksson",
+   "albumName": "10 år - en snäll mans bekännelser",
+   "albumType": "compilation",
+   "releaseDate": "2008",
+   "spotifyYear": 2008,
+   "gameYears": [
+    2008
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "17S4XrLvF5jlGvGCJHgF51",
+   "group": "hand",
+   "title": "Learning To Fly",
+   "artist": "Tom Petty and the Heartbreakers",
+   "albumName": "Into The Great Wide Open",
+   "albumType": "album",
+   "releaseDate": "1991-01-01",
+   "spotifyYear": 1991,
+   "gameYears": [
+    1991
+   ],
+   "facitYears": [
+    1991
+   ],
+   "corrected": false
+  },
+  {
+   "id": "18AXbzPzBS8Y3AkgSxzJPb",
+   "group": "hand",
+   "title": "In The Air Tonight - 2015 Remastered",
+   "artist": "Phil Collins",
+   "albumName": "Face Value (Deluxe Editon)",
+   "albumType": "album",
+   "releaseDate": "1981-01-01",
+   "spotifyYear": 1981,
+   "gameYears": [
+    1981
+   ],
+   "facitYears": [
+    1981
+   ],
+   "corrected": false
+  },
+  {
+   "id": "191WWeKEl9FKuTaSdJOqco",
+   "group": "hand",
+   "title": "Hey Boy",
+   "artist": "Teddybears",
+   "albumName": "Fresh",
+   "albumType": "album",
+   "releaseDate": "2004-08-18",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    2004
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1A8j067qyiNwQnZT0bzUpZ",
+   "group": "hand",
+   "title": "This Girl (Kungs Vs. Cookin' On 3 Burners)",
+   "artist": "Kungs, Cookin' On 3 Burners",
+   "albumName": "Layers",
+   "albumType": "album",
+   "releaseDate": "2016-11-04",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2016
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1B4Mt5DvMxocvcr7cj5Rdv",
+   "group": "hand",
+   "title": "Dancing in the Moonlight (feat. Neimy)",
+   "artist": "Jubël",
+   "albumName": "Dancing in the Moonlight (feat. NEIMY)",
+   "albumType": "single",
+   "releaseDate": "2018-06-22",
+   "spotifyYear": 2018,
+   "gameYears": [
+    2018
+   ],
+   "facitYears": [
+    2018
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1bgKMxPQU7JIZEhNsM1vFs",
+   "group": "hand",
+   "title": "Words (feat. Zara Larsson)",
+   "artist": "Alesso, Zara Larsson",
+   "albumName": "Words (feat. Zara Larsson)",
+   "albumType": "single",
+   "releaseDate": "2022-04-22",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1cWepLwVVDgyqxso6G4TQU",
+   "group": "hand",
+   "title": "Thinking out Loud - Alex Adair Remix",
+   "artist": "Ed Sheeran, Alex Adair",
+   "albumName": "Thinking Out Loud (Alex Adair Remix)",
+   "albumType": "single",
+   "releaseDate": "2014-11-07",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1Cwsd5xI8CajJz795oy4XF",
+   "group": "hand",
+   "title": "You Get What You Give",
+   "artist": "New Radicals",
+   "albumName": "Maybe You've Been Brainwashed Too",
+   "albumType": "album",
+   "releaseDate": "1998-01-01",
+   "spotifyYear": 1998,
+   "gameYears": [
+    1998
+   ],
+   "facitYears": [
+    1998
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1d5j7ibUKDihkXKddtp1dl",
+   "group": "hand",
+   "title": "Trubaduren",
+   "artist": "Magnus Uggla",
+   "albumName": "Uggla Box",
+   "albumType": "compilation",
+   "releaseDate": "2008-01-01",
+   "spotifyYear": 2008,
+   "gameYears": [
+    2008
+   ],
+   "facitYears": [
+    1993
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1FFd5yEjDOnQF6pRvyyaBC",
+   "group": "hand",
+   "title": "Nothing Really Matters - Afrojack Remix",
+   "artist": "Mr. Probz",
+   "albumName": "Nothing Really Matters (Afrojack Remix)",
+   "albumType": "single",
+   "releaseDate": "2015-02-20",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1Fka6XCbSxs4ElXQOe28xf",
+   "group": "two-source",
+   "title": "Sun Is Shining - De Luxe Edit",
+   "artist": "Funkstar De Luxe",
+   "albumName": "Sun Is Shining (Remixes)",
+   "albumType": "single",
+   "releaseDate": "1999-05-01",
+   "spotifyYear": 1999,
+   "gameYears": [
+    2017
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1gihuPhrLraKYrJMAEONyc",
+   "group": "hand",
+   "title": "Feel So Close - Radio Edit",
+   "artist": "Calvin Harris",
+   "albumName": "18 Months",
+   "albumType": "album",
+   "releaseDate": "2012-10-29",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1HFfMOxCAT4GAwaPfCdmUs",
+   "group": "hand",
+   "title": "Waves - Robin Schulz Radio Edit",
+   "artist": "Mr. Probz, Robin Schulz",
+   "albumName": "Waves (Robin Schulz Radio Edit)",
+   "albumType": "single",
+   "releaseDate": "2014-02-07",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1IsvXZXAV9EBC4hBKW6yDN",
+   "group": "two-source",
+   "title": "Missing - Todd Terry Remix / Radio Edit",
+   "artist": "Everything But The Girl",
+   "albumName": "Like The Deserts Miss The Rain",
+   "albumType": "compilation",
+   "releaseDate": "2002-01-01",
+   "spotifyYear": 2002,
+   "gameYears": [
+    2002
+   ],
+   "facitYears": [
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1ixbwbeBi5ufN4noUKmW5a",
+   "group": "hand",
+   "title": "Paper Planes",
+   "artist": "M.I.A.",
+   "albumName": "Kala",
+   "albumType": "album",
+   "releaseDate": "2007-08-20",
+   "spotifyYear": 2007,
+   "gameYears": [
+    2007
+   ],
+   "facitYears": [
+    2007
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1j8GQQGyC26O1TeW4LLvjk",
+   "group": "two-source",
+   "title": "Praise You (Radio Edit)",
+   "artist": "Fatboy Slim",
+   "albumName": "Praise You EP",
+   "albumType": "single",
+   "releaseDate": "2023-09-01",
+   "spotifyYear": 2023,
+   "gameYears": [
+    2023
+   ],
+   "facitYears": [
+    1998
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1MQrMQwfqjgOjXEUaN9AMd",
+   "group": "two-source",
+   "title": "I'm Too Sexy",
+   "artist": "Right Said Fred",
+   "albumName": "Up (Special Edition)",
+   "albumType": "album",
+   "releaseDate": "2007-11-19",
+   "spotifyYear": 2007,
+   "gameYears": [
+    2007
+   ],
+   "facitYears": [
+    1991
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1nSyBcZr8IS9wZcFyvqqE7",
+   "group": "hand",
+   "title": "När vindarna viskar mitt namn",
+   "artist": "Roger Pontare",
+   "albumName": "När vindarna viskar mitt namn - Single",
+   "albumType": "single",
+   "releaseDate": "2000-03-15",
+   "spotifyYear": 2000,
+   "gameYears": [
+    2000
+   ],
+   "facitYears": [
+    2000
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1nXTM2CVdaoCySSD5kgt3J",
+   "group": "hand",
+   "title": "Sweat (A La La La La Long)",
+   "artist": "Inner Circle",
+   "albumName": "Sweat (A La La La La Long)",
+   "albumType": "album",
+   "releaseDate": "1992-06-02",
+   "spotifyYear": 1992,
+   "gameYears": [
+    1992
+   ],
+   "facitYears": [
+    1992
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1PEqh7awkpuepLBSq8ZwqD",
+   "group": "hand",
+   "title": "I Love You Always Forever",
+   "artist": "Donna Lewis",
+   "albumName": "Now in a Minute",
+   "albumType": "album",
+   "releaseDate": "1996-04-16",
+   "spotifyYear": 1996,
+   "gameYears": [
+    1996
+   ],
+   "facitYears": [
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1PuU1oIYtIaPHF0ogxWMvc",
+   "group": "two-source",
+   "title": "Hiphopper (feat. Teddybears Sthlm)",
+   "artist": "Thomas Rusiak",
+   "albumName": "Magic Villa Anniversary Edition",
+   "albumType": "album",
+   "releaseDate": "2016-04-22",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2000,
+    2016
+   ],
+   "facitYears": [
+    2000
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1QEEqeFIZktqIpPI4jSVSF",
+   "group": "hand",
+   "title": "More Than a Feeling",
+   "artist": "Boston",
+   "albumName": "Boston",
+   "albumType": "album",
+   "releaseDate": "1976",
+   "spotifyYear": 1976,
+   "gameYears": [
+    1976
+   ],
+   "facitYears": [
+    1976
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1Rvl8qsKJurfFTyWLBI9ib",
+   "group": "hand",
+   "title": "Baby, I Love Your Way",
+   "artist": "Big Mountain",
+   "albumName": "The Best of Big Mountain",
+   "albumType": "compilation",
+   "releaseDate": "1999-01-01",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1uzWOoJdADfstQuFtQFTUn",
+   "group": "hand",
+   "title": "Breakfast At Tiffany's",
+   "artist": "Deep Blue Something",
+   "albumName": "Home",
+   "albumType": "album",
+   "releaseDate": "1995-01-01",
+   "spotifyYear": 1995,
+   "gameYears": [
+    1995
+   ],
+   "facitYears": [
+    1995
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1WCEAGGRD066z2Q89ObXTq",
+   "group": "hand",
+   "title": "Crazy What Love Can Do",
+   "artist": "David Guetta, Becky Hill, Ella Henderson",
+   "albumName": "Crazy What Love Can Do",
+   "albumType": "single",
+   "releaseDate": "2022-04-08",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1XFyebjye69ZVGR2WOze2U",
+   "group": "hand",
+   "title": "Would I Lie To You? - Album Edit",
+   "artist": "Charles & Eddie",
+   "albumName": "Would I Lie To You?",
+   "albumType": "single",
+   "releaseDate": "1992-01-01",
+   "spotifyYear": 1992,
+   "gameYears": [
+    1992
+   ],
+   "facitYears": [
+    1992
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1xNcBAoUw8Hz6LqK2jt4Ff",
+   "group": "hand",
+   "title": "Call on Me - Radio Mix",
+   "artist": "Eric Prydz",
+   "albumName": "Call on Me (Radio Mix)",
+   "albumType": "single",
+   "releaseDate": "2004-09-10",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    2004
+   ],
+   "corrected": false
+  },
+  {
+   "id": "1zi7xx7UVEFkmKfv06H8x0",
+   "group": "hand",
+   "title": "One Dance",
+   "artist": "Drake, Wizkid, Kyla",
+   "albumName": "Views",
+   "albumType": "album",
+   "releaseDate": "2016-05-06",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2016
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2374M0fQpWi3dLnB54qaLX",
+   "group": "hand",
+   "title": "Africa",
+   "artist": "TOTO",
+   "albumName": "Toto IV",
+   "albumType": "album",
+   "releaseDate": "1982-04-08",
+   "spotifyYear": 1982,
+   "gameYears": [
+    1982
+   ],
+   "facitYears": [
+    1982
+   ],
+   "corrected": false
+  },
+  {
+   "id": "27QvYgBk0CHOVHthWnkuWt",
+   "group": "two-source",
+   "title": "Vogue",
+   "artist": "Madonna",
+   "albumName": "Celebration (double disc version)",
+   "albumType": "compilation",
+   "releaseDate": "2009-09-18",
+   "spotifyYear": 2009,
+   "gameYears": [
+    2009
+   ],
+   "facitYears": [
+    1990
+   ],
+   "corrected": false
+  },
+  {
+   "id": "29bOAzAR0Ev2UVSa9rkyts",
+   "group": "hand",
+   "title": "Dum av dig",
+   "artist": "Daniel Adams-Ray",
+   "albumName": "Svart, vitt och allt däremellan",
+   "albumType": "album",
+   "releaseDate": "2010-01-01",
+   "spotifyYear": 2010,
+   "gameYears": [
+    2010
+   ],
+   "facitYears": [
+    2010
+   ],
+   "corrected": false
+  },
+  {
+   "id": "29fNIVCogo4jpvKgTtIwyb",
+   "group": "hand",
+   "title": "Öppna din dörr",
+   "artist": "Tommy Nilsson",
+   "albumName": "En kvinnas man",
+   "albumType": "album",
+   "releaseDate": "1995-12-11",
+   "spotifyYear": 1995,
+   "gameYears": [
+    1995
+   ],
+   "facitYears": [
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2E6W2xMHWCF9ZMNKLalsCf",
+   "group": "hand",
+   "title": "Bullet",
+   "artist": "Infinite Mass",
+   "albumName": "The Face",
+   "albumType": "album",
+   "releaseDate": "2001-01-01",
+   "spotifyYear": 2001,
+   "gameYears": [
+    2001
+   ],
+   "facitYears": [
+    2001
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2e7s0oEzUoJtDSPtYJuVvD",
+   "group": "hand",
+   "title": "Lean On (feat. MØ & DJ Snake)",
+   "artist": "Major Lazer, MØ, DJ Snake",
+   "albumName": "Peace Is the Mission",
+   "albumType": "album",
+   "releaseDate": "2015-06-01",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2FiSTH0GYpIioUgjfzMIja",
+   "group": "hand",
+   "title": "Stay (feat. Maty Noyes)",
+   "artist": "Kygo, Maty Noyes",
+   "albumName": "Cloud Nine",
+   "albumType": "album",
+   "releaseDate": "2016-05-13",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2FlcxnvybdwpaMmMhaRtSN",
+   "group": "hand",
+   "title": "Don't Start Now",
+   "artist": "Dua Lipa",
+   "albumName": "Future Nostalgia (The Moonlight Edition)",
+   "albumType": "album",
+   "releaseDate": "2021-02-11",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2019,
+    2021
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2fZW7ByWe46rGih0FtP2XK",
+   "group": "hand",
+   "title": "Nothing Left (feat. Will Heard)",
+   "artist": "Kygo, Will Heard",
+   "albumName": "Cloud Nine",
+   "albumType": "album",
+   "releaseDate": "2016-05-13",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2hKdd3qO7cWr2Jo0Bcs0MA",
+   "group": "hand",
+   "title": "Drops of Jupiter (Tell Me)",
+   "artist": "Train",
+   "albumName": "Drops Of Jupiter",
+   "albumType": "album",
+   "releaseDate": "2001-03-27",
+   "spotifyYear": 2001,
+   "gameYears": [
+    2001
+   ],
+   "facitYears": [
+    2001
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2HRqTpkrJO5ggZyyK6NPWz",
+   "group": "hand",
+   "title": "Espresso",
+   "artist": "Sabrina Carpenter",
+   "albumName": "Short n' Sweet",
+   "albumType": "album",
+   "releaseDate": "2024-08-23",
+   "spotifyYear": 2024,
+   "gameYears": [
+    2024
+   ],
+   "facitYears": [
+    2024
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2jplxGfYoedcIir4TaEIJw",
+   "group": "hand",
+   "title": "Lemon Tree (feat. Will Jay)",
+   "artist": "Pesho & Dave Bo, Will Jay",
+   "albumName": "Lemon Tree (feat. Will Jay)",
+   "albumType": "single",
+   "releaseDate": "2017-12-01",
+   "spotifyYear": 2017,
+   "gameYears": [
+    2017
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2KH16WveTQWT6KOG9Rg6e2",
+   "group": "two-source",
+   "title": "Eye of the Tiger",
+   "artist": "Survivor",
+   "albumName": "Rocky IV",
+   "albumType": "compilation",
+   "releaseDate": "1985",
+   "spotifyYear": 1985,
+   "gameYears": [
+    1985
+   ],
+   "facitYears": [
+    1981,
+    1982
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2LawezPeJhN4AWuSB0GtAU",
+   "group": "hand",
+   "title": "Have You Ever Seen The Rain",
+   "artist": "Creedence Clearwater Revival",
+   "albumName": "Pendulum (Expanded Edition)",
+   "albumType": "album",
+   "releaseDate": "1970-12-07",
+   "spotifyYear": 1970,
+   "gameYears": [
+    1970
+   ],
+   "facitYears": [
+    1970
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2M9ro2krNb7nr7HSprkEgo",
+   "group": "hand",
+   "title": "Fast Car",
+   "artist": "Tracy Chapman",
+   "albumName": "Tracy Chapman",
+   "albumType": "album",
+   "releaseDate": "1988-04-05",
+   "spotifyYear": 1988,
+   "gameYears": [
+    1988
+   ],
+   "facitYears": [
+    1988
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2tnVG71enUj33Ic2nFN6kZ",
+   "group": "hand",
+   "title": "Ride It",
+   "artist": "Regard",
+   "albumName": "Ride It",
+   "albumType": "single",
+   "releaseDate": "2019-07-26",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2UbVnbE5FH6008mAm6Mmgw",
+   "group": "hand",
+   "title": "Run",
+   "artist": "OneRepublic",
+   "albumName": "Run",
+   "albumType": "single",
+   "releaseDate": "2021-05-05",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2V65y3PX4DkRhy1djlxd9p",
+   "group": "hand",
+   "title": "Don't You Worry Child - Radio Edit",
+   "artist": "Swedish House Mafia, John Martin",
+   "albumName": "Don't You Worry Child",
+   "albumType": "single",
+   "releaseDate": "2012-09-14",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2wz5weI4PREzpexKfrKgwv",
+   "group": "two-source",
+   "title": "Sweet Dreams",
+   "artist": "La Bouche",
+   "albumName": "Greatest Hits",
+   "albumType": "compilation",
+   "releaseDate": "2007",
+   "spotifyYear": 2007,
+   "gameYears": [
+    2007
+   ],
+   "facitYears": [
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "2y4lAQpi5VTNLu2ldeTdUH",
+   "group": "hand",
+   "title": "We Can't Stop",
+   "artist": "Miley Cyrus",
+   "albumName": "Bangerz (Deluxe Version)",
+   "albumType": "album",
+   "releaseDate": "2013-10-04",
+   "spotifyYear": 2013,
+   "gameYears": [
+    2013
+   ],
+   "facitYears": [
+    2013
+   ],
+   "corrected": false
+  },
+  {
+   "id": "32r1fs1hQ5dDkvU7le5OfR",
+   "group": "hand",
+   "title": "Jetlag",
+   "artist": "Näääk, Nimo, Melo",
+   "albumName": "Mannen Utan Mask",
+   "albumType": "album",
+   "releaseDate": "2012-01-01",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "33UnthIRhXbB4gmkjl4H19",
+   "group": "hand",
+   "title": "Chilla lide",
+   "artist": "Labyrint, Amsie Brown",
+   "albumName": "Garalaowit",
+   "albumType": "album",
+   "releaseDate": "2014-01-01",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "37BZB0z9T8Xu7U3e65qxFy",
+   "group": "hard-case",
+   "title": "Save Your Tears (with Ariana Grande) (Remix)",
+   "artist": "The Weeknd, Ariana Grande",
+   "albumName": "Save Your Tears (Remix)",
+   "albumType": "single",
+   "releaseDate": "2021-04-23",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "37ZJ0p5Jm13JPevGcx4SkF",
+   "group": "hand",
+   "title": "Livin' On A Prayer",
+   "artist": "Bon Jovi",
+   "albumName": "Slippery When Wet",
+   "albumType": "album",
+   "releaseDate": "1986-08-16",
+   "spotifyYear": 1986,
+   "gameYears": [
+    1986
+   ],
+   "facitYears": [
+    1986
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3AeicLnm55RqcXGBKYQolM",
+   "group": "hand",
+   "title": "King",
+   "artist": "Olly Alexander (Years & Years)",
+   "albumName": "Communion (Deluxe)",
+   "albumType": "album",
+   "releaseDate": "2015-07-10",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3B54sVLJ402zGa6Xm4YGNe",
+   "group": "hand",
+   "title": "Unforgettable",
+   "artist": "French Montana",
+   "albumName": "Jungle Rules",
+   "albumType": "album",
+   "releaseDate": "2017-07-14",
+   "spotifyYear": 2017,
+   "gameYears": [
+    2017
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3BKD1PwArikchz2Zrlp1qi",
+   "group": "hand",
+   "title": "Baby Don't Hurt Me",
+   "artist": "David Guetta, Anne-Marie, Coi Leray",
+   "albumName": "Baby Don't Hurt Me",
+   "albumType": "single",
+   "releaseDate": "2023-04-06",
+   "spotifyYear": 2023,
+   "gameYears": [
+    2023
+   ],
+   "facitYears": [
+    2023
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3c8iiZGfEammKJuWTErE5x",
+   "group": "two-source",
+   "title": "Ain't Nobody (Loves Me Better) (feat. Jasmine Thompson)",
+   "artist": "Felix Jaehn, Jasmine Thompson",
+   "albumName": "I",
+   "albumType": "album",
+   "releaseDate": "2018-02-16",
+   "spotifyYear": 2018,
+   "gameYears": [
+    2018
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3cfOd4CMv2snFaKAnMdnvK",
+   "group": "hard-case",
+   "title": "All Star",
+   "artist": "Smash Mouth",
+   "albumName": "Astro Lounge",
+   "albumType": "album",
+   "releaseDate": "1999-06-08",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3cHyrEgdyYRjgJKSOiOtcS",
+   "group": "hand",
+   "title": "Timber",
+   "artist": "Pitbull, Kesha",
+   "albumName": "Global Warming: Meltdown (Deluxe Version)",
+   "albumType": "album",
+   "releaseDate": "2012",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2013
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3CTgRPxyTh2w7wBjVFH88e",
+   "group": "hand",
+   "title": "Honey Boy (feat. Nile Rodgers & Shenseea)",
+   "artist": "Purple Disco Machine, Benjamin Ingrosso, Nile Rodgers, Shenseea",
+   "albumName": "Paradise",
+   "albumType": "album",
+   "releaseDate": "2024-09-20",
+   "spotifyYear": 2024,
+   "gameYears": [
+    2024
+   ],
+   "facitYears": [
+    2024
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3Eh9GdnrobKY96N1V255sV",
+   "group": "hand",
+   "title": "Sinner",
+   "artist": "Klingande, Stevie Appleton",
+   "albumName": "The Album",
+   "albumType": "album",
+   "releaseDate": "2019-11-15",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3ejfcz0QPyV717Vd3ta04V",
+   "group": "hand",
+   "title": "My Way",
+   "artist": "Calvin Harris",
+   "albumName": "96 Months",
+   "albumType": "album",
+   "releaseDate": "2024-08-08",
+   "spotifyYear": 2024,
+   "gameYears": [
+    2024
+   ],
+   "facitYears": [
+    2016
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3GCpEbJzknVdpvx9WI03x3",
+   "group": "two-source",
+   "title": "Mysterious Girl - Radio Edit",
+   "artist": "Peter Andre",
+   "albumName": "The Long Road Back",
+   "albumType": "album",
+   "releaseDate": "2004-06-07",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    1995,
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3gdewACMIVMEWVbyb8O9sY",
+   "group": "hand",
+   "title": "Rocket Man (I Think It's Going To Be A Long, Long Time)",
+   "artist": "Elton John",
+   "albumName": "Honky Chateau",
+   "albumType": "album",
+   "releaseDate": "1972-05-19",
+   "spotifyYear": 1972,
+   "gameYears": [
+    1972
+   ],
+   "facitYears": [
+    1972
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3HGwI9qwq5XqBDeZBV3zti",
+   "group": "hand",
+   "title": "World Hold On (Children of the Sky) - Radio Edit",
+   "artist": "Bob Sinclar, Steve Edwards",
+   "albumName": "World Hold On (Children of the Sky) [Radio Edit]",
+   "albumType": "single",
+   "releaseDate": "2006-06-06",
+   "spotifyYear": 2006,
+   "gameYears": [
+    2006
+   ],
+   "facitYears": [
+    2006
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3ia3dJETSOllPsv3LJkE35",
+   "group": "hard-case",
+   "title": "California Love - Original Version",
+   "artist": "2Pac, Roger, Dr. Dre",
+   "albumName": "Greatest Hits",
+   "albumType": "compilation",
+   "releaseDate": "1998-01-01",
+   "spotifyYear": 1998,
+   "gameYears": [
+    1998
+   ],
+   "facitYears": [
+    1995
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3iPPpKw775rCOiFd2aMT8F",
+   "group": "hand",
+   "title": "Little Stereo",
+   "artist": "Teddybears",
+   "albumName": "Fresh",
+   "albumType": "album",
+   "releaseDate": "2004-08-18",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    2004
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3K7UdFfEr3EWURDOOYvuwq",
+   "group": "hand",
+   "title": "Ortens favoriter - Remix",
+   "artist": "Labyrint, Black Ghost, STOR, Aleks, Allyawan, Påse, Dani M, Alladin, Jaqe",
+   "albumName": "Ortens favoriter",
+   "albumType": "single",
+   "releaseDate": "2012-01-01",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3MjUtNVVq3C8Fn0MP3zhXa",
+   "group": "hand",
+   "title": "...Baby One More Time",
+   "artist": "Britney Spears",
+   "albumName": "...Baby One More Time (Digital Deluxe Version)",
+   "albumType": "album",
+   "releaseDate": "1999-01-12",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1998
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3mRM4NM8iO7UBqrSigCQFH",
+   "group": "hard-case",
+   "title": "Stayin' Alive - From \"Saturday Night Fever\" Soundtrack",
+   "artist": "Bee Gees",
+   "albumName": "Greatest",
+   "albumType": "compilation",
+   "releaseDate": "1979-01-01",
+   "spotifyYear": 1979,
+   "gameYears": [
+    1979
+   ],
+   "facitYears": [
+    1977
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3PzsbWSQdLCKDLxn7YZfkM",
+   "group": "hand",
+   "title": "I'm On Fire",
+   "artist": "Bruce Springsteen",
+   "albumName": "Born In The U.S.A.",
+   "albumType": "album",
+   "releaseDate": "1984-06-04",
+   "spotifyYear": 1984,
+   "gameYears": [
+    1984
+   ],
+   "facitYears": [
+    1984
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3QHONiXGMGU3z68mQInncF",
+   "group": "two-source",
+   "title": "I'll Be Missing You (feat. Faith Evans, 112)",
+   "artist": "Diddy, Faith Evans, 112",
+   "albumName": "Bad Boy's 10th Anniversary- The Hits",
+   "albumType": "compilation",
+   "releaseDate": "2004-03-09",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    1997
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3qqho4PnTn3zlMPBzWhFFD",
+   "group": "hand",
+   "title": "Ugly Heart",
+   "artist": "G.R.L.",
+   "albumName": "G.R.L.",
+   "albumType": "single",
+   "releaseDate": "2014-07-29",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3QRM0qZB7oMYavveH0iEqx",
+   "group": "hand",
+   "title": "Here Comes the Hotstepper - Heartical Mix",
+   "artist": "iNi Kamoze, Salaam Remi",
+   "albumName": "Here Comes The Hotstepper",
+   "albumType": "album",
+   "releaseDate": "1994",
+   "spotifyYear": 1994,
+   "gameYears": [
+    1994
+   ],
+   "facitYears": [
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3R6dPfF2yBO8mHySW1XDAa",
+   "group": "hand",
+   "title": "Solo Dance",
+   "artist": "Martin Jensen",
+   "albumName": "Solo Dance",
+   "albumType": "single",
+   "releaseDate": "2016-11-04",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2016
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3rgTS3933lMWoPiN6CW4qY",
+   "group": "hand",
+   "title": "Kids (feat. MKLA)",
+   "artist": "KSHMR, Stefy De Cicco, MKLA",
+   "albumName": "Kids (feat. MKLA)",
+   "albumType": "single",
+   "releaseDate": "2020-08-14",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3rmo8F54jFF8OgYsqTxm5d",
+   "group": "hand",
+   "title": "Bad Habits",
+   "artist": "Ed Sheeran",
+   "albumName": "=",
+   "albumType": "album",
+   "releaseDate": "2021-10-25",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3sa06xVNmLLYIxdNNmVQN8",
+   "group": "hand",
+   "title": "Where Did You Go? (feat. MNEK)",
+   "artist": "Jax Jones, MNEK",
+   "albumName": "Where Did You Go (feat. MNEK)",
+   "albumType": "single",
+   "releaseDate": "2022-02-04",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3uVO0fpvKhuPCfGCAjJev0",
+   "group": "hand",
+   "title": "Ju Mer Dom Spottar",
+   "artist": "Kapten Röd",
+   "albumName": "Fläcken Som Aldrig Går Bort",
+   "albumType": "album",
+   "releaseDate": "2011-07-06",
+   "spotifyYear": 2011,
+   "gameYears": [
+    2011
+   ],
+   "facitYears": [
+    2011
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3VARvuAse3BGcthh63pUeg",
+   "group": "two-source",
+   "title": "Insomnia - Radio Edit",
+   "artist": "Faithless",
+   "albumName": "One For The Lad's",
+   "albumType": "compilation",
+   "releaseDate": "2008-05-16",
+   "spotifyYear": 2008,
+   "gameYears": [
+    2008
+   ],
+   "facitYears": [
+    1995,
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3WkibOpDF7cQ5xntM1epyf",
+   "group": "hand",
+   "title": "It Wasn't Me",
+   "artist": "Shaggy, Rik Rok",
+   "albumName": "Hot Shot",
+   "albumType": "album",
+   "releaseDate": "2000-08-08",
+   "spotifyYear": 2000,
+   "gameYears": [
+    2000
+   ],
+   "facitYears": [
+    2000
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3XKIUb7HzIF1Vu9usunMzc",
+   "group": "hand",
+   "title": "Maria Maria (feat. The Product G&B)",
+   "artist": "Santana, The Product G&B",
+   "albumName": "Supernatural (Remastered)",
+   "albumType": "album",
+   "releaseDate": "1999-06-15",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3yrSvpt2l1xhsV9Em88Pul",
+   "group": "hand",
+   "title": "Brown Eyed Girl",
+   "artist": "Van Morrison",
+   "albumName": "Blowin' Your Mind!",
+   "albumType": "album",
+   "releaseDate": "1967-09",
+   "spotifyYear": 1967,
+   "gameYears": [
+    1967
+   ],
+   "facitYears": [
+    1967
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3zBhihYUHBmGd2bcQIobrF",
+   "group": "hard-case",
+   "title": "(Sittin' On) the Dock of the Bay",
+   "artist": "Otis Redding",
+   "albumName": "The Dock of the Bay (Mono)",
+   "albumType": "album",
+   "releaseDate": "1968",
+   "spotifyYear": 1968,
+   "gameYears": [
+    1968
+   ],
+   "facitYears": [
+    1968
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3ZpQiJ78LKINrW9SQTgbXd",
+   "group": "hand",
+   "title": "All I Wanna Do",
+   "artist": "Sheryl Crow",
+   "albumName": "Tuesday Night Music Club",
+   "albumType": "album",
+   "releaseDate": "1993-08-03",
+   "spotifyYear": 1993,
+   "gameYears": [
+    1993
+   ],
+   "facitYears": [
+    1993
+   ],
+   "corrected": false
+  },
+  {
+   "id": "3zz9eYWluKY5AsvtMXFL9K",
+   "group": "hand",
+   "title": "Pumped Up",
+   "artist": "Klingande",
+   "albumName": "The Album",
+   "albumType": "album",
+   "releaseDate": "2019-11-15",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4255amV4enzl28KAn16rUO",
+   "group": "hand",
+   "title": "Are You With Me",
+   "artist": "Lost Frequencies",
+   "albumName": "Less Is More",
+   "albumType": "album",
+   "releaseDate": "2016-10-21",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "45sdD9GjryujVOcRJ4YQRQ",
+   "group": "hand",
+   "title": "Cobrastyle (feat. Mad Cobra)",
+   "artist": "Teddybears",
+   "albumName": "Fresh",
+   "albumType": "album",
+   "releaseDate": "2004-08-18",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    2004
+   ],
+   "corrected": false
+  },
+  {
+   "id": "46jLy47W8rkf8rEX04gMKB",
+   "group": "hand",
+   "title": "Wherever I Go",
+   "artist": "OneRepublic",
+   "albumName": "Oh My My (Deluxe)",
+   "albumType": "album",
+   "releaseDate": "2016-12-02",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2016
+   ],
+   "corrected": false
+  },
+  {
+   "id": "46q5BtHso0ECuTKeq70ZhW",
+   "group": "hand",
+   "title": "How Bizarre",
+   "artist": "OMC",
+   "albumName": "How Bizarre (Deluxe)",
+   "albumType": "album",
+   "releaseDate": "1996",
+   "spotifyYear": 1996,
+   "gameYears": [
+    1996
+   ],
+   "facitYears": [
+    1995
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4BggEwLhGfrbrl7JBhC8EC",
+   "group": "hand",
+   "title": "Butterfly",
+   "artist": "Crazy Town",
+   "albumName": "The Gift Of Game",
+   "albumType": "album",
+   "releaseDate": "2000-12-15",
+   "spotifyYear": 2000,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    2000
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4cG7HUWYHBV6R6tHn1gxrl",
+   "group": "hand",
+   "title": "Friday (feat. Mufasa & Hypeman) - Dopamine Re-Edit",
+   "artist": "Riton, Nightcrawlers, Mufasa & Hypeman, Mufasa, Dopamine",
+   "albumName": "Friday (feat. Mufasa & Hypeman) [Dopamine Re-Edit]",
+   "albumType": "single",
+   "releaseDate": "2021-01-15",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4GewRLEiI4BDTQsoH8BRVV",
+   "group": "two-source",
+   "title": "Blue (Da Ba Dee) - Gabry Ponte Ice Pop Radio",
+   "artist": "Eiffel 65, Gabry Ponte",
+   "albumName": "Europop",
+   "albumType": "album",
+   "releaseDate": "2011-01-05",
+   "spotifyYear": 2011,
+   "gameYears": [
+    2011
+   ],
+   "facitYears": [
+    1998,
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4GK4mydvnsodLEHWb4zJV4",
+   "group": "hand",
+   "title": "Sunnanvind",
+   "artist": "Mares",
+   "albumName": "Sunnanvind",
+   "albumType": "album",
+   "releaseDate": "2019-03-15",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4h9wh7iOZ0GGn8QVp4RAOB",
+   "group": "hand",
+   "title": "I Ain't Worried",
+   "artist": "OneRepublic",
+   "albumName": "I Ain’t Worried (Music From The Motion Picture \"Top Gun: Maverick\")",
+   "albumType": "single",
+   "releaseDate": "2022-05-13",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4jPy3l0RUwlUI9T5XHBW2m",
+   "group": "hand",
+   "title": "Mood (feat. iann dior)",
+   "artist": "24kGoldn, iann dior",
+   "albumName": "El Dorado",
+   "albumType": "album",
+   "releaseDate": "2021-03-26",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4kbj5MwxO1bq9wjT5g9HaA",
+   "group": "hand",
+   "title": "Shut Up and Dance",
+   "artist": "WALK THE MOON",
+   "albumName": "TALKING IS HARD",
+   "albumType": "album",
+   "releaseDate": "2014-12-02",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4KyHNkxHKIQLutusfcj4ez",
+   "group": "two-source",
+   "title": "KU LO SA",
+   "artist": "Oxlade",
+   "albumName": "OFA: Deluxe Edition",
+   "albumType": "album",
+   "releaseDate": "2025-04-04",
+   "spotifyYear": 2025,
+   "gameYears": [
+    2025
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4mn2kNTqiGLwaUR8JdhJ1l",
+   "group": "two-source",
+   "title": "House of the Rising Sun",
+   "artist": "The Animals",
+   "albumName": "The Singles Plus",
+   "albumType": "compilation",
+   "releaseDate": "2003-02-28",
+   "spotifyYear": 2003,
+   "gameYears": [
+    1987
+   ],
+   "facitYears": [
+    1963,
+    1964
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4N5s8lPTsjI9EGP7K4SXzB",
+   "group": "hand",
+   "title": "Green Green Grass",
+   "artist": "George Ezra",
+   "albumName": "Gold Rush Kid",
+   "albumType": "album",
+   "releaseDate": "2022-06-10",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4RvWPyQ5RL0ao9LPZeSouE",
+   "group": "hand",
+   "title": "Everybody Wants To Rule The World",
+   "artist": "Tears For Fears",
+   "albumName": "Songs From The Big Chair (Super Deluxe Edition)",
+   "albumType": "compilation",
+   "releaseDate": "1985-02-25",
+   "spotifyYear": 1985,
+   "gameYears": [
+    1985
+   ],
+   "facitYears": [
+    1985
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4u7EnebtmKWzUH433cf5Qv",
+   "group": "hand",
+   "title": "Bohemian Rhapsody - Remastered 2011",
+   "artist": "Queen",
+   "albumName": "A Night At The Opera (2011 Remaster)",
+   "albumType": "album",
+   "releaseDate": "1975-11-21",
+   "spotifyYear": 1975,
+   "gameYears": [
+    1975
+   ],
+   "facitYears": [
+    1975
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4uUG5RXrOk84mYEfFvj3cK",
+   "group": "hand",
+   "title": "I'm Good (Blue)",
+   "artist": "David Guetta, Bebe Rexha",
+   "albumName": "I'm Good (Blue)",
+   "albumType": "single",
+   "releaseDate": "2022-08-26",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4VKoYgw6bQxiz3VuY1Zw8B",
+   "group": "two-source",
+   "title": "King of My Castle (Roy Malone's King Mix)",
+   "artist": "Wamdue Project, Roy Malone",
+   "albumName": "King Of My Castle (Mixes)",
+   "albumType": "album",
+   "releaseDate": "2023-07-14",
+   "spotifyYear": 2023,
+   "gameYears": [
+    2023
+   ],
+   "facitYears": [
+    1997,
+    1998
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4w3tQBXhn5345eUXDGBWZG",
+   "group": "hand",
+   "title": "9 to 5",
+   "artist": "Dolly Parton",
+   "albumName": "9 To 5 And Odd Jobs",
+   "albumType": "album",
+   "releaseDate": "1980",
+   "spotifyYear": 1980,
+   "gameYears": [
+    1980
+   ],
+   "facitYears": [
+    1980
+   ],
+   "corrected": false
+  },
+  {
+   "id": "4Y7XAxTANhu3lmnLAzhWJW",
+   "group": "hand",
+   "title": "Fireball (feat. John Ryan)",
+   "artist": "Pitbull, John Ryan",
+   "albumName": "Globalization",
+   "albumType": "album",
+   "releaseDate": "2014-11-24",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2014
+   ],
+   "corrected": false
+  },
+  {
+   "id": "50nfwKoDiSYg8zOCREWAm5",
+   "group": "hand",
+   "title": "Shivers",
+   "artist": "Ed Sheeran",
+   "albumName": "=",
+   "albumType": "album",
+   "releaseDate": "2021-10-25",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "50PeqUz1BjMw9ayNTk5O4d",
+   "group": "two-source",
+   "title": "I've Been Thinking About You",
+   "artist": "Londonbeat",
+   "albumName": "Best! The Singles 16 Tracks",
+   "albumType": "compilation",
+   "releaseDate": "1995-11-20",
+   "spotifyYear": 1995,
+   "gameYears": [
+    1995
+   ],
+   "facitYears": [
+    1990
+   ],
+   "corrected": false
+  },
+  {
+   "id": "58X2vGyNWT2ZPEaGUw1tAb",
+   "group": "hand",
+   "title": "Kung för en dag",
+   "artist": "Magnus Uggla",
+   "albumName": "Uggla Box",
+   "albumType": "compilation",
+   "releaseDate": "2008-01-01",
+   "spotifyYear": 2008,
+   "gameYears": [
+    2008
+   ],
+   "facitYears": [
+    1997
+   ],
+   "corrected": false
+  },
+  {
+   "id": "59o6ojGNGJOYiVJSzC6Lsa",
+   "group": "hand",
+   "title": "Memories (feat. Kid Cudi) - 2021 Remix",
+   "artist": "David Guetta, Kid Cudi",
+   "albumName": "Memories (feat. Kid Cudi) [2021 Remix]",
+   "albumType": "single",
+   "releaseDate": "2021-01-08",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "59qrUpoplZxbIZxk6X0Bm3",
+   "group": "hand",
+   "title": "Take You Dancing",
+   "artist": "Jason Derulo",
+   "albumName": "Take You Dancing",
+   "albumType": "single",
+   "releaseDate": "2020-07-22",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5aIfLbdgkbH7NbQryd1poB",
+   "group": "hand",
+   "title": "Samba de Janeiro",
+   "artist": "Bellini",
+   "albumName": "Samba de Janeiro",
+   "albumType": "album",
+   "releaseDate": "1997-08-01",
+   "spotifyYear": 1997,
+   "gameYears": [
+    1997
+   ],
+   "facitYears": [
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5bUVHuzQh5mkvMPjUU074i",
+   "group": "hand",
+   "title": "No Woman, No Cry",
+   "artist": "Fugees, Wyclef Jean",
+   "albumName": "The Score (Expanded Edition)",
+   "albumType": "album",
+   "releaseDate": "1996-02-13",
+   "spotifyYear": 1996,
+   "gameYears": [
+    1996
+   ],
+   "facitYears": [
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5ChkMS8OtdzJeqyybCc9R5",
+   "group": "hard-case",
+   "title": "Billie Jean",
+   "artist": "Michael Jackson",
+   "albumName": "Thriller 25 Super Deluxe Edition",
+   "albumType": "album",
+   "releaseDate": "2008-02-08",
+   "spotifyYear": 2008,
+   "gameYears": [
+    2008
+   ],
+   "facitYears": [
+    1982
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5DiXcVovI0FcY2s0icWWUu",
+   "group": "hand",
+   "title": "Mr. Jones",
+   "artist": "Counting Crows",
+   "albumName": "August And Everything After",
+   "albumType": "album",
+   "releaseDate": "1993-09-14",
+   "spotifyYear": 1993,
+   "gameYears": [
+    1993
+   ],
+   "facitYears": [
+    1993
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5fRvePkRGdpn2nKacG7I6d",
+   "group": "hand",
+   "title": "Coco Jamboo",
+   "artist": "Mr. President",
+   "albumName": "We See the Same Sun",
+   "albumType": "album",
+   "releaseDate": "1996-05-17",
+   "spotifyYear": 1996,
+   "gameYears": [
+    1996
+   ],
+   "facitYears": [
+    1996
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5fwSHlTEWpluwOM0Sxnh5k",
+   "group": "hand",
+   "title": "Pepas",
+   "artist": "Farruko",
+   "albumName": "Pepas",
+   "albumType": "single",
+   "releaseDate": "2021-06-24",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5hsZ6loP0rseyjleWs0cZ1",
+   "group": "hand",
+   "title": "Där palmerna bor",
+   "artist": "Medina",
+   "albumName": "Hayat",
+   "albumType": "album",
+   "releaseDate": "2012-10-05",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5iLYWyAMSGqpL7NASZbR4w",
+   "group": "hand",
+   "title": "Vår betong",
+   "artist": "Jacco",
+   "albumName": "Vår betong",
+   "albumType": "single",
+   "releaseDate": "2009-06-29",
+   "spotifyYear": 2009,
+   "gameYears": [
+    2009
+   ],
+   "facitYears": [
+    2009
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5k2eOI8e9RpwCZcFQrqtKi",
+   "group": "hand",
+   "title": "Steal My Sunshine",
+   "artist": "LEN",
+   "albumName": "You Can't Stop The Bum Rush",
+   "albumType": "album",
+   "releaseDate": "1999-05-24",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5K6Ssv4Z3zRvxt0P6EKUAP",
+   "group": "hand",
+   "title": "Heartbreak Anthem (with David Guetta & Little Mix)",
+   "artist": "Galantis, David Guetta, Little Mix",
+   "albumName": "Heartbreak Anthem (with David Guetta & Little Mix)",
+   "albumType": "single",
+   "releaseDate": "2021-05-20",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5Ls1Ir6Vl5frICvnH4nVRH",
+   "group": "hand",
+   "title": "Giftig",
+   "artist": "Mange Schmidt",
+   "albumName": "Känslan kommer tillbaks",
+   "albumType": "album",
+   "releaseDate": "2007-01-01",
+   "spotifyYear": 2007,
+   "gameYears": [
+    2007
+   ],
+   "facitYears": [
+    2007
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5masKPHeAOVNgxdLebIcK7",
+   "group": "hand",
+   "title": "Stole the Show",
+   "artist": "Kygo, Parson James",
+   "albumName": "Cloud Nine",
+   "albumType": "album",
+   "releaseDate": "2016-05-13",
+   "spotifyYear": 2016,
+   "gameYears": [
+    2016
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5N6M8yDiMV32T6Rkzh8EbW",
+   "group": "hand",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "artist": "Vengaboys",
+   "albumName": "The Party Album!",
+   "albumType": "album",
+   "releaseDate": "1999-06-04",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1998
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5OwH2YXbDrU5HOIyZDRFtg",
+   "group": "hand",
+   "title": "Oh boy",
+   "artist": "Peps Persson",
+   "albumName": "Bästa",
+   "albumType": "album",
+   "releaseDate": "2004-01-01",
+   "spotifyYear": 2004,
+   "gameYears": [
+    1993,
+    2004
+   ],
+   "facitYears": [
+    1993
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5QRAfvKPyQpwt897Jc0glg",
+   "group": "hand",
+   "title": "Blue (Da Ba Dee) - Gabry Ponte Ice Pop Radio",
+   "artist": "Eiffel 65, Gabry Ponte",
+   "albumName": "Blue (Da Ba Dee)",
+   "albumType": "single",
+   "releaseDate": "1998-11-11",
+   "spotifyYear": 1998,
+   "gameYears": [
+    1998
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5TAf4lnZCZTLlZHNZMLFLi",
+   "group": "hand",
+   "title": "I Try",
+   "artist": "Macy Gray",
+   "albumName": "On How Life Is",
+   "albumType": "album",
+   "releaseDate": "1999-07-03",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5tf1VVWniHgryyumXyJM7w",
+   "group": "hand",
+   "title": "Sugar (feat. Francesco Yates)",
+   "artist": "Robin Schulz, Francesco Yates",
+   "albumName": "Sugar",
+   "albumType": "album",
+   "releaseDate": "2015-09-25",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5WHTFyqSii0lmT9R21abT8",
+   "group": "hand",
+   "title": "Don't Call Me Up",
+   "artist": "Mabel",
+   "albumName": "Ivy To Roses (Mixtape)",
+   "albumType": "album",
+   "releaseDate": "2019-01-18",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5wsa7NPNWf4akemfHQ4u2g",
+   "group": "two-source",
+   "title": "go",
+   "artist": "Cat Burns",
+   "albumName": "early twenties",
+   "albumType": "album",
+   "releaseDate": "2024-07-12",
+   "spotifyYear": 2024,
+   "gameYears": [
+    2024
+   ],
+   "facitYears": [
+    2019,
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5XVjNRubJUW0iPhhSWpLCj",
+   "group": "hand",
+   "title": "Better Off Alone",
+   "artist": "Alice Deejay",
+   "albumName": "Who Needs Guitars Anyway?",
+   "albumType": "album",
+   "releaseDate": "2000-10-01",
+   "spotifyYear": 2000,
+   "gameYears": [
+    2000
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5YqEzk3C5c3UZ1D5fJUlXA",
+   "group": "hard-case",
+   "title": "Sunroof",
+   "artist": "Nicky Youre, hey daisy",
+   "albumName": "Good Times Go",
+   "albumType": "album",
+   "releaseDate": "2023-06-09",
+   "spotifyYear": 2023,
+   "gameYears": [
+    2023
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "5YuLlTsWYK9uslUdGM83dJ",
+   "group": "hand",
+   "title": "Ingen sommar utan reggae",
+   "artist": "Markoolio",
+   "albumName": "Värsta Plattan",
+   "albumType": "album",
+   "releaseDate": "2007-10-01",
+   "spotifyYear": 2007,
+   "gameYears": [
+    2007
+   ],
+   "facitYears": [
+    2007
+   ],
+   "corrected": false
+  },
+  {
+   "id": "68GdZAAowWDac3SkdNWOwo",
+   "group": "hand",
+   "title": "När solen går ner",
+   "artist": "AKI, Kapten Röd",
+   "albumName": "När solen går ner",
+   "albumType": "single",
+   "releaseDate": "2012-01-01",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6BKOBYeTXMQtMRshLprSbS",
+   "group": "two-source",
+   "title": "Country Roads",
+   "artist": "Hermes House Band",
+   "albumName": "Greatest Hits No.1 Gold Selection",
+   "albumType": "compilation",
+   "releaseDate": "2015-12-02",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2001,
+    2002
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6bTakgzLjy28vGMsD3a2FC",
+   "group": "hand",
+   "title": "She's A Freak",
+   "artist": "Infinite Mass",
+   "albumName": "The Face",
+   "albumType": "album",
+   "releaseDate": "2001-01-01",
+   "spotifyYear": 2001,
+   "gameYears": [
+    2001
+   ],
+   "facitYears": [
+    2001
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6cx06DFPPHchuUAcTxznu9",
+   "group": "hand",
+   "title": "Head & Heart (feat. MNEK)",
+   "artist": "Joel Corry, MNEK",
+   "albumName": "Head & Heart (feat. MNEK)",
+   "albumType": "single",
+   "releaseDate": "2020-07-03",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6dGnYIeXmHdcikdzNNDMm2",
+   "group": "hand",
+   "title": "Here Comes The Sun - Remastered 2009",
+   "artist": "The Beatles",
+   "albumName": "Abbey Road (Remastered)",
+   "albumType": "album",
+   "releaseDate": "1969-09-26",
+   "spotifyYear": 1969,
+   "gameYears": [
+    1969
+   ],
+   "facitYears": [
+    1969
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6DXLO8LndZMVOHM0wNbpzg",
+   "group": "hand",
+   "title": "Danza Kuduro",
+   "artist": "Don Omar, Lucenzo",
+   "albumName": "Meet The Orphans",
+   "albumType": "album",
+   "releaseDate": "2010-01-01",
+   "spotifyYear": 2010,
+   "gameYears": [
+    2010
+   ],
+   "facitYears": [
+    2010
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6Dy1jexKYriXAVG6evyUTJ",
+   "group": "hand",
+   "title": "OUT OUT (feat. Charli XCX & Saweetie)",
+   "artist": "Joel Corry, Jax Jones, Charli xcx, Saweetie",
+   "albumName": "OUT OUT (feat. Charli XCX & Saweetie)",
+   "albumType": "single",
+   "releaseDate": "2021-08-13",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6h5PAsRni4IRlxWr6uDPTP",
+   "group": "hand",
+   "title": "More Than You Know",
+   "artist": "Axwell /\\ Ingrosso",
+   "albumName": "More Than You Know",
+   "albumType": "compilation",
+   "releaseDate": "2017-07-28",
+   "spotifyYear": 2017,
+   "gameYears": [
+    2017
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6habFhsOp2NvshLv26DqMb",
+   "group": "hard-case",
+   "title": "Despacito",
+   "artist": "Luis Fonsi, Daddy Yankee",
+   "albumName": "VIDA",
+   "albumType": "album",
+   "releaseDate": "2019-02-01",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6hTcuIQa0sxrrByu9wTD7s",
+   "group": "hand",
+   "title": "Born to Run",
+   "artist": "Bruce Springsteen",
+   "albumName": "Born To Run",
+   "albumType": "album",
+   "releaseDate": "1975-08-25",
+   "spotifyYear": 1975,
+   "gameYears": [
+    1975
+   ],
+   "facitYears": [
+    1975
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6lvqg7xIvY8QJhZCVwQMoR",
+   "group": "hand",
+   "title": "The Thief",
+   "artist": "Infinite Mass",
+   "albumName": "1991",
+   "albumType": "album",
+   "releaseDate": "2004-05-12",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    2004
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6pb5DtlAeG95dNQLHiArRU",
+   "group": "hand",
+   "title": "Rock My Body",
+   "artist": "R3HAB, INNA, Sash!",
+   "albumName": "Rock My Body (with INNA & Sash!)",
+   "albumType": "single",
+   "releaseDate": "2023-04-28",
+   "spotifyYear": 2023,
+   "gameYears": [
+    2023
+   ],
+   "facitYears": [
+    2023
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6RtPijgfPKROxEzTHNRiDp",
+   "group": "hand",
+   "title": "Rude",
+   "artist": "MAGIC!",
+   "albumName": "Don't Kill the Magic",
+   "albumType": "album",
+   "releaseDate": "2014-06-25",
+   "spotifyYear": 2014,
+   "gameYears": [
+    2014
+   ],
+   "facitYears": [
+    2013
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6RUKPb4LETWmmr3iAEQktW",
+   "group": "hand",
+   "title": "Something Just Like This",
+   "artist": "The Chainsmokers, Coldplay",
+   "albumName": "Memories...Do Not Open",
+   "albumType": "album",
+   "releaseDate": "2017-04-07",
+   "spotifyYear": 2017,
+   "gameYears": [
+    2017
+   ],
+   "facitYears": [
+    2017
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6SluaPiV04KOaRTOIScoff",
+   "group": "hand",
+   "title": "Show Me Love - Radio Version",
+   "artist": "Robyn",
+   "albumName": "Robyn Is Here",
+   "albumType": "compilation",
+   "releaseDate": "1995-10-13",
+   "spotifyYear": 1995,
+   "gameYears": [
+    1995
+   ],
+   "facitYears": [
+    1995
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6tXnRSvuNgOq4QcxpIN54r",
+   "group": "hand",
+   "title": "Weather With You",
+   "artist": "Crowded House",
+   "albumName": "Woodface",
+   "albumType": "album",
+   "releaseDate": "1991-06-24",
+   "spotifyYear": 1991,
+   "gameYears": [
+    1991
+   ],
+   "facitYears": [
+    1991
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6UelLqGlWMcVH1E5c4H7lY",
+   "group": "hand",
+   "title": "Watermelon Sugar",
+   "artist": "Harry Styles",
+   "albumName": "Fine Line",
+   "albumType": "album",
+   "releaseDate": "2019-12-13",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6Vz7vzOpCwKeSQlfViibuY",
+   "group": "two-source",
+   "title": "Crazy",
+   "artist": "Seal",
+   "albumName": "Best 1991 - 2004",
+   "albumType": "compilation",
+   "releaseDate": "2004",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    1990,
+    1991
+   ],
+   "corrected": false
+  },
+  {
+   "id": "6zSpb8dQRaw0M1dK8PBwQz",
+   "group": "hand",
+   "title": "Cold Heart - PNAU Remix",
+   "artist": "Elton John, Dua Lipa, PNAU",
+   "albumName": "Cold Heart (PNAU Remix)",
+   "albumType": "single",
+   "releaseDate": "2021-08-13",
+   "spotifyYear": 2021,
+   "gameYears": [
+    2021
+   ],
+   "facitYears": [
+    2021
+   ],
+   "corrected": false
+  },
+  {
+   "id": "76D5nfZbYzZYfUZKGy73jy",
+   "group": "two-source",
+   "title": "7 Seconds (feat. Neneh Cherry)",
+   "artist": "Youssou N'Dour, Neneh Cherry",
+   "albumName": "7 Seconds: The Best Of Youssou N'Dour",
+   "albumType": "compilation",
+   "releaseDate": "2004",
+   "spotifyYear": 2004,
+   "gameYears": [
+    2004
+   ],
+   "facitYears": [
+    1993,
+    1994
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7a53HqqArd4b9NF4XAmlbI",
+   "group": "hand",
+   "title": "Kings & Queens",
+   "artist": "Ava Max",
+   "albumName": "Heaven & Hell",
+   "albumType": "album",
+   "releaseDate": "2020-09-18",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7C1trmcQQ5n5RNy4l6ziCv",
+   "group": "hand",
+   "title": "Some Say - Felix Jaehn Remix",
+   "artist": "Nea, Felix Jaehn",
+   "albumName": "Some Say (Felix Jaehn Remix)",
+   "albumType": "single",
+   "releaseDate": "2020-01-10",
+   "spotifyYear": 2020,
+   "gameYears": [
+    2020
+   ],
+   "facitYears": [
+    2020
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7ef4DlsgrMEH11cDZd32M6",
+   "group": "hand",
+   "title": "One Kiss (with Dua Lipa)",
+   "artist": "Calvin Harris, Dua Lipa",
+   "albumName": "One Kiss (with Dua Lipa)",
+   "albumType": "single",
+   "releaseDate": "2018-04-06",
+   "spotifyYear": 2018,
+   "gameYears": [
+    2018
+   ],
+   "facitYears": [
+    2018
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7Feaw9WAEREY0DUOSXJLOM",
+   "group": "hand",
+   "title": "Summer Days (feat. Macklemore & Patrick Stump of Fall Out Boy)",
+   "artist": "Martin Garrix, Macklemore, Fall Out Boy",
+   "albumName": "Summer Days (feat. Macklemore & Patrick Stump of Fall Out Boy)",
+   "albumType": "single",
+   "releaseDate": "2019-04-25",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7FwBtcecmlpc1sLySPXeGE",
+   "group": "hand",
+   "title": "Dancing In the Dark",
+   "artist": "Bruce Springsteen",
+   "albumName": "Born In The U.S.A.",
+   "albumType": "album",
+   "releaseDate": "1984-06-04",
+   "spotifyYear": 1984,
+   "gameYears": [
+    1984
+   ],
+   "facitYears": [
+    1984
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7fZBQnc0zXwVybgCIrQQil",
+   "group": "hand",
+   "title": "Belly Dancer",
+   "artist": "Imanbek, BYOR",
+   "albumName": "Belly Dancer",
+   "albumType": "single",
+   "releaseDate": "2022-02-18",
+   "spotifyYear": 2022,
+   "gameYears": [
+    2022
+   ],
+   "facitYears": [
+    2022
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7HW5WIw7ZgZORCzUxv5gW5",
+   "group": "hand",
+   "title": "Don't Go Breaking My Heart",
+   "artist": "Elton John, Kiki Dee",
+   "albumName": "Rock Of The Westies",
+   "albumType": "album",
+   "releaseDate": "1975-10-24",
+   "spotifyYear": 1975,
+   "gameYears": [
+    1975
+   ],
+   "facitYears": [
+    1976
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7ks6AZmFcm3Y6PGGxGSmlB",
+   "group": "hand",
+   "title": "Where Them Girls At (feat. Nicki Minaj & Flo Rida)",
+   "artist": "David Guetta, Flo Rida, Nicki Minaj",
+   "albumName": "Nothing but the Beat (Ultimate Edition)",
+   "albumType": "album",
+   "releaseDate": "2012-12-07",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2011
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7MC4XR9M9amdmKQr2iDF7i",
+   "group": "hand",
+   "title": "Iko Iko (My Bestie)",
+   "artist": "Justin Wellington, Small Jam",
+   "albumName": "Iko Iko (My Bestie)",
+   "albumType": "single",
+   "releaseDate": "2019-06-03",
+   "spotifyYear": 2019,
+   "gameYears": [
+    2019
+   ],
+   "facitYears": [
+    2019
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7mnGQesk1TzQLzQ9bYWZPR",
+   "group": "hand",
+   "title": "She's so High",
+   "artist": "Tal Bachman",
+   "albumName": "Tal Bachman",
+   "albumType": "album",
+   "releaseDate": "1999-02-23",
+   "spotifyYear": 1999,
+   "gameYears": [
+    1999
+   ],
+   "facitYears": [
+    1999
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7nLMZKhfkFZLr9rz4VyOpF",
+   "group": "hand",
+   "title": "Vart jag mig i världen vänder",
+   "artist": "Den svenska björnstammen",
+   "albumName": "Ett fel närmare rätt",
+   "albumType": "album",
+   "releaseDate": "2012-01-01",
+   "spotifyYear": 2012,
+   "gameYears": [
+    2012
+   ],
+   "facitYears": [
+    2012
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7v02Sn9vYRQ6pc1lqhnkWY",
+   "group": "hand",
+   "title": "Save Tonight",
+   "artist": "Eagle-Eye Cherry",
+   "albumName": "Desireless",
+   "albumType": "album",
+   "releaseDate": "1997-07-21",
+   "spotifyYear": 1997,
+   "gameYears": [
+    1997
+   ],
+   "facitYears": [
+    1997
+   ],
+   "corrected": false
+  },
+  {
+   "id": "7vHshinTU8161w69EPbabY",
+   "group": "hand",
+   "title": "Younger - Kygo Remix",
+   "artist": "Seinabo Sey, Kygo",
+   "albumName": "Pretend",
+   "albumType": "album",
+   "releaseDate": "2015-10-23",
+   "spotifyYear": 2015,
+   "gameYears": [
+    2015
+   ],
+   "facitYears": [
+    2015
+   ],
+   "corrected": false
+  }
+ ]
+}

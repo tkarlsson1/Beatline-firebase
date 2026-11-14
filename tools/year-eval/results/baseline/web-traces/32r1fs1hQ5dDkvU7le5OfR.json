@@ -1,0 +1,139 @@
+{
+ "id": "32r1fs1hQ5dDkvU7le5OfR",
+ "userMessage": "Titel: Jetlag\nArtist: Näääk, Nimo, Melo\nSpotifys album: Mannen Utan Mask\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2012-01-01\nSpotifys år: 2012",
+ "responseText": "Låten kom ut 2012, alltså samma år som Spotify anger. \"Jetlag\" släpptes först som singel och fanns sedan med på Näääks andra album, \"Mannen utan mask\".\n\n- **Albumet:** Engelska Wikipedia anger att albumet Mannen utan mask (\"The man without mask\") gavs ut den 26 september 2012. I listan över singlar står 2012: \"Jetlag\". Artikeln nämner också att Jetlag och Blåser min rök är två singlar som Näääk släppte med Nimo som gästrappare.\n- **Singeln:** Apple Music listar singeln \"Jetlag (feat. Nimo)\" med Utgiven: 1 jan 2012 · ℗ 2012 Universal Music AB. Den 1 januari ser ut som ett schablondatum, men årtalet stämmer med de andra källorna.\n- **Samtida källa:** Gaffa skrev i september 2012 att Nimo gästar Näääk på hans två singlar från nya skivan, Blåser Min Rök och Jetlag.\n\nSingeln kom alltså före albumet, men båda gavs ut 2012. Någon tidigare utgåva hittade jag inte.\n\når: 2012\nkälla: https://en.wikipedia.org/wiki/N%C3%A4%C3%A4%C3%A4k\nförklaring: Jetlag gavs ut som singel 2012 och fanns sedan med på Näääks album Mannen utan mask, som kom den 26 september 2012.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 34017,
+  "output_tokens": 991,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 2
+ },
+ "requests": 1,
+ "queries": [
+  "Näääk Nimo Melo Jetlag",
+  "Näääk Mannen utan mask album 2012 Jetlag singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://open.spotify.com/track/27snlGu4g70jswjvk79kxZ",
+   "title": "Jetlag - Marcus Price Remix - song and lyrics by Näääk, Nimo, Melo, Marcus Price",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://www.viberate.com/artist/naaak/",
+   "title": "Näääk - Songs, Events and Music Stats",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.jiosaavn.com/song/jetlag-marcus-price-remix/HzAdBBh,DkU",
+   "title": "Jetlag (Marcus Price Remix) (Full Song) - Näääk feat. Nimo, Melo - Download or Listen Free - JioSaavn",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://itunes.apple.com/qa/album/jetlag-feat-nimo-single/533340558",
+   "title": "‎Jetlag (feat. Nimo) - Single by Näääk on iTunes",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=IztiOKl2PD8",
+   "title": "Näääk - Jetlag ft (Nimo) - YouTube",
+   "pageAge": "5266 days ago"
+  },
+  {
+   "url": "https://testicanzoni.rockol.it/testi/naaak-nimo-feat-melo-jetlag-86420922",
+   "title": "√ Jetlag (testo) di Näääk, nimo - Rockol",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.youtube.com/watch?list=OLAK5uy_lyvxfkHOPdNT5cElwmRyBmnMXpU9fx94g&v=NX3Zl2B9oeE",
+   "title": "Näääk feat Nimo - Vi Är Kvar Här (Officiell video)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.letssingit.com/n%C3%A4%C3%A4%C3%A4k-lyrics-jetlag-rkmhrp2",
+   "title": "Näääk - Jetlag Lyrics",
+   "pageAge": "1713 days ago"
+  },
+  {
+   "url": "http://www17.goteborg.se/ubf/polhem/webb/elevarbeten/webbdesign/2012_3/wd023/videoochlatar.html",
+   "title": "Video & Låtar",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/se/album/jetlag-feat-nimo-single/1444418518",
+   "title": "‎Jetlag (feat. Nimo) - Single av Näääk i Apple Music",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/N%C3%A4%C3%A4%C3%A4k",
+   "title": "N%C3%A4%C3%A4%C3%A4k",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/artist/1229355",
+   "title": "Näääk: albums, songs, concerts",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/se/artist/n%C3%A4%C3%A4%C3%A4k/331106832",
+   "title": "Näääk på Apple Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://gaffa.se/nyheter/2012/september/naaak-och-nimo-aker-landet-runt/",
+   "title": "Näääk och Nimo åker landet runt",
+   "pageAge": "5167 days ago"
+  },
+  {
+   "url": "https://www.letssingit.com/n%C3%A4%C3%A4%C3%A4k-lyrics-jetlag-rkmhrp2",
+   "title": "Näääk - Jetlag Lyrics",
+   "pageAge": "1713 days ago"
+  },
+  {
+   "url": "https://music.apple.com/qa/album/jetlag-feat-nimo-single/1444418518",
+   "title": "‎Jetlag (feat. Nimo) - Single by Näääk on iTunes",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://www.kkbox.com/hk/en/album/TAKwePZm7-I0aQ0F1TVB0091-index.html",
+   "title": "Näääk - Jetlag - KKBOX",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Jet_Lag_(Milosh_album)",
+   "title": "Jet Lag (Milosh album)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/N%C3%A4%C3%A4%C3%A4k",
+   "title": "N%C3%A4%C3%A4%C3%A4k",
+   "citedText": "The debut was nominated for the prize of \"This Years Rap Album\" on the Swedish radio station\n\n[[3]](./N%C3%A4%C3%A4%C3%A4k#cite_note-GP-3) The latest ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/N%C3%A4%C3%A4%C3%A4k",
+   "title": "N%C3%A4%C3%A4%C3%A4k",
+   "citedText": "- Mannen utan mask (26 September 2012)\n\n- 2012: \"Jetlag\"\n\n| Title | Year | Peak chart positions | Album |\n\n| \"Dela min tid\" (featuring Jireel) | 2019 ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/N%C3%A4%C3%A4%C3%A4k",
+   "title": "N%C3%A4%C3%A4%C3%A4k",
+   "citedText": "Jetlag and Blåser min rök (\"Blow my smoke\") are two singles that Näääk released with Nimo as the guest rapper."
+  },
+  {
+   "url": "https://music.apple.com/se/album/jetlag-feat-nimo-single/1444418518",
+   "title": "‎Jetlag (feat. Nimo) - Single av Näääk i Apple Music",
+   "citedText": "2 låtar, 7 minuter · **Utgiven: 1 jan 2012** · ℗ 2012 Universal Music AB\n\nAlbum · 2012 · 1 låt.\n\n"
+  },
+  {
+   "url": "https://gaffa.se/nyheter/2012/september/naaak-och-nimo-aker-landet-runt/",
+   "title": "Näääk och Nimo åker landet runt",
+   "citedText": "Nimo, som släpper sitt debutalbum senare i år, gästar Näääk på hans två singlar från nya skivan, *Blåser Min Rök* och *Jetlag*.\n\n"
+  }
+ ]
+}

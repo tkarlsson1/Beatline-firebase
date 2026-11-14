@@ -1,0 +1,83 @@
+{
+ "id": "4GewRLEiI4BDTQsoH8BRVV",
+ "userMessage": "Titel: Blue (Da Ba Dee) - Gabry Ponte Ice Pop Radio\nArtist: Eiffel 65, Gabry Ponte\nSpotifys album: Europop\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2011-01-05\nSpotifys år: 2011",
+ "responseText": "Rätt år är 1998, inte 2011. Spotifys datum gäller en senare nyutgåva av albumet Europop. Gabry Ponte Ice Pop Radio är ingen senare remix. Den är 4:43 lång och är den vanliga originalversionen av låten. Engelska Wikipedia anger att singeln släpptes i oktober 1998 och att albumversionen är 4:43 lång. Apple Music listar spåret med just det namnet på singeln \"Blue (Da Ba Dee) - Single Eiffel 65 January 20, 1998\". Soundcharts anger samma utgivningsdatum, 1998-01-20, för spåret med ISRC ITT019810102. Datumen inom 1998 skiljer sig mellan källorna, men alla anger samma år. Låten blev inte särskilt framgångsrik när den släpptes 1998, men slog igenom stort året därpå när radion började spela den. Därför minns många den som en låt från 1999.\n\når: 1998\nkälla: https://en.wikipedia.org/wiki/Blue_(Da_Ba_Dee)\nförklaring: Eiffel 65 släppte singeln \"Blue (Da Ba Dee)\" med Gabry Pontes Ice Pop-version 1998, men låten blev en stor hit först 1999.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14626,
+  "output_tokens": 894,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Eiffel 65 Blue (Da Ba Dee) Gabry Ponte Ice Pop Radio 1998 single"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/song/blue-da-ba-dee-gabry-ponte-ice-pop-radio/257425340",
+   "title": "Blue (Da Ba Dee) [Gabry Ponte Ice Pop Radio] - Song with Lyrics by Eiffel 65 - Apple Music",
+   "pageAge": "10525 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/blue-da-ba-dee-gabry-ponte-ice-pop-radio-mixed/1860632691",
+   "title": "Blue (Da Ba Dee) [Gabry Ponte Ice Pop Radio] [Mixed] - Song by Eiffel 65 - Apple Music",
+   "pageAge": "10525 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/blue-da-ba-dee-gabry-ponte-ice-pop-mix/257424857",
+   "title": "Blue (Da Ba Dee) [Gabry Ponte Ice Pop Mix] - Song by Eiffel 65 - Apple Music",
+   "pageAge": "10525 days ago"
+  },
+  {
+   "url": "https://play.anghami.com/song/60469408",
+   "title": "Eiffel 65 - Blue (Da Ba Dee) (Gabry Ponte Ice Pop Radio)",
+   "pageAge": "10230 days ago"
+  },
+  {
+   "url": "https://soundcharts.com/en/song/11e82612-8761-beea-9852-a0369fe50396",
+   "title": "Blue (Da Ba Dee) (DJ Ponte Ice Pop radio) by Eiffel 65 & Gabry Ponte — Streaming Stats & Charts",
+   "pageAge": "10525 days ago"
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q696600",
+   "title": "Blue (Da Ba Dee) - Wikidata",
+   "pageAge": "2234 days ago"
+  },
+  {
+   "url": "https://music.amazon.com/tracks/B08QW7SW33",
+   "title": "Blue (Da Ba Dee) (Gabry Ponte Ice Pop Mix) song by Eiffel 65 from Europop on Amazon Music",
+   "pageAge": "10210 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Blue_(Da_Ba_Dee)",
+   "title": "Blue (Da Ba Dee)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/track/89629793",
+   "title": "Eiffel 65 - Blue (Da Ba Dee) (DJ Ponte Ice Pop Mix)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Blue_(Da_Ba_Dee)",
+   "title": "Blue (Da Ba Dee)",
+   "citedText": "Single by Eiffel 65\n\n- Released: October 1998\n- Genre: Eurodance; dance-pop;\n- Length: 4:43 (album version); 3:39 (video edit); 3:29 (US radio edit);\n..."
+  },
+  {
+   "url": "https://music.apple.com/us/song/blue-da-ba-dee-gabry-ponte-ice-pop-radio/257425340",
+   "title": "Blue (Da Ba Dee) [Gabry Ponte Ice Pop Radio] - Song with Lyrics by Eiffel 65 - Apple Music",
+   "citedText": "… **Blue (Da Ba Dee) - Single Eiffel 65 January 20, 1998**\n\nListen to Blue (Da Ba Dee) [Gabry Ponte Ice Pop Radio] by Eiffel 65 on Apple Music. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Blue_(Da_Ba_Dee)",
+   "title": "Blue (Da Ba Dee)",
+   "citedText": "\"Blue (Da Ba Dee)\" was developed before the formation of the group by its future members\n\nWhen released in 1998, it achieved little success, but becam..."
+  }
+ ]
+}

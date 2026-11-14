@@ -1,0 +1,37 @@
+{
+ "id": "1xNcBAoUw8Hz6LqK2jt4Ff",
+ "userMessage": "Titel: Call on Me - Radio Mix\nArtist: Eric Prydz\nSpotifys album: Call on Me (Radio Mix)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2004-09-10\nSpotifys år: 2004",
+ "responseText": "{\"year\":2004,\"explanation\":\"Singeln Call on Me gavs ut 2004 och toppade bland annat den brittiska singellistan samma höst, vilket stämmer med Spotifys år.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1502,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1502,
+    "output_tokens": 79,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 79,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

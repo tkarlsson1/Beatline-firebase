@@ -1,0 +1,88 @@
+{
+ "id": "5iLYWyAMSGqpL7NASZbR4w",
+ "userMessage": "Titel: Vår betong\nArtist: Jacco\nSpotifys album: Vår betong\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2009-06-29\nSpotifys år: 2009",
+ "responseText": "Alla källor jag hittade anger samma datum som Spotify: den 29 juni 2009.\n\n- **Deezer** anger att singeln ”Vår betong” har två spår och utgivningsdatum 29/06/2009. Spåren är 01 · Vår betong och 02 · När mörkret faller.\n- **Apple Music** visar June 29, 2009 2 Songs, 7 minutes ℗ 2009 Jacco Music.\n- **Musicstax** anger ISRC-koden SEVLE0900501. Siffrorna 09 i koden pekar normalt på att inspelningen registrerades 2009, vilket stämmer med året.\n\nJag hittade ingen tidigare utgåva. Det jag fann var den här tvåspårssingeln och en senare samlingsskiva, ”Svensk HipHop”. Alla källor är strömnings- och databastjänster. Jag hittade ingen sida på Wikipedia eller Discogs om låten.\n\når: 2009\nkälla: https://www.deezer.com/en/album/464521325\nförklaring: Jaccos ”Vår betong” gavs ut som singel den 29 juni 2009.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14341,
+  "output_tokens": 672,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Jacco \"Vår betong\""
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/song/v%C3%A5r-betong/1697478790",
+   "title": "Vår Betong - Song with Lyrics by Jacco - Apple Music",
+   "pageAge": "6347 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/album/v%C3%A5r-betong-single/1697478789",
+   "title": "Vår Betong - Single - Album by Jacco - Apple Music",
+   "pageAge": "6347 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/song/1697478790/vc3a5r-betong",
+   "title": "Vår Betong - Jacco: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "6347 days ago"
+  },
+  {
+   "url": "https://www.deezer.com/en/album/464521325",
+   "title": "Jacco - Vår betong",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/track/2368122965",
+   "title": "Jacco - Vår betong",
+   "pageAge": null
+  },
+  {
+   "url": "https://lyricstranslate.com/en/jacco-v%C3%A5r-betong-lyrics.html",
+   "title": "Jacco - Vår Betong lyrics",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Jacco/_/V%C3%A5r+betong/+lyrics",
+   "title": "Vår betong lyrics - Jacco",
+   "pageAge": null
+  },
+  {
+   "url": "https://musicstax.com/track/var-betong/0RrWsDOJJQfodBZyNYeiLy",
+   "title": "Key, tempo of Vår betong By Jacco",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Jacco",
+   "title": "Jacco",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.deezer.com/en/album/464521325",
+   "title": "Jacco - Vår betong",
+   "citedText": "Listen to Vår betong by Jacco on Deezer — Number of tracks: 2 | Length: 07:51 | Release date: 29/06/2009. "
+  },
+  {
+   "url": "https://www.deezer.com/en/album/464521325",
+   "title": "Jacco - Vår betong",
+   "citedText": "Jacco - album - 2009 - 2 songs\n\n**2009 \\| Jacco Music**\n\n# Vår betong\nJacco | 29-06-2009\n\nComposers: Aleksi Swallow\n\nTotal duration:07 min\n\n01 · Vår b..."
+  },
+  {
+   "url": "https://music.apple.com/us/album/v%C3%A5r-betong-single/1697478789",
+   "title": "Vår Betong - Single - Album by Jacco - Apple Music",
+   "citedText": "Album · 2009 · 2 Songs\n\nVår Betong - Single\n\n# Vår Betong - Single\nJacco\n\nHIP-HOP/RAP · 2009\n\nJune 29, 2009 2 Songs, 7 minutes ℗ 2009 Jacco Music\n\n{\"n..."
+  },
+  {
+   "url": "https://musicstax.com/track/var-betong/0RrWsDOJJQfodBZyNYeiLy",
+   "title": "Key, tempo of Vår betong By Jacco",
+   "citedText": "Vår betong info\n\nName\n\nVår betong\n\nArtist(s)\n\nJacco\n\nAlbum\n\nVår betong\n\nRelease Date\n\n29th June 2009\n\nISRC\n\nSEVLE0900501\n\nKey\n\nA min\n\nTempo\n\n172\n\nLoud..."
+  }
+ ]
+}

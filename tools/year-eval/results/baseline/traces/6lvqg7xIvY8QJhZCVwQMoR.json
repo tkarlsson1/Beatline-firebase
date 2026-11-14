@@ -1,0 +1,37 @@
+{
+ "id": "6lvqg7xIvY8QJhZCVwQMoR",
+ "userMessage": "Titel: The Thief\nArtist: Infinite Mass\nSpotifys album: 1991\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2004-05-12\nSpotifys år: 2004",
+ "responseText": "{\"year\":2004,\"explanation\":\"Låten finns på Infinite Mass album 1991 som gavs ut 2004, och det finns inget som tyder på en tidigare utgivning.\",\"confidence\":\"low\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1484,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1484,
+    "output_tokens": 273,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 273,
+  "output_tokens_details": {
+   "thinking_tokens": 200
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

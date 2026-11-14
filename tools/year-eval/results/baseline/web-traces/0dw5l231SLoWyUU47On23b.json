@@ -1,0 +1,88 @@
+{
+ "id": "0dw5l231SLoWyUU47On23b",
+ "userMessage": "Titel: By The River\nArtist: Klingande, Jamie N Commons\nSpotifys album: The Album\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2019-11-15\nSpotifys år: 2019",
+ "responseText": "Låten kom ut 2019, alltså samma år som Spotify anger. Den gavs ut som singel innan Klingandes skiva *The Album* kom.\n\n- **Discogs:** Discogs har singeln Klingande & Jamie N Commons – By the River med Format: File, AAC, Single, 256 kbps · Country: US · Released: Mar 8, 2019.\n- **Apple Music och Spotify:** Singeln anges som Released: Mar 8, 2019, och Spotifys egen sida för spåret visar samma datum. En annan Apple Music-sida anger 1 mars 2019, men det är fortfarande samma år.\n- **Samtida recension:** I mars 2019 skrev Relentless Beats att \"By the River\" is the lead single from Klingande's new double album *The Album*, set to release in September. Låten var alltså första singeln från albumet. Utgivningen flyttades sedan till 15 november, som är Spotifys datum.\n\når: 2019\nkälla: https://www.discogs.com/release/13411668-Klingande-Jamie-N-Commons-By-the-River\nförklaring: Låten kom ut som singel den 8 mars 2019 och fanns senare med på Klingandes skiva The Album.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14920,
+  "output_tokens": 599,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Klingande Jamie N Commons \"By The River\" single"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/ba/album/by-the-river-tuff-london-remix-single/1462125967",
+   "title": "By The River (Tuff London Remix) - Single - Album by Klingande & Jamie N Commons - Apple Music",
+   "pageAge": "2740 days ago"
+  },
+  {
+   "url": "https://music.apple.com/ug/album/by-the-river-single/1453362301",
+   "title": "By the River - Single - Album by Klingande & Jamie N Commons - Apple Music",
+   "pageAge": "2808 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/by-the-river/1453362302",
+   "title": "By the River - Song by Klingande & Jamie N Commons - Apple Music",
+   "pageAge": "2815 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/6u6Yp75E1u3pkOJz2hP6Nr",
+   "title": "By The River - song and lyrics by Klingande, Jamie N Commons",
+   "pageAge": "2808 days ago"
+  },
+  {
+   "url": "https://itunes.apple.com/us/album/by-the-river-single/1452926566",
+   "title": "‎By the River - Single by Klingande & Jamie N Commons on Apple Music",
+   "pageAge": "2808 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/13411668-Klingande-Jamie-N-Commons-By-the-River",
+   "title": "Klingande & Jamie N Commons",
+   "pageAge": "2808 days ago"
+  },
+  {
+   "url": "https://www.jiosaavn.com/song/by-the-river/SD0-fRNxfn0",
+   "title": "By The River (Full Song) - Klingande, Jamie N Commons - Download or Listen Free - JioSaavn",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.melodicnation.co.uk/klingande-jamie-n-commons-by-the-river/",
+   "title": "Klingande, Jamie N Commons - By The River",
+   "pageAge": "2804 days ago"
+  },
+  {
+   "url": "http://relentlessbeats.com/2019/03/relentless-beat-of-the-week-klingande-and-jamie-n-commons-by-the-river/",
+   "title": "Relentless Beat of the Week: Klingande and Jamie N Commons",
+   "pageAge": "2808 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Left_It_in_the_River",
+   "title": "Left It in the River",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/13411668-Klingande-Jamie-N-Commons-By-the-River",
+   "title": "Klingande & Jamie N Commons",
+   "citedText": "# Klingande & Jamie N Commons – By the River\nKlingande - By the River album cover\n\n- **Label:**: Klingande Music – none\n- **Format:**: File, AAC, Sing..."
+  },
+  {
+   "url": "https://itunes.apple.com/us/album/by-the-river-single/1452926566",
+   "title": "‎By the River - Single by Klingande & Jamie N Commons on Apple Music",
+   "citedText": "Album · 2019 · 1 Song\n\n# By the River - Single Klingande\n-\n  - Dance\n  - 2019\n\nListen on Apple Music\n\nListen on Apple Music\n\n|  | TITLE |  | TIME |\n| ..."
+  },
+  {
+   "url": "http://relentlessbeats.com/2019/03/relentless-beat-of-the-week-klingande-and-jamie-n-commons-by-the-river/",
+   "title": "Relentless Beat of the Week: Klingande and Jamie N Commons",
+   "citedText": "“By the River” is the lead single from Klingande’s new double album *The Album*, set to release in September. "
+  }
+ ]
+}

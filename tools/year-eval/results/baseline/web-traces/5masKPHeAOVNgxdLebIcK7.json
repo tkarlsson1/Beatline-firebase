@@ -1,0 +1,78 @@
+{
+ "id": "5masKPHeAOVNgxdLebIcK7",
+ "userMessage": "Titel: Stole the Show\nArtist: Kygo, Parson James\nSpotifys album: Cloud Nine\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2016-05-13\nSpotifys år: 2016",
+ "responseText": "Låten gavs ut på singel 2015, ett år innan albumet som Spotify anger.\n\nWikipedias artikel om albumet Cloud Nine säger att albumets andra singel, \"Stole the Show\" featuring Parson James was released on 23 March 2015. Discogs anger samma datum för den digitala singeln: Label:: Kygo – UL6062 · Format:: File, AIFF, Single · Country:: Norway · Released:: Mar 23, 2015. Spotifys år 2016 kommer från albumet Cloud Nine. Det kom först den 13 maj 2016, mer än ett år efter singeln.\n\nDiscogs listar också en promo-CDr från Nederländerna märkt 2014. Det är en ej granskad användarinlämning, och ingen annan källa nämner en utgivning 2014. Därför bygger jag på det tydligt belagda singeldatumet.\n\når: 2015\nkälla: https://en.wikipedia.org/wiki/Cloud_Nine_(Kygo_album)\nförklaring: Låten gavs ut som singel den 23 mars 2015, över ett år innan albumet Cloud Nine kom 2016.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14925,
+  "output_tokens": 565,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Kygo Stole the Show Parson James single release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://secondhandsongs.com/performance/558641/all",
+   "title": "Performance: Stole the Show by Kygo feat. Parson James",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Stole_the_Show",
+   "title": "Stole the Show",
+   "pageAge": null
+  },
+  {
+   "url": "https://musicbrainz.org/release-group/b952a681-1de0-40bf-b124-f2f9ff15d923",
+   "title": "Release group “Stole the Show” by Kygo feat. Parson James - MusicBrainz",
+   "pageAge": "4254 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Cloud_Nine_(Kygo_album)",
+   "title": "Cloud Nine (Kygo album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q19954816",
+   "title": "Stole the Show - Wikidata",
+   "pageAge": "4254 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/7015908-Kygo-Feat-Parson-James-Stole-The-Show",
+   "title": "Kygo Feat. Parson James",
+   "pageAge": "4201 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/7040326-Kygo-Feat-Parson-James-Stole-The-Show",
+   "title": "Kygo Feat. Parson James",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/6922786-Kygo-Feat-Parson-James-Stole-The-Show",
+   "title": "Kygo Feat. Parson James",
+   "pageAge": "4254 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/13970462-Kygo-Feat-Parson-James-Stole-The-Show",
+   "title": "Kygo Feat. Parson James",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Cloud_Nine_(Kygo_album)",
+   "title": "Cloud Nine (Kygo album)",
+   "citedText": "Studio album by Kygo\n\n- Producers: Kygo; Mark Ralph; William Wiik Larsen; Labrinth;\n\nKygo chronology\n\n- \"Firestone\" Released: 1 December 2014; \"Stole ..."
+  },
+  {
+   "url": "https://www.discogs.com/release/6922786-Kygo-Feat-Parson-James-Stole-The-Show",
+   "title": "Kygo Feat. Parson James",
+   "citedText": "… Label:: Kygo – UL6062 · Format:: File, AIFF, Single · Country:: Norway · **Released:: Mar 23, 2015** · Genre:: Electronic · Style:: Tropical House\n\n..."
+  }
+ ]
+}

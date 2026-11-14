@@ -1,0 +1,83 @@
+{
+ "id": "6habFhsOp2NvshLv26DqMb",
+ "userMessage": "Titel: Despacito\nArtist: Luis Fonsi, Daddy Yankee\nSpotifys album: VIDA\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2019-02-01\nSpotifys år: 2019",
+ "responseText": "Låten kom ut 2017, inte 2019. Spotifys år kommer från albumet VIDA. Låten kom ut på singel långt innan det albumet, och enligt reglerna gäller den tidigaste utgivningen.\n\nEnligt engelska Wikipedia släpptes den den 13 januari 2017 som första singel från Vida, Fonsis tionde studioalbum. Discogs anger samma datum för den digitala singeln, alltså 13 januari 2017. Billboard skrev samma dag att \"Despacito\" släpptes fredag morgon den 13 januari tillsammans med en musikvideo.\n\når: 2017\nkälla: https://en.wikipedia.org/wiki/Despacito\nförklaring: Despacito med Luis Fonsi och Daddy Yankee kom ut på singel den 13 januari 2017, två år före albumet VIDA (2019).\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15112,
+  "output_tokens": 441,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Despacito Luis Fonsi Daddy Yankee single released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.amazon.com/Despacito-Luis-Fonsi/dp/B06X1CXWX7",
+   "title": "Despacito : Luis Fonsi & Daddy Yankee: Digital Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Despacito",
+   "title": "Despacito",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.billboard.com/music/latin/luis-fonsi-daddy-yankee-despacito-music-video-7655122/",
+   "title": "Luis Fonsi & Daddy Yankeeâ€™s 'Despacito' Video Gets the Party Started",
+   "pageAge": "3592 days ago"
+  },
+  {
+   "url": "https://audiomack.com/luisfonsi/song/despacito",
+   "title": "Despacito by Luis Fonsi, Daddy Yankee: Listen on Audiomack",
+   "pageAge": "524 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/10099368-Luis-Fonsi-Daddy-Yankee-Despacito",
+   "title": "Luis Fonsi & Daddy Yankee",
+   "pageAge": "3508 days ago"
+  },
+  {
+   "url": "https://discogs.com/Luis-Fonsi-Ft-Daddy-Yankee-Despacito/release/10028519",
+   "title": "Luis Fonsi Ft. Daddy Yankee",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/11902255-Luis-Fonsi-Ft-Daddy-Yankee-Despacito",
+   "title": "Luis Fonsi Ft. Daddy Yankee",
+   "pageAge": "1824 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/5qnvJbamuZLbsasuYKRy1l",
+   "title": "Listen to Despacito (Featuring Daddy Yankee) - Single by Luis Fonsi",
+   "pageAge": "3592 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/El_Disco_Duro",
+   "title": "El Disco Duro",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Despacito",
+   "title": "Despacito",
+   "citedText": "On January 13, 2017, it was released as the [lead single](https://en.wikipedia.org/wiki/Lead_single) from [Vida](https://en.wikipedia.org/wiki/Vida_(L..."
+  },
+  {
+   "url": "https://discogs.com/Luis-Fonsi-Ft-Daddy-Yankee-Despacito/release/10028519",
+   "title": "Luis Fonsi Ft. Daddy Yankee",
+   "citedText": "… Format:: File, AAC, Single, 256 kbps · Country:: North America (inc Mexico) · **Released:: Jan 13, 2017** · Genre:: Latin, Pop · Style:: Latin, Regg..."
+  },
+  {
+   "url": "https://www.billboard.com/music/latin/luis-fonsi-daddy-yankee-despacito-music-video-7655122/",
+   "title": "Luis Fonsi & Daddy Yankeeâ€™s 'Despacito' Video Gets the Party Started",
+   "citedText": "### Luis Fonsi\n“Despacito” dropped on Friday morning (Jan. 13) accompanied by a music video filmed in the La Perla neighborhood in old San Juan last D..."
+  }
+ ]
+}

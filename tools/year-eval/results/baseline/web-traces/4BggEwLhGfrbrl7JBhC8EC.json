@@ -1,0 +1,93 @@
+{
+ "id": "4BggEwLhGfrbrl7JBhC8EC",
+ "userMessage": "Titel: Butterfly\nArtist: Crazy Town\nSpotifys album: The Gift Of Game\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2000-12-15\nSpotifys år: 2000",
+ "responseText": "Rätt år är **1999**, inte Spotifys 2000. Låten fanns med på debutalbumet ett år innan den kom ut på singel.\n\n- **Albumet:** Butterfly finns i låtlistan på debutalbumet The Gift of Game, som gavs ut den 9 november 1999 i USA av Columbia Records.\n- **Singeln:** Butterfly gavs ut i oktober 2000 som tredje singel från debutalbumet The Gift of Game och slog igenom brett när den kom ut fysiskt den 19 februari 2001.\n- **Ytterligare stöd:** SecondHandSongs anger att Crazy Town först gav ut låten på The Gift of Game, med datumet 26 oktober 1999. Källorna skiljer sig alltså lite på datumet, men båda anger 1999.\n\nSpotifys datum, 2000-12-15, gäller troligen en senare utgåva av albumet. Därför är det för sent.\n\når: 1999\nkälla: https://en.wikipedia.org/wiki/The_Gift_of_Game\nförklaring: Butterfly kom först ut på Crazy Towns debutalbum The Gift of Game i november 1999, innan den släpptes som singel 2000.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 17184,
+  "output_tokens": 822,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Crazy Town Butterfly single The Gift of Game released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Butterfly_(Crazy_Town_song)",
+   "title": "Butterfly (Crazy Town song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Gift_of_Game",
+   "title": "The Gift of Game",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Darkhorse",
+   "title": "Darkhorse",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Revolving_Door_(Crazy_Town_song)",
+   "title": "Revolving Door (Crazy Town song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/840/all",
+   "title": "Performance: Butterfly by Crazy Town",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Epic_Mazur",
+   "title": "Epic Mazur",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Crazy+Town/The+Gift+of+Game/Butterfly",
+   "title": "Butterfly — Crazy Town",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikiwand.com/en/Butterfly_(Crazy_Town_song)",
+   "title": "Butterfly (Crazy Town song) - Wikiwand",
+   "pageAge": null
+  },
+  {
+   "url": "https://pophits.org/songs/crazy-town-butterfly",
+   "title": "Butterfly by Crazy Town",
+   "pageAge": "9249 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Drowning_(Crazy_Town_song)",
+   "title": "Drowning (Crazy Town song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Gift_of_Game",
+   "title": "The Gift of Game",
+   "citedText": "It was released on November 9, 1999, in the US by [Columbia Records](https://en.wikipedia.org/wiki/Columbia_Records).\n\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Butterfly_(Crazy_Town_song)",
+   "title": "Butterfly (Crazy Town song)",
+   "citedText": "The song was released in October 2000 as the third single from their debut album, [The Gift of Game](https://en.wikipedia.org/wiki/The_Gift_of_Game). "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Butterfly_(Crazy_Town_song)",
+   "title": "Butterfly (Crazy Town song)",
+   "citedText": "It gained mainstream popularity after being released physically on February 19, 2001.\n\n"
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/840/all",
+   "title": "Performance: Butterfly by Crazy Town",
+   "citedText": "# Butterfly by Crazy Town\n## Original\n\n**Written by**: Flea, Shifty Shellshock, John Frusciante, Anthony Kiedis, Epic Mazur, Chad Smith\n**Language**: ..."
+  }
+ ]
+}

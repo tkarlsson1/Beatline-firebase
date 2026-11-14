@@ -1,0 +1,83 @@
+{
+ "id": "5YqEzk3C5c3UZ1D5fJUlXA",
+ "userMessage": "Titel: Sunroof\nArtist: Nicky Youre, hey daisy\nSpotifys album: Good Times Go\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2023-06-09\nSpotifys år: 2023",
+ "responseText": "Spotify anger 2023, men det året gäller EP:n/albumet \"Good Times Go\", där låten togs med i efterhand. Själva låten kom ut tidigare, som fristående singel 2021. Engelska Wikipedia beskriver den som en singel av Nicky Youre och hey daisy, utgiven 3 december 2021. Rate Your Music säger samma sak: utgiven 3 december 2021 på Columbia. Last.fm bekräftar också att den släpptes 3 december 2021 som fristående singel och togs med på EP:n \"Good Times Go\".\n\nDatumen skiljer sig lite mellan källorna. En sida anger 26 november och en annan november 2021. Året är ändå 2021 i alla källor, så det spelar ingen roll för svaret.\n\når: 2021\nkälla: https://en.wikipedia.org/wiki/Sunroof_(song)\nförklaring: \"Sunroof\" gavs ut som singel av Nicky Youre och hey daisy (dazy) den 3 december 2021 och kom med på \"Good Times Go\" först senare.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16130,
+  "output_tokens": 557,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Sunroof Nicky Youre dazy single release 2021"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.albumoftheyear.org/album/492039-nicky-youre-dazy-sunroof.php",
+   "title": "Nicky Youre & dazy - Sunroof (Single) - Reviews - Album of The Year",
+   "pageAge": "140 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Nicky_Youre",
+   "title": "Nicky Youre",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Sunroof_(song)",
+   "title": "Sunroof (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Nicky+Youre/Sunroof/Sunroof",
+   "title": "Sunroof — Nicky Youre",
+   "pageAge": null
+  },
+  {
+   "url": "https://rateyourmusic.com/release/single/nicky-youre-dazy/sunroof/",
+   "title": "Sunroof by Nicky Youre & Dazy (Single, Indie Pop): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "pageAge": "1807 days ago"
+  },
+  {
+   "url": "https://www.wikiwand.com/en/Sunroof_(song)",
+   "title": "Sunroof (song) - Wikiwand",
+   "pageAge": "1807 days ago"
+  },
+  {
+   "url": "https://www.fashionably-early.com/2021/12/12/nicky-youre-sunroof-f-dazy/",
+   "title": "Nicky Youre - Sunroof f. dazy",
+   "pageAge": "663 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Nicky_Jam:_Bzrp_Music_Sessions,_Vol._41",
+   "title": "Nicky Jam: Bzrp Music Sessions, Vol. 41",
+   "pageAge": null
+  },
+  {
+   "url": "https://justrandomthings.com/2022/09/29/nicky-youre-dazy-sunroof-lyrics-meaning-revealed/",
+   "title": "Nicky Youre & Dazy - Sunroof",
+   "pageAge": "1506 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Sunroof_(song)",
+   "title": "Sunroof (song)",
+   "citedText": "Single by Nicky Youre and hey daisy\n\n- Released: December 3, 2021\n- Recorded: February 2021\n- Studio: Nicky Youre's home, Aliso Viejo, California\n\nNic..."
+  },
+  {
+   "url": "https://rateyourmusic.com/release/single/nicky-youre-dazy/sunroof/",
+   "title": "Sunroof by Nicky Youre & Dazy (Single, Indie Pop): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "citedText": "**Released 3 December 2021 on Columbia**. "
+  },
+  {
+   "url": "https://www.last.fm/music/Nicky+Youre/Sunroof/Sunroof",
+   "title": "Sunroof — Nicky Youre",
+   "citedText": "It was released on December 3, 2021 as a standalone single and included on the EP 'Good Times Go'. "
+  }
+ ]
+}

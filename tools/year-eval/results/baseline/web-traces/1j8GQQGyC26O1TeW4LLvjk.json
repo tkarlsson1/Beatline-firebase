@@ -1,0 +1,88 @@
+{
+ "id": "1j8GQQGyC26O1TeW4LLvjk",
+ "userMessage": "Titel: Praise You (Radio Edit)\nArtist: Fatboy Slim\nSpotifys album: Praise You EP\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2023-09-01\nSpotifys år: 2023",
+ "responseText": "Rätt år är **1998**, inte Spotifys 2023. Spotifys datum gäller en nyutgåva av EP:n. Fatboy Slim gav ut Praise You som singel som den tredje singeln från sitt andra studioalbum, You've Come a Long Way, Baby (1998), den 4 januari 1999. Låten fanns alltså redan på albumet som kom ut 1998. Enligt reglerna gäller det tidigaste året när singeln och albumet kom olika år.\n\nOm någon vid bordet säger 1999 stämmer det bara för singeln. Den var Fatboy Slims första solohit som nådde etta i Storbritannien. Albumet kom ut året innan.\n\nFörväxla inte med Rita Oras ombearbetning \"Praising You\" med Fatboy Slim. Den kom ut den 19 april 2023 och är en annan låt.\n\når: 1998\nkälla: https://en.wikipedia.org/wiki/Praise_You\nförklaring: Praise You fanns först på Fatboy Slims album You've Come a Long Way, Baby från 1998 och kom ut på singel i januari 1999.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16536,
+  "output_tokens": 657,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Praise You Fatboy Slim single released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Praise_You",
+   "title": "Praise You",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.songfacts.com/facts/fatboy-slim/praise-you",
+   "title": "Praise You by Fatboy Slim - Songfacts",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Praising_You",
+   "title": "Praising You",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Gangster_Tripping",
+   "title": "Gangster Tripping",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Right_Here,_Right_Now_(Fatboy_Slim_song)",
+   "title": "Right Here, Right Now (Fatboy Slim song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/996522-Fat-Boy-Slim-Praise-You",
+   "title": "Fat Boy Slim",
+   "pageAge": "1520 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/4123164-Fatboy-Slim-Praise-You",
+   "title": "Fatboy Slim",
+   "pageAge": "3145 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/3439191-Fatboy-Slim-Praise-You",
+   "title": "Fatboy Slim",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/71337-Fatboy-Slim-Praise-You",
+   "title": "Fatboy Slim",
+   "pageAge": "423 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Rockafeller_Skank",
+   "title": "The Rockafeller Skank",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Praise_You",
+   "title": "Praise You",
+   "citedText": "It was released as the third single from his second studio album, [You've Come a Long Way, Baby](https://en.wikipedia.org/wiki/You've_Come_a_Long_Way,..."
+  },
+  {
+   "url": "https://www.songfacts.com/facts/fatboy-slim/praise-you",
+   "title": "Praise You by Fatboy Slim - Songfacts",
+   "citedText": "**Released on January 4, 1999**, as the third single from You've Come a Long Way, Baby, \"Praise You\" became Fatboy Slim's first solo UK #1 hit.\n\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Praising_You",
+   "title": "Praising You",
+   "citedText": "Single by Rita Ora featuring Fatboy Slim\n\n- Released: 19 April 2023\n\nFatboy Slim singles chronology\n\n- \"Praising You\" on YouTube\n\nThe song is a re-wor..."
+  }
+ ]
+}

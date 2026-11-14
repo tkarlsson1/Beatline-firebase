@@ -1,0 +1,37 @@
+{
+ "id": "5wsa7NPNWf4akemfHQ4u2g",
+ "userMessage": "Titel: go\nArtist: Cat Burns\nSpotifys album: early twenties\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2024-07-12\nSpotifys år: 2024",
+ "responseText": "{\"year\":2020,\"explanation\":\"Singeln \\\"go\\\" gavs ut första gången 2020 och blev en viral hit 2022. Spotifys år 2024 kommer från debutalbumet early twenties, där låten finns med i efterhand.\",\"confidence\":\"medium\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1481,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1481,
+    "output_tokens": 173,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 173,
+  "output_tokens_details": {
+   "thinking_tokens": 78
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

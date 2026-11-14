@@ -1,0 +1,37 @@
+{
+ "id": "6Dy1jexKYriXAVG6evyUTJ",
+ "userMessage": "Titel: OUT OUT (feat. Charli XCX & Saweetie)\nArtist: Joel Corry, Jax Jones, Charli xcx, Saweetie\nSpotifys album: OUT OUT (feat. Charli XCX & Saweetie)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2021-08-13\nSpotifys år: 2021",
+ "responseText": "{\"year\":2021,\"explanation\":\"Singeln med Joel Corry och Jax Jones med Charli XCX och Saweetie gavs ut i augusti 2021, vilket stämmer med Spotifys år.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1542,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1542,
+    "output_tokens": 83,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 83,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

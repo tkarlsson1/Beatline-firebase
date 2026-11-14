@@ -1,0 +1,88 @@
+{
+ "id": "2KH16WveTQWT6KOG9Rg6e2",
+ "userMessage": "Titel: Eye of the Tiger\nArtist: Survivor\nSpotifys album: Rocky IV\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 1985\nSpotifys år: 1985",
+ "responseText": "Spotify visar 1985 eftersom spåret ligger på samlingsskivan Rocky IV. Låten kom ut tidigare än så, 1982.\n\n- **Singeln:** Enligt Wikipedia skrevs låten som ledmotiv till filmen Rocky III från 1982. Den släpptes i maj samma år som singel från Survivors tredje album, Eye of the Tiger.\n- **Albumet:** Studioalbumet Eye of the Tiger gavs ut den 8 juni 1982.\n- **Topplistor:** Låten låg sex veckor som etta på Billboard Hot 100 och var den näst bäst säljande singeln 1982.\n- **Discogs:** De brittiska och tyska singelutgåvorna anges till 1982.\n- **Avvikelse:** Discogs har också en peruansk singel som är daterad 1981. Den är markerad som \"New Submission\", alltså ett nytt bidrag som ännu inte granskats, och stämmer inte med övriga källor. Den är troligen felaktig och ändrar inte svaret.\n\når: 1982\nkälla: https://en.wikipedia.org/wiki/Eye_of_the_Tiger\nförklaring: Survivor släppte \"Eye of the Tiger\" som singel i maj 1982 som ledmotiv till filmen Rocky III, innan den hamnade på samlingsskivan Rocky IV.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15642,
+  "output_tokens": 672,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Eye of the Tiger Survivor single released 1982"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Eye_of_the_Tiger",
+   "title": "Eye of the Tiger",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Eye_of_the_Tiger_(album)",
+   "title": "Eye of the Tiger (album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.albumoftheyear.org/album/196127-survivor-eye-of-the-tiger.php",
+   "title": "Survivor - Eye of the Tiger (Single) - Reviews - Album of The Year",
+   "pageAge": "55 days ago"
+  },
+  {
+   "url": "https://music.fandom.com/wiki/Eye_of_the_Tiger_(song)",
+   "title": "Eye of the Tiger (song)",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/American_Heartbeat",
+   "title": "American Heartbeat",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/4331875-Survivor-Eye-Of-The-Tiger-El-Ojo-Del-Tigre",
+   "title": "Survivor",
+   "pageAge": "531 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/4859234-Survivor-Eye-Of-The-Tiger",
+   "title": "Survivor",
+   "pageAge": "786 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Poor_Man%27s_Son_(song)",
+   "title": "Poor Man%27s Son (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/654868-Survivor-Eye-Of-The-Tiger",
+   "title": "Survivor",
+   "pageAge": "259 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Eye_of_the_Tiger",
+   "title": "Eye of the Tiger",
+   "citedText": "Single by Survivor\n\nfrom the album Rocky III and Eye of the Tiger\n\n- Released: May 1982\n- Recorded: 1982\n\n- Length: 4:04 (album version) 3:45 (single ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Eye_of_the_Tiger_(album)",
+   "title": "Eye of the Tiger (album)",
+   "citedText": "- Released: June 8, 1982\n\n| Premonition (1981) | Eye of the Tiger (1982) | Caught in the Game (1983) |\n\nSingles from Eye of the Tiger\n- \"Eye of the Ti..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Eye_of_the_Tiger",
+   "title": "Eye of the Tiger",
+   "citedText": "[Billboard Hot 100](https://en.wikipedia.org/wiki/Billboard_Hot_100) chart for six weeks, spent 15 consecutive weeks in the top 10, and was the second..."
+  },
+  {
+   "url": "https://www.discogs.com/release/4331875-Survivor-Eye-Of-The-Tiger-El-Ojo-Del-Tigre",
+   "title": "Survivor",
+   "citedText": "- Other (Impuesto de lujo a metalico): Permiso Nº 3637\n\n## Other Versions (5 of 70)\nTitle (Format) · Label · Cat# · Country · Year\nNew Submission · Ey..."
+  }
+ ]
+}

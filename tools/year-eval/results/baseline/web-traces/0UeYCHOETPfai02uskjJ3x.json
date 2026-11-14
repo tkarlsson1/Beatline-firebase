@@ -1,0 +1,93 @@
+{
+ "id": "0UeYCHOETPfai02uskjJ3x",
+ "userMessage": "Titel: Shooting Stars\nArtist: Bag Raiders\nSpotifys album: Bag Raiders (Deluxe)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2011-01-01\nSpotifys år: 2011",
+ "responseText": "Spotifys år 2011 stämmer inte. Det kommer från en deluxeutgåva av albumet *Bag Raiders*, och enligt Wikipedia kom originalalbumet redan den 1 oktober 2010 på Modular Recordings. Låten är ännu äldre än så.\n\n- **Första utgivning, 2008:** Låten fanns först med på duons EP Turbo Love, som släpptes den 8 oktober 2008. Där var den en b-sida till Turbo Love! och gavs ut som singel 2009.\n- **Egen singel, 2009:** Duon skrev kontrakt med Modular Recordings i juni 2009, och \"Shooting Stars\" kom ut i augusti 2009.\n\nJag har valt 2008 eftersom det var första gången låten gavs ut, men det beror på hur man räknar. Reglerna nämner bara singel och studioalbum, och en EP passar inte riktigt in i någon av dem. Om ni bara räknar låtens egen singel blir året i stället 2009. Det är därför jag anger stödet som svagt.\n\når: 2008\nkälla: https://en.wikipedia.org/wiki/Shooting_Stars_(Bag_Raiders_song)\nförklaring: Låten gavs först ut på Bag Raiders EP Turbo Love! i oktober 2008 och kom som egen singel 2009.\nstöd: svagt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16217,
+  "output_tokens": 797,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Bag Raiders Shooting Stars single released 2008"
+ ],
+ "searchResults": [
+  {
+   "url": "https://knowyourmeme.com/memes/shooting-stars",
+   "title": "Shooting Stars",
+   "pageAge": "164 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Shooting_Stars_(Bag_Raiders_song)",
+   "title": "Shooting Stars (Bag Raiders song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/artist/bag-raiders/262804084",
+   "title": "Bag Raiders on Apple Music",
+   "pageAge": "295 days ago"
+  },
+  {
+   "url": "https://music.apple.com/mt/song/shooting-stars/1440810921",
+   "title": "Shooting Stars - Song with Lyrics by Bag Raiders - Apple Music",
+   "pageAge": "6604 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/shooting-stars/1442858908",
+   "title": "Shooting Stars - Song with Lyrics by Bag Raiders - Apple Music",
+   "pageAge": "6604 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Bag_Raiders_(album)",
+   "title": "Bag Raiders (album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.allmusic.com/artist/bag-raiders-mn0001011315",
+   "title": "Bag Raiders — Biography, Discography, Albums & Expert Reviews",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/1QfD0fC5sHkjgaz1wMuvwD",
+   "title": "Shooting Stars - song and lyrics by Bag Raiders",
+   "pageAge": "6557 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Bag_Raiders",
+   "title": "Bag Raiders",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.tiktok.com/@banger_oftheday/video/7267197827489746222",
+   "title": "\"'Shooting Stars' is a song by Australian electronic duo Bag Raiders. The song was originally featured on the band's EP, Turbo Love, in 2008. The year afterwards, the song was released as a single from their eponymous debut album Bag Raiders, and reached number 18 in the Triple J Hottest 100 countdown of 2009. Although the song was released and charted in Australia in 2009, the song did not reach its peak there until 2013. It received international attention in February 2017 when the song became a part of a popular internet meme, thus cementing the track's legacy as a sleeper hit. The song reached number 11 on Billboard's Dance/Electronic Songs chart and number 9 on the Billboard Bubbling Under chart that year. The vocals on the song are performed by Rhys Taylor.\" - Wikipedia #fyp #foryou #song #music #songs #bangeroftheday #2000s #2000sthrowback #2000shits #bagraiders #meme #memes #2017",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Bag_Raiders_(album)",
+   "title": "Bag Raiders (album)",
+   "citedText": "Studio album by Bag Raiders\n- Released: 1 October 2010\n- Genre: Nu-disco; dance-pop; electropop;\n\n- Producer: Bag Raiders\n\nBag Raiders chronology\n| Bi..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Shooting_Stars_(Bag_Raiders_song)",
+   "title": "Shooting Stars (Bag Raiders song)",
+   "citedText": "The song was originally featured on the band's [EP](https://en.wikipedia.org/wiki/Extended_play), Turbo Love, which released on October 8, 2008. "
+  },
+  {
+   "url": "https://www.allmusic.com/artist/bag-raiders-mn0001011315",
+   "title": "Bag Raiders — Biography, Discography, Albums & Expert Reviews",
+   "citedText": "\"Shooting Stars,\" previously a Turbo Love! B-side, was issued as a single in 2009.\n\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Shooting_Stars_(Bag_Raiders_song)",
+   "title": "Shooting Stars (Bag Raiders song)",
+   "citedText": "[[3]](./Shooting_Stars_(Bag_Raiders_song)#cite_note-3) The band signed with [Modular Recordings](https://en.wikipedia.org/wiki/Modular_Recordings) in ..."
+  }
+ ]
+}

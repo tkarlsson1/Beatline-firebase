@@ -1,0 +1,88 @@
+{
+ "id": "6RtPijgfPKROxEzTHNRiDp",
+ "userMessage": "Titel: Rude\nArtist: MAGIC!\nSpotifys album: Don't Kill the Magic\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2014-06-25\nSpotifys år: 2014",
+ "responseText": "Rätt år är 2013, inte 2014 som Spotify anger. \"Rude\" kom ut som singel ett halvår innan albumet.\n\n- **Singeln:** Wikipedia skriver att \"Rude\" är MAGIC!:s debutsingel och att den först gavs ut som promosingel den 11 oktober 2013 och sedan gavs ut igen den 24 februari 2014 av Sony Music Entertainment.\n- **Albumet:** Studioalbumet *Don't Kill the Magic* kom den 30 juni 2014. Spotifys datum gäller alltså albumet, inte låten.\n- **Andra sidor ger samma år:** Wikipedias sida om bandet anger 12 oktober 2013 i stället för den 11:e, men även det är 2013. Spotify har dessutom en egen singelutgåva av \"Rude\" märkt single · 2013.\n\nEftersom det tidigaste datumet gäller blir svaret 2013.\n\når: 2013\nkälla: https://en.wikipedia.org/wiki/Rude_(song)\nförklaring: \"Rude\" kom ut som singel den 11 oktober 2013, alltså innan albumet Don't Kill the Magic släpptes 2014.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15928,
+  "output_tokens": 610,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "MAGIC! Rude single released 2013"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Rude_(song)",
+   "title": "Rude (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Kill_the_Magic",
+   "title": "Don%27t Kill the Magic",
+   "pageAge": null
+  },
+  {
+   "url": "https://musicplaylist.fandom.com/wiki/Rude",
+   "title": "Rude",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Magic!",
+   "title": "Magic!",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Kill_the_Magic_(song)",
+   "title": "Don%27t Kill the Magic (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Primary_Colours_(Magic!_album)",
+   "title": "Primary Colours (Magic! album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/2Qm9AzJHWLG9vbJCeXRaAW",
+   "title": "Listen to Rude - Single by MAGIC!",
+   "pageAge": "4782 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Nasri_(musician)",
+   "title": "Nasri (musician)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.ultimate-guitar.com/en/wiki/Magic!_-_Rude",
+   "title": "Magic! - Rude",
+   "pageAge": "3311 days ago"
+  },
+  {
+   "url": "https://www.last.fm/music/MAGIC!/_/Rude",
+   "title": "Rude — MAGIC!",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Rude_(song)",
+   "title": "Rude (song)",
+   "citedText": "|  | \"Rude\" (2013) | \"Don't Kill the Magic\" (2014) |\n\n- \"Rude\" on YouTube\n\n\"Rude\" is the debut single by Canadian band\n\nIt was originally released as ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Kill_the_Magic",
+   "title": "Don%27t Kill the Magic",
+   "citedText": "- Released: 30 June 2014\n\nMagic!\n\n"
+  },
+  {
+   "url": "https://open.spotify.com/album/2Qm9AzJHWLG9vbJCeXRaAW",
+   "title": "Listen to Rude - Single by MAGIC!",
+   "citedText": "· single · 2013 · 1 songs\n\nListen to Rude on Spotify · single · MAGIC! "
+  }
+ ]
+}

@@ -1,0 +1,83 @@
+{
+ "id": "1PuU1oIYtIaPHF0ogxWMvc",
+ "userMessage": "Titel: Hiphopper (feat. Teddybears Sthlm)\nArtist: Thomas Rusiak\nSpotifys album: Magic Villa Anniversary Edition\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2016-04-22\nSpotifys år: 2016",
+ "responseText": "Låten kom år 2000, inte 2016 som Spotify visar. Spotifys datum gäller jubileumsutgåvan av albumet, Magic Villa Anniversary Edition.\n\n- Låten finns med på Thomas Rusiaks debutalbum Magic Villa. Enligt Wikipedia är det ett studioalbum av Thomas Rusiak som släpptes 1 april 2000 i Sverige och 4 december 2000 i Storbritannien och USA.\n- Enligt SecondHandSongs gavs låten först ut av Thomas Rusiak feat. Teddybears STHLM år 2000. Den bygger på Punkrocker, men Hiphopper är en egen version med egen text, så det är Rusiaks utgivningsår som gäller.\n- Wikipedia anger också att singeln låg på Eurochart Hot 100 under juli 2000. Det stämmer med året.\n\når: 2000\nkälla: https://en.wikipedia.org/wiki/Magic_Villa\nförklaring: Hiphopper fanns med på Thomas Rusiaks debutalbum Magic Villa, som kom ut i Sverige den 1 april 2000.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15316,
+  "output_tokens": 641,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Thomas Rusiak Hiphopper Teddybears singel 2000"
+ ],
+ "searchResults": [
+  {
+   "url": "https://secondhandsongs.com/work/340503/all",
+   "title": "Song: Hiphopper written by Thomas Rusiak",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.ebay.com/itm/335588343288",
+   "title": "Thomas Rusiak - Single-CD - Hiphopper (2000, feat. Teddybears STHLM)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/song/1100895367/hiphopper-feat-teddybears-sthlm",
+   "title": "Hiphopper (feat. Teddybears STHLM) - Thomas Rusiak: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "9476 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Magic_Villa",
+   "title": "Magic Villa",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Thomas_Rusiak",
+   "title": "Thomas Rusiak",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=9V2I9KUryH8",
+   "title": "Thomas Rusiak - Hiphopper (feat Teddybears Sthlm & Eye N'I) - YouTube",
+   "pageAge": "3235 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Rock_%27n%27_Roll_Highschool",
+   "title": "Rock %27n%27 Roll Highschool",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=CNQzrBCVuZU",
+   "title": "Hiphopper (Single Edit) - YouTube",
+   "pageAge": "4069 days ago"
+  },
+  {
+   "url": "https://www.lololyrics.com/lyrics/22882.html",
+   "title": "Thomas Rusiak Feat. Teddybears STHLM - Hiphopper lyrics • Hip Hop/Rap",
+   "pageAge": "4891 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Magic_Villa",
+   "title": "Magic Villa",
+   "citedText": "Studio album by Thomas Rusiak\n- Released: 1 April 2000 (Sweden) 4 December 2000 (UK and United States)\n- Genre: Hip hop\n- Length: 58:00\n- Label: LED R..."
+  },
+  {
+   "url": "https://secondhandsongs.com/work/340503/all",
+   "title": "Song: Hiphopper written by Thomas Rusiak",
+   "citedText": "The song Hiphopper was written by Thomas Rusiak, Iggy Pop, Klas Åhlund, Patrik Arve and Joakim Åhlund and was first released by Thomas Rusiak feat. Te..."
+  },
+  {
+   "url": "https://secondhandsongs.com/work/340503/all",
+   "title": "Song: Hiphopper written by Thomas Rusiak",
+   "citedText": "It was adapted from Punkrocker (Thomas Rusiak, Iggy Pop, Klas Åhlund, Patrik Arve and Joakim Åhlund).\n\n"
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "id": "0JDp7p99FSja52T0YBLupR",
+ "userMessage": "Titel: The botten is nådd\nArtist: Timbuktu\nSpotifys album: The botten is nådd\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2003-06-02\nSpotifys år: 2003",
+ "responseText": "{\"year\":2003,\"explanation\":\"Låten är titelspåret på Timbuktus studioalbum The botten is nådd, som gavs ut 2003, så Spotifys år stämmer.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1490,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1490,
+    "output_tokens": 167,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 167,
+  "output_tokens_details": {
+   "thinking_tokens": 92
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

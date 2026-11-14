@@ -1,0 +1,83 @@
+{
+ "id": "1d5j7ibUKDihkXKddtp1dl",
+ "userMessage": "Titel: Trubaduren\nArtist: Magnus Uggla\nSpotifys album: Uggla Box\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2008-01-01\nSpotifys år: 2008",
+ "responseText": "Låten kom första gången 1993, inte 2008 som Spotify visar. Spotifys datum kommer från samlingsboxen Uggla Box. Svenska Wikipedia säger att Trubaduren är en balladlåt skriven av Magnus Uggla och Anders Henriksson och framförd av Magnus Uggla på albumet Alla får påsar 1993. Engelska Wikipedia bekräftar att studioalbumet Alla får påsar gavs ut i oktober 1993.\n\nLåten kom som singel först 1994. Discogs listar bland annat en promo-CD-singel från Columbia, Sverige, utgiven 1994. Eftersom det tidigaste året gäller är det albumets år, 1993, som räknas.\n\når: 1993\nkälla: https://sv.wikipedia.org/wiki/Trubaduren_(s%C3%A5ng)\nförklaring: Trubaduren kom först ut på Magnus Ugglas studioalbum Alla får påsar 1993, och singeln kom året efter.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16800,
+  "output_tokens": 556,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Magnus Uggla Trubaduren låt album"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Trubaduren",
+   "title": "Trubaduren",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Mitt_decennium",
+   "title": "Mitt decennium",
+   "pageAge": null
+  },
+  {
+   "url": "https://sv.wikipedia.org/wiki/Trubaduren_(s%C3%A5ng)",
+   "title": "Trubaduren (sång)",
+   "pageAge": "1021 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/2600322-Magnus-Uggla-Trubaduren",
+   "title": "Magnus Uggla",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Klassiska_m%C3%A4sterverk",
+   "title": "Klassiska m%C3%A4sterverk",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/se/artist/magnus-uggla/60934431",
+   "title": "Magnus Uggla på Apple Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/769016-Magnus-Uggla-Trubaduren",
+   "title": "Uggla...",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Alla_f%C3%A5r_p%C3%A5sar",
+   "title": "Alla f%C3%A5r p%C3%A5sar",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Retrospektivt_collage",
+   "title": "Retrospektivt collage",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://sv.wikipedia.org/wiki/Trubaduren_(s%C3%A5ng)",
+   "title": "Trubaduren (sång)",
+   "citedText": "Trubaduren är en balladlåt skriven av Magnus Uggla och Anders Henriksson och framförd av Magnus Uggla på **albumet Alla får påsar 1993**. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Alla_f%C3%A5r_p%C3%A5sar",
+   "title": "Alla f%C3%A5r p%C3%A5sar",
+   "citedText": "Studio album by Magnus Uggla\n- Released: October 1993\n- Genre: Pop rock\n- Length: 46:19\n- Label: Columbia\n- Producer: Anders Glenmark\n\nMagnus Uggla ch..."
+  },
+  {
+   "url": "https://www.discogs.com/release/769016-Magnus-Uggla-Trubaduren",
+   "title": "Uggla...",
+   "citedText": "# Uggla...\\* – Trubaduren\nMagnus Uggla - Trubaduren album cover\n\n- **Label:**: Columbia – MUPROMO 10\n- **Format:**: CD, Single, Promo\n- **Country:**: ..."
+  }
+ ]
+}

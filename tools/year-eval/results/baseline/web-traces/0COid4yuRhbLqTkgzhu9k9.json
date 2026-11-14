@@ -1,0 +1,88 @@
+{
+ "id": "0COid4yuRhbLqTkgzhu9k9",
+ "userMessage": "Titel: In The Summertime\nArtist: Shaggy, Rayvon\nSpotifys album: The Best Of Shaggy\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2008-01-01\nSpotifys år: 2008",
+ "responseText": "Det här är Shaggys och Rayvons cover av Mungo Jerrys låt från 1970. Det är alltså deras version från 1995 som räknas, inte originalet. Spotifys år 2008 kommer från samlingsskivan The Best Of Shaggy och är därför för sent.\n\nEnligt Discogs gavs singeln ut i Storbritannien med utgivningsdatum Jun 26, 1995, och konvolutet anger att \"In The Summertime\" is taken from the album \"Boombastic\". Studioalbumet Boombastic was released on July 11, 1995. Både singeln och albumet kom alltså 1995.\n\når: 1995\nkälla: https://www.discogs.com/release/5418125-Shaggy-In-The-Summertime\nförklaring: Shaggys och Rayvons version av Mungo Jerrys låt kom ut som singel den 26 juni 1995 och fanns samma år på albumet Boombastic.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15844,
+  "output_tokens": 506,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Shaggy Rayvon In the Summertime 1995 single"
+ ],
+ "searchResults": [
+  {
+   "url": "https://open.spotify.com/track/726KAdf3k8Ce8W95O38XNI",
+   "title": "In The Summertime - Song, Lyrics, and Music Video by Shaggy, Rayvon",
+   "pageAge": "11449 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/4345422-Shaggy-Featuring-Rayvon-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "pageAge": "695 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/master/83439-Shaggy-Featuring-Rayvon-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/5673004-Shaggy-Featuring-Rayvon-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "pageAge": "2280 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/6277440-Shaggy-feat-Rayvon-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/5418125-Shaggy-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/558874-Shaggy-Featuring-Rayvon-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "pageAge": "83 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Angel_(Shaggy_song)",
+   "title": "Angel (Shaggy song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Boombastic_(album)",
+   "title": "Boombastic (album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=nW_MJRscgHE",
+   "title": "Shaggy, Rayvon - In The Summertime - YouTube",
+   "pageAge": "6461 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/5418125-Shaggy-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "citedText": "Label:: Virgin – 7243 8 92983 2 1, Virgin – VSCDT1542 · Format:: CD, Single · Country:: UK · **Released:: Jun 26, 1995** · Genre:: Reggae · Style:: Re..."
+  },
+  {
+   "url": "https://www.discogs.com/release/5418125-Shaggy-In-The-Summertime",
+   "title": "Shaggy Featuring Rayvon",
+   "citedText": "℗ & © 1995 Virgin Records Ltd. \"In The Summertime\" is taken from the album \"Boombastic\" Insert: Printed in the UK Disc: Made in the UK\n\n{\"name\":\"In Th..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Boombastic_(album)",
+   "title": "Boombastic (album)",
+   "citedText": "The album was released on July 11, 1995.\n"
+  }
+ ]
+}

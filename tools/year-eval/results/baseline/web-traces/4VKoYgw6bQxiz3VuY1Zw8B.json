@@ -1,0 +1,98 @@
+{
+ "id": "4VKoYgw6bQxiz3VuY1Zw8B",
+ "userMessage": "Titel: King of My Castle (Roy Malone's King Mix)\nArtist: Wamdue Project, Roy Malone\nSpotifys album: King Of My Castle (Mixes)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2023-07-14\nSpotifys år: 2023",
+ "responseText": "Jag landar på **1998**. Originalet av ”King of My Castle” kom 1997, men det är Roy Malones remix som efterfrågas, och den gavs ut 1998. Spotifys år 2023 gäller bara en senare samlingsutgåva med mixar.\n\n- **Franska maxisingeln (1998):** Discogs listar en franskutgiven CD-maxisingel från Noise Traxx med utgivningsåret 1998. Spår 4 på den är King Of My Castle (Roy Malone's King Mix) Remix – Roy Malone, Walterino · 4:56.\n- **Fler utgåvor samma år:** Remixen finns också på en italiensk 12-tumsvinyl från Airplane! Records från 1998 och på en fransk-belgisk 12-tummare från Noise Traxx, också från 1998.\n- **Senare utgåvor:** Den tyska CD-singeln och den amerikanska 12-tummaren från Strictly Rhythm kom 1999. Därför gäller inte deras år.\n- **Shazam:** Sidan anger att remixen gavs ut 22 juni 1998. Samma sida har även ett motstridigt datum från 1997 i sina metadata, så den är en sämre källa än Discogs.\n\når: 1998\nkälla: https://www.discogs.com/release/195217-Wamdue-Project-King-Of-My-Castle\nförklaring: Roy Malones remix kom först ut 1998 på en fransk maxisingel. Originalet är från 1997 och Spotifys år 2023 kommer från en senare utgåva.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15089,
+  "output_tokens": 880,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Wamdue Project King of My Castle Roy Malone's King Mix release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.shazam.com/en-us/song/1689546957/king-of-my-castle-roy-malones-king-mix",
+   "title": "King of My Castle (Roy Malone's King Mix) - Wamdue Project: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "10766 days ago"
+  },
+  {
+   "url": "https://discogs.com/Wamdue-Project-King-Of-My-Castle/release/44719",
+   "title": "Wamdue Project",
+   "pageAge": "1912 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/6YeFYgc7H0ACm4IZ4Zro24",
+   "title": "King Of My Castle - Roy Malone's King Mix - song and lyrics by Wamdue Project, Roy Malone",
+   "pageAge": "6526 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/2bUvrEgtyQ41nFClPys70g",
+   "title": "King Of My Castle - Roy Malone Kings Mix - song and lyrics by Wamdue Project",
+   "pageAge": "6276 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/72715-Wamdue-Project-King-Of-My-Castle",
+   "title": "Wamdue Project",
+   "pageAge": "106 days ago"
+  },
+  {
+   "url": "https://discogs.com/Wamdue-Project-King-Of-My-Castle-The-Remixes/release/490434",
+   "title": "Wamdue Project",
+   "pageAge": "1965 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/119277-Wamdue-Project-King-Of-My-Castle",
+   "title": "Wamdue Project",
+   "pageAge": "1275 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/195217-Wamdue-Project-King-Of-My-Castle",
+   "title": "Wamdue Project",
+   "pageAge": "744 days ago"
+  },
+  {
+   "url": "https://tunebat.com/Info/King-Of-My-Castle-Roy-Malone-s-King-Mix-Wamdue-Project-Roy-Malone/4XZwpHpscrMkbpQPqjnwRJ",
+   "title": "Key & BPM for King Of My Castle - Roy Malone's King Mix by Wamdue Project, Roy Malone",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/King_of_My_Castle",
+   "title": "King of My Castle",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/195217-Wamdue-Project-King-Of-My-Castle",
+   "title": "Wamdue Project",
+   "citedText": "# Wamdue Project – King Of My Castle\nWamdue Project - King Of My Castle album cover\n\n- **Label:**: Noise Traxx – 910272\n- **Format:**: CD, Maxi-Single..."
+  },
+  {
+   "url": "https://www.discogs.com/release/195217-Wamdue-Project-King-Of-My-Castle",
+   "title": "Wamdue Project",
+   "citedText": "# Wamdue Project – King Of My Castle\nWamdue Project - King Of My Castle album cover\n\n- **Label:**: Noise Traxx – 910272\n- **Format:**: CD, Maxi-Single..."
+  },
+  {
+   "url": "https://discogs.com/Wamdue-Project-King-Of-My-Castle-The-Remixes/release/490434",
+   "title": "Wamdue Project",
+   "citedText": "Records – ARP 21035\n- **Format:**: Vinyl, 12\", 33 ⅓ RPM, Stereo\n- **Country:**: Italy\n- **Released:**: 1998\n- **Genre:**: Electronic\n- **Style:**: Hou..."
+  },
+  {
+   "url": "https://www.discogs.com/release/72715-Wamdue-Project-King-Of-My-Castle",
+   "title": "Wamdue Project",
+   "citedText": "# Wamdue Project – King Of My Castle\nWamdue Project - King Of My Castle album cover\n\n- **Label:**: Noise Traxx – 910276\n- **Format:**: Vinyl, 12\", 33 ..."
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1689546957/king-of-my-castle-roy-malones-king-mix",
+   "title": "King of My Castle (Roy Malone's King Mix) - Wamdue Project: Song Lyrics, Music Videos & Concerts",
+   "citedText": "King of My Castle (Roy Malone's King Mix) was **released on June 22, 1998** by Strictly Rhythm Records as a part of the album King of My Castle (Mixes..."
+  }
+ ]
+}

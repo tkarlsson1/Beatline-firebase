@@ -1,0 +1,88 @@
+{
+ "id": "4mn2kNTqiGLwaUR8JdhJ1l",
+ "userMessage": "Titel: House of the Rising Sun\nArtist: The Animals\nSpotifys album: The Singles Plus\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2003-02-28\nSpotifys år: 2003",
+ "responseText": "Låten kom ut 1964. Spotifys år 2003 gäller bara samlingsskivan \"The Singles Plus\".\n\nThe Animals version av den gamla folkvisan gavs ut på singel i Storbritannien med \"Talkin' 'bout You\" som B-sida, släpptes den 19 juni 1964 och spelades in den 18 maj 1964 på skivbolaget Columbia. I USA kom singeln i augusti 1964 och fanns också med på gruppens första amerikanska album, som släpptes i september 1964. Låten låg etta på den brittiska singellistan 9–15 juli 1964.\n\nAndra artister har spelat in låten tidigare, till exempel Bob Dylan 1962. Här gäller dock bara The Animals egen inspelning.\n\når: 1964\nkälla: https://en.wikipedia.org/wiki/The_House_of_the_Rising_Sun\nförklaring: The Animals version gavs ut på singel i Storbritannien den 19 juni 1964 och toppade den brittiska singellistan i juli samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16103,
+  "output_tokens": 499,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "The Animals House of the Rising Sun single released 1964"
+ ],
+ "searchResults": [
+  {
+   "url": "https://ultimatepopculture.fandom.com/wiki/House_of_the_Rising_Sun",
+   "title": "House of the Rising Sun",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_House_of_the_Rising_Sun",
+   "title": "The House of the Rising Sun",
+   "pageAge": null
+  },
+  {
+   "url": "https://rock.fandom.com/wiki/The_House_of_the_Rising_Sun",
+   "title": "The House of the Rising Sun",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://www.albumoftheyear.org/album/206030-the-animals-the-house-of-the-rising-sun.php",
+   "title": "The Animals - The House of the Rising Sun (Single) - Reviews - Album of The Year",
+   "pageAge": "97 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I%27m_Crying",
+   "title": "I%27m Crying",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.uncut.co.uk/features/the-making-of-the-animals-the-house-of-the-rising-sun-24476/",
+   "title": "The Making Of… The Animals’ The House Of The Rising Sun - UNCUT",
+   "pageAge": "2560 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Animals_(American_album)",
+   "title": "The Animals (American album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/The_House_of_the_Rising_Sun",
+   "title": "The House of the Rising Sun",
+   "pageAge": "685 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/473032-The-Animals-The-House-Of-The-Rising-Sun",
+   "title": "The Animals",
+   "pageAge": "225 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Animals_(album)",
+   "title": "The Animals (album)",
+   "pageAge": "73 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/The_House_of_the_Rising_Sun",
+   "title": "The House of the Rising Sun",
+   "citedText": "- US picture sleeve\n\nSingle by the Animals\n\nfrom the album The Animals\n- B-side: \"Talkin' 'bout You\"\n- Released: June 19, 1964\n- Recorded: May 18, 196..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Animals_(album)",
+   "title": "The Animals (album)",
+   "citedText": "The American album includes several R&B standards, written by the likes of Chuck Berry and John Lee Hooker, as well as the number one single \"House of..."
+  },
+  {
+   "url": "https://ultimatepopculture.fandom.com/wiki/House_of_the_Rising_Sun",
+   "title": "House of the Rising Sun",
+   "citedText": "\"House of the Rising Sun\" was a trans-Atlantic hit: after having reached the top of the UK pop singles chart in July 1964, it topped the U.S.\n\nPrecede..."
+  }
+ ]
+}

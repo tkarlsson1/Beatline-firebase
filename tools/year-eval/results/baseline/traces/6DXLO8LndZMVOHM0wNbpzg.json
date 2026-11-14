@@ -1,0 +1,37 @@
+{
+ "id": "6DXLO8LndZMVOHM0wNbpzg",
+ "userMessage": "Titel: Danza Kuduro\nArtist: Don Omar, Lucenzo\nSpotifys album: Meet The Orphans\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2010-01-01\nSpotifys år: 2010",
+ "responseText": "{\"year\":2010,\"explanation\":\"Don Omars och Lucenzos version gavs ut som singel och på albumet Meet The Orphans 2010, så Spotifys år stämmer.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1498,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1498,
+    "output_tokens": 156,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 156,
+  "output_tokens_details": {
+   "thinking_tokens": 82
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

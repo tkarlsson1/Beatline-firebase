@@ -1,0 +1,88 @@
+{
+ "id": "3cHyrEgdyYRjgJKSOiOtcS",
+ "userMessage": "Titel: Timber\nArtist: Pitbull, Kesha\nSpotifys album: Global Warming: Meltdown (Deluxe Version)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2012\nSpotifys år: 2012",
+ "responseText": "Rätt år är 2013, inte 2012 som Spotify anger. Engelska Wikipedia skriver att låten gavs ut den 7 oktober 2013 som första singel från Pitbulls EP Meltdown. EP:n kom senare samma år: Meltdown gavs ut den 22 november 2013. Apple Music ger samma datum för singeln: \"Timber (feat. Kesha) - Single Pitbull 7 October 2013\".\n\nSpotify visar troligen 2012 därför att spåret ligger på deluxeutgåvan av albumet Global Warming. Originalet av det albumet kom 2012, men Timber kom med först när deluxeutgåvan Meltdown gavs ut 2013.\n\når: 2013\nkälla: https://en.wikipedia.org/wiki/Timber_(Pitbull_song)\nförklaring: Timber av Pitbull och Kesha gavs ut som singel den 7 oktober 2013 och var första singeln från EP:n Meltdown.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 17171,
+  "output_tokens": 563,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Timber Pitbull Kesha single released 2013"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Timber_(Pitbull_song)",
+   "title": "Timber (Pitbull song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Timber_(Pitbull_song)",
+   "title": "Timber (Pitbull song)",
+   "pageAge": "685 days ago"
+  },
+  {
+   "url": "https://kesha.fandom.com/wiki/Timber",
+   "title": "Timber",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Outta_Nowhere",
+   "title": "Outta Nowhere",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/by/song/timber-feat-kesha/721686248",
+   "title": "Timber (feat. Kesha) - Song with Lyrics by Pitbull - Apple Music",
+   "pageAge": "4786 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Crazy_Kids",
+   "title": "Crazy Kids",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Meltdown_(EP)",
+   "title": "Meltdown (EP)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Kesha_discography",
+   "title": "Kesha discography",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/12220882-Pitbull-Feat-Keha-Timber",
+   "title": "Pitbull Feat. Ke$ha",
+   "pageAge": "4747 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Pebe_Sebert",
+   "title": "Pebe Sebert",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Timber_(Pitbull_song)",
+   "title": "Timber (Pitbull song)",
+   "citedText": "The song was released on October 7, 2013, as the [lead single](https://en.wikipedia.org/wiki/Lead_single) from Pitbull's [extended play](https://en.wi..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Meltdown_(EP)",
+   "title": "Meltdown (EP)",
+   "citedText": "EP by Pitbull\n- Released: November 22, 2013\n- Recorded: 2013\n\nPitbull chronology\n| Unreleased (2010) | Meltdown EP (2013) | Trackhouse (Daytona 500 Ed..."
+  },
+  {
+   "url": "https://music.apple.com/by/song/timber-feat-kesha/721686248",
+   "title": "Timber (feat. Kesha) - Song with Lyrics by Pitbull - Apple Music",
+   "citedText": "Kesha) - Single Pitbull 7 October 2013\n\n## More By Pitbull\n- Timber (feat. "
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "id": "46q5BtHso0ECuTKeq70ZhW",
+ "userMessage": "Titel: How Bizarre\nArtist: OMC\nSpotifys album: How Bizarre (Deluxe)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1996\nSpotifys år: 1996",
+ "responseText": "Singeln \"How Bizarre\" kom ut 1995, alltså året före albumet. Spotifys år 1996 gäller albumet och är därför ett år för sent.\n\n- **Singeln:** Wikipedia anger att den gavs ut i december 1995 av Huh! och Polydor Records som första singel från gruppens enda album, How Bizarre (1996). Infoboxen anger datumet 15 december 1995.\n- **Albumet:** Det gavs ut 1996, först den 27 september på Huh!\n- **Discogs** listar den nyzeeländska/australiska CD-singeln från Huh Records med utgivningen Nov 1995. Källorna skiljer sig alltså på månaden (november eller december), men alla anger året 1995.\n\når: 1995\nkälla: https://en.wikipedia.org/wiki/How_Bizarre\nförklaring: OMC gav ut \"How Bizarre\" på singel i Nya Zeeland i december 1995, året innan albumet kom.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15655,
+  "output_tokens": 576,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "OMC How Bizarre single released 1995"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/How_Bizarre",
+   "title": "How Bizarre",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.albumoftheyear.org/album/44800-omc-how-bizarre-single.php",
+   "title": "OMC - How Bizarre (Single) - Reviews - Album of The Year",
+   "pageAge": "4026 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/OMC_(band)",
+   "title": "OMC (band)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/How_Bizarre_(album)",
+   "title": "How Bizarre (album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/259049/all",
+   "title": "Performance: How Bizarre by OMC",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/15830839-OMC-How-Bizarre",
+   "title": "OMC",
+   "pageAge": "1148 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Club_Bizarre",
+   "title": "Club Bizarre",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/OMC/_/How+Bizarre",
+   "title": "How Bizarre — OMC",
+   "pageAge": null
+  },
+  {
+   "url": "https://rateyourmusic.com/release/single/omc/how-bizarre-2/",
+   "title": "How Bizarre by OMC (Single, Dance-Pop): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/How_Bizarre",
+   "title": "How Bizarre",
+   "citedText": "; Polydor;\n- Songwriters: Alan Jansson; Pauly Fuemana;\n- Producers: Alan Jansson; Pauly Fuemana;\n\nOMC singles chronology\n| \"We R the OMC\" (1994) | \"Ho..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/How_Bizarre",
+   "title": "How Bizarre",
+   "citedText": "Single by OMC\n\nfrom the album How Bizarre\n- Released: 15 December 1995\n- Genre: Pop; hip-hop;\n- Length: 3:43\n- Label: Huh!"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/How_Bizarre_(album)",
+   "title": "How Bizarre (album)",
+   "citedText": "Studio album by OMC\n- Released: 27 November 1996\n\nSingles from How Bizarre\n- \"How Bizarre\" Released: 15 December 1995; \"Right On\" Released: 1996; \"On ..."
+  },
+  {
+   "url": "https://www.discogs.com/release/15830839-OMC-How-Bizarre",
+   "title": "OMC",
+   "citedText": "# OMC – How Bizarre\nOMC - How Bizarre album cover\n\n- **Label:**: Huh Records – 577 620-2\n- **Format:**: CD, Single\n- **Country:**: Australasia\n- **Rel..."
+  }
+ ]
+}

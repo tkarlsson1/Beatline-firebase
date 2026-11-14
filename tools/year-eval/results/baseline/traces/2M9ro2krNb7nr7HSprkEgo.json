@@ -1,0 +1,37 @@
+{
+ "id": "2M9ro2krNb7nr7HSprkEgo",
+ "userMessage": "Titel: Fast Car\nArtist: Tracy Chapman\nSpotifys album: Tracy Chapman\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1988-04-05\nSpotifys år: 1988",
+ "responseText": "{\"year\":1988,\"explanation\":\"Låten gavs ut 1988 på Tracy Chapmans debutalbum och som singel samma år, så Spotifys år stämmer.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1491,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1491,
+    "output_tokens": 71,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 71,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

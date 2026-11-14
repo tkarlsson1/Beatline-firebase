@@ -1,0 +1,83 @@
+{
+ "id": "3iPPpKw775rCOiFd2aMT8F",
+ "userMessage": "Titel: Little Stereo\nArtist: Teddybears\nSpotifys album: Fresh\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2004-08-18\nSpotifys år: 2004",
+ "responseText": "Rätt år är 2004. Det är samma år som Spotify anger, men det bygger på albumets egen utgivning, inte på Spotifys datum.\n\n- Engelska Wikipedia uppger att det fjärde albumet Fresh (Sony Music) gavs ut den 26 mars 2004.\n- Wikipedias sida om albumet Fresh listar \"Little Stereo\" som spår 3. Bandets egen diskografi anger \"Little Stereo\" (featuring Daddy Boastin') | 2004 | … | Fresh.\n- Två saker kan leda till diskussion vid bordet:\n  - Låten finns också på samlingen Soft Machine från 2006.\n  - I singelkronologin på Wikipedias sida om \"Hey Boy\" står \"Little Stereo\" (2005). Det kan alltså finnas en singelutgåva från 2005.\n\n  Albumet från 2004 kom ändå först, och enligt reglerna gäller det tidigaste året.\n- Spotifys datum 2004-08-18 gäller troligen en senare utgåva av albumet. Året stämmer ändå.\n\når: 2004\nkälla: https://en.wikipedia.org/wiki/Teddybears_(band)\nförklaring: Little Stereo kom ut första gången på Teddybears album Fresh, som släpptes 26 mars 2004.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14153,
+  "output_tokens": 707,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Teddybears \"Little Stereo\" Fresh 2004"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/ca/song/little-stereo/189228018",
+   "title": "Little Stereo",
+   "pageAge": "8146 days ago"
+  },
+  {
+   "url": "https://audiomack.com/teddybears-sthlm/song/little-stereo-album-version-2106396",
+   "title": "Little Stereo (Album Version) by Teddybears Sthlm: Listen on Audiomack",
+   "pageAge": "8123 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/3iPPpKw775rCOiFd2aMT8F",
+   "title": "Little Stereo - song and lyrics by Teddybears",
+   "pageAge": "8123 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Hey_Boy_(Teddybears_song)",
+   "title": "Hey Boy (Teddybears song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://raygum.com/releases/u6NVxA95z1G2/fresh",
+   "title": "Fresh! - Teddybears",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Teddybears_(band)",
+   "title": "Teddybears (band)",
+   "pageAge": "59 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Soft_Machine_(Teddybears_album)",
+   "title": "Soft Machine (Teddybears album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=kfyah1BcqfE",
+   "title": "Teddybears Sthlm - Little Stereo [LYRICS] - YouTube",
+   "pageAge": "6129 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Fresh_(Teddybears_album)",
+   "title": "Fresh (Teddybears album)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Teddybears_(band)",
+   "title": "Teddybears (band)",
+   "citedText": "Four years later, the fourth album Fresh (Sony Music) was released on 26 March 2004. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Teddybears_(band)",
+   "title": "Teddybears (band)",
+   "citedText": "| Certifications |\n| --- | --- | --- | --- | --- | --- |\n| You Are Teddybears (as Teddybears STHLM) | Released: 1993 Label: MVG Formats: CD, LP | 35 |..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Hey_Boy_(Teddybears_song)",
+   "title": "Hey Boy (Teddybears song)",
+   "citedText": "Single by Teddybears featuring Swingfly\n\nfrom the album Fresh\n- Released: 10 May 2004\n- Recorded: 2004\n\n- Producers: Fabian \"Phat Fabe\" Torsson, Teddy..."
+  }
+ ]
+}

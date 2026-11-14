@@ -1,0 +1,134 @@
+{
+ "id": "1FFd5yEjDOnQF6pRvyyaBC",
+ "userMessage": "Titel: Nothing Really Matters - Afrojack Remix\nArtist: Mr. Probz\nSpotifys album: Nothing Really Matters (Afrojack Remix)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2015-02-20\nSpotifys år: 2015",
+ "responseText": "Jag landar på 2014, men stödet är svagt. Två källor sätter originallåten till 2014, men ingen anger ett exakt utgivningsdatum. Afrojack-remixen kom först 2015.\n\n**Originalet:** Engelska Wikipedia listar Mr. Probz singlar och ger låten årtalet \"Nothing Really Matters\" (2014). Amazons artistpresentation säger att Probz efter framgången med \"Waves\" 2014 hade another hit single, \"Nothing Really Matters,\" was out by the end of the year.\n\n**Remixen:** Apple Music anger Nothing Really Matters (Afrojack Remix) - Single February 20, 2015, och Discogs har en cd-singel som släpptes May 29, 2015.\n\n**Varför 2014 och inte 2015:** Reglerna säger att en remix bara räknas som en egen version när den angivna artisten själv har gjort den. Här är artisten Mr. Probz medan Afrojack gjorde remixen, så den bör räknas som en variant av Mr. Probz egen låt. Den gavs först ut 2014. Om ni i spelet vill räkna remixen som en egen version blir svaret i stället 2015.\n\når: 2014\nkälla: https://en.wikipedia.org/wiki/Nothing_Really_Matters_(Mr._Probz_song)\nförklaring: Mr. Probz gav ut \"Nothing Really Matters\" på singel 2014, och Afrojacks remix av låten kom 2015.\nstöd: svagt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 29817,
+  "output_tokens": 1536,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 2
+ },
+ "requests": 1,
+ "queries": [
+  "Mr. Probz Nothing Really Matters Afrojack Remix release",
+  "\"Nothing Really Matters\" Mr. Probz Afrojack remix 2014"
+ ],
+ "searchResults": [
+  {
+   "url": "https://open.spotify.com/track/07YdqyiBqsaEzrXe7Ny9C3",
+   "title": "Nothing Really Matters - Afrojack Remix - song and lyrics by Mr. Probz",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/5d7WVFuTwxrJ72NLQMQD1x",
+   "title": "Nothing Really Matters (Afrojack Remix) - Single by Mr. Probz",
+   "pageAge": "4285 days ago"
+  },
+  {
+   "url": "https://www.beatport.com/release/nothing-really-matters-afrojack-remix/5065632",
+   "title": "Mr. Probz - Nothing Really Matters - Afrojack Remix [Left Lane Recordings]",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Nothing_Really_Matters_(Mr._Probz_song)",
+   "title": "Nothing Really Matters (Mr. Probz song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/song/nothing-really-matters-afrojack-remix/1532431272",
+   "title": "Nothing Really Matters (Afrojack Remix) - Song by Mr. Probz - Apple Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.beatport.com/track/nothing-really-matters/20457370",
+   "title": "Mr. Probz - Nothing Really Matters (Afrojack Remix) [Left Lane Recordings]",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/02DoXNeIVYvONhTk1fGQrz",
+   "title": "Nothing Really Matters - Afrojack Remix - song and lyrics by Mr. Probz",
+   "pageAge": "4285 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/7065837-Mr-Probz-Nothing-Really-Matters-Afrojack-Remix",
+   "title": "Mr Probz",
+   "pageAge": "4187 days ago"
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=qtHd3GC0lgc",
+   "title": "Nothing Really Matters (Afrojack Remix) - YouTube",
+   "pageAge": "2245 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/5d7WVFuTwxrJ72NLQMQD1x",
+   "title": "Nothing Really Matters (Afrojack Remix) - Single by Mr. Probz",
+   "pageAge": "4285 days ago"
+  },
+  {
+   "url": "https://www.amazon.com/Nothing-Really-Matters-Afrojack-Remix/dp/B08JHFZ4PT",
+   "title": "Nothing Really Matters (Afrojack Remix) by Mr. Probz on Amazon Music - Amazon.com",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Nothing_Really_Matters_(Mr._Probz_song)",
+   "title": "Nothing Really Matters (Mr. Probz song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/album/nothing-really-matters-afrojack-remix-single/1532431271",
+   "title": "Nothing Really Matters (Afrojack Remix) - Single - Album by Mr. Probz - Apple Music",
+   "pageAge": "4285 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/master/1026573-Mr-Probz-Nothing-Really-Matters-Afrojack-Remix",
+   "title": "Mr Probz",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/7065837-Mr-Probz-Nothing-Really-Matters-Afrojack-Remix",
+   "title": "Mr Probz",
+   "pageAge": "4187 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/10000667-Mr-Probz-Nothing-Really-Matters-Afrojack-Remix",
+   "title": "Mr. Probz",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Little_Secrets_(Professor_Green_song)",
+   "title": "Little Secrets (Professor Green song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=M_lIi1hb6WU",
+   "title": "Mr. Probz - Nothing Really Matters (Afrojack Remix) (Official Video) - YouTube",
+   "pageAge": "4183 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Nothing_Really_Matters_(Mr._Probz_song)",
+   "title": "Nothing Really Matters (Mr. Probz song)",
+   "citedText": "| \"Twisted\" (2014) | \"Nothing Really Matters\" (2014) | \"Little Secrets\" (2014) |\n\n- \"Nothing Really Matters\" on YouTube; \"Nothing Really Matters\" (Afr..."
+  },
+  {
+   "url": "https://www.amazon.com/Nothing-Really-Matters-Afrojack-Remix/dp/B08JHFZ4PT",
+   "title": "Nothing Really Matters (Afrojack Remix) by Mr. Probz on Amazon Music - Amazon.com",
+   "citedText": "The success prompted high-profile collaborations with the likes of EDM producers Afrojack and David Guetta, and another hit single, \"Nothing Really Ma..."
+  },
+  {
+   "url": "https://music.apple.com/us/album/nothing-really-matters-afrojack-remix-single/1532431271",
+   "title": "Nothing Really Matters (Afrojack Remix) - Single - Album by Mr. Probz - Apple Music",
+   "citedText": "… Nothing Really Matters (Afrojack Remix) - Single February 20, 2015 1 Song, 3 minutes ℗ 2015 Left Lane Recordings\n\nListen to Nothing Really Matters (..."
+  },
+  {
+   "url": "https://www.discogs.com/release/7065837-Mr-Probz-Nothing-Really-Matters-Afrojack-Remix",
+   "title": "Mr Probz",
+   "citedText": "Label:: Ultra Music – 88875103842, Sony Music – 88875103842, Left Lane Recordings – 88875103842 · Format:: CD, Single · Country:: Germany, Austria, & ..."
+  }
+ ]
+}

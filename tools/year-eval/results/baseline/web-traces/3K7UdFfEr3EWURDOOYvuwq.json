@@ -1,0 +1,83 @@
+{
+ "id": "3K7UdFfEr3EWURDOOYvuwq",
+ "userMessage": "Titel: Ortens favoriter - Remix\nArtist: Labyrint, Black Ghost, STOR, Aleks, Allyawan, Påse, Dani M, Alladin, Jaqe\nSpotifys album: Ortens favoriter\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2012-01-01\nSpotifys år: 2012",
+ "responseText": "Remixen kom 2012, alltså samma år som Spotify anger. Den här versionen med alla gästartister gavs ut på singeln \"Ortens Favoriter\". Enligt Apple Music kom singeln 1 januari 2012 med tre spår, bland dem \"Ortens Favoriter (Remix) [feat. Black Ghost, Stor, Aleks, Allyawan, Pase, Dani M, Alladin & JaQe]\", ℗ 2012 Universal Music AB.\n\nEn annan källa pekar åt samma håll. Den 9 mars 2012 skrev Whoa.nu att den officiella videon till deras populära låt, Ortens favoriter, släpptes i en ny tappning. Enligt artikeln medverkade STOR, Aleks, Allyawan, Dani M, Jaqe, Alladin, Black Ghost och Pase. Originalet utan gästerna fanns på Labyrints debutalbum Labababa från november 2011. Det årtalet gäller inte här, eftersom det är remixens utgivning som räknas. Spotifys spårsida i sökträffarna visar 2021, men det verkar vara en senare uppladdning.\n\når: 2012\nkälla: https://itunes.apple.com/ae/album/ortens-favoriter-single/id508983156\nförklaring: Remixen med alla gästartister gavs ut på singeln \"Ortens Favoriter\" den 1 januari 2012 (Universal Music).\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14238,
+  "output_tokens": 873,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Labyrint \"Ortens favoriter\" remix Allyawan Påse Dani M"
+ ],
+ "searchResults": [
+  {
+   "url": "https://open.spotify.com/track/3oKVj5KPRCUPwaYLj6b8oI",
+   "title": "Ortens favoriter - Remix - song and lyrics by Labyrint, Black Ghost, STOR, Aleks, Allyawan, Påse, Dani M, Alladin, Jaqe",
+   "pageAge": "2066 days ago"
+  },
+  {
+   "url": "https://soundcloud.com/labyrint-music/ortens-favoriter-remix",
+   "title": "Stream Ortens favoriter (Remix) [feat. Black Ghost, Stor, Aleks, Allyawan, Pase, Dani M, Alladin & Jaqe] by Labyrint",
+   "pageAge": "5432 days ago"
+  },
+  {
+   "url": "https://music.apple.com/is/song/ortens-favoriter-remix-feat-black-ghost-stor-aleks/1444280011",
+   "title": "Ortens Favoriter (Remix) [feat. Black Ghost, Stor, Aleks, Allyawan, Pase, Dani M, Alladin & JaQe]",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://play.anghami.com/song/1370152",
+   "title": "Labyrint - Ortens favoriter (Remix) [feat. Black Ghost, Stor, Aleks, Allyawan, Pase, Dani M, Alladin & Jaqe]",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://music.apple.com/se/song/ortens-favoriter-remix-feat-black-ghost-stor-aleks/1444280011",
+   "title": "Ortens Favoriter (Remix) [feat. Black Ghost, Stor, Aleks, Allyawan, Pase, Dani M, Alladin & JaQe]",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://itunes.apple.com/ae/album/ortens-favoriter-single/id508983156",
+   "title": "‎Ortens Favoriter - Single by Labyrint on Apple Music",
+   "pageAge": "5431 days ago"
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=yR0KPH_4o4A",
+   "title": "Ortens favoriter (Remix) - YouTube",
+   "pageAge": "3041 days ago"
+  },
+  {
+   "url": "https://blog.whoa.nu/2012/03/09/video-labyrint-ortens-favoriter-remix-med-stor-aleks-allyawan-dani-m-jaqe-alladin-black-ghost-och-pase/index.html",
+   "title": "Video: Labyrint",
+   "pageAge": "5362 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Labyrint_(band)",
+   "title": "Labyrint (band)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://itunes.apple.com/ae/album/ortens-favoriter-single/id508983156",
+   "title": "‎Ortens Favoriter - Single by Labyrint on Apple Music",
+   "citedText": "Album · 2012 · 3 Songs\n\n# Ortens Favoriter - Single Labyrint\n-\n  - Hip-Hop/Rap\n  - 2012\n\n|  | TITLE |  | TIME |\n| --- | --- | --- | --- |\n|  | Ortens ..."
+  },
+  {
+   "url": "https://blog.whoa.nu/2012/03/09/video-labyrint-ortens-favoriter-remix-med-stor-aleks-allyawan-dani-m-jaqe-alladin-black-ghost-och-pase/index.html",
+   "title": "Video: Labyrint",
+   "citedText": "Idag släpptes den officiella videon till deras populära låt, *Ortens favoriter*,  i en ny tappning. "
+  },
+  {
+   "url": "https://blog.whoa.nu/2012/03/09/video-labyrint-ortens-favoriter-remix-med-stor-aleks-allyawan-dani-m-jaqe-alladin-black-ghost-och-pase/index.html",
+   "title": "Video: Labyrint",
+   "citedText": "Nämligen STOR, Aleks, Allyawan, Dani M, Jaqe, Alladin, Black Ghost och Pase.\n\n"
+  }
+ ]
+}

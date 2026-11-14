@@ -1,0 +1,98 @@
+{
+ "id": "7vHshinTU8161w69EPbabY",
+ "userMessage": "Titel: Younger - Kygo Remix\nArtist: Seinabo Sey, Kygo\nSpotifys album: Pretend\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2015-10-23\nSpotifys år: 2015",
+ "responseText": "Kygos remix av \"Younger\" gavs ut 2014, inte 2015 som Spotify anger.\n\n- **Den här versionen:** Discogs listar remixen som en egen digital singel, utgiven i Storbritannien och Irland i november 2014 av Virgin EMI Records. Skivan är märkt \"℗ 2014 Seinabo Sey, Under exclusive license to Universal Music AB\".\n- **Annan källa som pekar på samma år:** Amazon skriver att låten blev ännu mer populär genom Kygos remix från 2014.\n- **Varför Spotify visar 2015:** Spotify tar året från albumet Pretend. Albumet kom ut den 23 oktober 2015, och där finns remixen bara som bonusspår.\n- **Originalets år gäller inte här:** Sey själv gav ut \"Younger\" som singel den 22 november 2013. Enligt reglerna är det remixens år som räknas, inte originalets.\n\nDiscogs anger bara månaden för den brittiska utgåvan. Remixen kan ha getts ut tidigare samma år i Skandinavien, men allt jag hittade pekar på 2014.\n\når: 2014\nkälla: https://www.discogs.com/release/7946718-Seinabo-Sey-Younger-Kygo-Remix\nförklaring: Kygos remix av \"Younger\" gavs ut som singel i november 2014, nästan ett år före albumet Pretend där Spotify har den.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15122,
+  "output_tokens": 891,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Seinabo Sey Younger Kygo remix released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.shazam.com/en-us/song/1445882732/younger-kygo-remix",
+   "title": "Younger (Kygo Remix) - Seinabo Sey: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "5065 days ago"
+  },
+  {
+   "url": "https://www.amazon.com/Younger-Remixes-Seinabo-Sey/dp/B016QKWOH4",
+   "title": "Play Younger (The Remixes) by Seinabo Sey on Amazon Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/Seinabo-Sey-Younger-Kygo-Remix/release/7946718",
+   "title": "Seinabo Sey",
+   "pageAge": null
+  },
+  {
+   "url": "https://soundcloud.com/seinabosey/younger",
+   "title": "Stream Younger (Kygo Remix / Radio Edit) by Seinabo Sey",
+   "pageAge": "3985 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/7946718-Seinabo-Sey-Younger-Kygo-Remix",
+   "title": "Seinabo Sey",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Pretend_(album)",
+   "title": "Pretend (album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/7vHshinTU8161w69EPbabY",
+   "title": "Younger - Kygo Remix - song and lyrics by Seinabo Sey, Kygo",
+   "pageAge": "4040 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Younger_(Seinabo_Sey_song)",
+   "title": "Younger (Seinabo Sey song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.jiosaavn.com/song/younger-kygo-remix/OxghcDVIZWo",
+   "title": "Younger (Kygo Remix) (Full Song) - Seinabo Sey - Download or Listen Free - JioSaavn",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/7946718-Seinabo-Sey-Younger-Kygo-Remix",
+   "title": "Seinabo Sey",
+   "citedText": "Label:: Virgin EMI Records – none · Format:: File, AAC, Single, 256 kbps · Country:: UK & Ireland · **Released:: Nov 2014** · Genre:: Electronic, Pop ..."
+  },
+  {
+   "url": "https://www.discogs.com/release/7946718-Seinabo-Sey-Younger-Kygo-Remix",
+   "title": "Seinabo Sey",
+   "citedText": "- Phonographic Copyright ℗ – Seinabo Sey\n- Licensed To – Universal Music AB\n\n## Credits\n\n- Remix – Kygo\n\n## Notes\n\n℗ 2014 Seinabo Sey, Under exclusive..."
+  },
+  {
+   "url": "https://www.amazon.com/Younger-Remixes-Seinabo-Sey/dp/B016QKWOH4",
+   "title": "Play Younger (The Remixes) by Seinabo Sey on Amazon Music",
+   "citedText": "The song caught the public's attention and gained even wider popularity with a 2014 remix by Kygo. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Pretend_(album)",
+   "title": "Pretend (album)",
+   "citedText": "Studio album by Seinabo Sey\n- Released: 23 October 2015\n\nSeinabo Sey chronology\n\n- \"Younger\" Released: 22 November 2013; \"Hard Time\" Released: 5 May 2..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Pretend_(album)",
+   "title": "Pretend (album)",
+   "citedText": "| \"Younger\" | Seinabo Sey; Vincent Pontare; Magnus Lidehäll; Salem Al Fakir; | 3:34 |\n\n| \"Pretend\" | Sey; Lidehäll; | 3:29 |\n\n| \"Younger\" (Kygo remix)..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Pretend_(album)",
+   "title": "Pretend (album)",
+   "citedText": "Studio album by Seinabo Sey\n- Released: 23 October 2015\n\nSeinabo Sey chronology\n\n- \"Younger\" Released: 22 November 2013; \"Hard Time\" Released: 5 May 2..."
+  }
+ ]
+}

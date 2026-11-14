@@ -1,0 +1,88 @@
+{
+ "id": "5Ls1Ir6Vl5frICvnH4nVRH",
+ "userMessage": "Titel: Giftig\nArtist: Mange Schmidt\nSpotifys album: Känslan kommer tillbaks\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2007-01-01\nSpotifys år: 2007",
+ "responseText": "Året är 2007, samma år som Spotify anger, och flera källor bekräftar det. Discogs listar Mange Schmidts singel \"Giftig\" (med Petter) som en CD-maxisingel från Razzia Records (Razzia059), utgiven i Sverige 2007. Enligt Apple Music kom singeln den 7 juni 2007. I YouTube-videons beskrivning presenteras låten som nya singeln och där står också att Manges tredje skiva släpps i slutet av september. Albumet Känslan kommer tillbaks kom alltså senare samma år.\n\når: 2007\nkälla: https://www.discogs.com/release/1536166-Mange-Schmidt-Featuring-Petter-Giftig\nförklaring: \"Giftig\" kom ut som singel med Petter på Razzia Records 2007, före albumet Känslan kommer tillbaks.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 13385,
+  "output_tokens": 470,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Mange Schmidt Giftig singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/album/giftig-single/1504915045",
+   "title": "Giftig - Single by Mange Schmidt on Apple Music",
+   "pageAge": "7100 days ago"
+  },
+  {
+   "url": "https://www.deezer.com/us/track/915280262",
+   "title": "Mange Schmidt - Giftig",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/5Bxb3sjBchJUsGHhtW68Yq",
+   "title": "Giftig - Single by Mange Schmidt",
+   "pageAge": "6911 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/1FltkgUg8L2O4u5Lvqt5U7",
+   "title": "Giftig - Single by Mange Schmidt",
+   "pageAge": "7100 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/artist/mange-schmidt/151359398",
+   "title": "Mange Schmidt on Apple Music",
+   "pageAge": "351 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/master/2933659-Mange-Schmidt-Featuring-Petter-Giftig",
+   "title": "Mange Schmidt Featuring Petter",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/1536166-Mange-Schmidt-Featuring-Petter-Giftig",
+   "title": "Mange Schmidt Featuring Petter",
+   "pageAge": "979 days ago"
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=5tyyw9__c3g",
+   "title": "Mange Schmidt feat. Petter - Giftig - YouTube",
+   "pageAge": "7074 days ago"
+  },
+  {
+   "url": "https://www.last.fm/music/Mange+Schmidt/Giftig+-+Single",
+   "title": "Giftig - Single — Mange Schmidt",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/1536166-Mange-Schmidt-Featuring-Petter-Giftig",
+   "title": "Mange Schmidt Featuring Petter",
+   "citedText": "# Mange Schmidt Featuring Petter – Giftig\nMange Schmidt - Giftig album cover\n\n- **Label:**: Razzia Records – Razzia059\n- **Format:**: CD, Maxi-Single\n..."
+  },
+  {
+   "url": "https://music.apple.com/us/album/giftig-single/1504915045",
+   "title": "Giftig - Single by Mange Schmidt on Apple Music",
+   "citedText": "Album · 2007 · 3 Songs\n\n# Giftig - Single\nMange Schmidt\n\nHIP-HOP/RAP · 2007\n\nGiftig - Single\n\nGiftig\n\n1\n\nGiftig\n\n3:50\n\nGiftig (instrumental)\n\nGiftig (..."
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=5tyyw9__c3g",
+   "title": "Mange Schmidt feat. Petter - Giftig - YouTube",
+   "citedText": "**Mange Schmidt är tillbaka med nya singeln Giftig**, på vilken även Petter medverkar. "
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=5tyyw9__c3g",
+   "title": "Mange Schmidt feat. Petter - Giftig - YouTube",
+   "citedText": "Manges tredje skiva släpps i slutet av september. "
+  }
+ ]
+}

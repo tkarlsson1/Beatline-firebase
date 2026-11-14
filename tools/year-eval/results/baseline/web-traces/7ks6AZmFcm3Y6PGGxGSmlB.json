@@ -1,0 +1,93 @@
+{
+ "id": "7ks6AZmFcm3Y6PGGxGSmlB",
+ "userMessage": "Titel: Where Them Girls At (feat. Nicki Minaj & Flo Rida)\nArtist: David Guetta, Flo Rida, Nicki Minaj\nSpotifys album: Nothing but the Beat (Ultimate Edition)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2012-12-07\nSpotifys år: 2012",
+ "responseText": "Låten kom ut 2011, alltså året innan Spotifys 2012. Spotifys datum gäller *Nothing but the Beat (Ultimate Edition)*, som är en senare nyutgåva av albumet.\n\n- **Singeln:** Enligt Rate Your Music var det en singel av David Guetta som släpptes 2 maj 2011 på EMI. IMDb säger samma sak: spåret släpptes 2 maj 2011 via Virgin Records och var första singeln från Guettas femte studioalbum, Nothing but the Beat.\n- **Wikipedia:** I listan över Guettas singlar står den som \"Where Them Girls At\" (2011). Den gick in på plats 8 i Frankrike i maj 2011 och nådde som bäst plats 4 i juli 2011.\n- **Discogs:** Den europeiska CD-singeln har utgivningsår 2011.\n\nLåten spelades in 2010, men det året gäller inte eftersom den inte gavs ut förrän 2011.\n\når: 2011\nkälla: https://rateyourmusic.com/release/single/david-guetta/where-them-girls-at/\nförklaring: Låten kom ut som singel den 2 maj 2011 och var första singeln från David Guettas album Nothing but the Beat.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16091,
+  "output_tokens": 717,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Where Them Girls At David Guetta single release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Where_Them_Girls_At",
+   "title": "Where Them Girls At",
+   "pageAge": null
+  },
+  {
+   "url": "https://nickiminaj.fandom.com/wiki/Where_Them_Girls_At",
+   "title": "Where Them Girls At",
+   "pageAge": "2074 days ago"
+  },
+  {
+   "url": "https://www.imdb.com/title/tt4118142/",
+   "title": "David Guetta Feat. Flo Rida and Nicki Minaj: Where Them Girls At (Music Video 2011) ⭐ 5.6",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/2scyWiDIu54LKHmy9tDEhW",
+   "title": "Listen to Where Them Girls At (feat. Nicki Minaj & Flo Rida) [Remixes] - Single by David Guetta",
+   "pageAge": "5629 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/3130008-David-Guetta-Feat-Flo-Rida-And-Nicki-Minaj-Where-Them-Girls-At",
+   "title": "David Guetta Feat. Flo Rida And Nicki Minaj",
+   "pageAge": "263 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Little_Bad_Girl",
+   "title": "Little Bad Girl",
+   "pageAge": null
+  },
+  {
+   "url": "https://rateyourmusic.com/release/single/david-guetta/where-them-girls-at/",
+   "title": "Where Them Girls At by David Guetta (Single, Electro House): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "pageAge": "5675 days ago"
+  },
+  {
+   "url": "https://www.wikiwand.com/en/Where_Them_Girls_At",
+   "title": "Where Them Girls At - Wikiwand",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Light_My_Body_Up",
+   "title": "Light My Body Up",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://rateyourmusic.com/release/single/david-guetta/where-them-girls-at/",
+   "title": "Where Them Girls At by David Guetta (Single, Electro House): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "citedText": "**Released 2 May 2011 on EMI**. "
+  },
+  {
+   "url": "https://www.imdb.com/title/tt4118142/",
+   "title": "David Guetta Feat. Flo Rida and Nicki Minaj: Where Them Girls At (Music Video 2011) ⭐ 5.6",
+   "citedText": "Did you know: Trivia The track was **released on 2 May 2011**, via Virgin Records, serving as the lead single from Guetta's fifth studio album, Nothin..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Where_Them_Girls_At",
+   "title": "Where Them Girls At",
+   "citedText": "Single by David Guetta featuring Flo Rida and Nicki Minaj\n\nfrom the album Nothing but the Beat\n\n- Length: 3:30 (album version); 3:14 (single version);..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Where_Them_Girls_At",
+   "title": "Where Them Girls At",
+   "citedText": "In France, David Guetta's native country \"Where Them Girls At\" entered at number 8 in May 2011 and later reached at number 4 in July 2011, becoming Mi..."
+  },
+  {
+   "url": "https://www.discogs.com/release/3130008-David-Guetta-Feat-Flo-Rida-And-Nicki-Minaj-Where-Them-Girls-At",
+   "title": "David Guetta Feat. Flo Rida And Nicki Minaj",
+   "citedText": "Label:: Virgin – 509990857212 7, Positiva – 509990857212 7 · Format:: CD, Maxi-Single · Country:: Europe · **Released:: 2011** · Genre:: Electronic · ..."
+  }
+ ]
+}

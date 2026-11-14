@@ -1,0 +1,88 @@
+{
+ "id": "3rgTS3933lMWoPiN6CW4qY",
+ "userMessage": "Titel: Kids (feat. MKLA)\nArtist: KSHMR, Stefy De Cicco, MKLA\nSpotifys album: Kids (feat. MKLA)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2020-08-14\nSpotifys år: 2020",
+ "responseText": "Låten kom ut 2020. Det är KSHMR:s, Stefy De Ciccos och MKLA:s egen version av MGMT:s låt \"Kids\". Därför räknas året då den här versionen gavs ut och inte originalets år.\n\n- Enligt Discogs är singeln utgiven på skivbolaget Dharma och har Released:: Aug 14, 2020. På Discogs står det också att det är en Cover version of MGMT - Kids.\n- Beatport anger samma datum: Release Date 2020-08-14 Label Dharma Worldwide.\n- I pressen beskrivs låten som A modern-day, dancefloor-focused reimagining of the 2008 MGMT track of the same name. Den kom alltså ut 14 augusti 2020.\n\nSpotifys år stämmer med källorna.\n\når: 2020\nkälla: https://www.discogs.com/release/15770225-KSHMR-Stefy-De-Cicco-Feat-MKLA-Kids\nförklaring: KSHMR:s och Stefy De Ciccos cover av MGMT:s \"Kids\" med MKLA kom ut som singel den 14 augusti 2020.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14438,
+  "output_tokens": 566,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "KSHMR Stefy De Cicco Kids MKLA release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.shazam.com/song/1525916139/kids-feat-mkla",
+   "title": "Kids (feat. MKLA) - KSHMR & Stefy De Cicco: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "2283 days ago"
+  },
+  {
+   "url": "https://www.beatport.com/release/kids-feat-mkla/3077264",
+   "title": "Stefy De Cicco, KSHMR, MKLA - Kids (feat. MKLA) [Dharma Worldwide]",
+   "pageAge": "2283 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/15770225-KSHMR-Stefy-De-Cicco-Feat-MKLA-Kids",
+   "title": "KSHMR & Stefy De Cicco Feat. MKLA",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Kshmr_discography",
+   "title": "Kshmr discography",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=2qiyHnuVL3w",
+   "title": "KSHMR & Stefy De Cicco - Kids (feat. MKLA) [Official Music Video] - YouTube",
+   "pageAge": "2278 days ago"
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=fnlfMHyJm44",
+   "title": "KSHMR & Stefy De Cicco Feat. MKLA - Kids - YouTube",
+   "pageAge": "2278 days ago"
+  },
+  {
+   "url": "https://www.thehypemagazine.com/2020/08/kshmr-links-up-with-steffy-de-cicco-and-mkla-on-new-single-kids/",
+   "title": "KSHMR links up with Steffy De Cicco and MKLA on new single ‘Kids’ The Hype Magazine: Unveiling the Pulse of Urban Culture - From Hip Hop to Hollywood! Explore a Diverse Tapestry of Stories, Interviews, and Impactful Editorials Spanning Fashion, Gaming, Movies, MMA, EDM, Rock, and Beyond! www.thehypemagazine.com - The Hype Magazine The Hype Magazine - News From Hip Hop To Hollywood!",
+   "pageAge": "2276 days ago"
+  },
+  {
+   "url": "https://www.cultr.com/news/kshmr-teams-up-with-stefy-de-cicco-mkla-on-new-single-kids/",
+   "title": "KSHMR Teams Up With Stefy De Cicco & MKLA On New Single 'Kids'",
+   "pageAge": "2283 days ago"
+  },
+  {
+   "url": "https://popmusic.life/2020/11/26/music-producer-kshmr-releases-mgmt-kids-song-remix/",
+   "title": "Music producer KSHMR releases MGMT ‘Kids’ song remix",
+   "pageAge": "2179 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/15770225-KSHMR-Stefy-De-Cicco-Feat-MKLA-Kids",
+   "title": "KSHMR & Stefy De Cicco Feat. MKLA",
+   "citedText": "… Label:: Dharma (4) – none · Format:: File, FLAC · Country:: Netherlands · **Released:: Aug 14, 2020** · Genre:: Electronic · Style:: Electro House\n\n..."
+  },
+  {
+   "url": "https://www.discogs.com/release/15770225-KSHMR-Stefy-De-Cicco-Feat-MKLA-Kids",
+   "title": "KSHMR & Stefy De Cicco Feat. MKLA",
+   "citedText": "MKLA – Kids\nKSHMR - Kids album cover\n\n- **Label:**: Dharma (4) – none\n- **Format:**: File, FLAC\n- **Country:**: Netherlands\n- **Released:**: Aug 14, 2..."
+  },
+  {
+   "url": "https://www.beatport.com/release/kids-feat-mkla/3077264",
+   "title": "Stefy De Cicco, KSHMR, MKLA - Kids (feat. MKLA) [Dharma Worldwide]",
+   "citedText": "MKLA)\nStefy De Cicco, KSHMR, MKLA\n\nRelease Date\n\n2020-08-14\n\nLabel\n\nDharma Worldwide"
+  },
+  {
+   "url": "https://www.thehypemagazine.com/2020/08/kshmr-links-up-with-steffy-de-cicco-and-mkla-on-new-single-kids/",
+   "title": "KSHMR links up with Steffy De Cicco and MKLA on new single ‘Kids’ The Hype Magazine: Unveiling the Pulse of Urban Culture - From Hip Hop to Hollywood! Explore a Diverse Tapestry of Stories, Interviews, and Impactful Editorials Spanning Fashion, Gaming, Movies, MMA, EDM, Rock, and Beyond! www.thehypemagazine.com - The Hype Magazine The Hype Magazine - News From Hip Hop To Hollywood!",
+   "citedText": "A modern-day, dancefloor-focused reimagining of the 2008 **MGMT** track of the same name, **‘Kids’** pairs a high-energy bassline with the smooth, sul..."
+  }
+ ]
+}

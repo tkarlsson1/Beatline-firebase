@@ -1,0 +1,149 @@
+{
+ "id": "1IsvXZXAV9EBC4hBKW6yDN",
+ "userMessage": "Titel: Missing - Todd Terry Remix / Radio Edit\nArtist: Everything But The Girl\nSpotifys album: Like The Deserts Miss The Rain\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2002-01-01\nSpotifys år: 2002",
+ "responseText": "**Svar: 1994.** Själva låten \"Missing\" och Todd Terrys remix kom båda ut första gången 1994. Spotifys år, 2002, gäller samlingsskivan *Like The Deserts Miss The Rain*.\n\n- **Originallåten:** \"Missing\" finns på studioalbumet *Amplified Heart* från 1994. Den gavs ut som singel den 8 augusti 1994, i form av en EP.\n- **Todd Terrys remix:** Discogs listar en amerikansk kassettsingel från Atlantic, utgiven 1994, där spåret \"Missing (Todd Terry Remix Edit)\" finns med. Samma år kom en europeisk vinyl-EP med remixen, utgiven 1994 av Blanco Y Negro med Todd Terry angiven som remixare.\n- **Varför vissa säger 1995:** Wikipedia anger att låten inte blev någon större framgång förrän Todd Terry remixade den och den gavs ut på nytt 1995. Då blev den en världshit. Den brittiska nyutgåvan av remixen kom den 16 oktober 1995. Det är en senare utgåva, så den ändrar inte svaret, eftersom remixen redan fanns i USA 1994.\n\nSvaret blir alltså 1994 vare sig man räknar originalinspelningen eller remixen.\n\når: 1994\nkälla: https://www.discogs.com/release/7543589-Everything-But-The-Girl-Missing\nförklaring: \"Missing\" kom ut på albumet Amplified Heart och som singel 1994, och Todd Terrys remix gavs ut på singel i USA samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 39842,
+  "output_tokens": 1814,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 2
+ },
+ "requests": 1,
+ "queries": [
+  "Everything But The Girl Missing Todd Terry remix released 1995",
+  "Everything But The Girl Missing (The Full Remix EP) Atlantic 1994 Todd Terry discogs"
+ ],
+ "searchResults": [
+  {
+   "url": "https://culture.fandom.com/wiki/Missing_(Everything_but_the_Girl_song)",
+   "title": "Missing (Everything but the Girl song)",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Missing_(Everything_but_the_Girl_song)",
+   "title": "Missing (Everything but the Girl song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://readdork.com/lyrics/everything-but-the-girl-missing-todd-terry-remix",
+   "title": "Missing (Todd Terry Remix) Lyrics — Everything But The Girl",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Walking_Wounded_(Everything_but_the_Girl_song)",
+   "title": "Walking Wounded (Everything but the Girl song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Amplified_Heart",
+   "title": "Amplified Heart",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/74642-Everything-But-The-Girl-Missing-The-Remix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": "62 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/19859-Everything-But-The-Girl-Missing",
+   "title": "Everything But The Girl",
+   "pageAge": "1919 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/531206-Everything-But-The-Girl-Missing-The-Remix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": "248 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Wrong_(Everything_but_the_Girl_song)",
+   "title": "Wrong (Everything but the Girl song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Everything_but_the_Girl_discography",
+   "title": "Everything but the Girl discography",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/31371-Everything-But-The-Girl-Missing-The-Full-Remix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": "7437 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/74642-Everything-But-The-Girl-Missing-The-Remix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": "62 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/1644028-Everything-But-The-Girl-Missing",
+   "title": "Everything But The Girl",
+   "pageAge": "248 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/15281216-Everything-But-The-Girl-Missing-",
+   "title": "Everything But The Girl",
+   "pageAge": "573 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/7543589-Everything-But-The-Girl-Missing",
+   "title": "Everything But The Girl",
+   "pageAge": "99 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Amplified_Heart",
+   "title": "Amplified Heart",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/master/72594-Everything-But-The-Girl-Missing-The-Full-Remix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Missing_(Everything_but_the_Girl_song)",
+   "title": "Missing (Everything but the Girl song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/193058-Everything-But-The-Girl-Missing-The-Full-Remix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": "1970 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/805715-Everything-But-The-Girl-Missing-The-Re-Mix-EP",
+   "title": "Everything But The Girl",
+   "pageAge": "217 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Missing_(Everything_but_the_Girl_song)",
+   "title": "Missing (Everything but the Girl song)",
+   "citedText": "It was released as the album's second single on 8 August 1994, promoted as an [extended play](https://en.wikipedia.org/wiki/Extended_play) (EP).\n\n"
+  },
+  {
+   "url": "https://www.discogs.com/release/7543589-Everything-But-The-Girl-Missing",
+   "title": "Everything But The Girl",
+   "citedText": "Label:: Atlantic – 4-87124 · Format:: Cassette, Single · Country:: US · Released:: 1994 · Genre:: Electronic, Pop · Style:: House\n\n# Everything But Th..."
+  },
+  {
+   "url": "https://www.discogs.com/release/805715-Everything-But-The-Girl-Missing-The-Re-Mix-EP",
+   "title": "Everything But The Girl",
+   "citedText": "album cover\n\n- **Label:**: Blanco Y Negro – 0630-10457-0\n- **Format:**: Vinyl, 12\", 45 RPM, EP\n- **Country:**: Europe\n- **Released:**: 1994\n- **Genre:..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Missing_(Everything_but_the_Girl_song)",
+   "title": "Missing (Everything but the Girl song)",
+   "citedText": "The song initially did not achieve much success until it was remixed by [Todd Terry](https://en.wikipedia.org/wiki/Todd_Terry) and re-released in 1995..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Amplified_Heart",
+   "title": "Amplified Heart",
+   "citedText": "Studio album by Everything but the Girl\n- Released: 13 June 1994\n\nEverything but the Girl chronology\n\n- \"Rollercoaster\" Released: 23 May 1994 (EP); \"M..."
+  }
+ ]
+}

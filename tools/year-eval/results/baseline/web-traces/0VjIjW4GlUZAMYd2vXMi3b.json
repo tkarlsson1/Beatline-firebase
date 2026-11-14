@@ -1,0 +1,83 @@
+{
+ "id": "0VjIjW4GlUZAMYd2vXMi3b",
+ "userMessage": "Titel: Blinding Lights\nArtist: The Weeknd\nSpotifys album: After Hours\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2020-03-20\nSpotifys år: 2020",
+ "responseText": "\"Blinding Lights\" kom ut som singel 2019, ett år före albumet *After Hours*. Spotifys år 2020 är alltså för sent. Engelska Wikipedia skriver att låten gavs ut via XO och Republic Records den 29 november 2019 som albumets andra singel. Albumet *After Hours* kom däremot ut den 20 mars 2020. Eftersom det tidigaste året gäller blir svaret 2019.\n\når: 2019\nkälla: https://en.wikipedia.org/wiki/Blinding_Lights\nförklaring: Låten kom ut som singel den 29 november 2019, flera månader före albumet After Hours (2020).\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16175,
+  "output_tokens": 375,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Blinding Lights The Weeknd single released November 2019"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Blinding_Lights",
+   "title": "Blinding Lights",
+   "pageAge": null
+  },
+  {
+   "url": "https://excellentmusic.miraheze.org/wiki/Blinding_Lights",
+   "title": "Blinding Lights - Excellent Music Wiki - Miraheze",
+   "pageAge": "108 days ago"
+  },
+  {
+   "url": "https://the-weeknd.fandom.com/wiki/Blinding_Lights_(song)",
+   "title": "Blinding Lights (song)",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Blinding_Lights",
+   "title": "Blinding Lights",
+   "pageAge": "337 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/blinding-lights/1488408568",
+   "title": "Blinding Lights - Song by The Weeknd - Apple Music",
+   "pageAge": "2542 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Heartless_(The_Weeknd_song)",
+   "title": "Heartless (The Weeknd song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q76566134",
+   "title": "Blinding Lights - Wikidata",
+   "pageAge": "2542 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/After_Hours_(The_Weeknd_album)",
+   "title": "After Hours (The Weeknd album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/The+Weeknd/Blinding+Lights",
+   "title": "Blinding Lights — The Weeknd",
+   "pageAge": "2490 days ago"
+  },
+  {
+   "url": "https://www.last.fm/music/The+Weeknd/Blinding+Lights/+wiki",
+   "title": "Wiki - Blinding Lights — The Weeknd",
+   "pageAge": "1001 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Blinding_Lights",
+   "title": "Blinding Lights",
+   "citedText": "Single by the Weeknd\n\nfrom the album After Hours\n- Released: November 29, 2019\n- Recorded: February 2019\n\nThe Weeknd singles chronology\n| \"Heartless\" ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/After_Hours_(The_Weeknd_album)",
+   "title": "After Hours (The Weeknd album)",
+   "citedText": "- Released: March 20, 2020\n\nThe Weeknd chronology\n\n- \"Heartless\" Released: November 27, 2019; \"Blinding Lights\" Released: November 29, 2019; \"After Ho..."
+  }
+ ]
+}

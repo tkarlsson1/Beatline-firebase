@@ -1,0 +1,93 @@
+{
+ "id": "3ejfcz0QPyV717Vd3ta04V",
+ "userMessage": "Titel: My Way\nArtist: Calvin Harris\nSpotifys album: 96 Months\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2024-08-08\nSpotifys år: 2024",
+ "responseText": "Spotifys år 2024 stämmer inte. Det är året då samlingsskivan *96 Months* kom ut. Låten släpptes som fristående singel redan 2016. Enligt Wikipedia släpptes singeln 16 September 2016, och Harris announced the single along with its official artwork to his Twitter page on 12 September 2016, four days prior to its release. Flera andra källor anger samma datum. Discogs listar singeln som Released:: Sep 16, 2016. Billboard skrev den 16 september 2016 att Calvin Harris released his new single, \"My Way,\" on Thursday night. Låten fanns också med på den brittiska singellistan i september 2016.\n\når: 2016\nkälla: https://en.wikipedia.org/wiki/My_Way_(Calvin_Harris_song)\nförklaring: Calvin Harris släppte \"My Way\" som singel den 16 september 2016, och samlingsskivan 96 Months kom först 2024.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15015,
+  "output_tokens": 502,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Calvin Harris \"My Way\" single 2016"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/My_Way_(Calvin_Harris_song)",
+   "title": "My Way (Calvin Harris song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/song/my-way/1153704956",
+   "title": "My Way - Song with Lyrics by Calvin Harris - Apple Music",
+   "pageAge": "3711 days ago"
+  },
+  {
+   "url": "https://dancingastronaut.com/2016/09/calvin-harris-gets-personal-way/",
+   "title": "Calvin Harris gets personal with new single 'My Way' - Dancing Astronaut",
+   "pageAge": "3710 days ago"
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q26907194",
+   "title": "My Way - Wikidata",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/0dzeoQhVNzKkwM5ieOJC54",
+   "title": "Listen to My Way - Single by Calvin Harris",
+   "pageAge": "3711 days ago"
+  },
+  {
+   "url": "https://www.billboard.com/music/music-news/calvin-harris-sings-new-song-my-way-listen-7511087/",
+   "title": "Calvin Harris Sings On New Song, 'My Way': Listen Billboard",
+   "pageAge": "3711 days ago"
+  },
+  {
+   "url": "https://www.officialcharts.com/songs/calvin-harris-my-way/",
+   "title": "MY WAY",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/9151521-Calvin-Harris-My-Way",
+   "title": "Calvin Harris",
+   "pageAge": "3711 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Hype_(song)",
+   "title": "Hype (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/This_Is_What_You_Came_For",
+   "title": "This Is What You Came For",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/My_Way_(Calvin_Harris_song)",
+   "title": "My Way (Calvin Harris song)",
+   "citedText": "Single by Calvin Harris\n\nfrom the album 96 Months\n- Released: 16 September 2016\n\n- Songwriter: Calvin Harris\n- Producer: Calvin Harris\n\nCalvin Harris ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/My_Way_(Calvin_Harris_song)",
+   "title": "My Way (Calvin Harris song)",
+   "citedText": "— Harris, during an interview with\n\nOn 6 September 2016, Harris uploaded the artwork for \"My Way\" without the song title to his\n[[5]](./My_Way_(Calvin..."
+  },
+  {
+   "url": "https://www.discogs.com/release/9151521-Calvin-Harris-My-Way",
+   "title": "Calvin Harris",
+   "citedText": "Calvin Harris - My Way album cover Label:: Sony Music – none · Format:: File, MP3, Single, 320 kbps · Country:: Finland · **Released:: Sep 16, 2016** ..."
+  },
+  {
+   "url": "https://www.billboard.com/music/music-news/calvin-harris-sings-new-song-my-way-listen-7511087/",
+   "title": "Calvin Harris Sings On New Song, 'My Way': Listen Billboard",
+   "citedText": "Calvin Harris released his new single, \"My Way,\" on Thursday night, after teasing its arrival all week on Twitter.\n\n"
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "id": "3ia3dJETSOllPsv3LJkE35",
+ "userMessage": "Titel: California Love - Original Version\nArtist: 2Pac, Roger, Dr. Dre\nSpotifys album: Greatest Hits\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 1998-01-01\nSpotifys år: 1998",
+ "responseText": "Låten kom ut 1995, inte 1998. Engelska Wikipedia anger att låten gavs ut den 3 december 1995 som 2Pacs comebacksingel efter att han släppts från fängelset 1995, och den var hans första singel för Death Row Records. Discogs listar också singeln med utgivningsåret 1995, bland annat en promo-CD-singel från Death Row och Interscope.\n\nDen ursprungliga versionen är just singelversionen. En känd remixversion av låten kom med på dubbelalbumet All Eyez on Me 1996, medan originalversionen finns med på den brittiska utgåvan av albumet. Spotifys år 1998 kommer från samlingsskivan Greatest Hits och gäller alltså inte här.\n\når: 1995\nkälla: https://en.wikipedia.org/wiki/California_Love\nförklaring: California Love kom ut som singel den 3 december 1995, alltså innan låten hamnade på samlingsskivan Greatest Hits 1998.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15795,
+  "output_tokens": 523,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "California Love 2Pac Dr. Dre Roger Troutman single released 1995"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/California_Love",
+   "title": "California Love",
+   "pageAge": null
+  },
+  {
+   "url": "https://2pac.fandom.com/wiki/California_Love",
+   "title": "California Love",
+   "pageAge": "614 days ago"
+  },
+  {
+   "url": "https://rap.fandom.com/wiki/California_Love",
+   "title": "California Love",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/song/california-love-feat-roger-troutman-dr-dre/1440784906",
+   "title": "California Love (feat. Roger Troutman & Dr. Dre) - Song with Lyrics by 2Pac - Apple Music",
+   "pageAge": "11279 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/1770772-2Pac-Featuring-Dr-Dre-And-Roger-Troutman-California-Love",
+   "title": "2Pac Featuring Dr. Dre And Roger Troutman",
+   "pageAge": "320 days ago"
+  },
+  {
+   "url": "https://music.apple.com/by/song/california-love-feat-roger-troutman-dr-dre/1440662041",
+   "title": "California Love (feat. Roger Troutman & Dr. Dre) - Song with Lyrics by 2Pac - Apple Music",
+   "pageAge": "11279 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/12272833-2Pac-Featuring-Dr-Dre-Roger-Troutman-California-Love",
+   "title": "2Pac Featuring Dr. Dre & Roger Troutman",
+   "pageAge": null
+  },
+  {
+   "url": "https://translate.google.com/translate?u=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FCalifornia_Love&hl=vi&sl=en&tl=vi&client=srp",
+   "title": "California Love",
+   "pageAge": "236 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/All_Eyez_on_Me",
+   "title": "All Eyez on Me",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/West_Coast_Poplock",
+   "title": "West Coast Poplock",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/California_Love",
+   "title": "California Love",
+   "citedText": "The song was released December 3, 1995, as 2Pac's comeback single after his release from prison in 1995 and was his first single as the newest artist ..."
+  },
+  {
+   "url": "https://www.discogs.com/release/1770772-2Pac-Featuring-Dr-Dre-And-Roger-Troutman-California-Love",
+   "title": "2Pac Featuring Dr. Dre And Roger Troutman",
+   "citedText": "Label:: Death Row Records (2) – DRPD 00001, Interscope Records – DRPD 00001 · Format:: CD, Single, Promo · Country:: US · **Released:: 1995** · Genre:..."
+  },
+  {
+   "url": "https://rap.fandom.com/wiki/California_Love",
+   "title": "California Love",
+   "citedText": "A popular remix version of the song appeared on his 1996 double album All Eyez on Me. "
+  },
+  {
+   "url": "https://translate.google.com/translate?u=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FCalifornia_Love&hl=vi&sl=en&tl=vi&client=srp",
+   "title": "California Love",
+   "citedText": "The original version is featured on the UK version of his fourth album, *All Eyez on Me* (1996).\n\n"
+  }
+ ]
+}

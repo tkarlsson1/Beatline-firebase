@@ -1,0 +1,83 @@
+{
+ "id": "2jplxGfYoedcIir4TaEIJw",
+ "userMessage": "Titel: Lemon Tree (feat. Will Jay)\nArtist: Pesho & Dave Bo, Will Jay\nSpotifys album: Lemon Tree (feat. Will Jay)\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2017-12-01\nSpotifys år: 2017",
+ "responseText": "Pesho & Dave Bo gjorde sin version av \"Lemon Tree\" med Will Jay 2017. Det är en cover av Fool's Gardens äldre låt, och originalets år räknas inte, så rätt år är 2017. Spotify anger också 2017, men datumet där är 1 december, alltså lite senare.\n\n- **Första utgivningen:** Apple Music listar singeln med en enda låt och anger \"Released: Nov 10, 2017 - ℗ 2017 tb media\". Amazon Music anger samma datum: \"1 SONG • 3 MINUTES • NOV 10 2017\".\n- **Senare utgåva som inte gäller:** Det finns också en singel med två spår, en radioversion och en förlängd mix, från 17 March 2018 2 Songs, 7 minutes ℗ 2018 BIP Records under exclusive license from Soundz Good. Den är en nyutgåva och ändrar inte året.\n\nKällan är en musiktjänst och inte ett uppslagsverk, men den anger uttryckligen när singeln gavs ut.\n\når: 2017\nkälla: https://itunes.apple.com/us/album/lemon-tree-feat-will-jay-single/1305849166\nförklaring: Pesho & Dave Bos version av \"Lemon Tree\" med Will Jay gavs ut som singel den 10 november 2017.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 13863,
+  "output_tokens": 647,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Pesho & Dave Bo Lemon Tree Will Jay"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.amazon.com/Lemon-Tree-Pesho-Dave-feat/dp/B0773SC9Z7",
+   "title": "Lemon Tree by Pesho & Dave Bo feat. Will Jay on Amazon Music - Amazon.com",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/nz/album/lemon-tree-feat-will-jay-single/1305849166",
+   "title": "Lemon Tree (feat. Will Jay) - Single by Pesho & DAVE BO on Apple Music",
+   "pageAge": "3291 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/album/lemon-tree-feat-will-jay-single/1305849166",
+   "title": "Lemon Tree (feat. Will Jay) - Single - Album by Pesho & DAVE BO - Apple Music",
+   "pageAge": "3291 days ago"
+  },
+  {
+   "url": "https://music.apple.com/tr/song/lemon-tree-feat-will-jay/1305849638",
+   "title": "Lemon Tree (feat. Will Jay)",
+   "pageAge": "3291 days ago"
+  },
+  {
+   "url": "https://music.apple.com/be/album/lemon-tree-feat-will-jay-single/1360416684",
+   "title": "Lemon Tree (feat. Will Jay) - Single - Album by Pesho & DAVE BO - Apple Music",
+   "pageAge": "3164 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/5iqCDaVWI5xPJENWh4I68o",
+   "title": "Lemon Tree - song and lyrics by Pesho, DAVE BO, Will Jay",
+   "pageAge": "3291 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/0pr16QsXIUBkr9CQfiV5dZ",
+   "title": "Lemon Tree (feat. Will Jay) - Single by Pesho & Dave Bo",
+   "pageAge": "3270 days ago"
+  },
+  {
+   "url": "https://itunes.apple.com/us/album/lemon-tree-feat-will-jay-single/1305849166",
+   "title": "‎Lemon Tree (feat. Will Jay) - Single by Pesho & DAVE BO on Apple Music",
+   "pageAge": "3291 days ago"
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=5Z5NUMbtALk",
+   "title": "Pesho & Dave Bo - Lemon Tree (ft. Will Jay) Official Video - YouTube",
+   "pageAge": "3221 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://itunes.apple.com/us/album/lemon-tree-feat-will-jay-single/1305849166",
+   "title": "‎Lemon Tree (feat. Will Jay) - Single by Pesho & DAVE BO on Apple Music",
+   "citedText": "Will Jay)  |  | 3:05 |\n\n- 1 Song, 3 Minutes\n- Released: Nov 10, 2017\n- ℗ 2017 tb media\n\n## More By Pesho\nPesho, Pt. "
+  },
+  {
+   "url": "https://www.amazon.com/Lemon-Tree-Pesho-Dave-feat/dp/B0773SC9Z7",
+   "title": "Lemon Tree by Pesho & Dave Bo feat. Will Jay on Amazon Music - Amazon.com",
+   "citedText": "… **1 SONG • 3 MINUTES • NOV 10 2017**\n\nCheck out Lemon Tree by Pesho & Dave Bo feat. "
+  },
+  {
+   "url": "https://music.apple.com/be/album/lemon-tree-feat-will-jay-single/1360416684",
+   "title": "Lemon Tree (feat. Will Jay) - Single - Album by Pesho & DAVE BO - Apple Music",
+   "citedText": "Will Jay) - Single\nPesho, DAVE BO\n\nDANCE · 2018\n\n17 March 2018 2 Songs, 7 minutes ℗ 2018 BIP Records under exclusive license from Soundz Good\n\n{\"name\"..."
+  }
+ ]
+}

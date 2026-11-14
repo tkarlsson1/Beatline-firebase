@@ -1,0 +1,103 @@
+{
+ "id": "4255amV4enzl28KAn16rUO",
+ "userMessage": "Titel: Are You With Me\nArtist: Lost Frequencies\nSpotifys album: Less Is More\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2016-10-21\nSpotifys år: 2016",
+ "responseText": "Rätt år är 2014, inte Spotifys 2016. Lost Frequencies version är en remix av Easton Corbins låt. Den kom som singel två år innan den togs med på debutalbumet Less Is More.\n\n- **Officiell singel 2014:** Lost Frequencies-artikeln på engelska Wikipedia skriver att den officiella utgivningen var den 27 oktober 2014. Enligt Songfacts tog han musiken och refrängen från låten, ökade tempot och gav ut den som en deep house-remix den 27 oktober 2014.\n- **Originalet räknas inte:** Easton Corbin spelade in låten först, på sitt studioalbum All Over the Road från 2012. Enligt reglerna gäller året då Lost Frequencies egen version kom ut.\n- **Spotifys 2016 är för sent:** Albumet Less Is More gavs ut den 21 oktober 2016.\n- **Skillnader mellan källorna:**\n  - Albumartikeln på Wikipedia anger 24 oktober 2014 i sin lista över singlar. Samma artikel säger också att låten gavs ut som första singel den 26 januari 2015, vilket troligen gäller den internationella utgivningen.\n  - Deezer anger 21/08/2014.\n\n  Alla dessa datum utom 2015-datumet ligger 2014, och det året är det tidigaste.\n\når: 2014\nkälla: https://en.wikipedia.org/wiki/Lost_Frequencies\nförklaring: Lost Frequencies remix av Easton Corbins låt kom ut som singel den 27 oktober 2014, två år före albumet Less Is More.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16560,
+  "output_tokens": 833,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Lost Frequencies Are You With Me single released 2014"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Less_Is_More_(Lost_Frequencies_album)",
+   "title": "Less Is More (Lost Frequencies album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Are_You_with_Me",
+   "title": "Are You with Me",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.songfacts.com/facts/lost-frequencies/are-you-with-me",
+   "title": "Are You With Me by Lost Frequencies - Songfacts",
+   "pageAge": "4150 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Reality_(Lost_Frequencies_song)",
+   "title": "Reality (Lost Frequencies song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/63zsZVaIMUW10wP6QanS42",
+   "title": "Listen to Are You With Me - Single by Lost Frequencies",
+   "pageAge": "4468 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Lost_Frequencies",
+   "title": "Lost Frequencies",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Lost_Frequencies_discography",
+   "title": "Lost Frequencies discography",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/track/81300218",
+   "title": "Lost Frequencies - Are You With Me",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Where_Are_You_Now_(Lost_Frequencies_song)",
+   "title": "Where Are You Now (Lost Frequencies song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://edmhousenetwork.com/released-9-years-ago-today-lost-frequencies-are-you-with-me/",
+   "title": "Released 9 Years Ago: Lost Frequencies - Are You With Me - EDM House Network",
+   "pageAge": "1115 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Lost_Frequencies",
+   "title": "Lost Frequencies",
+   "citedText": "The official release was on 27 October 2014.\n\n"
+  },
+  {
+   "url": "https://www.songfacts.com/facts/lost-frequencies/are-you-with-me",
+   "title": "Are You With Me by Lost Frequencies - Songfacts",
+   "citedText": "Two years later the Belgian DJ and producer Lost Frequencies took the music and the refrain from the song, sped up the track and **released it as a de..."
+  },
+  {
+   "url": "https://www.songfacts.com/facts/lost-frequencies/are-you-with-me",
+   "title": "Are You With Me by Lost Frequencies - Songfacts",
+   "citedText": "### Are You With Me\nby Lost Frequencies\n\n**Album:** single release only (2014)\n\n**Charted:** **1**\n\n#### Songfacts®:\n- This Tommy Lee James, Terry McB..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Less_Is_More_(Lost_Frequencies_album)",
+   "title": "Less Is More (Lost Frequencies album)",
+   "citedText": "Studio album by Lost Frequencies\n- Released: 21 October 2016\n- Recorded: 2014–16\n\nLost Frequencies chronology\n\n- \"Are You with Me\" Released: 24 Octobe..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Less_Is_More_(Lost_Frequencies_album)",
+   "title": "Less Is More (Lost Frequencies album)",
+   "citedText": "Studio album by Lost Frequencies\n- Released: 21 October 2016\n- Recorded: 2014–16\n\nLost Frequencies chronology\n\n- \"Are You with Me\" Released: 24 Octobe..."
+  },
+  {
+   "url": "https://www.deezer.com/en/track/81300218",
+   "title": "Lost Frequencies - Are You With Me",
+   "citedText": "Listen to Are You With Me on Deezer: **Are You With Me | Lost Frequencies | 21/08/2014** | 02:18. "
+  }
+ ]
+}

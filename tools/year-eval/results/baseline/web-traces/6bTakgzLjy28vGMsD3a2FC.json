@@ -1,0 +1,73 @@
+{
+ "id": "6bTakgzLjy28vGMsD3a2FC",
+ "userMessage": "Titel: She's A Freak\nArtist: Infinite Mass\nSpotifys album: The Face\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2001-01-01\nSpotifys år: 2001",
+ "responseText": "Infinite Mass släppte ”She's A Freak” 2001. Spotifys år stämmer alltså, och Discogs visar att låten inte fanns ute tidigare under något annat år.\n\n- **Singeln:** Låten gavs ut som maxisingel på CD i Sverige, med Polar – 570 529-2, Murlyn Music – 570 529-2, Universal – 570 529-2 · Format:: CD, Maxi-Single, Enhanced · Country:: Sweden · Released:: 2001.\n- **Alla singelversioner:** Discogs huvudsida för singeln listar tre versioner: en CD-maxisingel, en 12\"-vinyl och en promo-CDr. Alla tre är svenska och från 2001.\n- **Albumet:** Albumet *The Face* som låten finns på anges också till 2001.\n\nIngen av källorna anger något månadsdatum, så det går inte att avgöra om singeln eller albumet kom först. Det spelar ingen roll för svaret eftersom båda kom 2001.\n\når: 2001\nkälla: https://www.discogs.com/master/138264-Infinite-Mass-Shes-A-Freak\nförklaring: Infinite Mass gav ut ”She's A Freak” som singel 2001, samma år som albumet The Face.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14403,
+  "output_tokens": 642,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Infinite Mass \"She's a Freak\" singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/song/shes-a-freak/1442543372",
+   "title": "She's a Freak - Song by Infinite Mass & Linda Sundblad - Apple Music",
+   "pageAge": "9448 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/6bTakgzLjy28vGMsD3a2FC",
+   "title": "She's A Freak - song and lyrics by Infinite Mass, Linda Sundblad",
+   "pageAge": "9448 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/5639442-Infinite-Mass-Shes-A-Freak",
+   "title": "Infinite Mass",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/Infinite-Mass-Shes-A-Freak/release/630277",
+   "title": "Infinite Mass",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/master/138264-Infinite-Mass-Shes-A-Freak",
+   "title": "Infinite Mass",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/226407-Infinite-Mass-Shes-A-Freak",
+   "title": "Infinite Mass",
+   "pageAge": "1658 days ago"
+  },
+  {
+   "url": "https://www.elyrics.net/read/i/infinite-mass-lyrics/she_s-a-freak-lyrics.html",
+   "title": "SHE'S A FREAK Lyrics - INFINITE MASS",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.letras.com/infinite-mass/827224/",
+   "title": "SHE'S A FREAK - Infinite Mass - LETRAS.COM",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Freak_(Estelle_song)",
+   "title": "Freak (Estelle song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/226407-Infinite-Mass-Shes-A-Freak",
+   "title": "Infinite Mass",
+   "citedText": "Label:: Polar – 570 529-2, Murlyn Music – 570 529-2, Universal – 570 529-2 · Format:: CD, Maxi-Single, Enhanced · Country:: Sweden · Released:: 2001 ·..."
+  }
+ ]
+}

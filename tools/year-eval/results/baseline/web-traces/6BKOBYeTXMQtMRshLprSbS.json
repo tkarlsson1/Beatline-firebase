@@ -1,0 +1,88 @@
+{
+ "id": "6BKOBYeTXMQtMRshLprSbS",
+ "userMessage": "Titel: Country Roads\nArtist: Hermes House Band\nSpotifys album: Greatest Hits No.1 Gold Selection\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2015-12-02\nSpotifys år: 2015",
+ "responseText": "Hermes House Bands cover av \"Country Roads\" kom ut på singel 2001. Spotifys år, 2015, kommer från en senare samlingsskiva och räknas därför inte.\n\n- **Singelns utgivning:** Discogs listar en europeisk maxisingel på Zeitgeist/Universal/Polydor som gavs ut den 21 maj 2001 (Released:: May 21, 2001).\n- **Fler utgåvor samma år:** Discogs översiktssida visar att singeln också kom ut 2001 i Nederländerna, Belgien, Storbritannien och Skandinavien. En australisk utgåva kom först 2003. \n- **Apple Music:** Där står singeln med utgivningsdatum 2001-05-23.\n- **Cover:** Versionen är Hermes House Bands egen inspelning av John Denvers låt. Discogs anger att den är inspelad live i The Lager Hall (Recorded live at the Lager Hall). Därför gäller året för just den här versionen och inte originalets.\n\når: 2001\nkälla: https://www.discogs.com/release/1061781-Hermes-House-Band-Country-Roads\nförklaring: Hermes House Bands cover av \"Country Roads\" gavs ut på singel den 21 maj 2001.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15483,
+  "output_tokens": 647,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Hermes House Band Country Roads single"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/album/country-roads-single/1019583092",
+   "title": "Country Roads - Single - Album by Hermes House Band - Apple Music",
+   "pageAge": "9306 days ago"
+  },
+  {
+   "url": "https://music.apple.com/gb/album/country-roads-single/1759330016",
+   "title": "Country Roads - Single - Album by Hermes House Band - Apple Music",
+   "pageAge": "9020 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/0c54ZEU1FYZCcKMRCiRul3",
+   "title": "Country Roads - song and lyrics by Hermes House Band",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/master/142407-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "pageAge": "1665 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/912131-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "pageAge": "293 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/1431299-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "pageAge": "900 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/15002547-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/1061781-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "pageAge": "9308 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/15846891-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/1061781-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "citedText": "Label:: Zeitgeist – 587 058-2, Universal – 587 058-2, Polydor – 587 058-2 · **Format:: CD, Maxi-Single**, Stereo · Country:: Europe · Released:: May 2..."
+  },
+  {
+   "url": "https://www.discogs.com/master/142407-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "citedText": "# Hermes House Band – Country Roads\nHermes House Band - Country Roads album cover\n\nCountry Roads (Karaoke Version) · 3:20\n\n| Cover of Country Roads, 2..."
+  },
+  {
+   "url": "https://music.apple.com/us/album/country-roads-single/1019583092",
+   "title": "Country Roads - Single - Album by Hermes House Band - Apple Music",
+   "citedText": "Album · 2001 · 2 Songs\n\nCountry Roads - Single\n\n# Country Roads - Single\nHermes House Band\n\nPop · 2001\n\nMay 23, 2001 2 songs, 6 minutes ℗ 2015 Xplo Mu..."
+  },
+  {
+   "url": "https://www.discogs.com/release/912131-Hermes-House-Band-Country-Roads",
+   "title": "Hermes House Band",
+   "citedText": "- Phonographic Copyright ℗ – ARS Productions Belgium\n- Copyright © – ARS Productions Belgium\n- Licensed From – XPLO Music\n- Recorded At – The Lager Ha..."
+  }
+ ]
+}

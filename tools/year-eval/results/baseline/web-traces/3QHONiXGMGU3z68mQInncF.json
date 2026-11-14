@@ -1,0 +1,83 @@
+{
+ "id": "3QHONiXGMGU3z68mQInncF",
+ "userMessage": "Titel: I'll Be Missing You (feat. Faith Evans, 112)\nArtist: Diddy, Faith Evans, 112\nSpotifys album: Bad Boy's 10th Anniversary- The Hits\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2004-03-09\nSpotifys år: 2004",
+ "responseText": "**1997** är rätt år. Spotifys 2004 kommer från samlingsskivan *Bad Boy's 10th Anniversary – The Hits*.\n\nDiddy är samma artist som Puff Daddy, som var hans artistnamn 1997. Låten är en hyllning till The Notorious B.I.G. och släpptes i maj 1997 av Bad Boy och Arista Records som andra singeln från Puff Daddys debutalbum *No Way Out* (1997). Wikipedia anger utgivningsdatumet 27 maj 1997. Discogs bekräftar året och listar en europeisk CD-singel som släpptes 16 juni 1997.\n\nLåten bygger på ett sampel av The Polices \"Every Breath You Take\" från 1983. Men det året gäller inte här, eftersom Puff Daddys version är en egen låt och inte samma inspelning.\n\når: 1997\nkälla: https://en.wikipedia.org/wiki/I'll_Be_Missing_You\nförklaring: Låten släpptes som singel i maj 1997 och fanns med på Puff Daddys (Diddys) debutalbum No Way Out samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16210,
+  "output_tokens": 558,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "I'll Be Missing You Puff Daddy Faith Evans 112 single released 1997"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/I'll_Be_Missing_You",
+   "title": "I'll Be Missing You",
+   "pageAge": "3 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I%27ll_Be_Missing_You",
+   "title": "I%27ll Be Missing You",
+   "pageAge": null
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/I'll_Be_Missing_You",
+   "title": "I'll Be Missing You",
+   "pageAge": "79 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/ill-be-missing-you-feat-faith-evans-112/906589235",
+   "title": "I'll Be Missing You (feat. Faith Evans & 112) - Song with Lyrics by Puff Daddy - Apple Music",
+   "pageAge": "10909 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/song/906589235/ill-be-missing-you-feat-faith-evans-and-112",
+   "title": "I'll Be Missing You (feat. Faith Evans & 112) - Puff Daddy: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "10909 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/1281351-Puff-Daddy-Faith-Evans-Featuring-112-Ill-Be-Missing-You-Tribute-To-The-Notorious-BIG",
+   "title": "Puff Daddy & Faith Evans Featuring 112",
+   "pageAge": "10743 days ago"
+  },
+  {
+   "url": "https://music.amazon.com/tracks/B0B4PB25LJ",
+   "title": "I'll Be Missing You (feat. Faith Evans & 112) song by Puff Daddy feat. Faith Evans & 112 from BAD BOY CELEBRATES DIDDY: The Artist [Explicit] on Amazon Music",
+   "pageAge": "10763 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/8361947-Puff-Daddy-Faith-Evans-Featuring-112-Ill-Be-Missing-You",
+   "title": "Puff Daddy & Faith Evans Featuring 112",
+   "pageAge": "1647 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/112_discography",
+   "title": "112 discography",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/I'll_Be_Missing_You",
+   "title": "I'll Be Missing You",
+   "citedText": "It was released in May 1997 by Bad Boy and Arista Records as the second single from Puff Daddy's debut studio album, *No Way Out* (1997).\n\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I'll_Be_Missing_You",
+   "title": "I'll Be Missing You",
+   "citedText": "# I'll Be Missing You\n**\"I'll Be Missing You\"**\n\n**Single by Puff Daddy and Faith Evans featuring 112**\n\n- **Released**: May 27, 1997 (1997-05-27)\n\n- ..."
+  },
+  {
+   "url": "https://www.discogs.com/release/1281351-Puff-Daddy-Faith-Evans-Featuring-112-Ill-Be-Missing-You-Tribute-To-The-Notorious-BIG",
+   "title": "Puff Daddy & Faith Evans Featuring 112",
+   "citedText": "Label:: Arista – 74321511692, Puff Daddy Records – 74321511692, BMG – 74321511692 · Format:: CD, Single · Country:: Europe · **Released:: Jun 16, 1997..."
+  }
+ ]
+}

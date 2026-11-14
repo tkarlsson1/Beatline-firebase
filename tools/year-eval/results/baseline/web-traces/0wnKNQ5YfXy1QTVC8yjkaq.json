@@ -1,0 +1,78 @@
+{
+ "id": "0wnKNQ5YfXy1QTVC8yjkaq",
+ "userMessage": "Titel: Hos dig är jag underbar\nArtist: Patrik Isaksson\nSpotifys album: 10 år - en snäll mans bekännelser\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2008\nSpotifys år: 2008",
+ "responseText": "Låten kom ut 1999, alltså tidigare än Spotifys år 2008. Spotifys datum kommer från samlingsskivan *10 år – en snäll mans bekännelser*.\n\n- Discogs listar CD-singeln \"Hos Dig Är Jag Underbar\" med B-sidan \"Längesen\" och anger Format: CD, Single · Country: Scandinavia · Released: 1999.\n- Låten fanns också på debutalbumet *När verkligheten tränger sig på*, ett studioalbum av Patrik Isaksson som gavs ut i april 1999.\n- Engelska Wikipedia anger att singeln kom 1999 och nådde nionde plats på den svenska topplistan.\n\nSingeln och albumet kom alltså samma år.\n\når: 1999\nkälla: https://www.discogs.com/release/6136209-Patrik-Isaksson-Hos-Dig-%C3%84r-Jag-Underbar\nförklaring: Patrik Isaksson gav ut \"Hos dig är jag underbar\" på singel och på debutalbumet När verkligheten tränger sig på 1999.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15470,
+  "output_tokens": 496,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Patrik Isaksson \"Hos dig är jag underbar\" singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.deezer.com/en/track/70498523",
+   "title": "Patrik Isaksson - Hos dig är jag underbar",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Patrik_Isaksson_(singer)",
+   "title": "Patrik Isaksson (singer)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/master/738869-Patrik-Isaksson-Hos-Dig-%C3%84r-Jag-Underbar",
+   "title": "Patrik Isaksson",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/se/artist/patrik-isaksson/68208902",
+   "title": "Patrik Isaksson på Apple Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/6136209-Patrik-Isaksson-Hos-Dig-%C3%84r-Jag-Underbar",
+   "title": "Patrik Isaksson",
+   "pageAge": "1269 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Du_f%C3%A5r_g%C3%B6ra_som_du_vill",
+   "title": "Du f%C3%A5r g%C3%B6ra som du vill",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.youtube.com/channel/UCqw2OXjtJqRMZJ26QDoOY8Q",
+   "title": "Patrik Isaksson",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=2jUEBcwtWBU",
+   "title": "Hos dig är jag underbar - YouTube",
+   "pageAge": "3556 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/N%C3%A4r_verkligheten_tr%C3%A4nger_sig_p%C3%A5",
+   "title": "N%C3%A4r verkligheten tr%C3%A4nger sig p%C3%A5",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/6136209-Patrik-Isaksson-Hos-Dig-%C3%84r-Jag-Underbar",
+   "title": "Patrik Isaksson",
+   "citedText": "# Patrik Isaksson – Hos Dig Är Jag Underbar\nPatrik Isaksson - Hos Dig Är Jag Underbar album cover\n\n- **Label:**: Columbia – COL 667340 1, Columbia – 6..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/N%C3%A4r_verkligheten_tr%C3%A4nger_sig_p%C3%A5",
+   "title": "N%C3%A4r verkligheten tr%C3%A4nger sig p%C3%A5",
+   "citedText": "Studio album by Patrik Isaksson\n- Released: April 1999\n- Genre: Pop\n- Length: circa 45 minutes\n- Label: Sony\n- Producer: Anders Glenmark\n\nPatrik Isaks..."
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "id": "5N6M8yDiMV32T6Rkzh8EbW",
+ "userMessage": "Titel: Boom, Boom, Boom, Boom!!\nArtist: Vengaboys\nSpotifys album: The Party Album!\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1999-06-04\nSpotifys år: 1999",
+ "responseText": "Spotify anger 1999, men det är albumets år. Spotify listar låten på *The Party Album!*, som är en internationell nyutgåva från 1999. Själva singeln kom 1998.\n\n- Engelska Wikipedia säger att låten släpptes som singel i oktober 1998 och anger att den gavs ut i Europa den 16 oktober 1998 på CD.\n- Andra källor ger ett annat datum men samma år. Enligt Simple English Wikipedia är det en låt från 1998 och första singeln från den internationella nyutgåvan av *The Party Album* (1999).\n- Discogs listar den europeiska maxisingeln med Released: 1998.\n- Singeln låg också på 1998 års årslista: den hamnade på plats 6 på holländska Single Top 100 för 1998.\n\nKällorna är alltså oense om dagen, 16 eller 23 oktober, men alla anger 1998.\n\når: 1998\nkälla: https://en.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!\nförklaring: Låten kom ut som singel i oktober 1998, ett år innan den kom med på den internationella utgåvan av The Party Album 1999.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 17672,
+  "output_tokens": 723,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Vengaboys Boom, Boom, Boom, Boom!! single release 1998"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "pageAge": null
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "pageAge": "1205 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/boom-boom-boom-boom/1631123484",
+   "title": "Boom, Boom, Boom, Boom!! - Song by Vengaboys - Apple Music",
+   "pageAge": "10249 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1631123484/boom-boom-boom-boom",
+   "title": "Boom, Boom, Boom, Boom!! - Vengaboys: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "10249 days ago"
+  },
+  {
+   "url": "https://readdork.com/track/vengaboys-boom-boom-boom-boom",
+   "title": "Vengaboys",
+   "pageAge": null
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/411148/all",
+   "title": "Performance: Boom, Boom, Boom, Boom !! by Vengaboys",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/372029-Vengaboys-Boom-Boom-Boom-Boom",
+   "title": "Vengaboys",
+   "pageAge": "116 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/We_Like_to_Party",
+   "title": "We Like to Party",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/We%27re_Going_to_Ibiza",
+   "title": "We%27re Going to Ibiza",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "citedText": "is a song by Dutch\n[Eurodance](https://en.wikipedia.org/wiki/Eurodance) group [Vengaboys](https://en.wikipedia.org/wiki/Vengaboys), released as a sing..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "citedText": "| Europe | 16 October 1998 | CD | Breakin'; Jive; |  |"
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "citedText": "**\" is a 1998 song by Dutch Eurodance group Vengaboys and is the lead single from their international reissue of *The Party Album* (1999). "
+  },
+  {
+   "url": "https://www.discogs.com/release/372029-Vengaboys-Boom-Boom-Boom-Boom",
+   "title": "Vengaboys",
+   "citedText": "album cover\n\n- **Label:**: Jive – 0523152, Breakin' Records (4) – 0523152\n- **Format:**: CD, Maxi-Single\n- **Country:**: Europe\n- **Released:**: 1998\n..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Boom,_Boom,_Boom,_Boom!!",
+   "title": "Boom, Boom, Boom, Boom!!",
+   "citedText": "| Chart (1998) | Position |\n\n| Netherlands (Single Top 100) | 6 |\n\n1999 year-end chart performance for \"Boom, Boom, Boom, Boom!\"\n\n"
+  }
+ ]
+}

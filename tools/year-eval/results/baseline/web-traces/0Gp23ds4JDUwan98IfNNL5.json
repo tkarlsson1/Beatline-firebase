@@ -1,0 +1,88 @@
+{
+ "id": "0Gp23ds4JDUwan98IfNNL5",
+ "userMessage": "Titel: Bittersweet Symphony\nArtist: GAMPER & DADONI, Emily Roberts\nSpotifys album: REVIVE\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2024-11-22\nSpotifys år: 2024",
+ "responseText": "Låten gavs ut 2019. GAMPER & DADONIs version med Emily Roberts är en cover på The Verves Bitter Sweet Symphony. Därför gäller året för just den här versionen och inte originalets år. Spotifys år, 2024, kommer från samlingsalbumet REVIVE och är för sent.\n\n- **Discogs:** En svensk promosingel (CDr) från Warner Music Sweden finns listad med Released:: 2019. Den beskrivs som en Cover version of The Verve - Bitter Sweet Symphony.\n- **Deezer:** Den tidigaste singelutgåvan, på Big Top Amsterdam, har Release date: 29/03/2019. Apple Music anger samma datum. En senare utgåva på Ultra Records kom i augusti 2019.\n\når: 2019\nkälla: https://www.discogs.com/release/16237566-Gamper-Dadoni-Ft-Emily-Roberts-Bittersweet-Symphony\nförklaring: GAMPER & DADONIs cover av The Verves låt med Emily Roberts kom ut som singel 2019 (den 29 mars på Big Top Amsterdam), långt innan den kom med på samlingen REVIVE.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14921,
+  "output_tokens": 752,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "GAMPER & DADONI Emily Roberts Bittersweet Symphony release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.1001tracklists.com/track/bqgu90f/gamper-dadoni-bittersweet-symphony/index.html",
+   "title": "Gamper & Dadoni ft. Emily Roberts - Bittersweet Symphony [BIG TOP]",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/us/album/109024982",
+   "title": "GAMPER & DADONI - Bittersweet Symphony (feat. Emily Roberts)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/album/370804537",
+   "title": "GAMPER & DADONI - Bittersweet Symphony",
+   "pageAge": "2787 days ago"
+  },
+  {
+   "url": "https://www.beatport.com/track/bittersweet-symphony/17070339",
+   "title": "Gamper & Dadoni, Emily Roberts - Bittersweet Symphony (Extended Version) [Big Top Amsterdam]",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.beatport.com/track/bittersweet-symphony/17070337",
+   "title": "Gamper & Dadoni, Emily Roberts - Bittersweet Symphony (Original Mix) [Big Top Amsterdam]",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/16237566-Gamper-Dadoni-Ft-Emily-Roberts-Bittersweet-Symphony",
+   "title": "Gamper & Dadoni Ft. Emily Roberts",
+   "pageAge": "1625 days ago"
+  },
+  {
+   "url": "https://www.beatport.com/track/bittersweet-symphony-feat-emily-roberts/12493036",
+   "title": "Gamper & Dadoni, Emily Roberts - Bittersweet Symphony feat. Emily Roberts (Extended Mix) [Ultra]",
+   "pageAge": "2635 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/bittersweet-symphony-feat-emily-roberts/1652064556",
+   "title": "Bittersweet Symphony (feat. Emily Roberts) - Song with Lyrics by GAMPER & DADONI - Apple Music",
+   "pageAge": "2787 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/album/bittersweet-symphony-feat-emily-roberts-single/1711641004",
+   "title": "Bittersweet Symphony (feat. Emily Roberts) - Single - Album by GAMPER & DADONI - Apple Music",
+   "pageAge": "2636 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/0ZUF5EJguM6Mt9invD8mgP",
+   "title": "Bittersweet Symphony - song and lyrics by GAMPER & DADONI, Emily Roberts",
+   "pageAge": "2458 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/16237566-Gamper-Dadoni-Ft-Emily-Roberts-Bittersweet-Symphony",
+   "title": "Gamper & Dadoni Ft. Emily Roberts",
+   "citedText": "… Format:: CDr, Single, Promo · Country:: Sweden · **Released:: 2019** · Genre:: Electronic · Style:: House\n\nView credits, reviews, tracks and shop fo..."
+  },
+  {
+   "url": "https://www.discogs.com/release/16237566-Gamper-Dadoni-Ft-Emily-Roberts-Bittersweet-Symphony",
+   "title": "Gamper & Dadoni Ft. Emily Roberts",
+   "citedText": "Cover version of The Verve - Bitter Sweet Symphony.\n\n"
+  },
+  {
+   "url": "https://www.deezer.com/en/album/370804537",
+   "title": "GAMPER & DADONI - Bittersweet Symphony",
+   "citedText": "Listen to Bittersweet Symphony by GAMPER & DADONI on Deezer — Number of tracks: 1 | Length: 03:14 | **Release date: 29/03/2019**. "
+  }
+ ]
+}

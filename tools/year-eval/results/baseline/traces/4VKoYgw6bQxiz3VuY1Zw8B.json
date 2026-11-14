@@ -1,0 +1,37 @@
+{
+ "id": "4VKoYgw6bQxiz3VuY1Zw8B",
+ "userMessage": "Titel: King of My Castle (Roy Malone's King Mix)\nArtist: Wamdue Project, Roy Malone\nSpotifys album: King Of My Castle (Mixes)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2023-07-14\nSpotifys år: 2023",
+ "responseText": "{\"year\":1999,\"explanation\":\"Roy Malones King Mix av låten (originalet kom 1997) gavs ut på singel 1999 och blev då en stor hit. Spotifys år 2023 kommer från en senare mixutgåva.\",\"confidence\":\"medium\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1516,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1516,
+    "output_tokens": 356,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 356,
+  "output_tokens_details": {
+   "thinking_tokens": 262
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

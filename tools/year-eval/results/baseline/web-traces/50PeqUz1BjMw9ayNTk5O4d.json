@@ -1,0 +1,88 @@
+{
+ "id": "50PeqUz1BjMw9ayNTk5O4d",
+ "userMessage": "Titel: I've Been Thinking About You\nArtist: Londonbeat\nSpotifys album: Best! The Singles 16 Tracks\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 1995-11-20\nSpotifys år: 1995",
+ "responseText": "Låten kom ut **1990**, alltså inte 1995. Spotifys år kommer från samlingsskivan \"Best! The Singles\", som släpptes senare.\n\n- **Wikipedia:** \"I've Been Thinking About You\" is a song by British band Londonbeat, released in August 1990 by Anxious and RCA Records as the lead single from their second studio album, *In the Blood* (1990).\n- **Officiella brittiska topplistan:** Singeln gick in på listan den 1 september 1990 och nådde som bäst plats 2. First Chart Date 01/09/1990\n- **Discogs:** Den brittiska 7-tumssingeln på Anxious Records har Released:: 1990.\n\nDet finns också senare versioner, men de räknas inte här. In 2019, German DJ/producer Klaas remixed a version of the song featuring newly recorded vocals from Londonbeat. Låten på samlingsskivan från 1995 är originalinspelningen, och den gavs ut första gången 1990.\n\når: 1990\nkälla: https://en.wikipedia.org/wiki/I've_Been_Thinking_About_You\nförklaring: Londonbeat släppte låten på singel i augusti 1990 som första singel från albumet In the Blood, som också kom ut 1990.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15489,
+  "output_tokens": 611,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Londonbeat I've Been Thinking About You single"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/album/ive-been-thinking-about-you-featuring-londonbeat-single/64660031",
+   "title": "I've Been Thinking About You (Featuring Londonbeat) - Single - Album by Damae & Londonbeat - Apple Music",
+   "pageAge": "7816 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/6EMFqQfEHt8mwwTqLPL4bE",
+   "title": "I've Been Thinking About You - song and lyrics by Londonbeat",
+   "pageAge": "4513 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I've_Been_Thinking_About_You",
+   "title": "I've Been Thinking About You",
+   "pageAge": "4 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I%27ve_Been_Thinking_About_You",
+   "title": "I%27ve Been Thinking About You",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/master/101658-Londonbeat-Ive-Been-Thinking-About-You",
+   "title": "Londonbeat",
+   "pageAge": "1336 days ago"
+  },
+  {
+   "url": "https://discogs.com/Londonbeat-Ive-Been-Thinking-About-You/release/173449",
+   "title": "Londonbeat",
+   "pageAge": "2173 days ago"
+  },
+  {
+   "url": "https://www.officialcharts.com/songs/londonbeat-ive-been-thinking-about-you/",
+   "title": "I'VE BEEN THINKING ABOUT YOU",
+   "pageAge": "13223 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/A_Better_Love",
+   "title": "A Better Love",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/In_the_Blood_(album)",
+   "title": "In the Blood (album)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/I've_Been_Thinking_About_You",
+   "title": "I've Been Thinking About You",
+   "citedText": "7-inch single \"I've Been Thinking About You\" – 3:49 \"9AM\" (live at Moles) – 5:49 CD maxi \"I've Been Thinking About You\" (7-inch version) – 3:49 \"I've ..."
+  },
+  {
+   "url": "https://www.officialcharts.com/songs/londonbeat-ive-been-thinking-about-you/",
+   "title": "I'VE BEEN THINKING ABOUT YOU",
+   "citedText": "Official Charts logo Official Singles Chart: Peak position 2 · Label ANXIOUS · **Catalogue number ANX14** · **First Chart Date 01/09/1990**\n\n# I'VE BE..."
+  },
+  {
+   "url": "https://discogs.com/Londonbeat-Ive-Been-Thinking-About-You/release/173449",
+   "title": "Londonbeat",
+   "citedText": "Label:: Anxious Records – ANX 14 · **Format:: Vinyl, 7\", 45 RPM, Single** · Country:: UK · Released:: 1990 · Genre:: Electronic, Funk / Soul · Style::..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I've_Been_Thinking_About_You",
+   "title": "I've Been Thinking About You",
+   "citedText": "## Track listings\n7-inch single \"I've Been Thinking About You\" – 3:49 \"9AM\" (live at Moles) – 5:49 CD maxi \"I've Been Thinking About You\" (7-inch vers..."
+  }
+ ]
+}

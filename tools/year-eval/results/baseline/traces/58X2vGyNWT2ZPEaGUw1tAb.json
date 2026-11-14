@@ -1,0 +1,37 @@
+{
+ "id": "58X2vGyNWT2ZPEaGUw1tAb",
+ "userMessage": "Titel: Kung för en dag\nArtist: Magnus Uggla\nSpotifys album: Uggla Box\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2008-01-01\nSpotifys år: 2008",
+ "responseText": "{\"year\":1983,\"explanation\":\"Låten kom ursprungligen 1983 på Magnus Ugglas album Välkommen till folkhemmet. Spotifys år 2008 kommer från samlingsboxen Uggla Box.\",\"confidence\":\"medium\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1493,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1493,
+    "output_tokens": 542,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 542,
+  "output_tokens_details": {
+   "thinking_tokens": 450
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

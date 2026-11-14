@@ -1,0 +1,88 @@
+{
+ "id": "191WWeKEl9FKuTaSdJOqco",
+ "userMessage": "Titel: Hey Boy\nArtist: Teddybears\nSpotifys album: Fresh\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2004-08-18\nSpotifys år: 2004",
+ "responseText": "Det blir 2004. Teddybears version är originalet: Blog 27:s låt \"Hey Boy (Get Your Ass Up)\" är en cover av den. Enligt engelska Wikipedia gavs \"Hey Boy\" av Teddybears featuring Swingfly ut som singel från albumet Fresh den 10 maj 2004, och den släpptes som albumets andra singel 2004 och kom in på topp 20 i Sverige. Själva albumet Fresh kom 2004. Singeln kom alltså samma år som Spotifys albumdatum, bara några månader tidigare.\n\når: 2004\nkälla: https://en.wikipedia.org/wiki/Hey_Boy_(Teddybears_song)\nförklaring: Teddybears gav ut \"Hey Boy\" som singel från albumet Fresh den 10 maj 2004.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14593,
+  "output_tokens": 501,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Teddybears \"Hey Boy\" singel 2004 Fresh"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/ca/song/hey-boy/355029833",
+   "title": "Hey Boy",
+   "pageAge": "8146 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Hey_Boy_(Teddybears_song)",
+   "title": "Hey Boy (Teddybears song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/track/7860287",
+   "title": "Teddybears - Hey Boy (Album Version)",
+   "pageAge": null
+  },
+  {
+   "url": "https://audiomack.com/teddybears-sthlm/song/hey-boy-album-version-3896565",
+   "title": "Hey Boy (Album Version) by Teddybears Sthlm: Listen on Audiomack",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikidata.org/wiki/Q5749244",
+   "title": "Hey Boy - Wikidata",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Cobrastyle",
+   "title": "Cobrastyle",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.whosampled.com/Teddybears-Sthlm/Hey-Boy/",
+   "title": "Hey Boy by Teddybears Sthlm feat. Swingfly - Samples, Covers and Remixes",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Fresh_(Teddybears_album)",
+   "title": "Fresh (Teddybears album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Soft_Machine_(Teddybears_album)",
+   "title": "Soft Machine (Teddybears album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikiwand.com/en/Hey_Boy_(Teddybears_song)",
+   "title": "Wikiwand - Hey Boy (Teddybears song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Hey_Boy_(Teddybears_song)",
+   "title": "Hey Boy (Teddybears song)",
+   "citedText": "Single by Teddybears featuring Swingfly\n\nfrom the album Fresh\n- Released: 10 May 2004\n- Recorded: 2004\n\nTeddybears featuring Swingfly singles chronolo..."
+  },
+  {
+   "url": "https://www.wikiwand.com/en/Hey_Boy_(Teddybears_song)",
+   "title": "Wikiwand - Hey Boy (Teddybears song)",
+   "citedText": "[1] It was released as the album's second single in 2004 and reached the top 20 in Sweden. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Fresh_(Teddybears_album)",
+   "title": "Fresh (Teddybears album)",
+   "citedText": "Studio album by Teddybears STHLM\n- Released: 2004\n- Genre: Electropop; indietronica; hip hop; alternative rock; reggae fusion; pop-rap;\n- Length: 43:0..."
+  }
+ ]
+}

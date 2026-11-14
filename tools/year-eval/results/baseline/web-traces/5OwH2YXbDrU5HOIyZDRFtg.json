@@ -1,0 +1,83 @@
+{
+ "id": "5OwH2YXbDrU5HOIyZDRFtg",
+ "userMessage": "Titel: Oh boy\nArtist: Peps Persson\nSpotifys album: Bästa\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2004-01-01\nSpotifys år: 2004",
+ "responseText": "Låten kom ut 1992, inte 2004. Svenska Wikipedia anger att \"Oh Boy\" är en låt av den svenske blues- och reggaesångaren Peps Persson från 1992. Den gavs ut på singel av Peps Blodsband på skivbolaget Sonet och fanns med på albumet *Spelar för livet*. Apple Music daterar också albumet *Spelar för livet* till January 1, 1992.\n\nWikipedia skriver ut Peps Blodsband som artist på singeln, men Spotify anger Peps Persson för samma inspelning. Ni behöver alltså inte bråka om det vid bordet.\n\nLåten tog sig in på Sverigetopplistan först 2007–2009, och då nådde den som bäst plats 43. Wikipedia påpekar att den kom in på listan först 15 år efter släppet. Det kan få någon vid bordet att tro att låten är nyare än den är. Spotifys år 2004 kommer från samlingsskivan *Bästa*.\n\når: 1992\nkälla: https://sv.wikipedia.org/wiki/Oh_Boy_(Peps_Persson)\nförklaring: \"Oh Boy\" kom ut på singel 1992 och fanns med på albumet Spelar för livet samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 12537,
+  "output_tokens": 630,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Peps Persson \"Oh boy\" låt år"
+ ],
+ "searchResults": [
+  {
+   "url": "https://sv.wikipedia.org/wiki/Oh_Boy_(Peps_Persson)",
+   "title": "Oh Boy (Peps Persson)",
+   "pageAge": "1259 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/track/46130004/oh-boy",
+   "title": "Oh Boy - Peps Persson: Song Lyrics, Music Videos & Concerts",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/song/oh-boy/1442353220",
+   "title": "Oh Boy - Song by Peps Persson - Apple Music",
+   "pageAge": "12736 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/4UFb5t3CvBprPee5l8KXN3",
+   "title": "Oh boy - song and lyrics by Peps Persson",
+   "pageAge": "7622 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/5wDSlUDuS3mVPq5TY25DZa",
+   "title": "Oh boy - song and lyrics by Peps Persson",
+   "pageAge": "12736 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/5OwH2YXbDrU5HOIyZDRFtg",
+   "title": "Oh boy - song and lyrics by Peps Persson",
+   "pageAge": "8353 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/6iYsXMyu2Id1nkYj0hct1z",
+   "title": "Oh boy - song and lyrics by Peps Persson",
+   "pageAge": "1942 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Peps_Persson",
+   "title": "Peps Persson",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.wikiwand.com/sv/articles/Oh_Boy_(Peps_Persson)",
+   "title": "Oh Boy (Peps Persson) - Wikiwand",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://sv.wikipedia.org/wiki/Oh_Boy_(Peps_Persson)",
+   "title": "Oh Boy (Peps Persson)",
+   "citedText": "A-sida: \"Oh Boy\" · B-sida: \"Häng inte på\" (\"Stop Breakin' Down\") · **Utgiven: 1992** · Genre: Reggae · Skivbolag: Sonet · Låtskrivare: Peps Persson\n\n#..."
+  },
+  {
+   "url": "https://music.apple.com/us/song/oh-boy/1442353220",
+   "title": "Oh Boy - Song by Peps Persson - Apple Music",
+   "citedText": "… Spelar för livet Peps Persson **January 1, 1992**\n\nListen to Oh Boy by Peps Persson on Apple Music. "
+  },
+  {
+   "url": "https://sv.wikipedia.org/wiki/Oh_Boy_(Peps_Persson)",
+   "title": "Oh Boy (Peps Persson)",
+   "citedText": "## Listplaceringar\n**Notera** hur singelskivan först 15 år efter släppet stiger in på Sverigetopplistan.\n\n"
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "id": "6Vz7vzOpCwKeSQlfViibuY",
+ "userMessage": "Titel: Crazy\nArtist: Seal\nSpotifys album: Best 1991 - 2004\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2004\nSpotifys år: 2004",
+ "responseText": "Spotify anger 2004, men det är året för samlingsskivan *Best 1991–2004*. Låten kom ut fjorton år tidigare.\n\nEnligt engelska Wikipedia gavs \"Crazy\" ut av ZTT Records den 26 november 1990 som första singel från Seals debutalbum Seal (1991). Discogs anger samma datum för CD-singeln: \"Released:: Nov 26, 1990\". Singeln kom ut i USA först 1991, men det tidigaste utgivningsåret gäller. Därför blir svaret 1990 och inte 1991, som är både USA-året och debutalbumets år.\n\nDet här gäller Seals original. Inte heller Alanis Morissettes cover ska blandas ihop med det här spåret, eftersom den gavs ut som singel från hennes samlingsalbum The Collection från 2005.\n\når: 1990\nkälla: https://en.wikipedia.org/wiki/Crazy_(Seal_song)\nförklaring: \"Crazy\" kom ut som Seals debutsingel den 26 november 1990, före debutalbumet \"Seal\" från 1991.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16431,
+  "output_tokens": 579,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Seal Crazy single released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://culture.fandom.com/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://pop-culture-scrapbook.fandom.com/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "pageAge": "614 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/master/59750-Seal-Crazy",
+   "title": "Seal",
+   "pageAge": "1664 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Future_Love_Paradise",
+   "title": "Future Love Paradise",
+   "pageAge": null
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "pageAge": "1413 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/1991434-Seal-Crazy",
+   "title": "Seal",
+   "pageAge": "13137 days ago"
+  },
+  {
+   "url": "https://en.namu.wiki/w/Crazy(%EC%94%B0)",
+   "title": "Crazy (seal) - NamuWiki",
+   "pageAge": "320 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Crazy_(Neu!_song)",
+   "title": "Crazy (Neu! song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/The_Beginning_(Seal_song)",
+   "title": "The Beginning (Seal song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "citedText": "Single by Seal\n\nfrom the album Seal\n\n- Released: 26 November 1990\n\n- Length: 4:30 (single version); 5:57 (album version);\n\n- Songwriters: Seal; Guy Si..."
+  },
+  {
+   "url": "https://www.discogs.com/release/1991434-Seal-Crazy",
+   "title": "Seal",
+   "citedText": "… Label:: ZTT – ZANG 8CD, ZTT – 9031-73156-2 · Format:: CD, Single · Country:: Europe · **Released:: Nov 26, 1990** · Genre:: Electronic, Pop · Style:..."
+  },
+  {
+   "url": "https://culture.fandom.com/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "citedText": "The single was **released in the United States in 1991**, debuting at number eighty-three on the Billboard Hot 100 in mid-June; it peaked at number se..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Crazy_(Seal_song)",
+   "title": "Crazy (Seal song)",
+   "citedText": "It has since been covered by several artists, including [Alanis Morissette](https://en.wikipedia.org/wiki/Alanis_Morissette), whose version was releas..."
+  }
+ ]
+}

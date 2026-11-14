@@ -1,0 +1,93 @@
+{
+ "id": "1Rvl8qsKJurfFTyWLBI9ib",
+ "userMessage": "Titel: Baby, I Love Your Way\nArtist: Big Mountain\nSpotifys album: The Best of Big Mountain\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 1999-01-01\nSpotifys år: 1999",
+ "responseText": "Big Mountains cover av Peter Framptons låt kom ut som singel 1994. Spotifys år 1999 kommer från en samlingsskiva och är för sent.\n\n- AllMusic anger att CD-singeln \"Baby I Love Your Way [CD Single] by Big Mountain released in 1994\". Utgivningsdatum var 18 april 1994.\n- På Discogs har den brittiska 7\"-singeln (RCA) datumet Released: May 23, 1994. Det framgår också att låten fanns på soundtrackalbumet till filmen \"Reality Bites\".\n- Enligt Wikipedia blev covern en topp 10-singel i USA i början av 1994. Låten kom också med på bandets studioalbum Unity från samma år, men den fanns först på soundtracket till Reality Bites.\n\nKällorna anger samma år.\n\når: 1994\nkälla: https://www.allmusic.com/album/baby-i-love-your-way-cd-single--mw0000623623\nförklaring: Big Mountains cover kom ut som singel i april 1994 och fanns först på soundtracket till filmen Reality Bites.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16029,
+  "output_tokens": 668,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Big Mountain Baby, I Love Your Way single 1994"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/us/album/baby-i-love-your-way-single/1336818814",
+   "title": "Baby I Love Your Way - Single - Album by Big Mountain & Nasha - Apple Music",
+   "pageAge": "11898 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/baby-i-love-your-way/1630146198",
+   "title": "Baby, I Love Your Way - Song with Lyrics by Big Mountain - Apple Music",
+   "pageAge": "12005 days ago"
+  },
+  {
+   "url": "https://www.allmusic.com/album/baby-i-love-your-way-cd-single--mw0000623623",
+   "title": "Baby I Love Your Way [CD Single] - Big Mountai...",
+   "pageAge": "11898 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/master/134504-Big-Mountain-Baby-I-Love-Your-Way",
+   "title": "Big Mountain",
+   "pageAge": "3090 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/1382015-Big-Mountain-Baby-I-Love-Your-Way",
+   "title": "Big Mountain",
+   "pageAge": "11863 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/6718611-Big-Mountain-Baby-I-Love-Your-Way",
+   "title": "Big Mountain",
+   "pageAge": "651 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/11775530-Big-Mountain-Baby-I-Love-Your-Way",
+   "title": "Big Mountain",
+   "pageAge": "156 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Big_Mountain_(band)",
+   "title": "Big Mountain (band)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Unity_(Big_Mountain_album)",
+   "title": "Unity (Big Mountain album)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.allmusic.com/album/baby-i-love-your-way-cd-single--mw0000623623",
+   "title": "Baby I Love Your Way [CD Single] - Big Mountai...",
+   "citedText": "**Baby I Love Your Way [CD Single] by Big Mountain released in 1994**. "
+  },
+  {
+   "url": "https://www.discogs.com/release/1382015-Big-Mountain-Baby-I-Love-Your-Way",
+   "title": "Big Mountain",
+   "citedText": "# Big Mountain – Baby, I Love Your Way\nBig Mountain - Baby, I Love Your Way album cover\n\n- **Label:**: RCA – 74321 19806-7\n- **Format:**: Vinyl, 7\", S..."
+  },
+  {
+   "url": "https://www.discogs.com/release/1382015-Big-Mountain-Baby-I-Love-Your-Way",
+   "title": "Big Mountain",
+   "citedText": "From the RCA Records Label Original Motion Picture Soundtrack Album \"Reality Bites\" 0786366364-2/4.  "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Big_Mountain_(band)",
+   "title": "Big Mountain (band)",
+   "citedText": "The band gained wide recognition and became known for its cover of\n[Peter Frampton](https://en.wikipedia.org/wiki/Peter_Frampton)'s \" [Baby, I Love Yo..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Unity_(Big_Mountain_album)",
+   "title": "Unity (Big Mountain album)",
+   "citedText": "[[11]](./Unity_(Big_Mountain_album)#cite_note-11) The cover of \" [Baby, I Love Your Way](https://en.wikipedia.org/wiki/Baby,_I_Love_Your_Way)\" first a..."
+  }
+ ]
+}

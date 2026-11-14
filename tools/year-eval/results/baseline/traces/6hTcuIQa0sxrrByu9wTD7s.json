@@ -1,0 +1,37 @@
+{
+ "id": "6hTcuIQa0sxrrByu9wTD7s",
+ "userMessage": "Titel: Born to Run\nArtist: Bruce Springsteen\nSpotifys album: Born To Run\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1975-08-25\nSpotifys år: 1975",
+ "responseText": "{\"year\":1975,\"explanation\":\"Låten gavs ut som singel och på albumet Born to Run 1975, vilket stämmer med Spotifys år.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1489,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1489,
+    "output_tokens": 64,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 64,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

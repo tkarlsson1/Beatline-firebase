@@ -1,0 +1,78 @@
+{
+ "id": "3uVO0fpvKhuPCfGCAjJev0",
+ "userMessage": "Titel: Ju Mer Dom Spottar\nArtist: Kapten Röd\nSpotifys album: Fläcken Som Aldrig Går Bort\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2011-07-06\nSpotifys år: 2011",
+ "responseText": "Låten kom ut 2011, alltså samma år som Spotify anger. Shazam skriver att Ju Mer Dom Spottar was released on July 6, 2011 by Kapten Röd as a part of the album Fläcken Som Aldrig Går Bort. Det stämmer med Spotifys datum, 2011-07-06. Låten gavs också ut på singel samma år. Apple Music listar singeln med datumet 20 November 2011 2 songs, 6 minutes ℗ 2011 Kapten Röd & SwingKids, så albumet kom ut före singeln. Shazam är ingen typisk förstahandskälla, men både albumet och singeln kom 2011. Därför finns inget tidigare år.\n\når: 2011\nkälla: https://www.shazam.com/song/1631933473/ju-mer-dom-spottar\nförklaring: Låten gavs ut den 6 juli 2011 på Kapten Röds album Fläcken som aldrig går bort och kom på singel i november samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16017,
+  "output_tokens": 510,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Kapten Röd \"Ju mer dom spottar\""
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/dk/album/ju-mer-dom-spottar-single/1631932375",
+   "title": "Ju Mer Dom Spottar - Single - Album by Kapten Röd - Apple Music",
+   "pageAge": "5473 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/song/1631933473/ju-mer-dom-spottar",
+   "title": "Ju Mer Dom Spottar - Kapten Röd: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "5610 days ago"
+  },
+  {
+   "url": "https://lyricstranslate.com/en/Kapten-Roed-Ju-Mer-Dom-Spottar-lyrics.html",
+   "title": "Letra de Ju mer dom spottar - Kapten Röd",
+   "pageAge": "5381 days ago"
+  },
+  {
+   "url": "https://www.letssingit.com/kapten-r%C3%B6d-lyrics-ju-mer-dom-spottar-wtpvnm7",
+   "title": "Kapten Röd - Ju Mer Dom Spottar Lyrics",
+   "pageAge": "647 days ago"
+  },
+  {
+   "url": "https://singa.com/us/artists/kapten-rod/ju-mer-dom-spottar/Kr8x6/",
+   "title": "Kapten Röd - Ju mer dom spottar Karaoke",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Kapten_R%C3%B6d",
+   "title": "Kapten R%C3%B6d",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.metrolyrics.com/ju-mer-dom-spottar-lyrics-kapten-rod.html",
+   "title": "Kapten Röd - Ju Mer Dom Spottar Lyrics",
+   "pageAge": null
+  },
+  {
+   "url": "https://sonichits.com/video/Kapten_R%C3%B6d/Ju_Mer_Dom_Spottar",
+   "title": "Ju Mer Dom Spottar",
+   "pageAge": null
+  },
+  {
+   "url": "https://sweetslyrics.com/kapten-rod/ju-mer-dom-spottar-lyrics",
+   "title": "Kapten Röd - Ju Mer Dom Spottar lyrics",
+   "pageAge": "5587 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.shazam.com/song/1631933473/ju-mer-dom-spottar",
+   "title": "Ju Mer Dom Spottar - Kapten Röd: Song Lyrics, Music Videos & Concerts",
+   "citedText": "Kapten Röd\n\nJu Mer Dom Spottar\n\n35,310\n\nMusic\n\nJu Mer Dom Spottar was released on July 6, 2011 by Kapten Röd as a part of the album Fläcken Som Aldrig..."
+  },
+  {
+   "url": "https://music.apple.com/dk/album/ju-mer-dom-spottar-single/1631932375",
+   "title": "Ju Mer Dom Spottar - Single - Album by Kapten Röd - Apple Music",
+   "citedText": "Album · 2011 · 2 Songs\n\nJu Mer Dom Spottar - Single\n\n# Ju Mer Dom Spottar - Single\nKapten Röd\n\nModern Dancehall · 2011\n\n20 November 2011 2 songs, 6 mi..."
+  }
+ ]
+}

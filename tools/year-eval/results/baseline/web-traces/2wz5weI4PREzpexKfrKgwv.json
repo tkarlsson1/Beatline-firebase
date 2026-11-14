@@ -1,0 +1,98 @@
+{
+ "id": "2wz5weI4PREzpexKfrKgwv",
+ "userMessage": "Titel: Sweet Dreams\nArtist: La Bouche\nSpotifys album: Greatest Hits\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2007\nSpotifys år: 2007",
+ "responseText": "Rätt år är 1994, inte Spotifys 2007, som kommer från samlingsskivan Greatest Hits.\n\n- **Singeln:** Engelska Wikipedia anger att \"Sweet Dreams (Ola Ola E)\" är inspelad av den tyska eurodance-duon La Bouche och gavs ut som singel den 13 april 1994. Den var La Bouches debutsingel.\n- **Discogs bekräftar året:** Där finns en tysk maxisingel på MCI/BMG från 1994 och en brittisk maxisingel på Arista/MCI från 1994.\n- **Varför andra år kan dyka upp:** Studioalbumet *Sweet Dreams* kom först den 12 juni 1995, och den amerikanska CD-singeln gavs ut 1996. Eftersom den tidigaste utgivningen gäller blir svaret 1994.\n\når: 1994\nkälla: https://en.wikipedia.org/wiki/Sweet_Dreams_(La_Bouche_song)\nförklaring: La Bouches debutsingel \"Sweet Dreams\" gavs ut den 13 april 1994, året innan låten kom med på albumet med samma namn.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15379,
+  "output_tokens": 608,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "La Bouche Sweet Dreams single release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.albumoftheyear.org/album/177127-la-bouche-sweet-dreams.php",
+   "title": "La Bouche - Sweet Dreams (Single) - Reviews - Album of The Year",
+   "pageAge": "120 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Sweet_Dreams_(La_Bouche_song)",
+   "title": "Sweet Dreams (La Bouche song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Sweet_Dreams_(La_Bouche_album)",
+   "title": "Sweet Dreams (La Bouche album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1686920013/sweet-dreams",
+   "title": "Sweet Dreams - La Bouche & Paolo Pellegrino: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "1275 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/La_Bouche",
+   "title": "La Bouche",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Be_My_Lover_(La_Bouche_song)",
+   "title": "Be My Lover (La Bouche song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/291305-La-Bouche-Sweet-Dreams",
+   "title": "La Bouche",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Melanie_Thornton",
+   "title": "Melanie Thornton",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/album/2RurzWKPCb7srgGxyr2b3s",
+   "title": "Listen to Sweet Dreams - Single by La Bouche",
+   "pageAge": "799 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/album/sweet-dreams/258632976",
+   "title": "Sweet Dreams - Album by La Bouche - Apple Music",
+   "pageAge": "11478 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Sweet_Dreams_(La_Bouche_song)",
+   "title": "Sweet Dreams (La Bouche song)",
+   "citedText": "Single by La Bouche\n\nfrom the album Sweet Dreams\n- Released: April 13, 1994\n- Recorded: January 1994\n- Genre: Eurodance; hi-NRG;\n\n- Label: RCA\n\nLa Bou..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/La_Bouche",
+   "title": "La Bouche",
+   "citedText": "On 13 April 1994, La Bouche released their debut single, titled \"\n[Sweet Dreams](https://en.wikipedia.org/wiki/Sweet_Dreams_(La_Bouche_song))\".\n\n"
+  },
+  {
+   "url": "https://www.discogs.com/release/291305-La-Bouche-Sweet-Dreams",
+   "title": "La Bouche",
+   "citedText": "- Manufactured By – BMG Distribution\n- Distributed By – BMG Distribution\n- Phonographic Copyright ℗ – MCI\n- Copyright © – BMG Entertainment\n- Publishe..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Sweet_Dreams_(La_Bouche_album)",
+   "title": "Sweet Dreams (La Bouche album)",
+   "citedText": "Studio album by La Bouche\n- Released: 12 June 1995\n- Recorded: 1994–1995\n- Genre: Eurodance; dance-pop;\n- Length: 55:16\n- Label: MCI\n- Producer: FMP (..."
+  },
+  {
+   "url": "https://www.discogs.com/release/291305-La-Bouche-Sweet-Dreams",
+   "title": "La Bouche",
+   "citedText": "Published By – Warner-Tamerlane Publishing Corp.\n\n# La Bouche – Sweet Dreams\nLa Bouche - Sweet Dreams album cover\n\n- **Label:**: RCA – 07863 64505-2\n-..."
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "id": "3CTgRPxyTh2w7wBjVFH88e",
+ "userMessage": "Titel: Honey Boy (feat. Nile Rodgers & Shenseea)\nArtist: Purple Disco Machine, Benjamin Ingrosso, Nile Rodgers, Shenseea\nSpotifys album: Paradise\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2024-09-20\nSpotifys år: 2024",
+ "responseText": "{\"year\":2024,\"explanation\":\"Singeln gavs ut 2024 och låten finns även på albumet Paradise från samma år, så Spotifys år stämmer.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1535,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1535,
+    "output_tokens": 152,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 152,
+  "output_tokens_details": {
+   "thinking_tokens": 84
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

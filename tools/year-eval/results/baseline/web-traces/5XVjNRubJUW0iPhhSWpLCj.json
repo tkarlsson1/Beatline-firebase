@@ -1,0 +1,98 @@
+{
+ "id": "5XVjNRubJUW0iPhhSWpLCj",
+ "userMessage": "Titel: Better Off Alone\nArtist: Alice Deejay\nSpotifys album: Who Needs Guitars Anyway?\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2000-10-01\nSpotifys år: 2000",
+ "responseText": "\"Better Off Alone\" med Alice Deejay kom ut på singel 1998. Albumet Who Needs Guitars Anyway?, som Spotify utgår från, kom först senare.\n\n- **Singeln:** Enligt engelska Wikipedia gavs singeln ut i december 1998. Wikipedias sida om gruppen säger att de är kända för sin singel \"Better Off Alone\" från 1998, som blev en världsframgång.\n- **Datumet skiljer sig:** Album of the Year anger i stället 19 juli 1998 som utgivningsdatum för singeln. Källorna säger olika månad men samma år.\n- **DJ Jurgen-versionen:** Låten gavs först ut 1997 som en instrumental singel av DJ Jurgen på skivbolaget Violent Records. Det var en annan artist och en annan version, så den räknas inte. Senare utgåvor hade sång av Judith Pronk, som sedan blev en viktig del av Alice Deejay.\n- **Om någon tar upp 1997:** Det kan vara bra att veta vid bordet. Den första versionen med sång var krediterad \"DJ Jurgen presents Alice Deejay\". Den kom ut 1998, så året blir detsamma.\n\når: 1998\nkälla: https://en.wikipedia.org/wiki/Better_Off_Alone\nförklaring: Alice Deejays version av \"Better Off Alone\" kom ut på singel 1998, två år före albumet Who Needs Guitars Anyway?.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15720,
+  "output_tokens": 754,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Alice Deejay Better Off Alone single 1998 release"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Better_Off_Alone",
+   "title": "Better Off Alone",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.albumoftheyear.org/album/46962-alice-deejay-better-off-alone.php",
+   "title": "Alice Deejay - Better Off Alone (Single) - Reviews - Album of The Year",
+   "pageAge": "98 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Better_Off_Alone_(disambiguation)",
+   "title": "Better Off Alone (disambiguation)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1631123438/better-off-alone",
+   "title": "Better Off Alone - Alice Deejay: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "10345 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Alice_Deejay",
+   "title": "Alice Deejay",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Back_in_My_Life",
+   "title": "Back in My Life",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/track/1802291377",
+   "title": "Alice Deejay - Better Off Alone",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Better_Off_(Alone,_Pt._III)",
+   "title": "Better Off (Alone, Pt. III)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Alice+Deejay/Better+Off+Alone+-+Single",
+   "title": "Better Off Alone - Single — Alice Deejay",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Better_Off_Alone",
+   "title": "Better Off Alone",
+   "citedText": "Single by Alice Deejay\n\n- Released: December 1998\n\nAlice Deejay singles chronology\n|  | \"Better Off Alone\" (1998) | \"Back in My Life\" (1999) |\n\n- \"Bet..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Alice_Deejay",
+   "title": "Alice Deejay",
+   "citedText": "- Origin: Amsterdam, Netherlands\n\n- Years active: 1998–2002; 2021–2024;\n\nAlice Deejay was a Dutch\n\nThey are best known for their 1998 single \" [Better..."
+  },
+  {
+   "url": "https://www.albumoftheyear.org/album/46962-alice-deejay-better-off-alone.php",
+   "title": "Alice Deejay - Better Off Alone (Single) - Reviews - Album of The Year",
+   "citedText": "# Better Off Alone\n75\n\n90\n\n1998 Rank: **#53**\n\n## Details\nJuly 19, 1998 / Release Date\n\nSingle / Format\n\nUniversal / Label\n\nPronti & Kalmani / Produce..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Better_Off_Alone",
+   "title": "Better Off Alone",
+   "citedText": "\"Better Off Alone\" is written in the key of\n\nWith the turn of the century, \"Better Off Alone\" has been described as a turning point in the development..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Better_Off_Alone",
+   "title": "Better Off Alone",
+   "citedText": "Single by Alice Deejay\n\n- Released: December 1998\n\nAlice Deejay singles chronology\n|  | \"Better Off Alone\" (1998) | \"Back in My Life\" (1999) |\n\n- \"Bet..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Alice_Deejay",
+   "title": "Alice Deejay",
+   "citedText": "Formed in 1998, Alice Deejay launched their career with their debut\n[single](https://en.wikipedia.org/wiki/Single_(music)), \" [Better Off Alone](https..."
+  }
+ ]
+}

@@ -1,0 +1,93 @@
+{
+ "id": "4KyHNkxHKIQLutusfcj4ez",
+ "userMessage": "Titel: KU LO SA\nArtist: Oxlade\nSpotifys album: OFA: Deluxe Edition\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2025-04-04\nSpotifys år: 2025",
+ "responseText": "\"KU LO SA\" kom ut på singel 2022, inte 2025. Spotifys datum gäller deluxeutgåvan av albumet OFA, som kom senare.\n\n- **Första utgivningen:** Enligt engelska Wikipedia släpptes \"Ku Lo Sa\" officiellt den 10 juni 2022 tillsammans med en video från Colors Show. Pulse Nigeria skriver samma sak: singeln kom ut på strömningstjänsterna fredagen den 10 juni 2022.\n- **Studioversionen:** Wikipedias sida om OFA anger att albumets första singel \"Ku Lo Sa\" släpptes den 21 oktober 2022. Låten framfördes första gången live i Colors Show den 10 juni 2022. Juniversionen var alltså liveinspelningen och oktoberversionen studioinspelningen.\n\nBåda versionerna kom ut 2022, så året blir detsamma oavsett vilken man räknar.\n\når: 2022\nkälla: https://en.wikipedia.org/wiki/Ku_Lo_Sa\nförklaring: Oxlade släppte \"KU LO SA\" på singel den 10 juni 2022, långt innan låten kom med på albumet OFA.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16447,
+  "output_tokens": 637,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Oxlade Ku Lo Sa single release 2022"
+ ],
+ "searchResults": [
+  {
+   "url": "https://audiomack.com/oxlade/song/ku-lo-sa",
+   "title": "KU LO SA by Oxlade: Listen on Audiomack",
+   "pageAge": "1485 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/artist/oxlade/968819175",
+   "title": "Oxlade on Apple Music",
+   "pageAge": "513 days ago"
+  },
+  {
+   "url": "https://camilacabello.fandom.com/wiki/Ku_Lo_Sa",
+   "title": "Ku Lo Sa",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Want_You_(song)",
+   "title": "Want You (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/OFA_(Oxlade_From_Africa)",
+   "title": "OFA (Oxlade From Africa)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.shazam.com/en-us/album/1649742676/ku-lo-sa-single",
+   "title": "KU LO SA - Single - album by Oxlade",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Oxlade_(singer)",
+   "title": "Oxlade (singer)",
+   "pageAge": null
+  },
+  {
+   "url": "https://creators.audiomack.com/oxlade/song/ku-lo-sa",
+   "title": "KU LO SA by Oxlade: Listen on Audiomack",
+   "pageAge": "89 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Ku_Lo_Sa",
+   "title": "Ku Lo Sa",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.pulse.ng/story/oxlade-premieres-new-single-ku-lo-sa-on-a-colors-show-2024072515475075772",
+   "title": "Oxlade drops new single 'KU LO SA' for A Colors Show",
+   "pageAge": "351 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Ku_Lo_Sa",
+   "title": "Ku Lo Sa",
+   "citedText": "Single by Oxlade\n\n| \"Want You\" (2022) | \"Ku Lo Sa\" (2022) | \"Clueless\" (2023) |\n\n| \"Mon amour\" (2022) | \"Ku Lo Sa\" (2022) | \"I Luv It\" (2024) |\n\n- \"Ku..."
+  },
+  {
+   "url": "https://www.pulse.ng/story/oxlade-premieres-new-single-ku-lo-sa-on-a-colors-show-2024072515475075772",
+   "title": "Oxlade drops new single 'KU LO SA' for A Colors Show",
+   "citedText": "The single was **released on streaming platforms on Friday 10th June, 2022**. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/OFA_(Oxlade_From_Africa)",
+   "title": "OFA (Oxlade From Africa)",
+   "citedText": "Studio album by Oxlade\n\n- Recorded: 2022–2024\n\nOxlade chronology\n\n- \"Ku Lo Sa\" Released: 21 October 2022; \"Ovami\" Released: 19 May 2023; \"Intoxycated\"..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/OFA_(Oxlade_From_Africa)",
+   "title": "OFA (Oxlade From Africa)",
+   "citedText": "The album's lead single \"\n[Ku Lo Sa](https://en.wikipedia.org/wiki/Ku_Lo_Sa)\" premiered live as a [Colors Show](https://en.wikipedia.org/wiki/ColorsxS..."
+  }
+ ]
+}

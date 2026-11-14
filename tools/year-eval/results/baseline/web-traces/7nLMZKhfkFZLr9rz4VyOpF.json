@@ -1,0 +1,93 @@
+{
+ "id": "7nLMZKhfkFZLr9rz4VyOpF",
+ "userMessage": "Titel: Vart jag mig i världen vänder\nArtist: Den svenska björnstammen\nSpotifys album: Ett fel närmare rätt\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2012-01-01\nSpotifys år: 2012",
+ "responseText": "Rätt år är 2011, inte 2012. Spotifys år gäller albumet *Ett fel närmare rätt*, men låten kom ut på singel redan sommaren 2011.\n\n- **Svenska Wikipedia:** Låten är en låt av Den Svenska Björnstammen, utgiven på singel 2011. Den kom samt på gruppens album Ett fel närmare rätt 2012. Singeln anges som utgiven i juli 2011 på skivbolaget Gaphals.\n- **Apple Music** anger samma singel med datumet July 1, 2011 1 song, 3 minutes ℗ 2011 Goldenbest Records.\n- **Discogs** visar en vinylsingel i begränsad upplaga som kom Dec 7, 2011.\n- **Detta kan spelarna också få veta:** Låten nådde förstaplatsen på Sverigetopplistan och utsågs under P3 Guld-galan i januari 2012 till \"Årets låt 2011\".\n\når: 2011\nkälla: https://sv.wikipedia.org/wiki/Vart_jag_mig_i_v%C3%A4rlden_v%C3%A4nder\nförklaring: Låten gavs ut på singel i juli 2011 och kom först året efter med på albumet Ett fel närmare rätt.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14304,
+  "output_tokens": 697,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Den svenska björnstammen Vart jag mig i världen vänder singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://open.spotify.com/album/0HXVDGFfTMaFuwViMsWD1E",
+   "title": "Vart jag mig i världen vänder - Single by Den svenska björnstammen",
+   "pageAge": "5624 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/5S32jUs4dlmMUKF9Kqvwh5",
+   "title": "Vart jag mig i världen vänder (Remixes) - Single by Den svenska björnstammen",
+   "pageAge": "5796 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/album/vart-jag-mig-i-v%C3%A4rlden-v%C3%A4nder-single/965331242",
+   "title": "Vart Jag Mig I Världen Vänder - Single - Album by Den svenska björnstammen - Apple Music",
+   "pageAge": "5615 days ago"
+  },
+  {
+   "url": "https://music.apple.com/se/album/vart-jag-mig-i-v%C3%A4rlden-v%C3%A4nder-single/965331242",
+   "title": "Vart Jag Mig I Världen Vänder - Single",
+   "pageAge": "5615 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Den_svenska_bj%C3%B6rnstammen",
+   "title": "Den svenska bj%C3%B6rnstammen",
+   "pageAge": null
+  },
+  {
+   "url": "https://sv.wikipedia.org/wiki/Vart_jag_mig_i_v%C3%A4rlden_v%C3%A4nder",
+   "title": "Vart jag mig i världen vänder",
+   "pageAge": "1544 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/3420364-Den-Svenska-Bj%C3%B6rnstammen-Vart-Jag-Mig-I-V%C3%A4rlden-V%C3%A4nder",
+   "title": "Den Svenska Björnstammen",
+   "pageAge": "5456 days ago"
+  },
+  {
+   "url": "https://www.letras.com/den-svenska-bjornstammen/vart-jag-mig-i-varlden-vander/",
+   "title": "VART JAG MIG I VÄRLDEN VÄNDER - Den Svenska Björnstammen - LETRAS.COM",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Du_och_jag_mot_v%C3%A4rlden",
+   "title": "Du och jag mot v%C3%A4rlden",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://sv.wikipedia.org/wiki/Vart_jag_mig_i_v%C3%A4rlden_v%C3%A4nder",
+   "title": "Vart jag mig i världen vänder",
+   "citedText": "Vart jag mig i världen vänder är en låt av Den Svenska Björnstammen, **utgiven på singel 2011**. "
+  },
+  {
+   "url": "https://sv.wikipedia.org/wiki/Vart_jag_mig_i_v%C3%A4rlden_v%C3%A4nder",
+   "title": "Vart jag mig i världen vänder",
+   "citedText": "samt på gruppens album Ett fel närmare rätt 2012.\n\n"
+  },
+  {
+   "url": "https://music.apple.com/us/album/vart-jag-mig-i-v%C3%A4rlden-v%C3%A4nder-single/965331242",
+   "title": "Vart Jag Mig I Världen Vänder - Single - Album by Den svenska björnstammen - Apple Music",
+   "citedText": "Album · 2011 · 1 Song\n\nVart Jag Mig I Världen Vänder - Single\n\n# Vart Jag Mig I Världen Vänder - Single\nDen svenska björnstammen\n\nPop · 2011\n\nJuly 1, ..."
+  },
+  {
+   "url": "https://www.discogs.com/release/3420364-Den-Svenska-Bj%C3%B6rnstammen-Vart-Jag-Mig-I-V%C3%A4rlden-V%C3%A4nder",
+   "title": "Den Svenska Björnstammen",
+   "citedText": "# Den Svenska Björnstammen – Vart Jag Mig I Världen Vänder\nDen Svenska Björnstammen - Vart Jag Mig I Världen Vänder album cover\n\n- **Label:**: Goldenb..."
+  },
+  {
+   "url": "https://sv.wikipedia.org/wiki/Vart_jag_mig_i_v%C3%A4rlden_v%C3%A4nder",
+   "title": "Vart jag mig i världen vänder",
+   "citedText": "Låten nådde förstaplatsen på Sverigetopplistan och utsågs under P3 Guld-galan i januari 2012 till \"Årets låt 2011\".\n\n"
+  }
+ ]
+}

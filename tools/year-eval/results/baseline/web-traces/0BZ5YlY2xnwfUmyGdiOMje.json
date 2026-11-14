@@ -1,0 +1,98 @@
+{
+ "id": "0BZ5YlY2xnwfUmyGdiOMje",
+ "userMessage": "Titel: Call on Me - Ryan Riback Remix\nArtist: Starley, Ryan Riback\nSpotifys album: One of One\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2020-09-25\nSpotifys år: 2020",
+ "responseText": "Ryan Ribacks remix av Starleys \"Call on Me\" kom ut 2016, inte 2020. Spotifys år kommer från albumet One of One. Den Spotify-sida där spåret ligger på EP:n Call On Me (Remixes) anger Starley, Ryan Riback · Call On Me (Remixes) · Song · 2016, med publiceringsdatum 2016-10-18.\n\nWikipedia stämmer med detta. Artikeln hänvisar till remixen \"Call on Me (Ryan Riback Remix)\" from Call on Me (Remixes) – EP by Starley on Apple Music, och den källan arkiverades on 6 November 2016.\n\nDet finns också källor som anger 2017, men de gäller senare utgåvor:\n- Musikvideon hade premiär i USA January 18, 2017.\n- Rate Your Music listar en separat singel med remixen, Released 5 May 2017 on Central Station.\n\nEftersom den tidigaste utgivningen gäller blir svaret 2016.\n\når: 2016\nkälla: https://open.spotify.com/track/2L6orAlH8tBhiFTumIfMyF\nförklaring: Ryan Ribacks remix gavs först ut på EP:n \"Call On Me (Remixes)\" i oktober 2016, innan den kom som egen singel 2017.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14698,
+  "output_tokens": 1065,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Starley Call on Me Ryan Riback remix released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.imdb.com/title/tt9260500/releaseinfo/",
+   "title": "Starley: Call on Me (Ryan Riback Remix) (Music Video 2017) - Release info",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.beatport.com/track/call-on-me/20370175",
+   "title": "Starley - Call on Me (Ryan Riback Remix) [Tinted Records]",
+   "pageAge": "584 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/album/1qpzQaJEsbDtQ9Gfrk5A9w",
+   "title": "Call on Me (Ryan Riback Remix) - Single by Starley",
+   "pageAge": "3564 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/2L6orAlH8tBhiFTumIfMyF",
+   "title": "Call on Me - Ryan Riback Remix - song and lyrics by Starley, Ryan Riback",
+   "pageAge": "3679 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Call_on_Me_(Starley_song)",
+   "title": "Call on Me (Starley song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Ryan_Riback",
+   "title": "Ryan Riback",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Touch_Me_(Starley_song)",
+   "title": "Touch Me (Starley song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://rateyourmusic.com/release/single/starley/call-on-me-ryan-riback-remix/",
+   "title": "Call on Me (Ryan Riback Remix) by Starley (Single, Dance-Pop): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "pageAge": "3480 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/This_Feeling_(IYES_and_Ryan_Riback_song)",
+   "title": "This Feeling (IYES and Ryan Riback song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://open.spotify.com/track/2L6orAlH8tBhiFTumIfMyF",
+   "title": "Call on Me - Ryan Riback Remix - song and lyrics by Starley, Ryan Riback",
+   "citedText": "Starley, Ryan Riback · Call On Me (Remixes) · Song · 2016\n\nListen to Call on Me - Ryan Riback Remix on Spotify. "
+  },
+  {
+   "url": "https://open.spotify.com/track/2L6orAlH8tBhiFTumIfMyF",
+   "title": "Call on Me - Ryan Riback Remix - song and lyrics by Starley, Ryan Riback",
+   "citedText": "Song · Starley, Ryan Riback · 2016\",\"datePublished\":\"2016-10-18\"}"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Call_on_Me_(Starley_song)",
+   "title": "Call on Me (Starley song)",
+   "citedText": "- Genre: Electropop (original) EDM (Ryan Riback remix)\n- Length: 2:41 3:42 (Ryan Riback Remix)\n\n- \"Call on Me\" on YouTube; \"Call on Me\" (Ryan Riback r..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Call_on_Me_(Starley_song)",
+   "title": "Call on Me (Starley song)",
+   "citedText": "Archived from [the original](https://itunes.apple.com/nz/album/call-on-me-ryan-riback-remix/id1146645693?i=1146645737)on 6 November 2016.\n\n"
+  },
+  {
+   "url": "https://www.imdb.com/title/tt9260500/releaseinfo/",
+   "title": "Starley: Call on Me (Ryan Riback Remix) (Music Video 2017) - Release info",
+   "citedText": "Starley: Call on Me (Ryan Riback Remix) (Music Video 2017) - Movies, TV, Celebs, and more... … Release date: United States · **January 18, 2017**\n\nSta..."
+  },
+  {
+   "url": "https://rateyourmusic.com/release/single/starley/call-on-me-ryan-riback-remix/",
+   "title": "Call on Me (Ryan Riback Remix) by Starley (Single, Dance-Pop): Reviews, Ratings, Credits, Song list - Rate Your Music",
+   "citedText": "**Released 5 May 2017** on Central Station. "
+  }
+ ]
+}

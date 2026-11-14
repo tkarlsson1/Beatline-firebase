@@ -1,0 +1,98 @@
+{
+ "id": "27QvYgBk0CHOVHthWnkuWt",
+ "userMessage": "Titel: Vogue\nArtist: Madonna\nSpotifys album: Celebration (double disc version)\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 2009-09-18\nSpotifys år: 2009",
+ "responseText": "Rätt år är 1990, inte Spotifys 2009. Spotify visar samlingsskivan Celebration. Engelska Wikipedia uppger att Madonnas \"Vogue\" gavs ut som första singel från albumet den 20 mars 1990 av Sire Records och Warner Bros. Låten kommer från soundtrackalbumet I'm Breathless (1990). Den togs senare med på samlingsskivorna The Immaculate Collection (1990), Celebration (2009) och Finally Enough Love: 50 Number Ones (2022).\n\nKällorna anger inte samma dag. Simple English Wikipedia skriver 5 april 1990. Båda datumen ligger ändå i 1990, så året är säkert.\n\nLåten ska inte blandas ihop med Malcolm McLarens \"Deep in Vogue\". Den toppade Billboards danslista i juli 1989, åtta månader innan Madonnas singel kom ut i mars 1990.\n\når: 1990\nkälla: https://en.wikipedia.org/wiki/Vogue_(song)\nförklaring: Madonnas \"Vogue\" kom ut som singel i mars 1990 och fanns med på albumet I'm Breathless samma år, medan Celebration är en samlingsskiva från 2009.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16322,
+  "output_tokens": 631,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Madonna Vogue single released 1990"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Vogue_(song)",
+   "title": "Vogue (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://paradiserecords.fandom.com/wiki/Vogue_(Madonna_song)",
+   "title": "Vogue (Madonna song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.slantmagazine.com/music/madonna-vogue-through-the-years/",
+   "title": "Madonna’s 'Vogue': Through the Years",
+   "pageAge": "568 days ago"
+  },
+  {
+   "url": "https://madonna.fandom.com/wiki/Vogue_(song)",
+   "title": "Vogue (song)",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Vogue_(Madonna_song)",
+   "title": "Vogue (Madonna song)",
+   "pageAge": "111 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Keep_It_Together_(song)",
+   "title": "Keep It Together (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/I%27m_Breathless",
+   "title": "I%27m Breathless",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Madonna_singles_discography",
+   "title": "Madonna singles discography",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Justify_My_Love",
+   "title": "Justify My Love",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Deep_in_Vogue",
+   "title": "Deep in Vogue",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Vogue_(song)",
+   "title": "Vogue (song)",
+   "citedText": "The song was released as the lead single from the album on March 20, 1990, by [Sire Records](https://en.wikipedia.org/wiki/Sire_Records) and [Warner B..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Vogue_(song)",
+   "title": "Vogue (song)",
+   "citedText": "Single by Madonna\n\n- Released: March 20, 1990\n- Recorded: December 1989–January 1990\n\nMadonna singles chronology\n| \"Keep It Together\" (1990) | \"Vogue\"..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Vogue_(song)",
+   "title": "Vogue (song)",
+   "citedText": "The song was released as the lead single from the album on March 20, 1990, by [Sire Records](https://en.wikipedia.org/wiki/Sire_Records) and [Warner B..."
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Vogue_(Madonna_song)",
+   "title": "Vogue (Madonna song)",
+   "citedText": "It was released on April 5, 1990, through Sire and Warner Bros. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Deep_in_Vogue",
+   "title": "Deep in Vogue",
+   "citedText": "Single by Malcolm McLaren\n\nfrom the album Waltz Darling\n- A-side: \"Waltz Darling\"\n- Released: 12 May 1989\n- Recorded: 1989\n\n| \"Something's Jumpin' in ..."
+  }
+ ]
+}

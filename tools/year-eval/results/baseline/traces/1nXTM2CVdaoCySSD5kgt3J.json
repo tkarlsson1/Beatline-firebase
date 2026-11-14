@@ -1,0 +1,37 @@
+{
+ "id": "1nXTM2CVdaoCySSD5kgt3J",
+ "userMessage": "Titel: Sweat (A La La La La Long)\nArtist: Inner Circle\nSpotifys album: Sweat (A La La La La Long)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1992-06-02\nSpotifys år: 1992",
+ "responseText": "{\"year\":1992,\"explanation\":\"Låten gavs ut 1992 på albumet Bad to the Bone och som singel samma år, så Spotifys år stämmer, även om den blev en stor hit internationellt först 1993.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1502,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1502,
+    "output_tokens": 236,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 236,
+  "output_tokens_details": {
+   "thinking_tokens": 149
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

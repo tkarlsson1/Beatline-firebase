@@ -1,0 +1,93 @@
+{
+ "id": "59o6ojGNGJOYiVJSzC6Lsa",
+ "userMessage": "Titel: Memories (feat. Kid Cudi) - 2021 Remix\nArtist: David Guetta, Kid Cudi\nSpotifys album: Memories (feat. Kid Cudi) [2021 Remix]\nAlbumtyp enligt Spotify: single\nUtgivningsdatum enligt Spotify: 2021-01-08\nSpotifys år: 2021",
+ "responseText": "Svaret blir 2021, eftersom just den här remixen är en ny version. Reglerna säger emot varandra här. Ett årtal i titeln ska inte ändra året, men en remix räknas från när den versionen kom ut. \"2021 Remix\" är inte en remaster av originalinspelningen. Det är en ny mix som Guetta själv gjorde, med ett nytt synthtema och ett nytt trumkomp, och den gavs ut som en egen singel. Därför har jag följt remixregeln.\n\n- **Remixen kom 2021:** Wikipedia anger att Guetta släppte en ny remix av låten 2021 och listar den som en digital nedladdning (2021-remix) den 8 januari 2021. Den har också fått egna placeringar på 2021 års topplistor. EDM.com skriver att remixen kom ut den 8 januari via Warner Music.\n- **Originalet är från 2010:** Låten släpptes i februari 2010 som fjärde singel från hans fjärde studioalbum, One Love. Ska spelet räkna låten som \"Memories\" i allmänhet blir svaret i stället 2010. Det är bra att veta om någon vid bordet protesterar.\n\når: 2021\nkälla: https://en.wikipedia.org/wiki/Memories_(David_Guetta_song)\nförklaring: Den här versionen är David Guettas egen remix som släpptes som singel den 8 januari 2021, medan originalet med Kid Cudi kom 2010.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15544,
+  "output_tokens": 900,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "David Guetta Memories 2021 Remix Kid Cudi released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.prostudiomasters.com/album/page/78598",
+   "title": "David Guetta; Kid Cudi, Memories (feat. Kid Cudi / 2021 Remix / Single) in High-Resolution Audio - ProStudioMasters - Audio Uncompromised™",
+   "pageAge": "2136 days ago"
+  },
+  {
+   "url": "https://audiomack.com/davidguetta/song/memories-feat-kid-cudi-2021-remix-extended",
+   "title": "Memories (feat. Kid Cudi) [2021 Remix Extended] by David Guetta: Listen on Audiomack",
+   "pageAge": "527 days ago"
+  },
+  {
+   "url": "https://www.amazon.com/Memories-feat-Cudi-Remix-Explicit/dp/B08QXLBJ9C",
+   "title": "Memories (feat. Kid Cudi) [2021 Remix] [Explicit] by David Guetta on Amazon Music - Amazon.com",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.beatport.com/release/memories-feat-kid-cudi-2021-remix/3248979",
+   "title": "David Guetta, Kid Cudi - Memories (feat. Kid Cudi) (2021 Remix) [Parlophone (France)]",
+   "pageAge": "2136 days ago"
+  },
+  {
+   "url": "https://thissongissick.com/post/david-guetta-kid-cudi-reboot-memories-with-new-2021-remix/",
+   "title": "David Guetta & Kid Cudi Reboot \"Memories\" With New 2021 Remix",
+   "pageAge": "2135 days ago"
+  },
+  {
+   "url": "https://www.deezer.com/us/album/197633322",
+   "title": "David Guetta - Memories (feat. Kid Cudi) (2021 Remix)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.beatport.com/track/memories-feat-kid-cudi/14759816",
+   "title": "David Guetta, Kid Cudi - Memories (feat. Kid Cudi) (2021 Remix) [Parlophone (France)]",
+   "pageAge": "2136 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Memories_(David_Guetta_song)",
+   "title": "Memories (David Guetta song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.facebook.com/DavidGuetta/videos/memories-ft-kid-cudi2021-remix/678984942793908/",
+   "title": "Memories (ft. Kid Cudi)(2021 Remix)",
+   "pageAge": "2136 days ago"
+  },
+  {
+   "url": "https://edm.com/music-releases/david-guetta-kid-cudi-2021-memories-remix/",
+   "title": "David Guetta, Kid Cudi Release New Remix of 2011 Smash Single, \"Memories\" - EDM",
+   "pageAge": "464 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Memories_(David_Guetta_song)",
+   "title": "Memories (David Guetta song)",
+   "citedText": "In 2021, Guetta released a new remix of the track.\n\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Memories_(David_Guetta_song)",
+   "title": "Memories (David Guetta song)",
+   "citedText": "- \"Memories\" – 3:28\n- \"Memories\" (Fuck Me I'm Famous Remix) – 6:06\n\n- \"Memories\" – 3:28\n- \"Memories\" (Extended) – 5:20\n- \"Memories\" (Fuck Me I'm Famou..."
+  },
+  {
+   "url": "https://edm.com/music-releases/david-guetta-kid-cudi-2021-memories-remix/",
+   "title": "David Guetta, Kid Cudi Release New Remix of 2011 Smash Single, \"Memories\" - EDM",
+   "citedText": "**Released January 8th via Warner Music**, this 2021 reimagination reinvigorates the decade-old original with classic dance energy, updating its drivi..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Memories_(David_Guetta_song)",
+   "title": "Memories (David Guetta song)",
+   "citedText": "Written alongside Frédéric Riesterer, who produced it with Guetta, it was released in February 2010 as the fourth single from his fourth studio album,..."
+  }
+ ]
+}

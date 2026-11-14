@@ -1,0 +1,88 @@
+{
+ "id": "3GCpEbJzknVdpvx9WI03x3",
+ "userMessage": "Titel: Mysterious Girl - Radio Edit\nArtist: Peter Andre\nSpotifys album: The Long Road Back\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2004-06-07\nSpotifys år: 2004",
+ "responseText": "Låten kom först ut 1995, inte 2004 som Spotify anger.\n\n- **Första utgivningen:** Enligt Wikipedia gavs \"Mysterious Girl\" först ut som singel av Melodian Records i Australien den 14 augusti 1995 och kom ut i Storbritannien samma år. Den blev dock en kommersiell framgång där först när den återutgavs 1996.\n- **Samma version:** Enligt Discogs har den australiska CD-singeln från 1995 spåret \"Mysterious Girl (Radio Edit)\". Titeltillägget ändrar alltså inte året.\n- **Spotifys datum:** Det gäller albumet The Long Road Back. Låten kom ut som singel igen 2004, och Wikipedias diskografi beskriver det som att han återutgav sin singel \"Mysterious Girl\" från 1995.\n\når: 1995\nkälla: https://en.wikipedia.org/wiki/Mysterious_Girl\nförklaring: Singeln \"Mysterious Girl\" gavs först ut i Australien den 14 augusti 1995, medan Spotifys år 2004 gäller en senare återutgivning.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16246,
+  "output_tokens": 743,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Mysterious Girl Peter Andre single released 1995"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Mysterious_Girl",
+   "title": "Mysterious Girl",
+   "pageAge": null
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/1661254/all",
+   "title": "Performance: Mysterious Girl by Peter Andre",
+   "pageAge": null
+  },
+  {
+   "url": "https://secondhandsongs.com/release/452295/all",
+   "title": "Release: Mysterious Girl - Peter Andre (September 1995)",
+   "pageAge": "674 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Natural_(Peter_Andre_album)",
+   "title": "Natural (Peter Andre album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Peter_Andre_discography",
+   "title": "Peter Andre discography",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/1863591-Peter-Andre-Mysterious-Girl",
+   "title": "Peter Andre",
+   "pageAge": "446 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Turn_It_Up_(Peter_Andre_song)",
+   "title": "Turn It Up (Peter Andre song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/9218591-Peter-Andre-Mysterious-Girl",
+   "title": "Peter Andre",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/5442837-Peter-Andre-Mysterious-Girl",
+   "title": "Peter Andre",
+   "pageAge": "895 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Insania",
+   "title": "Insania",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Mysterious_Girl",
+   "title": "Mysterious Girl",
+   "citedText": "Single by Peter Andre featuring Bubbler Ranx\n\n- B-side: \"Take Me Back\" (1995); \"Turn It Up\" (extended mix) (1996);\n- Released: 14 August 1995\n\n- Songw..."
+  },
+  {
+   "url": "https://www.discogs.com/release/5442837-Peter-Andre-Mysterious-Girl",
+   "title": "Peter Andre",
+   "citedText": "Label:: Melodian – D11921 · Format:: CD, Single · Country:: Australia · **Released:: 1995** · Genre:: Hip Hop · Style:: Ragga HipHop, Pop Rap\n\n# Peter..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Peter_Andre_discography",
+   "title": "Peter Andre discography",
+   "citedText": "He re-released his 1995 single \" [Mysterious Girl](https://en.wikipedia.org/wiki/Mysterious_Girl)\" it peaked at No.\n\n"
+  }
+ ]
+}

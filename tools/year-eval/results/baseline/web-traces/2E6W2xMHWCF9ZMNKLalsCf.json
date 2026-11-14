@@ -1,0 +1,124 @@
+{
+ "id": "2E6W2xMHWCF9ZMNKLalsCf",
+ "userMessage": "Titel: Bullet\nArtist: Infinite Mass\nSpotifys album: The Face\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2001-01-01\nSpotifys år: 2001",
+ "responseText": "Låten kom ut 2001. Både singeln och albumet The Face gavs ut det året, så Spotifys år stämmer.\n\n- **Singeln:** Discogs listar singeln \"Bullet\" med Infinite Mass som CD-maxisingel på Universal, Polar och Murlyn Music, utgiven i Sverige 2001. Även 12\"-singeln och promosingeln står där med året 2001.\n- **Albumet:** Låten finns på The Face. Last.fm:s biografi nämner albumet The Face (2001) och låtarna \"She's A Freak\", \"Bullet\", \"Blazin\" och \"Enter The Dragon\".\n\nBullet innehåller samplingar från Roger Daltreys \"My Time Is Gonna Come\" från 1980. Det årtalet gäller originalet och inte den här låten.\n\når: 2001\nkälla: https://www.discogs.com/release/1045515-Infinite-Mass-Bullet\nförklaring: Infinite Mass gav ut \"Bullet\" på singel 2001, samma år som den kom på albumet The Face.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 30556,
+  "output_tokens": 682,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 2
+ },
+ "requests": 1,
+ "queries": [
+  "Infinite Mass Bullet singel The Face album",
+  "Infinite Mass \"Bullet\" swedishcharts"
+ ],
+ "searchResults": [
+  {
+   "url": "https://www.shazam.com/en-us/song/1442543544/bullet",
+   "title": "Bullet - Infinite Mass: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "9448 days ago"
+  },
+  {
+   "url": "https://www.deezer.com/en/track/118190242",
+   "title": "Infinite Mass - Bullet",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/en/artist/66290",
+   "title": "Infinite Mass: albums, songs, concerts",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/3q50J3nI1GOjDOwZDjt5Un",
+   "title": "Bullet - song and lyrics by Infinite Mass",
+   "pageAge": "9448 days ago"
+  },
+  {
+   "url": "https://www.jiosaavn.com/song/bullet/NjdTa0ZRYlo",
+   "title": "Bullet (Full Song) - Infinite Mass - Download or Listen Free - JioSaavn",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.elyrics.net/read/i/infinite-mass-lyrics/bullet-lyrics.html",
+   "title": "BULLET Lyrics - INFINITE MASS",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Infinite+Mass/_/Bullet",
+   "title": "Bullet — Infinite Mass",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.flashlyrics.com/lyrics/infinite-mass/bullet-62",
+   "title": "\"BULLET\" LYRICS by INFINITE MASS: Load up your bullet,...",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Infinite_(Eminem_song)",
+   "title": "Infinite (Eminem song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/1045515-Infinite-Mass-Bullet",
+   "title": "Infinite Mass",
+   "pageAge": "1780 days ago"
+  },
+  {
+   "url": "https://www.whosampled.com/Infinite-Mass/Bullet/",
+   "title": "Bullet by Infinite Mass - Samples, Covers and Remixes",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.whosampled.com/sample/91522/Infinite-Mass-Bullet-Roger-Daltrey-My-Time-Is-Gonna-Come/",
+   "title": "Infinite Mass's 'Bullet' sample of Roger Daltrey's 'My Time Is Gonna Come'",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/artist/23400-Infinite-Mass",
+   "title": "Infinite Mass Discography: Vinyl, CDs, & More",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.deezer.com/us/artist/66290",
+   "title": "Infinite Mass: albums, songs, concerts",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Infinite+Mass/_/Bullet",
+   "title": "Bullet — Infinite Mass",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Infinite+Mass",
+   "title": "Infinite Mass music, videos, stats, and photos",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.last.fm/music/Infinite+Mass/+wiki",
+   "title": "Infinite Mass hometown, lineup, biography",
+   "pageAge": "628 days ago"
+  },
+  {
+   "url": "https://songwhip.com/infinite-mass",
+   "title": "Infinite Mass",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/1045515-Infinite-Mass-Bullet",
+   "title": "Infinite Mass",
+   "citedText": "New Submission · Bullet (CD, Single, Promo) · Universal, Polar · POLPROCD 19 · Sweden · 2001\n\n# Infinite Mass – Bullet\nInfinite Mass - Bullet album co..."
+  },
+  {
+   "url": "https://www.last.fm/music/Infinite+Mass/+wiki",
+   "title": "Infinite Mass hometown, lineup, biography",
+   "citedText": "With the album The Face (2001) and the songs \"She’s A Freak\", \"Bullet\", \"Blazin\", and \"Enter The Dragon\" they established a style that is unusual in h..."
+  }
+ ]
+}

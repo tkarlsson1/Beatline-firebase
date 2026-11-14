@@ -1,0 +1,93 @@
+{
+ "id": "7HW5WIw7ZgZORCzUxv5gW5",
+ "userMessage": "Titel: Don't Go Breaking My Heart\nArtist: Elton John, Kiki Dee\nSpotifys album: Rock Of The Westies\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1975-10-24\nSpotifys år: 1975",
+ "responseText": "Rätt år är 1976, inte 1975 som Spotify visar. Spotify har låten på albumet Rock of the Westies från 1975. Men duetten spelades in först 1976 och kom ut som fristående singel samma år.\n\n- **Utgivning:** Låten är en duett av Elton John och Kiki Dee som gavs ut av The Rocket Record Company den 25 juni 1976. Elton Johns officiella webbplats ger datumen för originalsingeln: den 21 juni i USA och den 25 juni i Storbritannien.\n- **Inspelning:** Den spelades in den 27 mars 1976 (musiker och Elton Johns sång) och i maj 1976 (körsång). Därför kan den inte ha funnits med när Rock of the Westies kom ut 1975.\n- **Inget originalalbum:** Låten kom aldrig med på ett originalalbum, men spelades in under arbetet med Elton Johns elfte studioalbum Blue Moves från 1976. Spotifys spår kommer alltså från en senare utgåva av albumet.\n- **Annan version:** Elton John spelade senare in låten igen tillsammans med RuPaul. Det är en annan version och påverkar inte året här.\n\når: 1976\nkälla: https://en.wikipedia.org/wiki/Don't_Go_Breaking_My_Heart\nförklaring: Duetten spelades in våren 1976 och gavs ut som fristående singel i juni 1976, så Spotifys album från 1975 stämmer inte.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16842,
+  "output_tokens": 767,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Don't Go Breaking My Heart Elton John Kiki Dee single 1976"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Don't_Go_Breaking_My_Heart",
+   "title": "Don't Go Breaking My Heart",
+   "pageAge": "6 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Go_Breaking_My_Heart",
+   "title": "Don%27t Go Breaking My Heart",
+   "pageAge": null
+  },
+  {
+   "url": "https://americansongwriter.com/on-this-day-in-1976-elton-john-and-kiki-dees-classic-pop-duet-dont-go-breaking-my-heart-hit-no-1-on-the-hot-100/",
+   "title": "On This Day in 1976: Elton John and Kiki Dee’s Classic Pop Duet “Don’t Go Breaking My Heart” Hit No. 1 on the Hot 100",
+   "pageAge": "828 days ago"
+  },
+  {
+   "url": "https://www.udiscovermusic.com/news/elton-john-kiki-dee-dont-go-breaking-my-heart-spotify-billions-club/",
+   "title": "'Don’t Go Breaking My Heart' Hits One Billion Spotify Streams",
+   "pageAge": "414 days ago"
+  },
+  {
+   "url": "https://www.eltonjohn.com/stories/dgbmh-anniversary",
+   "title": "10 Fun Facts About 'Don't Go Breaking My Heart' - Elton John",
+   "pageAge": "150 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/dont-go-breaking-my-heart/1440903791",
+   "title": "Don't Go Breaking My Heart - Song by Elton John & Kiki Dee - Apple Music",
+   "pageAge": "18408 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/dont-go-breaking-my-heart/1452864418",
+   "title": "Don't Go Breaking My Heart - Song with Lyrics by Elton John & Kiki Dee - Apple Music",
+   "pageAge": "18408 days ago"
+  },
+  {
+   "url": "https://simple.wikipedia.org/wiki/Don't_Go_Breaking_My_Heart",
+   "title": "Don't Go Breaking My Heart",
+   "pageAge": "647 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Go_Breaking_My_Heart_(disambiguation)",
+   "title": "Don%27t Go Breaking My Heart (disambiguation)",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/master/38994-Elton-John-Kiki-Dee-Dont-Go-Breaking-My-Heart",
+   "title": "Elton John, Kiki Dee",
+   "pageAge": "1418 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Don't_Go_Breaking_My_Heart",
+   "title": "Don't Go Breaking My Heart",
+   "citedText": "# Don't Go Breaking My Heart\n**\"Don't Go Breaking My Heart\"**\n\n**Single by Elton John and Kiki Dee**\n\n- **Released**: 25 June 1976 (1976-06-25)\n- **Re..."
+  },
+  {
+   "url": "https://www.eltonjohn.com/stories/dgbmh-anniversary",
+   "title": "10 Fun Facts About 'Don't Go Breaking My Heart' - Elton John",
+   "citedText": "Elton and Kiki Dee (Photo: David Nutter)\n\n- 1976: Elton John and Kiki Dee’s original single, released on June 21 in the US and June 25 in the UK.\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don't_Go_Breaking_My_Heart",
+   "title": "Don't Go Breaking My Heart",
+   "citedText": "# Don't Go Breaking My Heart\n**\"Don't Go Breaking My Heart\"**\n\n**Single by Elton John and Kiki Dee**\n\n- **Released**: 25 June 1976 (1976-06-25)\n- **Re..."
+  },
+  {
+   "url": "https://www.udiscovermusic.com/news/elton-john-kiki-dee-dont-go-breaking-my-heart-spotify-billions-club/",
+   "title": "'Don’t Go Breaking My Heart' Hits One Billion Spotify Streams",
+   "citedText": "“Don’t Go Breaking My Heart” was never included on an original album, though it was recorded during the sessions for John’s 11th studio album, 1976’s ..."
+  }
+ ]
+}

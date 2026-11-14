@@ -1,0 +1,83 @@
+{
+ "id": "2FlcxnvybdwpaMmMhaRtSN",
+ "userMessage": "Titel: Don't Start Now\nArtist: Dua Lipa\nSpotifys album: Future Nostalgia (The Moonlight Edition)\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2021-02-11\nSpotifys år: 2021",
+ "responseText": "Spotifys år (2021) gäller nyutgåvan Future Nostalgia (The Moonlight Edition), inte låten. Låten kom ut som singel 2019. Enligt engelska Wikipedia släpptes \"Don't Start Now\" för nedladdning och streaming den 31 oktober 2019 som första singel från Lipas andra studioalbum, *Future Nostalgia* (2020). Själva albumet gavs ut den 27 mars 2020, alltså efter singeln. Därför gäller 2019.\n\når: 2019\nkälla: https://en.wikipedia.org/wiki/Don't_Start_Now\nförklaring: Dua Lipa släppte \"Don't Start Now\" som singel den 31 oktober 2019, några månader före albumet Future Nostalgia (2020).\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16497,
+  "output_tokens": 391,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Don't Start Now Dua Lipa single released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://simple.wikipedia.org/wiki/Don't_Start_Now",
+   "title": "Don't Start Now",
+   "pageAge": "747 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don't_Start_Now",
+   "title": "Don't Start Now",
+   "pageAge": "6 days ago"
+  },
+  {
+   "url": "https://www.songfacts.com/facts/dua-lipa/dont-start-now",
+   "title": "Don't Start Now by Dua Lipa - Songfacts",
+   "pageAge": "2571 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Start_Now",
+   "title": "Don%27t Start Now",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Future_Nostalgia_(song)",
+   "title": "Future Nostalgia (song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don't_Start_Now_(Dua_Lipa_song)",
+   "title": "Don't Start Now",
+   "pageAge": "102 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Don%27t_Start_Now_(disambiguation)",
+   "title": "Don%27t Start Now (disambiguation)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Future_Nostalgia",
+   "title": "Future Nostalgia",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/14347178-Dua-Lipa-Dont-Start-Now",
+   "title": "Dua Lipa",
+   "pageAge": "2570 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Physical_(Dua_Lipa_song)",
+   "title": "Physical (Dua Lipa song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Don't_Start_Now",
+   "title": "Don't Start Now",
+   "citedText": "\"Don't Start Now\" was released for digital download and streaming on 31 October 2019 as the lead single from Lipa's second studio album, *Future Nosta..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Future_Nostalgia",
+   "title": "Future Nostalgia",
+   "citedText": "Studio album by Dua Lipa\n- Released: 27 March 2020\n\nDua Lipa chronology\n| Dua Lipa (2017) | Future Nostalgia (2020) | Club Future Nostalgia (2020) |\n\n..."
+  }
+ ]
+}

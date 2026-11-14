@@ -1,0 +1,88 @@
+{
+ "id": "1uzWOoJdADfstQuFtQFTUn",
+ "userMessage": "Titel: Breakfast At Tiffany's\nArtist: Deep Blue Something\nSpotifys album: Home\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1995-01-01\nSpotifys år: 1995",
+ "responseText": "Rätt år är **1993**, inte Spotifys 1995. Låten kom först ut på bandets debutalbum, inte på Home.\n\n- **Första utgivningen:** Enligt engelska Wikipedia fanns låten först med på deras album *11th Song* från 1993 och spelades sedan in på nytt för albumet *Home* från 1994. *11th Song* är ett studioalbum av Deep Blue Something, utgivet den 13 oktober 1993. SecondHandSongs och AllMusic anger också 1993.\n- **Spotifys år är för sent:** Wikipedia daterar Home till 24 oktober 1994. Singeln kom i juli 1995 på Interscope och Rainmaker.\n- **Möjlig invändning vid bordet:** Spåret på Spotify är den nyinspelade versionen från Home, alltså hitversionen. Om man räknar just den inspelningen blir året 1994 enligt Wikipedia. Spotify anger 1995. Enligt regeln gäller ändå första gången artisten gav ut låten, och det var 1993.\n\når: 1993\nkälla: https://en.wikipedia.org/wiki/Breakfast_at_Tiffany's_(song)\nförklaring: Låten gavs först ut på Deep Blue Somethings debutalbum 11th Song 1993 och spelades senare in på nytt för albumet Home.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16052,
+  "output_tokens": 995,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Deep Blue Something Breakfast at Tiffany's song 11th Song 1993"
+ ],
+ "searchResults": [
+  {
+   "url": "https://en.wikipedia.org/wiki/11th_Song",
+   "title": "11th Song",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/0SaOhWDuRf7X67Xv9q68QZ",
+   "title": "Breakfast at Tiffany's - song and lyrics by Deep Blue Something",
+   "pageAge": "12370 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Breakfast_at_Tiffany's_(song)",
+   "title": "Breakfast at Tiffany's (song)",
+   "pageAge": "14 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/artist/deep-blue-something/363059",
+   "title": "Deep Blue Something on Apple Music",
+   "pageAge": "463 days ago"
+  },
+  {
+   "url": "https://secondhandsongs.com/performance/73612/all",
+   "title": "Performance: Breakfast at Tiffany's by Deep Blue Something",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Home_(Deep_Blue_Something_album)",
+   "title": "Home (Deep Blue Something album)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Deep_Blue_Something",
+   "title": "Deep Blue Something",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.allmusic.com/song/breakfast-at-tiffanys-mt0006829955",
+   "title": "Breakfast at Tiffany's - Deep Blue Something",
+   "pageAge": "12153 days ago"
+  },
+  {
+   "url": "https://www.elyrics.net/read/d/deep-blue-something-lyrics/breakfast-at-tiffany_s-lyrics.html",
+   "title": "BREAKFAST AT TIFFANY'S Lyrics - DEEP BLUE SOMETHING",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Breakfast_at_Tiffany's_(song)",
+   "title": "Breakfast at Tiffany's (song)",
+   "citedText": "Originally appearing on their 1993 album *11th Song*, it was later re-recorded and released on their 1994 album *Home*. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/11th_Song",
+   "title": "11th Song",
+   "citedText": "Studio album by Deep Blue Something\n- Released: October 13, 1993\n- Recorded: March – July 1993\n- Studio: Reeltime Studios in Dallas, Texas.\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Home_(Deep_Blue_Something_album)",
+   "title": "Home (Deep Blue Something album)",
+   "citedText": "Studio album by Deep Blue Something\n- Released: October 24, 1994\n\n- Producer: Deep Blue Something, David Castell\n\nDeep Blue Something chronology\n| 11t..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Breakfast_at_Tiffany's_(song)",
+   "title": "Breakfast at Tiffany's (song)",
+   "citedText": "Released as a single in July 1995 by Interscope and Rainmaker, the song was the band's only hit in the United States, peaking at number five on the US..."
+  }
+ ]
+}

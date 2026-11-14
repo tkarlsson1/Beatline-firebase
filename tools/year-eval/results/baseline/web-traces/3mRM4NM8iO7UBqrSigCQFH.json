@@ -1,0 +1,88 @@
+{
+ "id": "3mRM4NM8iO7UBqrSigCQFH",
+ "userMessage": "Titel: Stayin' Alive - From \"Saturday Night Fever\" Soundtrack\nArtist: Bee Gees\nSpotifys album: Greatest\nAlbumtyp enligt Spotify: compilation\nUtgivningsdatum enligt Spotify: 1979-01-01\nSpotifys år: 1979",
+ "responseText": "Rätt år är 1977. Spotifys år, 1979, kommer från samlingsskivan \"Greatest\" och gäller därför inte låten.\n\nEnligt engelska Wikipedia gav RSO Records ut låten i december 1977 som den andra singeln från soundtracket till Saturday Night Fever. Infoboxen anger att singeln gavs ut den 15 december 1977. Samma sida säger att singeln kom i mitten av december, en månad efter albumet. Soundtrackalbumet kom alltså också 1977, så singeln och albumet hamnar på samma år. En annan källa anger den 13 december 1977 för singeln, men året är detsamma.\n\når: 1977\nkälla: https://en.wikipedia.org/wiki/Stayin'_Alive\nförklaring: Bee Gees gav ut \"Stayin' Alive\" på soundtracket till Saturday Night Fever i november 1977 och som singel i december samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 16494,
+  "output_tokens": 518,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Stayin' Alive Bee Gees single released 1977"
+ ],
+ "searchResults": [
+  {
+   "url": "https://beegees.fandom.com/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "pageAge": null
+  },
+  {
+   "url": "https://culture.fandom.com/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Stayin%27_Alive",
+   "title": "Stayin%27 Alive",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "pageAge": "3 days ago"
+  },
+  {
+   "url": "https://music.fandom.com/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "pageAge": "107 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/If_I_Can%27t_Have_You_(Bee_Gees_song)",
+   "title": "If I Can%27t Have You (Bee Gees song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/How_Deep_Is_Your_Love_(Bee_Gees_song)",
+   "title": "How Deep Is Your Love (Bee Gees song)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Staying_Alive_(soundtrack)",
+   "title": "Staying Alive (soundtrack)",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Night_Fever",
+   "title": "Night Fever",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/us/song/stayin-alive/1540382984",
+   "title": "Stayin Alive - Song with Lyrics by Bee Gees - Apple Music",
+   "pageAge": "17896 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "citedText": "The song was **released in December 1977** by RSO Records as the second single from the Saturday Night Fever soundtrack.\n\n"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "citedText": "# Stayin' Alive\n**\"Stayin' Alive\"**\n\nUK 7-inch vinyl single\n\n**Single by Bee Gees**\n\n- **Released**: 15 December 1977\n- **Recorded**: 1977\n\n- **Length..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Stayin'_Alive",
+   "title": "Stayin' Alive",
+   "citedText": "The single was eventually released in mid-December, a month after the album, and moved to the top of the *Billboard* Hot 100 in the United States in F..."
+  }
+ ]
+}

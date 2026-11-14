@@ -1,0 +1,37 @@
+{
+ "id": "0BZ5YlY2xnwfUmyGdiOMje",
+ "userMessage": "Titel: Call on Me - Ryan Riback Remix\nArtist: Starley, Ryan Riback\nSpotifys album: One of One\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2020-09-25\nSpotifys år: 2020",
+ "responseText": "{\"year\":2016,\"explanation\":\"Ryan Ribacks remix av Starleys Call on Me gavs ut som singel 2016. Spotifys år 2020 kommer från albumet One of One, som kom senare.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1500,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1500,
+    "output_tokens": 175,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 175,
+  "output_tokens_details": {
+   "thinking_tokens": 91
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,88 @@
+{
+ "id": "3c8iiZGfEammKJuWTErE5x",
+ "userMessage": "Titel: Ain't Nobody (Loves Me Better) (feat. Jasmine Thompson)\nArtist: Felix Jaehn, Jasmine Thompson\nSpotifys album: I\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2018-02-16\nSpotifys år: 2018",
+ "responseText": "Felix Jaehns version av låten med Jasmine Thompson kom ut på singel den 3 april 2015. Albumet \"I\" på Spotify kom ut 2018, alltså tre år senare. Därför gäller 2015 och inte Spotifys år.\n\nEngelska Wikipedia anger singeln som \"Single by Felix Jaehn featuring Jasmine Thompson\" från albumet I, utgiven den 3 april 2015 på Polydor Island. Discogs har en CD-singel från Tyskland, Österrike och Schweiz utgiven den 21 april 2015. Apple Music har också singeln med datumet 3 april 2015.\n\nOm någon vid bordet säger 2013 så är det en annan version. Felix Jaehns version byggde på en soloutgåva av låten som Thompson gjorde 2013, när hon var 13 år. Den versionen är Jasmine Thompsons egen och räknas inte här. Felix Jaehns remix är en egen version, och för den gäller 2015. Låten är i sin tur en cover på Chaka Khans \"Ain't Nobody\".\n\når: 2015\nkälla: https://en.wikipedia.org/wiki/Ain't_Nobody\nförklaring: Felix Jaehns version med Jasmine Thompson kom ut på singel den 3 april 2015, flera år innan den kom med på albumet \"I\" 2018.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 15927,
+  "output_tokens": 675,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Felix Jaehn Ain't Nobody (Loves Me Better) Jasmine Thompson single released"
+ ],
+ "searchResults": [
+  {
+   "url": "https://audiomack.com/felixjaehn/song/aint-nobody-loves-me-better-felix-jaehn-happy-rave-mix",
+   "title": "Ain't Nobody (Loves Me Better) (Felix Jaehn Happy Rave Mix) by Felix Jaehn, Jasmine Thompson: Listen on Audiomack",
+   "pageAge": "479 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Ain't_Nobody",
+   "title": "Ain't Nobody",
+   "pageAge": "20 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/6966661-Felix-Jaehn-Feat-Jasmine-Thompson-Aint-Nobody-Loves-Me-Better",
+   "title": "Felix Jaehn Feat. Jasmine Thompson",
+   "pageAge": "4225 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/7404384-Felix-Jaehn-Feat-Jasmine-Thompson-Aint-Nobody-Loves-Me-Better",
+   "title": "Felix Jaehn Feat. Jasmine Thompson",
+   "pageAge": "4222 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/release/10172114-Felix-Jaehn-Feat-Jasmine-Thompson-Aint-Nobody-Loves-Me-Better",
+   "title": "Felix Jaehn Feat. Jasmine Thompson",
+   "pageAge": "2944 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Jasmine_Thompson",
+   "title": "Jasmine Thompson",
+   "pageAge": null
+  },
+  {
+   "url": "https://music.apple.com/tt/song/aint-nobody-loves-me-better-feat-jasmine-thompson/1444888648",
+   "title": "Ain't Nobody (Loves Me Better) [feat. Jasmine Thompson] - Song with Lyrics by felix jaehn - Apple Music",
+   "pageAge": "4243 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/5afHIkEcVhCF1Z1CTqMUXB",
+   "title": "Ain't Nobody (Loves Me Better) - Song, Lyrics, and Music Video by felix jaehn, Jasmine Thompson",
+   "pageAge": "4274 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/en-us/song/1445319006/aint-nobody-loves-me-better-feat-jasmine-thompson",
+   "title": "Ain't Nobody (Loves Me Better) [feat. Jasmine Thompson] - felix jaehn: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "4243 days ago"
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Ain't_Nobody",
+   "title": "Ain't Nobody",
+   "citedText": "# Ain't Nobody\n## Felix Jaehn version\n**\"Ain't Nobody (Loves Me Better)\"**\n\n**Single by Felix Jaehn featuring Jasmine Thompson**\n\n**from the album I**..."
+  },
+  {
+   "url": "https://www.discogs.com/release/6966661-Felix-Jaehn-Feat-Jasmine-Thompson-Aint-Nobody-Loves-Me-Better",
+   "title": "Felix Jaehn Feat. Jasmine Thompson",
+   "citedText": "Label:: Island Records – 06025 4735530 0 · Format:: CD, Single · Country:: Germany, Austria, & Switzerland · **Released:: Apr 21, 2015** · Genre:: Ele..."
+  },
+  {
+   "url": "https://music.apple.com/tt/song/aint-nobody-loves-me-better-feat-jasmine-thompson/1444888648",
+   "title": "Ain't Nobody (Loves Me Better) [feat. Jasmine Thompson] - Song with Lyrics by felix jaehn - Apple Music",
+   "citedText": "Jasmine Thompson] - Single felix jaehn **3 April 2015**\n\nListen to Ain't Nobody (Loves Me Better) [feat. "
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Ain't_Nobody",
+   "title": "Ain't Nobody",
+   "citedText": "The remix was based on a solo release of the song by Thompson in 2013, when Thompson was 13, which had peaked at number 32 on the UK Singles Chart.\n\n"
+  }
+ ]
+}

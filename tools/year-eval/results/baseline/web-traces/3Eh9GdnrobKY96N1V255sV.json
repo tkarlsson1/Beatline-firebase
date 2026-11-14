@@ -1,0 +1,88 @@
+{
+ "id": "3Eh9GdnrobKY96N1V255sV",
+ "userMessage": "Titel: Sinner\nArtist: Klingande, Stevie Appleton\nSpotifys album: The Album\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 2019-11-15\nSpotifys år: 2019",
+ "responseText": "Rätt år är 2019, samma år som Spotify anger. Låten kom först ut som singel i juni 2019, alltså innan albumet \"The Album\" släpptes den 15 november 2019.\n\nDiscogs listar singeln \"Sinner\" av Klingande och Stevie Appleton som en digital singel på Ultra Records, släppt den 28 juni 2019. Apple Music anger samma datum för singeln, 28 juni 2019, ℗ 2019 Klingande Music under exclusive license to Ultra Records, LLC. Klingande själv kallade låten den andra singeln från sitt kommande album, med Stevie Appleton.\n\når: 2019\nkälla: https://www.discogs.com/release/13821478-Klingande-Stevie-Appleton-Sinner\nförklaring: Klingande och Stevie Appletons \"Sinner\" kom ut som singel på Ultra Records den 28 juni 2019, före albumet samma höst.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 13918,
+  "output_tokens": 468,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Klingande Stevie Appleton Sinner single"
+ ],
+ "searchResults": [
+  {
+   "url": "https://music.apple.com/ke/album/sinner-single/1468039262",
+   "title": "Sinner - Single by Klingande & Stevie Appleton on Apple Music",
+   "pageAge": "2696 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/album/sinner-single/1468039262",
+   "title": "Sinner - Single - Album by Klingande & Stevie Appleton - Apple Music",
+   "pageAge": "2696 days ago"
+  },
+  {
+   "url": "https://music.apple.com/lk/album/sinner-mr-belt-wezol-remix-single/1474904969",
+   "title": "Sinner (Mr. Belt & Wezol Remix) - Single - Album by Klingande & Stevie Appleton - Apple Music",
+   "pageAge": "2654 days ago"
+  },
+  {
+   "url": "https://music.apple.com/us/song/sinner/1467781557",
+   "title": "Sinner - Song by Klingande & Stevie Appleton - Apple Music",
+   "pageAge": null
+  },
+  {
+   "url": "https://soundcloud.com/klingande/klingande-stevie-appleton-sinner?in=rlogg/sets/epic-sac",
+   "title": "Listen to Klingande & Stevie Appleton - Sinner by Klingande in Chillax playlist online for free on SoundCloud",
+   "pageAge": null
+  },
+  {
+   "url": "https://open.spotify.com/track/2fu3k0tK8eVj9bv4Vd99yT",
+   "title": "Sinner - song by Klingande, Stevie Appleton",
+   "pageAge": "2696 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/0tUqaDwJlYuzBD8xk7zkjP",
+   "title": "Sinner - song and lyrics by Klingande, Stevie Appleton",
+   "pageAge": "2696 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/song/1474904970/sinner-mr-belt-wezol-remix",
+   "title": "Sinner (Mr. Belt & Wezol Remix) - Klingande & Stevie Appleton: Song Lyrics, Music Videos & Concerts",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/13821478-Klingande-Stevie-Appleton-Sinner",
+   "title": "Klingande & Stevie Appleton",
+   "pageAge": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Blue_(Ti%C3%ABsto_song)",
+   "title": "Blue (Ti%C3%ABsto song)",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://www.discogs.com/release/13821478-Klingande-Stevie-Appleton-Sinner",
+   "title": "Klingande & Stevie Appleton",
+   "citedText": "# Klingande & Stevie Appleton\\* – Sinner\nKlingande - Sinner album cover\n\n- **Label:**: Ultra Records – none\n- **Format:**: File, FLAC, Single\n- **Coun..."
+  },
+  {
+   "url": "https://music.apple.com/us/album/sinner-single/1468039262",
+   "title": "Sinner - Single - Album by Klingande & Stevie Appleton - Apple Music",
+   "citedText": "Album · 2019 · 1 Song\n\n# Sinner - Single\nKlingande, Stevie Appleton\n\nDANCE · 2019\n\nSinner - Single\n\nJune 28, 2019 1 Song, 3 minutes ℗ 2019 Klingande M..."
+  },
+  {
+   "url": "https://soundcloud.com/klingande/klingande-stevie-appleton-sinner?in=rlogg/sets/epic-sac",
+   "title": "Listen to Klingande & Stevie Appleton - Sinner by Klingande in Chillax playlist online for free on SoundCloud",
+   "citedText": "Here is the second single of my upcoming album, featuring Stevie Appleton! "
+  }
+ ]
+}

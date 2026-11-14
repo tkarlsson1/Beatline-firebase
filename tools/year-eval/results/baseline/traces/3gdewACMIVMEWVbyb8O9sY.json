@@ -1,0 +1,37 @@
+{
+ "id": "3gdewACMIVMEWVbyb8O9sY",
+ "userMessage": "Titel: Rocket Man (I Think It's Going To Be A Long, Long Time)\nArtist: Elton John\nSpotifys album: Honky Chateau\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1972-05-19\nSpotifys år: 1972",
+ "responseText": "{\"year\":1972,\"explanation\":\"Låten gavs ut 1972 som singel och på albumet Honky Chateau, vilket stämmer med Spotifys år.\",\"confidence\":\"high\"}",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 1507,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "iterations": [
+   {
+    "input_tokens": 1507,
+    "output_tokens": 67,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "type": "message",
+    "model": null
+   }
+  ],
+  "output_tokens": 67,
+  "output_tokens_details": {
+   "thinking_tokens": 0
+  },
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard"
+ }
+}

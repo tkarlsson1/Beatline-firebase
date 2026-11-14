@@ -1,0 +1,88 @@
+{
+ "id": "29fNIVCogo4jpvKgTtIwyb",
+ "userMessage": "Titel: Öppna din dörr\nArtist: Tommy Nilsson\nSpotifys album: En kvinnas man\nAlbumtyp enligt Spotify: album\nUtgivningsdatum enligt Spotify: 1995-12-11\nSpotifys år: 1995",
+ "responseText": "Rätt år är 1994, inte Spotifys 1995. Låten kom ut på singel 1994.\n\n- **Wikipedia:** Engelska Wikipedia anger att \"Öppna din dörr\" skrevs av Tommy Nilsson och gavs ut som singel från hans studioalbum En kvinnas man från 1994. Den låg också 24 veckor på Svensktoppen mellan 18 juni och 26 november 1994 och toppade listan. Den utsågs dessutom till \"årets Svensktoppenlåt 1994\".\n- **Discogs:** Singeln listas som utgiven på Alpha Records (ONECDS 149) i Sverige 1994.\n- **Avvikande källa:** Shazam anger 1982, men då med samlingsskivan Det bästa med Tommy Nilsson som album. Låten fanns inte 1982, så det året kan inte stämma. Samlingsskivor räknas inte heller enligt reglerna.\n\når: 1994\nkälla: https://en.wikipedia.org/wiki/%C3%96ppna_din_d%C3%B6rr\nförklaring: Låten kom ut som singel 1994 och låg på Svensktoppen från juni samma år.\nstöd: tydligt",
+ "model": "claude-opus-5-5",
+ "stopReason": "end_turn",
+ "usage": {
+  "input_tokens": 14481,
+  "output_tokens": 731,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "web_search_requests": 1
+ },
+ "requests": 1,
+ "queries": [
+  "Tommy Nilsson \"Öppna din dörr\" singel"
+ ],
+ "searchResults": [
+  {
+   "url": "https://open.spotify.com/track/4bcnUDksPr6hCr04DwtlY7",
+   "title": "Öppna din dörr - song and lyrics by Tommy Nilsson",
+   "pageAge": "9224 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/2c0mjg1Ori1ZqVyU1kp6Q1",
+   "title": "Öppna din dörr - song and lyrics by Tommy Nilsson",
+   "pageAge": "6773 days ago"
+  },
+  {
+   "url": "https://open.spotify.com/track/5mwYNCP6mi5JUtlrsxXVqj",
+   "title": "Öppna din dörr - song and lyrics by Tommy Nilsson",
+   "pageAge": "8523 days ago"
+  },
+  {
+   "url": "https://www.shazam.com/song/255787710/%C3%B6ppna-din-d%C3%B6rr",
+   "title": "Öppna Din Dörr - Tommy Nilsson: Song Lyrics, Music Videos & Concerts",
+   "pageAge": "16388 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/%C3%96ppna_din_d%C3%B6rr",
+   "title": "%C3%96ppna din d%C3%B6rr",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=Ug9KQU6IAmY",
+   "title": "Tommy Nilsson - Öppna din dörr (HQ) - YouTube",
+   "pageAge": "5658 days ago"
+  },
+  {
+   "url": "https://www.discogs.com/master/489000-Tommy-Nilsson-%C3%96ppna-Din-D%C3%B6rr",
+   "title": "Tommy Nilsson",
+   "pageAge": null
+  },
+  {
+   "url": "https://www.discogs.com/release/1108584-Tommy-Nilsson-%C3%96ppna-Din-D%C3%B6rr",
+   "title": "Tommy Nilsson",
+   "pageAge": "644 days ago"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Tommy_Nilsson",
+   "title": "Tommy Nilsson",
+   "pageAge": null
+  }
+ ],
+ "searchErrors": [],
+ "citations": [
+  {
+   "url": "https://en.wikipedia.org/wiki/%C3%96ppna_din_d%C3%B6rr",
+   "title": "%C3%96ppna din d%C3%B6rr",
+   "citedText": "Single by Tommy Nilsson\n\nfrom the album En kvinnas man\n- B-side: \"Nu ger jag mig av\"\n- Released: 1994\n- Genre: Soft rock\n- Label: Alpha\n- Songwriter: ..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/%C3%96ppna_din_d%C3%B6rr",
+   "title": "%C3%96ppna din d%C3%B6rr",
+   "citedText": "It also became a [Svensktoppen](https://en.wikipedia.org/wiki/Svensktoppen) hit, [[3]](./%C3%96ppna_din_d%C3%B6rr#cite_note-3) charting for 24 weeks b..."
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/%C3%96ppna_din_d%C3%B6rr",
+   "title": "%C3%96ppna din d%C3%B6rr",
+   "citedText": "It was also appointed \"Svensktoppen song of the year 1994\". "
+  },
+  {
+   "url": "https://www.discogs.com/release/1108584-Tommy-Nilsson-%C3%96ppna-Din-D%C3%B6rr",
+   "title": "Tommy Nilsson",
+   "citedText": "# Tommy Nilsson – Öppna Din Dörr\nTommy Nilsson - Öppna Din Dörr album cover\n\n- **Label:**: Alpha Records – ONECDS 149\n- **Format:**: CD, Single\n- **Co..."
+  }
+ ]
+}
