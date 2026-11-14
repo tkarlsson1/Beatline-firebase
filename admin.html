@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.069</title>
+    <title>Notestream Admin v0.070</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -509,10 +509,84 @@
                     modal.style.display = "none";
                 };
 
+                // How the origin of a year from resolveSongYear is described in the row below a song
+                const YEAR_SOURCE_LABELS = {
+                    spotify: "Spotifys år stämmer",
+                    web: "Webbsökning",
+                    opus: "Opus och webbsökningen är överens"
+                };
+
+                // The explanation and the address come from Claude and from web pages, so they are
+                // escaped, and an address only becomes a link when it is a plain http(s) address.
+                const yearSourceLink = (url, title) => /^https?:\/\//i.test(url || "")
+                    ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">${escapeHtml(title || url)}</a>`
+                    : "";
+
                 for (const [trackId, track] of Object.entries(songsObj)) {
                     const tr = document.createElement("tr");
                     const googleQuery = encodeURIComponent(`${track.artist} ${track.title} release year`);
-                    
+
+                    // A second row under the song, shown when AI-Sök has an answer
+                    const infoTr = document.createElement("tr");
+                    infoTr.style.display = "none";
+                    const infoCell = document.createElement("td");
+                    infoCell.colSpan = 4;
+                    infoCell.style.cssText = "padding: 4px 12px 14px; font-size: 13px; color: var(--text-muted); border-top: none;";
+                    infoTr.appendChild(infoCell);
+
+                    // The latest accepted answer from resolveSongYear for this song, until it is saved
+                    let pendingResult = null;
+
+                    const showYearInfo = (result) => {
+                        const album = `${escapeHtml(result.albumName || "okänt album")}, ${escapeHtml(result.albumType || "okänd typ")}`;
+                        let html;
+                        if (result.status === "ok") {
+                            html = `<strong>${escapeHtml(YEAR_SOURCE_LABELS[result.source] || result.source)}:</strong> ${escapeHtml(result.explanation || "")}`;
+                            if (result.source !== "spotify") html += ` (Spotify: ${escapeHtml(result.spotifyYear)}, ${album})`;
+                            const link = yearSourceLink(result.sourceUrl, result.sourceTitle);
+                            if (link) html += ` · Källa: ${link}`;
+                        } else {
+                            const parts = [`Spotify: ${escapeHtml(result.spotifyYear)} (${album})`];
+                            if (result.memory) parts.push(`Opus ur minnet: ${escapeHtml(result.memory.year)} (${escapeHtml(result.memory.confidence)})`);
+                            if (result.web) {
+                                let webPart = `Webbsökning: ${escapeHtml(result.web.year)} (stöd: ${escapeHtml(result.web.support)})`;
+                                if (result.web.explanation) webPart += ` – ${escapeHtml(result.web.explanation)}`;
+                                const link = result.web.sourceVerified ? yearSourceLink(result.web.sourceUrl, null) : "";
+                                if (link) webPart += ` ${link}`;
+                                parts.push(webPart);
+                            }
+                            html = `<strong>Behöver granskas.</strong> ${parts.join(" · ")}`;
+                        }
+                        infoCell.innerHTML = html;
+                        infoTr.style.display = "";
+                    };
+
+                    // The cache record for this song. If the year in the field is still the one the
+                    // review gave, its source and explanation are saved with it. A year typed by hand
+                    // is saved as manual, without them.
+                    const buildVerifiedRecord = (year) => {
+                        const record = {
+                            title: track.title,
+                            artist: track.artist,
+                            year: year,
+                            manuallyVerified: true,
+                            sourceList: playlistName,
+                            source: "manual",
+                            checkedAt: Date.now()
+                        };
+                        if (pendingResult && String(pendingResult.year) === String(year)) {
+                            record.source = pendingResult.source;
+                            record.explanation = pendingResult.explanation || null;
+                            record.sourceUrl = pendingResult.sourceUrl || null;
+                            record.sourceTitle = pendingResult.sourceTitle || null;
+                            record.spotifyYear = pendingResult.spotifyYear;
+                            record.albumName = pendingResult.albumName || null;
+                            record.albumType = pendingResult.albumType || null;
+                            record.releaseDate = pendingResult.releaseDate || null;
+                        }
+                        return record;
+                    };
+
                     tr.innerHTML = `
                         <td style="font-weight: 500;">${track.title}</td>
                         <td style="color: var(--text-muted);">${track.artist}</td>
@@ -544,13 +618,7 @@
                             // Spara i standardList
                             await set(ref(db, `standardLists/${playlistName}/songs/${trackId}/year`), newYear);
                             // Spara i cache!
-                            await set(ref(db, `verifiedTracks/${trackId}`), {
-                                title: track.title,
-                                artist: track.artist,
-                                year: newYear,
-                                manuallyVerified: true,
-                                sourceList: playlistName
-                            });
+                            await set(ref(db, `verifiedTracks/${trackId}`), buildVerifiedRecord(newYear));
                             // Ta ev bort flaggningar (om det finns)
                             await set(ref(db, `flaggedTracks/${trackId}`), null);
                             
@@ -572,35 +640,43 @@
                             try {
                                 await set(ref(db, `standardLists/${playlistName}/songs/${trackId}`), null);
                                 tr.remove();
+                                infoTr.remove();
                             } catch (err) {
                                 alert("Kunde inte ta bort låten: " + err);
                             }
                         }
                     });
 
-                    // AI Scan funktion
+                    // AI-Sök: Spotify's year reviewed by Claude, with a web search when the year changes.
+                    // The server reads the track from Spotify itself, so only the id is sent.
                     tr.querySelector(".ai-scan-btn").addEventListener("click", async (e) => {
                         const btn = e.target;
                         btn.disabled = true;
                         btn.textContent = "Söker...";
                         try {
-                            const getSongYearsAiBatch = httpsCallable(functions, 'getSongYearsAiBatch');
-                            const payload = {
-                                songs: [{ id: trackId, title: track.title, artist: track.artist }]
-                            };
-                            const result = await getSongYearsAiBatch(payload);
-                            
-                            if (result && result.data && result.data.results && result.data.results.length > 0) {
-                                const aiResult = result.data.results[0];
-                                if (aiResult.year !== "UNKNOWN") {
-                                    input.value = aiResult.year;
-                                    saveBtn.style.display = "inline-block"; // Trigger save button
-                                    btn.textContent = "AI Hittade!";
-                                    btn.style.background = "var(--success)";
-                                } else {
-                                    btn.textContent = "Kunde ej hitta";
-                                    btn.style.background = "var(--danger)";
-                                }
+                            // A web search can take a while, so the default limit of 70 s is raised
+                            const resolveSongYear = httpsCallable(functions, 'resolveSongYear', { timeout: 300000 });
+                            const response = await resolveSongYear({ trackIds: [trackId] });
+                            const result = response && response.data && Array.isArray(response.data.results)
+                                ? response.data.results[0]
+                                : null;
+
+                            if (result && result.status === "ok") {
+                                pendingResult = result;
+                                input.value = result.year;
+                                saveBtn.style.display = "inline-block"; // Trigger save button
+                                showYearInfo(result);
+                                btn.textContent = "AI Hittade!";
+                                btn.style.background = "var(--success)";
+                            } else if (result && result.status === "needsReview") {
+                                // No year is suggested: the field keeps its value and the answers are shown
+                                pendingResult = null;
+                                showYearInfo(result);
+                                btn.textContent = "Behöver granskas";
+                                btn.style.background = "var(--warning)";
+                            } else if (result && (result.status === "notFound" || result.status === "noSpotifyYear")) {
+                                btn.textContent = "Kunde ej hitta";
+                                btn.style.background = "var(--danger)";
                             } else {
                                 btn.textContent = "Fel!";
                             }
@@ -616,11 +692,12 @@
                     });
 
                     tbody.appendChild(tr);
+                    tbody.appendChild(infoTr);
                 }
 
                 modal.style.display = "block";
             }
-            
+
             function loadUsers() {
                 const tbody = document.getElementById("usersTableBody");
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Laddar användare...</td></tr>';

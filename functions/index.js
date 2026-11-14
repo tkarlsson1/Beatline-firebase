@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const Anthropic = require("@anthropic-ai/sdk");
 const { MUSIC_YEAR_SINGLE_PROMPT, MUSIC_YEAR_BATCH_PROMPT } = require("./prompts");
+const yearReview = require("./year-review");
 
 // Test-RTDB (NOTESTREAM): inte live
 admin.initializeApp({
@@ -21,6 +22,18 @@ const MAX_ID_LENGTH = 100;
 function requireAuth(context) {
   if (!context.auth) {
     throw new functions.https.HttpsError("unauthenticated", "Sign-in required.");
+  }
+}
+
+// The admin account: the same uid that database.rules.json gives write access.
+const ADMIN_UID = "rtEO2DAFwfM4KdujZrFblspbwpu1";
+
+// resolveSongYear can run a web search for every song, which costs about ten times more than the
+// older AI functions, so only the admin may call it.
+function requireAdmin(context) {
+  requireAuth(context);
+  if (context.auth.uid !== ADMIN_UID) {
+    throw new functions.https.HttpsError("permission-denied", "Admin only.");
   }
 }
 
@@ -250,13 +263,13 @@ exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeout
   }
 });
 
-/**
- * Callable: getSpotifyToken
- * Hämtar Spotify access token via Client Credentials flow.
- */
-exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (data, context) => {
-  requireAuth(context);
+// ─── Spotify ─────────────────────────────────────────────────────────────────
 
+/**
+ * Asks Spotify for an app token (Client Credentials flow).
+ * Returns { access_token, expires_in }. Throws an HttpsError when it fails.
+ */
+async function requestSpotifyAppToken() {
   const clientId = process.env.SPOTIFY_CLIENT_ID || functions.config().spotify?.client_id;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET || functions.config().spotify?.client_secret;
 
@@ -281,7 +294,7 @@ exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (d
     if (!response.ok) {
       const errText = await response.text();
       functions.logger.error('Spotify API error:', response.status, errText);
-      throw new functions.https.HttpsError('internal', 'Failed to fetch Spotify token.');
+      throw new Error(`Spotify token request failed with status ${response.status}`);
     }
 
     const json = await response.json();
@@ -293,4 +306,152 @@ exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (d
     functions.logger.error('Error during Spotify token fetch:', error);
     throw new functions.https.HttpsError('internal', 'Error fetching Spotify token.');
   }
+}
+
+// The server's own app token, reused until shortly before it expires
+let cachedSpotifyToken = null;
+
+async function getSpotifyAppToken() {
+  if (cachedSpotifyToken && Date.now() < cachedSpotifyToken.expiresAt) return cachedSpotifyToken.token;
+  const { access_token: token, expires_in: expiresIn } = await requestSpotifyAppToken();
+  cachedSpotifyToken = { token, expiresAt: Date.now() + (expiresIn - 60) * 1000 };
+  return token;
+}
+
+// A Spotify track id is 22 letters and digits. Checked before the id is put into an address.
+const SPOTIFY_TRACK_ID = /^[A-Za-z0-9]{22}$/;
+
+/**
+ * Reads one track from Spotify.
+ * Returns { title, artist, albumName, albumType, releaseDate, spotifyYear }, or null when Spotify
+ * has no track with that id. spotifyYear is null when the album has no release date.
+ */
+async function fetchSpotifyTrack(trackId) {
+  const token = await getSpotifyAppToken();
+  const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  if (response.status === 404 || response.status === 400) return null;
+  // A rejected token is dropped, so the next call asks for a new one
+  if (response.status === 401) cachedSpotifyToken = null;
+  if (!response.ok) throw new Error(`Spotify answered ${response.status} for track ${trackId}`);
+
+  const track = await response.json();
+  const album = track.album || {};
+  const releaseDate = album.release_date || null;
+  const spotifyYear = releaseDate ? parseInt(releaseDate.substring(0, 4), 10) : NaN;
+  return {
+    title: track.name,
+    artist: (track.artists || []).map(artist => artist.name).join(", "),
+    albumName: album.name || null,
+    albumType: album.album_type || null,
+    releaseDate,
+    spotifyYear: Number.isInteger(spotifyYear) ? spotifyYear : null
+  };
+}
+
+/**
+ * Callable: getSpotifyToken
+ * Hämtar Spotify access token via Client Credentials flow.
+ */
+exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (data, context) => {
+  requireAuth(context);
+  return requestSpotifyAppToken();
+});
+
+// ─── Year review: Spotify's year checked by Claude, with a web search when it changes ───
+
+const MAX_TRACKS_PER_RESOLVE = 10;
+const RESOLVE_CONCURRENCY = 3;
+
+// Runs the chain for one track. A failure for one track does not stop the others: it is logged
+// and returned as status "error". A configuration error stops the whole call.
+async function resolveTrack(client, trackId) {
+  try {
+    const track = await fetchSpotifyTrack(trackId);
+    if (!track) return { id: trackId, status: "notFound" };
+    if (track.spotifyYear === null) {
+      return { id: trackId, status: "noSpotifyYear", title: track.title, artist: track.artist };
+    }
+
+    const resolved = await yearReview.resolveSongYear(client, track);
+    const decision = resolved.decision;
+    functions.logger.info(
+      `[resolveSongYear] ${trackId} '${track.title}': Spotify ${track.spotifyYear} -> ${decision.year} (${decision.source}, ${decision.status})`,
+      { usage: resolved.usage, reviewFailure: resolved.reviewFailure, webFailure: resolved.webFailure }
+    );
+
+    return {
+      id: trackId,
+      title: track.title,
+      artist: track.artist,
+      albumName: track.albumName,
+      albumType: track.albumType,
+      releaseDate: track.releaseDate,
+      spotifyYear: track.spotifyYear,
+      year: decision.year,
+      source: decision.source,
+      status: decision.status,
+      reason: decision.reason,
+      explanation: decision.explanation,
+      sourceUrl: decision.sourceUrl,
+      sourceTitle: decision.sourceTitle,
+      // What each step answered, shown when a song needs review
+      memory: resolved.review ? { year: resolved.review.year, confidence: resolved.review.confidence } : null,
+      web: resolved.webReview ? {
+        year: resolved.webReview.year,
+        support: resolved.webReview.support,
+        sourceVerified: resolved.webReview.sourceVerified,
+        sourceUrl: resolved.webReview.sourceUrl,
+        explanation: resolved.webReview.explanation
+      } : null
+    };
+  } catch (error) {
+    if (error instanceof functions.https.HttpsError) throw error;
+    if (error instanceof Anthropic.APIError) {
+      functions.logger.error(`[resolveSongYear] ${trackId}: Anthropic API error ${error.status}:`, error.message);
+    } else {
+      functions.logger.error(`[resolveSongYear] ${trackId}: unexpected error:`, error);
+    }
+    return { id: trackId, status: "error" };
+  }
+}
+
+/**
+ * Callable: resolveSongYear
+ * Finds the release year for tracks: reads each track from Spotify, lets Claude review Spotify's
+ * year, runs a web search when Claude changes it, and decides which year applies.
+ * Nothing is written to the database; the caller decides what to save.
+ *
+ * data:    { trackIds: [Spotify track id] }, at most 10
+ * returns: { results: [{ id, status, ... }] } in the same order as trackIds (duplicates removed).
+ *          status is "ok", "needsReview", "notFound", "noSpotifyYear" or "error".
+ */
+exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
+  requireAdmin(context);
+
+  const { trackIds } = data || {};
+  if (!Array.isArray(trackIds) || trackIds.length === 0 || trackIds.length > MAX_TRACKS_PER_RESOLVE) {
+    throw new functions.https.HttpsError("invalid-argument", `Between 1 and ${MAX_TRACKS_PER_RESOLVE} track ids are required.`);
+  }
+  if (trackIds.some(id => typeof id !== "string" || !SPOTIFY_TRACK_ID.test(id))) {
+    throw new functions.https.HttpsError("invalid-argument", "Every track id must be a Spotify track id.");
+  }
+
+  const uniqueIds = [...new Set(trackIds)];
+  // A web search answer can take a while, so each request gets more time than in the older functions
+  const client = createAnthropicClient(150000);
+
+  const results = new Array(uniqueIds.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < uniqueIds.length) {
+      const index = nextIndex++;
+      results[index] = await resolveTrack(client, uniqueIds[index]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(RESOLVE_CONCURRENCY, uniqueIds.length) }, worker));
+
+  return { results };
 });

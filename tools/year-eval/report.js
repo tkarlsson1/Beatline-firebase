@@ -5,6 +5,8 @@
  * Usage:
  *   node tools/year-eval/report.js                  grade results/baseline
  *   node tools/year-eval/report.js --step web       grade the web step, writes web-resultat.md
+ *   node tools/year-eval/report.js --step final     replay the decision rule (decideYear in functions/year-review.js)
+ *                                                    over the saved answers, writes slutresultat.md
  *   node tools/year-eval/report.js --run <name>     grade another run
  *   node tools/year-eval/report.js --selftest       check the grading itself with made-up answers
  *
@@ -21,6 +23,9 @@ const path = require("path");
 
 const REPO_ROOT = path.join(__dirname, "..", "..");
 const FACIT_FILE = path.join(__dirname, "facit.json");
+
+// The decision rule that the Cloud Function uses, so the replay tests the real one
+const { decideYear } = require(path.join(REPO_ROOT, "functions", "year-review.js"));
 
 // USD per million tokens. Cache writes cost 1.25 x input and cache reads 0.1 x input.
 const PRICES_PER_MTOK = {
@@ -454,6 +459,82 @@ function renderWebMarkdown(summary, graded, runName, facit, errorCount) {
   return lines.join("\n");
 }
 
+// ─── Final outcome: the decision rule replayed over the saved answers ───────
+
+/**
+ * Runs decideYear for every song that has a review row, with the web answer only where the rule
+ * would have run a web search (the review changed the year). Makes no API calls.
+ */
+function replayDecisions(cases, reviewRows, webRows, grossErrorYears) {
+  const reviewById = new Map(reviewRows.map(row => [row.id, row.review]));
+  const webById = new Map(webRows.map(row => [row.id, row.review]));
+  const outcomes = [];
+  for (const evalCase of cases) {
+    if (!reviewById.has(evalCase.id)) continue;
+    const review = reviewById.get(evalCase.id);
+    const needsWeb = !!review && review.changed;
+    // A song that should have had a web search but has no saved web row is left out of the count
+    if (needsWeb && !webById.has(evalCase.id)) {
+      outcomes.push({ evalCase, missingWeb: true });
+      continue;
+    }
+    const decision = decideYear(evalCase.spotifyYear, review, needsWeb ? webById.get(evalCase.id) : null);
+    outcomes.push({
+      evalCase,
+      decision,
+      needsWeb,
+      distance: distanceToFacit(decision.year, evalCase.facitYears),
+      gross: isGrossError(decision.year, evalCase.facitYears, grossErrorYears)
+    });
+  }
+  return outcomes;
+}
+
+function renderFinalMarkdown(outcomes, runName, facit) {
+  const decided = outcomes.filter(outcome => !outcome.missingWeb);
+  const missingWeb = outcomes.length - decided.length;
+  const count = predicate => decided.filter(predicate).length;
+  const gross = decided.filter(outcome => outcome.gross);
+  const needsReview = decided.filter(outcome => outcome.decision.status === "needsReview");
+  const agreed = decided.filter(outcome => outcome.decision.source === "opus");
+
+  const lines = [];
+  lines.push(`# Slutresultat med beslutsregeln – ${runName}`);
+  lines.push("");
+  lines.push(`Beslutsregeln i functions/year-review.js körd mot de sparade svaren för ${decided.length} låtar. Inga nya API-anrop.`);
+  if (missingWeb > 0) lines.push(`${missingWeb} låtar saknar sparat svar från webbsteget och räknas inte.`);
+  lines.push("");
+  lines.push("| Utfall | Låtar |");
+  lines.push("|---|---|");
+  lines.push(`| Spotifys år behålls | ${count(o => o.decision.source === "spotify" && o.decision.status === "ok")} |`);
+  lines.push(`| Sökningens år gäller, med källa | ${count(o => o.decision.source === "web")} |`);
+  lines.push(`| Minnet och sökningen överens trots svagt stöd | ${agreed.length} |`);
+  lines.push(`| Till granskning | ${needsReview.length} |`);
+  lines.push(`| Grova fel (mer än ${facit.grossErrorYears} år från facit) | ${gross.length} |`);
+  lines.push("");
+  lines.push(`- Exakt rätt: ${count(o => o.distance === 0)}`);
+  lines.push(`- Inom ±1 år: ${count(o => o.distance <= 1)}`);
+  lines.push(`- Webbsökningar som regeln kräver: ${count(o => o.needsWeb)} av ${decided.length}`);
+  lines.push("");
+
+  const listed = [...gross, ...needsReview.filter(o => !o.gross), ...agreed.filter(o => !o.gross)];
+  lines.push(`## Grova fel, låtar till granskning och låtar godtagna på samstämmighet (${listed.length})`);
+  lines.push("");
+  if (listed.length > 0) {
+    lines.push("| Artist | Titel | Facit | Spotify | Beslutat år | Källa | Status | Orsak |");
+    lines.push("|---|---|---|---|---|---|---|---|");
+    for (const outcome of listed) {
+      const c = outcome.evalCase;
+      const d = outcome.decision;
+      lines.push(`| ${cell(c.artist)} | ${cell(c.title)} | ${c.facitYears.join("/")} | ${c.spotifyYear} | ${d.year}${outcome.gross ? " GROVT FEL" : ""} | ${d.source} | ${d.status} | ${cell(d.reason || "")} |`);
+    }
+  } else {
+    lines.push("Inga.");
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
 function readJsonLines(file) {
   if (!fs.existsSync(file)) return [];
   return fs.readFileSync(file, "utf8").split("\n").filter(line => line.trim()).map(line => JSON.parse(line));
@@ -541,7 +622,18 @@ function main() {
 
   const stepIndex = argv.indexOf("--step");
   const stepName = stepIndex >= 0 ? argv[stepIndex + 1] : "review";
-  if (stepName !== "review" && stepName !== "web") throw new Error("--step must be review or web.");
+  if (!["review", "web", "final"].includes(stepName)) throw new Error("--step must be review, web or final.");
+
+  if (stepName === "final") {
+    const webRows = readJsonLines(path.join(runDir, "web-results.jsonl"));
+    const outcomes = replayDecisions(facit.cases, rows, webRows, facit.grossErrorYears);
+    const finalMarkdown = renderFinalMarkdown(outcomes, runName, facit);
+    const finalOutputFile = path.join(runDir, "slutresultat.md");
+    fs.writeFileSync(finalOutputFile, finalMarkdown);
+    console.log(finalMarkdown);
+    console.log(`Written to ${path.relative(REPO_ROOT, finalOutputFile)}`);
+    return;
+  }
 
   if (stepName === "web") {
     const webRows = readJsonLines(path.join(runDir, "web-results.jsonl"));

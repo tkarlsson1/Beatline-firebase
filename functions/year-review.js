@@ -8,10 +8,11 @@
  * in Swedish that can be shown in the game, and a confidence level.
  *
  * A second step, verifySongYearOnWeb, looks the year up with a web search and returns it with a
- * source. It is meant for the songs where the first review is not certain.
+ * source. It runs for the songs where the first review changes the year.
  *
- * Not wired into any Cloud Function yet. tools/year-eval/run-eval.js calls both functions to
- * measure them against the answer key before they go live.
+ * decideYear settles which year applies, and resolveSongYear runs the whole chain for one song.
+ * The Cloud Function resolveSongYear in index.js calls it. tools/year-eval measures the steps
+ * against an answer key.
  */
 
 const REVIEW_MODEL = "claude-opus-5-5";
@@ -403,6 +404,85 @@ async function verifySongYearOnWeb(client, song) {
   return { review, failure, meta };
 }
 
+// ─── Decision: which year applies ────────────────────────────────────────────
+
+/**
+ * Decides the year from Spotify's year, the review from memory and the web review.
+ * Pure function: tools/year-eval/report.js replays it over the saved measurement answers.
+ *
+ * review:    the answer from reviewSongYear, or null when there was no usable answer
+ * webReview: the answer from verifySongYearOnWeb, or null when the web step did not run or failed
+ *
+ * Returns { year, source, status, reason, explanation, sourceUrl, sourceTitle }:
+ *   source: "spotify" (Spotify's year stands), "web" (the search's year, with a verified source that
+ *           clearly supports it) or "opus" (memory and search agree, but the source is weak)
+ *   status: "ok", or "needsReview" when the song has to be settled by hand. A song that needs
+ *           review keeps Spotify's year meanwhile; reason says why.
+ */
+function decideYear(spotifyYear, review, webReview) {
+  const keepSpotify = (status, reason, explanation) => ({
+    year: spotifyYear, source: "spotify", status, reason, explanation, sourceUrl: null, sourceTitle: null
+  });
+
+  if (!review) return keepSpotify("needsReview", "no_review", "");
+  if (!review.changed) return keepSpotify("ok", null, review.explanation);
+
+  // The review from memory changed the year. That is never accepted on its own: every gross error
+  // in the measurement was a year changed from memory.
+  if (!webReview) return keepSpotify("needsReview", "no_web_answer", "");
+
+  if (webReview.sourceVerified && webReview.support === "tydligt") {
+    return {
+      year: webReview.year, source: "web", status: "ok", reason: null,
+      explanation: webReview.explanation, sourceUrl: webReview.sourceUrl, sourceTitle: webReview.sourceTitle
+    };
+  }
+
+  if (webReview.year === review.year) {
+    // Two independent answers agree, so the year is accepted although the source is weak.
+    // The address is kept only if it really was one of the search results.
+    return {
+      year: webReview.year, source: "opus", status: "ok", reason: null,
+      explanation: webReview.explanation,
+      sourceUrl: webReview.sourceVerified ? webReview.sourceUrl : null,
+      sourceTitle: webReview.sourceVerified ? webReview.sourceTitle : null
+    };
+  }
+
+  return keepSpotify("needsReview", "weak_support", "");
+}
+
+/**
+ * Runs the whole chain for one song: review from memory, a web search if the year was changed,
+ * and the decision.
+ *
+ * client: an Anthropic client (the caller sets the API key, timeout and retries)
+ * song:   { title, artist, spotifyYear, albumName?, albumType?, releaseDate? }
+ *
+ * Returns { decision, review, reviewFailure, webReview, webFailure, usage }:
+ *   decision: the result of decideYear
+ *   usage:    { review, web } with the token usage of each step (web is null when it did not run)
+ * API errors are thrown to the caller.
+ */
+async function resolveSongYear(client, song) {
+  const spotifyYear = parseInt(song.spotifyYear, 10);
+  if (!Number.isInteger(spotifyYear)) {
+    throw new Error("resolveSongYear needs a numeric spotifyYear.");
+  }
+
+  const memory = await reviewSongYear(client, song);
+  const web = memory.review && memory.review.changed ? await verifySongYearOnWeb(client, song) : null;
+
+  return {
+    decision: decideYear(spotifyYear, memory.review, web ? web.review : null),
+    review: memory.review,
+    reviewFailure: memory.failure,
+    webReview: web ? web.review : null,
+    webFailure: web ? web.failure : null,
+    usage: { review: memory.meta.usage, web: web ? web.meta.usage : null }
+  };
+}
+
 module.exports = {
   REVIEW_MODEL,
   REVIEW_EFFORT,
@@ -416,5 +496,7 @@ module.exports = {
   normalizeUrl,
   parseWebAnswer,
   buildWebReview,
-  verifySongYearOnWeb
+  verifySongYearOnWeb,
+  decideYear,
+  resolveSongYear
 };

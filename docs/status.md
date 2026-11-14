@@ -3,17 +3,18 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.840 |
-| admin.html | 0.069 |
+| index.html (spelet) | 0.841 |
+| admin.html | 0.070 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v44 |
+| service-worker | v45 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
-| functions/prompts.js | Delad prompt, v1 |
+| functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
+| functions/year-review.js | Ny årtalsgranskning: Opus ur minnet, webbsökning när året ändras, beslutsregel |
 
 ---
 
@@ -52,6 +53,8 @@
 | 2026-11-08 | Functions: oanvända `hostStart` borttagen ur koden och raderad i Firebase | 0.838 |
 | 2026-11-08 | Admin, rapporter: papperskorgen på en skannad rad raderar nu rapporten (laddade tidigare om hela listan, raderade inget och kastade alla skanningar). Skannade rader behåller kolumnen "Antal". "Skanna alla" hoppar över rader som raderats under skanningen | 0.068 |
 | 2026-11-08 | AI bytt från gpt-5.5 (OpenAI) till Claude Opus 5.5 i `getSongYearAi` och `getSongYearsAiBatch`: officiella SDK:n `@anthropic-ai/sdk`, JSON-svar enligt schema, effort medium, server-side fallback vid nekande. Nyckeln i Secret Manager (`ANTHROPIC_API_KEY`), kostnaden dras från Ultra-krediterna. Samma prompt och samma svarsformat mot klienterna | 0.840 / Functions |
+| 2026-11-14 | Mätning av ny årtalsgranskning i `tools/year-eval` mot ett facit på 186 låtar. Spotifys år har grovt fel (mer än 2 år) på 34, Opus ur minnet med Spotifys albumdata lämnar 6, och med webbsökning på de år Opus ändrar blir det 0. Resultat i `tools/year-eval/results/baseline/` | – |
+| 2026-11-14 | Ny funktion `resolveSongYear` (bara admin): servern hämtar låten från Spotify, Opus granskar Spotifys år, webbsökning körs när året ändras, och en beslutsregel avgör året. Returnerar år, källa, förklaring och länk men skriver inget i databasen. "AI-Sök" i spellistedetaljer använder den, visar förklaring och källa under låten och sparar härkomsten i `verifiedTracks` vid Spara (`source`, `explanation`, `sourceUrl`, `sourceTitle`, `spotifyYear`, `albumName`, `albumType`, `releaseDate`, `checkedAt`). `getSpotifyToken` delar tokenhämtningen med den nya funktionen. Övriga flöden använder fortfarande de gamla funktionerna | 0.841 / 0.070 / Functions |
 
 ---
 
@@ -99,7 +102,7 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | 39 | Service workern (stale-while-revalidate) kan servera gammal JS: `spotify.js` ändrades i 0.832 och 0.833 utan att `?v=` höjdes, och `lobby.js` och `styles.css` saknar `?v=` | Medel | Öppen (ej verifierad) |
 | 40 | "Städa databasen": filtret ">5 år nyare än Spotify" slås aldrig på, eftersom `fixedBy` alltid är "AI" (admin.html) | Medel | Öppen |
 | 41 | "Städa databasen": avbockade rader hoppas inte över utan låses med Spotifys år och `manuallyVerified: true`. Fallet där AI säger mer än 5 år tidigare än Spotify (nyutgåvor, samlingsskivor) är avbockat från början – Spara utan genomgång låser Spotifys år permanent (admin.html) | Medel | Öppen |
-| 42 | "AI-Sök" i spellistedetaljer: funktionen svarar `null`, men koden letar efter "UNKNOWN", så "AI Hittade!" visas med tomt fält. Spara skriver "" och låten försvinner ur spelen (admin.html) | Medel | Öppen |
+| 42 | "AI-Sök" i spellistedetaljer: funktionen svarar `null`, men koden letar efter "UNKNOWN", så "AI Hittade!" visas med tomt fält. Spara skriver "" och låten försvinner ur spelen (admin.html) | Medel | Åtgärdad (0.070) – "AI-Sök" använder `resolveSongYear`, som alltid svarar med ett år eller en status |
 | 43 | Import i admin: misslyckas en AI-batch visas inte granskningen av osäkra låtar från de andra batcharna. AI-svar som inte används (null, mer än 1 år senare än Spotify) försvinner tyst och räknas inte | Medel | Öppen |
 | 44 | manifest.json har `"orientation": "portrait-primary"` – en installerad hemskärmsapp bör låsas i stående läge, medan spelet kräver liggande | Låg | Öppen (ej testad på enhet) |
 
