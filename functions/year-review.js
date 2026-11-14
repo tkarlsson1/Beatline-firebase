@@ -197,6 +197,17 @@ Vad stöd betyder:
 
 Källan måste vara en adress du fick som sökträff. En påhittad adress upptäcks och förkastas, och då går låten till manuell granskning. Det är bättre att svara "saknas" än att ange en källa som inte stöder året.`;
 
+// Some search results carry the page title percent-encoded ("Kung f%C3%B6r en dag"). The title is
+// shown to people, so it is decoded. A title that cannot be decoded is kept as it is.
+function decodeTitle(title) {
+  if (typeof title !== "string" || !/%[0-9A-Fa-f]{2}/.test(title)) return title;
+  try {
+    return decodeURIComponent(title);
+  } catch (e) {
+    return title;
+  }
+}
+
 // Makes two spellings of the same address compare equal: no scheme, no "www.", no fragment,
 // no trailing slash, and percent-encoded letters decoded (Wikipedia links come in both forms).
 function normalizeUrl(url) {
@@ -371,7 +382,7 @@ async function verifySongYearOnWeb(client, song) {
       // A failed search has an error object as content instead of a list of results
       if (Array.isArray(block.content)) {
         for (const result of block.content) {
-          searchResults.push({ url: result.url, title: result.title, pageAge: result.page_age || null });
+          searchResults.push({ url: result.url, title: decodeTitle(result.title), pageAge: result.page_age || null });
         }
       } else if (block.content && block.content.error_code) {
         searchErrors.push(block.content.error_code);
@@ -379,7 +390,7 @@ async function verifySongYearOnWeb(client, song) {
     } else if (block.type === "text") {
       rawText += block.text;
       for (const citation of block.citations || []) {
-        if (citation.url) citations.push({ url: citation.url, title: citation.title || null, citedText: citation.cited_text || null });
+        if (citation.url) citations.push({ url: citation.url, title: decodeTitle(citation.title) || null, citedText: citation.cited_text || null });
       }
     }
   }
@@ -493,6 +504,7 @@ module.exports = {
   buildYearReviewInput,
   toValidReview,
   reviewSongYear,
+  decodeTitle,
   normalizeUrl,
   parseWebAnswer,
   buildWebReview,
