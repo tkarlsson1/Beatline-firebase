@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.071</title>
+    <title>Notestream Admin v0.072</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -357,6 +357,91 @@
                 .replace(/'/g, "&#39;");
         }
 
+        // How the origin of a year from resolveSongYear is described
+        const YEAR_SOURCE_LABELS = {
+            spotify: "Spotifys år stämmer",
+            web: "Webbsökning",
+            opus: "Opus och webbsökningen är överens"
+        };
+
+        // The explanation and the address come from Claude and from web pages, so they are
+        // escaped, and an address only becomes a link when it is a plain http(s) address.
+        const yearSourceLink = (url, title) => /^https?:\/\//i.test(url || "")
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">${escapeHtml(title || url)}</a>`
+            : "";
+
+        // <year-review-summary>
+        /**
+         * Sorts the stored year reviews by what would happen to each song in the standard lists.
+         * Pure function: it only reads its arguments.
+         *
+         * lists:    standardLists from the database
+         * verified: verifiedTracks from the database, which holds the year the game uses
+         * reviews:  yearReviews from the database, written by resolveSongYear
+         *
+         * Returns counts and lists:
+         *   pending        ids of songs that have no review yet, in list order
+         *   unchanged      number of songs where the review gives the year the game already has
+         *   lockedSame     the same, for songs locked as manually verified
+         *   changes        songs whose year would change
+         *   lockedDiffers  locked songs where the review gives another year (never changed automatically)
+         *   needsReview    songs the review could not settle
+         *   notFound       songs Spotify does not know, or that have no release date
+         */
+        function classifyYearReviews(lists, verified, reviews) {
+            const songs = new Map();
+            for (const [listName, list] of Object.entries(lists || {})) {
+                for (const [trackId, song] of Object.entries((list && list.songs) || {})) {
+                    if (!song) continue;
+                    if (!songs.has(trackId)) {
+                        songs.set(trackId, { id: trackId, title: song.title, artist: song.artist, listYear: song.year, lists: [] });
+                    }
+                    songs.get(trackId).lists.push(listName);
+                }
+            }
+
+            const summary = {
+                total: songs.size, pending: [], unchanged: 0, lockedSame: 0,
+                changes: [], lockedDiffers: [], needsReview: [], notFound: []
+            };
+            for (const song of songs.values()) {
+                const review = reviews ? reviews[song.id] : null;
+                if (!review) {
+                    summary.pending.push(song.id);
+                    continue;
+                }
+                const cached = verified ? verified[song.id] : null;
+                // The game takes the cache's year before the list's year, so that is the current year
+                const currentYear = parseInt(cached && cached.year ? cached.year : song.listYear, 10);
+                const locked = !!(cached && cached.manuallyVerified === true);
+                const entry = { ...song, currentYear, locked, review };
+
+                if (review.status === "notFound" || review.status === "noSpotifyYear") {
+                    summary.notFound.push(entry);
+                } else if (review.status === "needsReview") {
+                    summary.needsReview.push(entry);
+                } else if (review.status === "ok") {
+                    if (review.year === currentYear) {
+                        if (locked) summary.lockedSame++; else summary.unchanged++;
+                    } else if (locked) {
+                        summary.lockedDiffers.push(entry);
+                    } else {
+                        summary.changes.push(entry);
+                    }
+                } else {
+                    // A status this page does not know is treated as not reviewed
+                    summary.pending.push(song.id);
+                }
+            }
+
+            const largestChangeFirst = (a, b) =>
+                Math.abs(b.review.year - b.currentYear) - Math.abs(a.review.year - a.currentYear);
+            summary.changes.sort(largestChangeFirst);
+            summary.lockedDiffers.sort(largestChangeFirst);
+            return summary;
+        }
+        // </year-review-summary>
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("adminLoginForm").style.display = "block";
             document.getElementById("adminContent").style.display = "none";
@@ -508,19 +593,6 @@
                 document.getElementById("closeDetailsModal").onclick = () => {
                     modal.style.display = "none";
                 };
-
-                // How the origin of a year from resolveSongYear is described in the row below a song
-                const YEAR_SOURCE_LABELS = {
-                    spotify: "Spotifys år stämmer",
-                    web: "Webbsökning",
-                    opus: "Opus och webbsökningen är överens"
-                };
-
-                // The explanation and the address come from Claude and from web pages, so they are
-                // escaped, and an address only becomes a link when it is a plain http(s) address.
-                const yearSourceLink = (url, title) => /^https?:\/\//i.test(url || "")
-                    ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: var(--primary);">${escapeHtml(title || url)}</a>`
-                    : "";
 
                 for (const [trackId, track] of Object.entries(songsObj)) {
                     const tr = document.createElement("tr");
@@ -1264,6 +1336,190 @@
                     return null;
                 }
             }
+
+            // --- YEAR REVIEW OF ALL SONGS ---
+            // Runs resolveSongYear over the songs in the standard lists. The server stores every
+            // result in yearReviews, which the game does not read, so nothing here changes the game.
+            const REVIEW_BATCH_SIZE = 10;      // resolveSongYear accepts at most 10 ids per call
+            const REVIEW_PARALLEL_CALLS = 2;
+            let yearReviewRunning = false;
+            let yearReviewStopRequested = false;
+
+            const yearReviewCountsEl = document.getElementById("yearReviewCounts");
+            const yearReviewStatusEl = document.getElementById("yearReviewStatus");
+            const yearReviewSummaryEl = document.getElementById("yearReviewSummary");
+            const yearReviewStartBtn = document.getElementById("yearReviewStartBtn");
+            const yearReviewStopBtn = document.getElementById("yearReviewStopBtn");
+            const yearReviewSummaryBtn = document.getElementById("yearReviewSummaryBtn");
+
+            async function loadYearReviewSummary() {
+                const [listsSnap, verifiedSnap, reviewsSnap] = await Promise.all([
+                    get(ref(db, "standardLists")),
+                    get(ref(db, "verifiedTracks")),
+                    get(ref(db, "yearReviews"))
+                ]);
+                return classifyYearReviews(listsSnap.val(), verifiedSnap.val(), reviewsSnap.val());
+            }
+
+            // One table of songs. columns: [{ title, cell: entry => html }]. Every value is escaped by the cell functions.
+            function yearReviewTable(heading, entries, columns) {
+                if (entries.length === 0) return "";
+                const head = columns.map(column => `<th>${column.title}</th>`).join("");
+                const rows = entries.map(entry => `<tr>${columns.map(column => `<td>${column.cell(entry)}</td>`).join("")}</tr>`).join("");
+                return `<h4 style="margin: 20px 0 8px;">${heading} (${entries.length})</h4>
+                    <div style="overflow: auto; max-height: 420px;"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
+            }
+
+            function renderYearReviewSummary(summary) {
+                const reviewed = summary.total - summary.pending.length;
+                yearReviewCountsEl.textContent = `${summary.total} låtar i standardlistorna · ${reviewed} granskade · ${summary.pending.length} kvar`;
+
+                const songColumns = [
+                    { title: "Artist", cell: entry => escapeHtml(entry.artist) },
+                    { title: "Titel", cell: entry => escapeHtml(entry.title) }
+                ];
+                const explanationCell = entry => {
+                    const review = entry.review;
+                    const link = yearSourceLink(review.sourceUrl, review.sourceTitle);
+                    return `<strong>${escapeHtml(YEAR_SOURCE_LABELS[review.source] || review.source)}:</strong> ${escapeHtml(review.explanation || "")}${link ? ` · ${link}` : ""}`;
+                };
+                const changeColumns = [
+                    ...songColumns,
+                    { title: "Nu", cell: entry => escapeHtml(entry.currentYear) },
+                    { title: "Nytt", cell: entry => `<strong>${escapeHtml(entry.review.year)}</strong>` },
+                    { title: "Källa och förklaring", cell: explanationCell }
+                ];
+                const reviewColumns = [
+                    ...songColumns,
+                    { title: "Nu", cell: entry => escapeHtml(entry.currentYear) + (entry.locked ? " (låst)" : "") },
+                    { title: "Spotify", cell: entry => `${escapeHtml(entry.review.spotifyYear)} (${escapeHtml(entry.review.albumName || "okänt album")})` },
+                    { title: "Opus ur minnet", cell: entry => entry.review.memory ? `${escapeHtml(entry.review.memory.year)} (${escapeHtml(entry.review.memory.confidence)})` : "inget svar" },
+                    { title: "Webbsökning", cell: entry => {
+                        const web = entry.review.web;
+                        if (!web) return "inget svar";
+                        const link = web.sourceVerified ? yearSourceLink(web.sourceUrl, null) : "";
+                        return `${escapeHtml(web.year)} (stöd: ${escapeHtml(web.support)}) ${escapeHtml(web.explanation || "")} ${link}`;
+                    } }
+                ];
+                const notFoundColumns = [
+                    ...songColumns,
+                    { title: "Nu", cell: entry => escapeHtml(entry.currentYear) },
+                    { title: "Orsak", cell: entry => entry.review.status === "noSpotifyYear" ? "Spotify har inget utgivningsdatum för albumet" : "Spotify känner inte igen låtens id" }
+                ];
+
+                yearReviewSummaryEl.innerHTML = `
+                    <ul style="margin: 12px 0 0 20px; line-height: 1.7;">
+                        <li>Oförändrat år: <strong>${summary.unchanged}</strong></li>
+                        <li>Året ändras: <strong>${summary.changes.length}</strong></li>
+                        <li>Behöver granskas: <strong>${summary.needsReview.length}</strong></li>
+                        <li>Låsta av dig, samma år som granskningen: <strong>${summary.lockedSame}</strong></li>
+                        <li>Låsta av dig, granskningen säger ett annat år: <strong>${summary.lockedDiffers.length}</strong></li>
+                        <li>Hittades inte hos Spotify: <strong>${summary.notFound.length}</strong></li>
+                    </ul>
+                    ${yearReviewTable("Året ändras", summary.changes, changeColumns)}
+                    ${yearReviewTable("Behöver granskas", summary.needsReview, reviewColumns)}
+                    ${yearReviewTable("Låsta av dig där granskningen säger ett annat år", summary.lockedDiffers, changeColumns)}
+                    ${yearReviewTable("Hittades inte hos Spotify", summary.notFound, notFoundColumns)}
+                `;
+            }
+
+            yearReviewSummaryBtn.addEventListener("click", async () => {
+                yearReviewSummaryBtn.disabled = true;
+                try {
+                    if (!yearReviewRunning) yearReviewStatusEl.textContent = "Läser läget...";
+                    renderYearReviewSummary(await loadYearReviewSummary());
+                    if (!yearReviewRunning) yearReviewStatusEl.textContent = "";
+                } catch (err) {
+                    console.error("[Årtalsgranskning] Kunde inte läsa läget:", err);
+                    yearReviewStatusEl.textContent = "Kunde inte läsa läget: " + err.message;
+                }
+                yearReviewSummaryBtn.disabled = false;
+            });
+
+            yearReviewStopBtn.addEventListener("click", () => {
+                yearReviewStopRequested = true;
+                yearReviewStopBtn.disabled = true;
+                yearReviewStatusEl.textContent = "Stoppar när de pågående anropen är klara...";
+            });
+
+            yearReviewStartBtn.addEventListener("click", async () => {
+                if (yearReviewRunning) return;
+                const limit = parseInt(document.getElementById("yearReviewLimit").value, 10);
+                if (!Number.isInteger(limit) || limit < 1) {
+                    yearReviewStatusEl.textContent = "Ange hur många låtar som ska granskas.";
+                    return;
+                }
+
+                yearReviewRunning = true;
+                yearReviewStopRequested = false;
+                yearReviewStartBtn.disabled = true;
+                yearReviewStopBtn.disabled = false;
+
+                try {
+                    yearReviewStatusEl.textContent = "Läser läget...";
+                    const before = await loadYearReviewSummary();
+                    renderYearReviewSummary(before);
+
+                    const todo = before.pending.slice(0, limit);
+                    if (todo.length === 0) {
+                        yearReviewStatusEl.textContent = "Alla låtar är redan granskade.";
+                        return;
+                    }
+
+                    const batches = [];
+                    for (let i = 0; i < todo.length; i += REVIEW_BATCH_SIZE) batches.push(todo.slice(i, i + REVIEW_BATCH_SIZE));
+
+                    // A batch with web searches can take a few minutes, so the default limit of 70 s is raised
+                    const resolveSongYear = httpsCallable(functions, 'resolveSongYear', { timeout: 540000 });
+                    let done = 0;
+                    let failed = 0;
+                    let nextBatch = 0;
+                    const showProgress = () => {
+                        yearReviewStatusEl.textContent = `Granskar... ${done + failed} / ${todo.length}` + (failed > 0 ? ` (${failed} misslyckade)` : "");
+                    };
+
+                    // One call to the server. A call that fails is tried once more; songs that still
+                    // fail are left without a review, so the next run takes them again.
+                    const runBatch = async (ids) => {
+                        for (let attempt = 1; attempt <= 2; attempt++) {
+                            try {
+                                const response = await resolveSongYear({ trackIds: ids, store: true });
+                                const results = response && response.data && Array.isArray(response.data.results) ? response.data.results : null;
+                                if (!results) throw new Error("Svaret saknar resultat.");
+                                const failedHere = results.filter(result => result.status === "error").length;
+                                failed += failedHere;
+                                done += ids.length - failedHere;
+                                return;
+                            } catch (err) {
+                                console.error(`[Årtalsgranskning] Anrop misslyckades (försök ${attempt}/2):`, err);
+                                if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 5000));
+                            }
+                        }
+                        failed += ids.length;
+                    };
+
+                    const worker = async () => {
+                        while (nextBatch < batches.length && !yearReviewStopRequested) {
+                            const ids = batches[nextBatch++];
+                            await runBatch(ids);
+                            showProgress();
+                        }
+                    };
+                    showProgress();
+                    await Promise.all(Array.from({ length: Math.min(REVIEW_PARALLEL_CALLS, batches.length) }, worker));
+
+                    const stopped = yearReviewStopRequested && nextBatch < batches.length;
+                    renderYearReviewSummary(await loadYearReviewSummary());
+                    yearReviewStatusEl.textContent = `${stopped ? "Stoppad" : "Klar"}: ${done} låtar granskade` + (failed > 0 ? `, ${failed} misslyckades och körs om nästa gång.` : ".");
+                } catch (err) {
+                    console.error("[Årtalsgranskning] Körningen avbröts:", err);
+                    yearReviewStatusEl.textContent = "Körningen avbröts: " + err.message;
+                } finally {
+                    yearReviewRunning = false;
+                    yearReviewStartBtn.disabled = false;
+                    yearReviewStopBtn.disabled = true;
+                }
+            });
 
             // --- DATABAS-STÄDNING ---
             document.getElementById("cleanDatabaseBtn").addEventListener("click", async () => {
@@ -2034,6 +2290,25 @@
                             <tbody id="cacheSearchTableBody"></tbody>
                         </table>
                     </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Granska alla årtal</h3>
+                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 12px;">
+                        Går igenom låtarna i standardlistorna: Opus granskar Spotifys år, och en webbsökning görs när året ändras.
+                        Resultaten sparas vid sidan av och <strong>ändrar ingenting i spelet</strong>. Körningen går att stoppa och fortsätta.
+                        En låt kostar ungefär 4 cent i snitt.
+                    </p>
+                    <p id="yearReviewCounts" style="font-weight: 600; margin-bottom: 12px;">Tryck på "Visa sammanställning" för att läsa läget.</p>
+                    <div class="flex-row" style="margin-bottom: 12px; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <label for="yearReviewLimit" style="white-space: nowrap;">Antal låtar den här gången:</label>
+                        <input type="number" id="yearReviewLimit" value="50" min="1" style="width: 100px;">
+                        <button id="yearReviewStartBtn" class="btn-primary" style="white-space: nowrap;">Starta / Fortsätt</button>
+                        <button id="yearReviewStopBtn" class="btn-danger" style="white-space: nowrap;" disabled>Stoppa</button>
+                        <button id="yearReviewSummaryBtn" class="btn-info" style="white-space: nowrap;">Visa sammanställning</button>
+                    </div>
+                    <p id="yearReviewStatus" style="font-weight: 600; color: var(--primary);"></p>
+                    <div id="yearReviewSummary"></div>
                 </div>
 
                 <div class="card">

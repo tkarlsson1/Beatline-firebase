@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.842 |
-| admin.html | 0.071 |
+| index.html (spelet) | 0.843 |
+| admin.html | 0.072 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v46 |
+| service-worker | v47 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
@@ -56,6 +56,7 @@
 | 2026-11-14 | Mätning av ny årtalsgranskning i `tools/year-eval` mot ett facit på 186 låtar. Spotifys år har grovt fel (mer än 2 år) på 34, Opus ur minnet med Spotifys albumdata lämnar 6, och med webbsökning på de år Opus ändrar blir det 0. Resultat i `tools/year-eval/results/baseline/` | – |
 | 2026-11-14 | Ny funktion `resolveSongYear` (bara admin): servern hämtar låten från Spotify, Opus granskar Spotifys år, webbsökning körs när året ändras, och en beslutsregel avgör året. Returnerar år, källa, förklaring och länk men skriver inget i databasen. "AI-Sök" i spellistedetaljer använder den, visar förklaring och källa under låten och sparar härkomsten i `verifiedTracks` vid Spara (`source`, `explanation`, `sourceUrl`, `sourceTitle`, `spotifyYear`, `albumName`, `albumType`, `releaseDate`, `checkedAt`). `getSpotifyToken` delar tokenhämtningen med den nya funktionen. Övriga flöden använder fortfarande de gamla funktionerna | 0.841 / 0.070 / Functions |
 | 2026-11-14 | `resolveSongYear`: källsidans titel avkodas, så länken visar "Kung för en dag" och inte "Kung f%C3%B6r en dag". Hittat vid test live: 37 av 852 sökträffar i mätningen hade kodad titel, främst Wikipedia-sidor med å, ä, ö eller apostrof | 0.842 / 0.071 / Functions |
+| 2026-11-14 | Admin, Databas: nytt kort "Granska alla årtal". Kör `resolveSongYear` över låtarna i standardlistorna, 10 per anrop och två anrop samtidigt, med valfritt antal per körning. Servern sparar varje resultat i den nya noden `yearReviews` (bara admin får läsa och skriva), så körningen går att stoppa och fortsätta. Sammanställningen visar oförändrade, ändrade, till granskning, låsta där granskningen säger annat, och ej hittade hos Spotify. Inget skrivs till `verifiedTracks` eller `standardLists` – verkställandet är ett eget steg | 0.843 / 0.072 / Functions / Regler |
 
 ---
 

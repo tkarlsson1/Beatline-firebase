@@ -422,33 +422,57 @@ async function resolveTrack(client, trackId) {
  * Callable: resolveSongYear
  * Finds the release year for tracks: reads each track from Spotify, lets Claude review Spotify's
  * year, runs a web search when Claude changes it, and decides which year applies.
- * Nothing is written to the database; the caller decides what to save.
  *
- * data:    { trackIds: [Spotify track id] }, at most 10
+ * Without store, nothing is written to the database and the caller decides what to save. With
+ * store: true, each result is written to yearReviews/<track id> as soon as the track is done, so
+ * a long run over many tracks keeps its results if the browser tab is closed. yearReviews is
+ * beside the data the game reads: verifiedTracks and standardLists are never touched here.
+ * A track that fails (status "error") is not stored, so the next run tries it again.
+ *
+ * data:    { trackIds: [Spotify track id], store?: boolean }, at most 10 ids
  * returns: { results: [{ id, status, ... }] } in the same order as trackIds (duplicates removed).
  *          status is "ok", "needsReview", "notFound", "noSpotifyYear" or "error".
  */
 exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
   requireAdmin(context);
 
-  const { trackIds } = data || {};
+  const { trackIds, store } = data || {};
   if (!Array.isArray(trackIds) || trackIds.length === 0 || trackIds.length > MAX_TRACKS_PER_RESOLVE) {
     throw new functions.https.HttpsError("invalid-argument", `Between 1 and ${MAX_TRACKS_PER_RESOLVE} track ids are required.`);
   }
   if (trackIds.some(id => typeof id !== "string" || !SPOTIFY_TRACK_ID.test(id))) {
     throw new functions.https.HttpsError("invalid-argument", "Every track id must be a Spotify track id.");
   }
+  if (store !== undefined && typeof store !== "boolean") {
+    throw new functions.https.HttpsError("invalid-argument", "store must be true or false.");
+  }
 
   const uniqueIds = [...new Set(trackIds)];
   // A web search answer can take a while, so each request gets more time than in the older functions
   const client = createAnthropicClient(150000);
+
+  // Writes one result to yearReviews. The id is the key, so it is left out of the stored value.
+  const storeResult = async (result) => {
+    const { id, ...review } = result;
+    await db.ref(`yearReviews/${id}`).set({ ...review, checkedAt: admin.database.ServerValue.TIMESTAMP });
+  };
 
   const results = new Array(uniqueIds.length);
   let nextIndex = 0;
   const worker = async () => {
     while (nextIndex < uniqueIds.length) {
       const index = nextIndex++;
-      results[index] = await resolveTrack(client, uniqueIds[index]);
+      let result = await resolveTrack(client, uniqueIds[index]);
+      if (store === true && result.status !== "error") {
+        try {
+          await storeResult(result);
+        } catch (error) {
+          // A result that could not be stored is reported as failed, so the caller runs it again
+          functions.logger.error(`[resolveSongYear] ${result.id}: could not store the result:`, error);
+          result = { id: result.id, status: "error" };
+        }
+      }
+      results[index] = result;
     }
   };
   await Promise.all(Array.from({ length: Math.min(RESOLVE_CONCURRENCY, uniqueIds.length) }, worker));
