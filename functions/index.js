@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const Anthropic = require("@anthropic-ai/sdk");
-const { MUSIC_YEAR_SINGLE_PROMPT, MUSIC_YEAR_BATCH_PROMPT } = require("./prompts");
+const { MUSIC_YEAR_SINGLE_PROMPT } = require("./prompts");
 const yearReview = require("./year-review");
 
 // Test-RTDB (NOTESTREAM): inte live
@@ -10,11 +10,8 @@ admin.initializeApp({
 });
 const db = admin.database();
 
-// Limits for the older AI functions. 500 songs was the highest batch size of the admin cleanup,
-// which is removed; the user import still sends 25 at a time through getSongYearsAiBatch.
-const MAX_SONGS_PER_BATCH = 500;
+// The longest title or artist the older AI function getSongYearAi accepts
 const MAX_TEXT_LENGTH = 300;
-const MAX_ID_LENGTH = 100;
 
 // The AI and Spotify functions cost money or rate limit, so only signed-in users may call them.
 // The admin page and the playlist import both run while signed in, and the callable SDK sends
@@ -28,8 +25,8 @@ function requireAuth(context) {
 // The admin account: the same uid that database.rules.json gives write access.
 const ADMIN_UID = "rtEO2DAFwfM4KdujZrFblspbwpu1";
 
-// resolveSongYear can run a web search for every song, which costs about ten times more than the
-// older AI functions, so only the admin may call it.
+// resolveSongYear can run a web search for every song and has no daily limit, so only the admin
+// may call it. Other signed-in users go through reviewImportedTracks, which is limited.
 function requireAdmin(context) {
   requireAuth(context);
   if (context.auth.uid !== ADMIN_UID) {
@@ -37,12 +34,11 @@ function requireAdmin(context) {
   }
 }
 
-// Accepts strings (and numbers, e.g. a song titled 1999) up to maxLength characters.
-// allowEmpty is used for batch songs, so one track with an empty artist does not reject the whole batch.
-function isText(value, maxLength, allowEmpty) {
+// Accepts strings (and numbers, e.g. a song titled 1999) of 1 to maxLength characters
+function isText(value, maxLength) {
   if (typeof value !== "string" && typeof value !== "number") return false;
   const length = String(value).length;
-  return length <= maxLength && (allowEmpty || length > 0);
+  return length > 0 && length <= maxLength;
 }
 
 // ─── Claude (Anthropic) ──────────────────────────────────────────────────────
@@ -55,29 +51,13 @@ const AI_SECRET = "ANTHROPIC_API_KEY";
 // so a changed default cannot change cost or behaviour unnoticed.
 const AI_EFFORT = "medium";
 
-// JSON schemas for structured output: the API only returns JSON that matches them, so the
-// answers no longer have to be searched for a year or an array.
+// JSON schema for structured output: the API only returns JSON that matches it, so the answer
+// does not have to be searched for a year.
 const NULLABLE_YEAR = { anyOf: [{ type: "integer" }, { type: "null" }] };
 const SINGLE_YEAR_SCHEMA = {
   type: "object",
   properties: { year: NULLABLE_YEAR },
   required: ["year"],
-  additionalProperties: false
-};
-const BATCH_YEARS_SCHEMA = {
-  type: "object",
-  properties: {
-    songs: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { id: { type: "string" }, year: NULLABLE_YEAR },
-        required: ["id", "year"],
-        additionalProperties: false
-      }
-    }
-  },
-  required: ["songs"],
   additionalProperties: false
 };
 
@@ -92,7 +72,7 @@ function createAnthropicClient(timeoutMs) {
 }
 
 // Asks Claude once and returns the parsed JSON object, or null when there is no usable answer
-// (Claude declined, or the answer was cut off). The caller then treats the song(s) as unknown.
+// (Claude declined, or the answer was cut off). The caller then treats the song as unknown.
 async function askClaudeForJson(client, systemPrompt, userPrompt, schema, logLabel) {
   const response = await client.beta.messages.create({
     model: AI_MODEL,
@@ -203,7 +183,7 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
   requireAuth(context);
 
   const { title, artist } = data || {};
-  if (!isText(title, MAX_TEXT_LENGTH, false) || !isText(artist, MAX_TEXT_LENGTH, false)) {
+  if (!isText(title, MAX_TEXT_LENGTH) || !isText(artist, MAX_TEXT_LENGTH)) {
     throw new functions.https.HttpsError("invalid-argument", `Title and artist are required (max ${MAX_TEXT_LENGTH} characters).`);
   }
 
@@ -219,47 +199,6 @@ exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSecond
     return { year };
   } catch (error) {
     throw toAiHttpsError(error, "getSongYearAi", "An error occurred while estimating the year.");
-  }
-});
-
-/**
- * Callable: getSongYearsAiBatch
- * Uses Claude to estimate the release years for a batch of songs.
- * data: { songs: [{ id: string, title: string, artist: string }] }
- */
-exports.getSongYearsAiBatch = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
-  requireAuth(context);
-
-  const { songs } = data || {};
-  if (!Array.isArray(songs) || songs.length === 0) {
-    throw new functions.https.HttpsError("invalid-argument", "An array of songs is required.");
-  }
-  if (songs.length > MAX_SONGS_PER_BATCH) {
-    throw new functions.https.HttpsError("invalid-argument", `At most ${MAX_SONGS_PER_BATCH} songs per call.`);
-  }
-  const hasInvalidSong = songs.some(s =>
-    !s ||
-    !isText(s.id, MAX_ID_LENGTH, false) ||
-    !isText(s.title, MAX_TEXT_LENGTH, true) ||
-    !isText(s.artist, MAX_TEXT_LENGTH, true)
-  );
-  if (hasInvalidSong) {
-    throw new functions.https.HttpsError("invalid-argument", `Every song needs an id, and title/artist may be at most ${MAX_TEXT_LENGTH} characters.`);
-  }
-
-  const userPrompt = `Analysera ALLA följande ${songs.length} låtar och returnera ett JSON-objekt med nyckeln 'songs' som innehåller en array med ${songs.length} objekt (ett per låt):\n` + songs.map(s => `ID: ${s.id} | Titel: ${s.title} | Artist: ${s.artist}`).join("\n");
-
-  try {
-    // Two attempts of at most 250 s each fit inside the function's 540 s timeout
-    const client = createAnthropicClient(250000);
-    const parsed = await askClaudeForJson(client, MUSIC_YEAR_BATCH_PROMPT, userPrompt, BATCH_YEARS_SCHEMA, "getSongYearsAiBatch");
-
-    // Same shape as before ({ results: [{ id, year }] }), so the admin page and the import are unchanged
-    const results = parsed && Array.isArray(parsed.songs) ? parsed.songs : [];
-    functions.logger.info(`[getSongYearsAiBatch] ${results.length} svar för ${songs.length} skickade låtar: ${JSON.stringify(results).substring(0, 500)}`);
-    return { results };
-  } catch (error) {
-    throw toAiHttpsError(error, "getSongYearsAiBatch", "An error occurred while estimating years.");
   }
 });
 
@@ -364,7 +303,7 @@ exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (d
 
 const MAX_TRACKS_PER_RESOLVE = 10;
 const RESOLVE_CONCURRENCY = 3;
-// A web search answer can take a while, so each request gets more time than in the older functions
+// A web search answer can take a while, so each request gets more time than in getSongYearAi
 const REVIEW_REQUEST_TIMEOUT_MS = 150000;
 
 // Throws unless trackIds is a list of 1 to 10 Spotify track ids
@@ -475,7 +414,6 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
   const resolveOptions = { forceWeb: forceWeb === true, webWhenUncertain: webWhenUncertain === true };
 
   const uniqueIds = [...new Set(trackIds)];
-  // A web search answer can take a while, so each request gets more time than in the older functions
   const client = createAnthropicClient(REVIEW_REQUEST_TIMEOUT_MS);
 
   const results = new Array(uniqueIds.length);

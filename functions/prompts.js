@@ -4,12 +4,13 @@
  *
  * Exporterar:
  *   MUSIC_YEAR_SINGLE_PROMPT  – används av getSongYearAi (en låt åt gången)
- *   MUSIC_YEAR_BATCH_PROMPT   – används av getSongYearsAiBatch (flera låtar i en batch)
  *
- * Uppdatera ENBART här. Deploya sedan getSongYearAi och/eller getSongYearsAiBatch.
+ * Uppdatera ENBART här. Deploya sedan getSongYearAi.
+ * Den nya årtalsgranskningen (resolveSongYear, reviewImportedTracks) har sina egna prompter
+ * i year-review.js.
  */
 
-// ─── Gemensamma regler (gäller alltid, oavsett singel eller batch) ────────────
+// ─── Reglerna ────────────────────────────────────────────────────────────────
 
 const BASE_RULES = `Du är en musikdatabasexpert med djup kunskap om musikhistoria. Ditt enda jobb är att identifiera vilket år en låt gavs ut FÖRSTA GÅNGEN på singel eller studioalbum av den angivna artisten.
 
@@ -37,11 +38,4 @@ const MUSIC_YEAR_SINGLE_PROMPT =
   BASE_RULES +
   `\n\nSVARSFORMAT: Svara ENBART med ett giltigt JSON-objekt med nyckeln "year" (heltal) eller null. Exempel: {"year": 1983} eller {"year": null}.`;
 
-// ─── Batch-prompt (getSongYearsAiBatch) ───────────────────────────────────────
-
-const MUSIC_YEAR_BATCH_PROMPT =
-  BASE_RULES +
-  `\n\n9. BATCH-ISOLERING. Behandla varje låt helt separat och oberoende. Låt inte din bedömning av en låt påverka en annan i samma lista.` +
-  `\n\nSVARSFORMAT: Svara ENBART med ett giltigt JSON-objekt med nyckeln "songs" som innehåller en array. Exempel: {"songs": [{"id": "ID_HÄR", "year": 1975}, {"id": "ANNAT_ID", "year": null}]}. Du MÅSTE inkludera ALLA låtar du fick i svaret, inte bara några.`;
-
-module.exports = { MUSIC_YEAR_SINGLE_PROMPT, MUSIC_YEAR_BATCH_PROMPT };
+module.exports = { MUSIC_YEAR_SINGLE_PROMPT };
