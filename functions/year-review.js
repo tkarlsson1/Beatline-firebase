@@ -8,25 +8,27 @@
  * in Swedish that can be shown in the game, and a confidence level.
  *
  * A second step, verifySongYearOnWeb, looks the year up with a web search and returns it with a
- * source. It runs for the songs where the first review changes the year.
+ * source. It runs for the songs where the first review changes the year, and for others when
+ * the caller asks for it (see shouldSearchWeb).
  *
  * decideYear settles which year applies, and resolveSongYear runs the whole chain for one song.
- * The Cloud Function resolveSongYear in index.js calls it. tools/year-eval measures the steps
- * against an answer key.
+ * The Cloud Functions in index.js call it: resolveSongYear, reviewImportedTracks and
+ * checkReportedTrack. tools/year-eval measures the steps against an answer key.
  */
 
 const REVIEW_MODEL = "claude-opus-5-5";
 // Opus 5.5 always thinks; effort controls how much. Set explicitly so a changed default
-// cannot change cost or behaviour unnoticed. Same level as the functions in index.js.
+// cannot change cost or behaviour unnoticed.
 const REVIEW_EFFORT = "medium";
 const REVIEW_MAX_TOKENS = 16000;
 
 const CONFIDENCE_LEVELS = ["high", "medium", "low"];
 const MIN_YEAR = 1900;
 
-// The rules for covers, remixes, title suffixes and compilations are the same as in prompts.js.
-// The differences: Spotify's album data is given as evidence, the answer is never null (an
-// unknown song keeps Spotify's year with low confidence), and every answer has an explanation.
+// The rules for covers, remixes, title suffixes and compilations come from the older prompt
+// (prompts.js, removed with the function that used it). What this prompt adds: Spotify's album
+// data is given as evidence, the answer is never null (an unknown song keeps Spotify's year with
+// low confidence), and every answer has an explanation.
 const YEAR_REVIEW_PROMPT = `Du granskar utgivningsår för låtar i ett musikspel där spelarna ska placera låtar i tidsordning. Ett fel årtal leder till diskussioner vid bordet, så varje år ska gå att försvara.
 
 Rätt år är det år då låten först gavs ut på singel eller studioalbum av den angivna artisten.

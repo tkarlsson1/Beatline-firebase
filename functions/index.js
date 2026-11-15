@@ -1,7 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const Anthropic = require("@anthropic-ai/sdk");
-const { MUSIC_YEAR_SINGLE_PROMPT } = require("./prompts");
 const yearReview = require("./year-review");
 
 // Test-RTDB (NOTESTREAM): inte live
@@ -9,9 +8,6 @@ admin.initializeApp({
   databaseURL: "https://notestreamfire.europe-west1.firebasedatabase.app"
 });
 const db = admin.database();
-
-// The longest title or artist the older AI function getSongYearAi accepts
-const MAX_TEXT_LENGTH = 300;
 
 // The AI and Spotify functions cost money or rate limit, so only signed-in users may call them.
 // The admin page and the playlist import both run while signed in, and the callable SDK sends
@@ -34,32 +30,12 @@ function requireAdmin(context) {
   }
 }
 
-// Accepts strings (and numbers, e.g. a song titled 1999) of 1 to maxLength characters
-function isText(value, maxLength) {
-  if (typeof value !== "string" && typeof value !== "number") return false;
-  const length = String(value).length;
-  return length > 0 && length <= maxLength;
-}
-
 // ─── Claude (Anthropic) ──────────────────────────────────────────────────────
 
-// All year lookups use Claude Opus 5.5. The API key is a Secret Manager secret that each AI
-// function binds with runWith({ secrets: [...] }), so only those functions can read it.
-const AI_MODEL = "claude-opus-5-5";
+// All year lookups use Claude Opus 5.5: the model, the prompts and the requests are in
+// year-review.js. The API key is a Secret Manager secret that each AI function binds with
+// runWith({ secrets: [...] }), so only those functions can read it.
 const AI_SECRET = "ANTHROPIC_API_KEY";
-// Opus 5.5 always thinks; effort controls how much. medium is the model's default, set explicitly
-// so a changed default cannot change cost or behaviour unnoticed.
-const AI_EFFORT = "medium";
-
-// JSON schema for structured output: the API only returns JSON that matches it, so the answer
-// does not have to be searched for a year.
-const NULLABLE_YEAR = { anyOf: [{ type: "integer" }, { type: "null" }] };
-const SINGLE_YEAR_SCHEMA = {
-  type: "object",
-  properties: { year: NULLABLE_YEAR },
-  required: ["year"],
-  additionalProperties: false
-};
 
 function createAnthropicClient(timeoutMs) {
   const apiKey = process.env[AI_SECRET];
@@ -69,60 +45,6 @@ function createAnthropicClient(timeoutMs) {
   }
   // One retry, with a timeout that lets both attempts finish before the function's own timeout
   return new Anthropic({ apiKey, timeout: timeoutMs, maxRetries: 1 });
-}
-
-// Asks Claude once and returns the parsed JSON object, or null when there is no usable answer
-// (Claude declined, or the answer was cut off). The caller then treats the song as unknown.
-async function askClaudeForJson(client, systemPrompt, userPrompt, schema, logLabel) {
-  const response = await client.beta.messages.create({
-    model: AI_MODEL,
-    max_tokens: 16000,
-    // If a safety classifier declines, the API re-runs the request on the fallback model
-    // Anthropic recommends for that category instead of returning the refusal
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
-    output_config: {
-      effort: AI_EFFORT,
-      format: { type: "json_schema", schema }
-    }
-  });
-
-  if (response.model !== AI_MODEL) {
-    functions.logger.warn(`[${logLabel}] Answered by fallback model ${response.model}`);
-  }
-  if (response.stop_reason === "refusal") {
-    functions.logger.warn(`[${logLabel}] Claude declined`, response.stop_details || null);
-    return null;
-  }
-  if (response.stop_reason === "max_tokens") {
-    functions.logger.warn(`[${logLabel}] Answer was cut off at max_tokens`);
-    return null;
-  }
-
-  const textBlock = response.content.find(block => block.type === "text");
-  if (!textBlock) {
-    functions.logger.warn(`[${logLabel}] No text block in the answer (stop_reason: ${response.stop_reason})`);
-    return null;
-  }
-  try {
-    return JSON.parse(textBlock.text);
-  } catch (e) {
-    functions.logger.warn(`[${logLabel}] Could not parse JSON: ${textBlock.text.substring(0, 500)}`);
-    return null;
-  }
-}
-
-// Logs the real error and returns a generic one for the client, so API details never reach the browser
-function toAiHttpsError(error, logLabel, clientMessage) {
-  if (error instanceof functions.https.HttpsError) return error;
-  if (error instanceof Anthropic.APIError) {
-    functions.logger.error(`[${logLabel}] Anthropic API error ${error.status}:`, error.message);
-  } else {
-    functions.logger.error(`[${logLabel}] Unexpected error:`, error);
-  }
-  return new functions.https.HttpsError("internal", clientMessage);
 }
 
 /**
@@ -173,34 +95,6 @@ exports.cleanupOldGames = functions.region("europe-west1").pubsub
     
     return null;
   });
-
-/**
- * Callable: getSongYearAi
- * Uses Claude to estimate the release year of a song.
- * data: { title: string, artist: string }
- */
-exports.getSongYearAi = functions.region("europe-west1").runWith({ timeoutSeconds: 120, memory: "256MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
-  requireAuth(context);
-
-  const { title, artist } = data || {};
-  if (!isText(title, MAX_TEXT_LENGTH) || !isText(artist, MAX_TEXT_LENGTH)) {
-    throw new functions.https.HttpsError("invalid-argument", `Title and artist are required (max ${MAX_TEXT_LENGTH} characters).`);
-  }
-
-  const userPrompt = `Analysera låten '${title}' av artisten '${artist}' och returnera ett JSON-objekt med nyckeln 'year' (heltal) eller null om du är osäker. Exempel: {"year": 1983} eller {"year": null}.`;
-
-  try {
-    // Two attempts of at most 55 s each fit inside the function's 120 s timeout
-    const client = createAnthropicClient(55000);
-    const parsed = await askClaudeForJson(client, MUSIC_YEAR_SINGLE_PROMPT, userPrompt, SINGLE_YEAR_SCHEMA, "getSongYearAi");
-    functions.logger.info(`[getSongYearAi] Svar för '${title}' av '${artist}': ${JSON.stringify(parsed)}`);
-
-    const year = parsed && Number.isInteger(parsed.year) ? parsed.year : null;
-    return { year };
-  } catch (error) {
-    throw toAiHttpsError(error, "getSongYearAi", "An error occurred while estimating the year.");
-  }
-});
 
 // ─── Spotify ─────────────────────────────────────────────────────────────────
 
@@ -303,7 +197,7 @@ exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (d
 
 const MAX_TRACKS_PER_RESOLVE = 10;
 const RESOLVE_CONCURRENCY = 3;
-// A web search answer can take a while, so each request gets more time than in getSongYearAi
+// A web search answer can take a while, so each request to Claude gets two and a half minutes
 const REVIEW_REQUEST_TIMEOUT_MS = 150000;
 
 // Throws unless trackIds is a list of 1 to 10 Spotify track ids
