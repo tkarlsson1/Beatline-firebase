@@ -658,18 +658,30 @@ body {
   padding: 1.5rem;
   max-width: 500px;
   max-height: 320px;
+  /* Never taller than the screen: 56px is the padding and border above and below, plus 1px of air on each side */
+  max-height: min(320px, calc(100vh - 56px));
+  max-height: min(320px, calc(100dvh - 56px));
   width: 90%;
   text-align: center;
   border: 3px solid var(--accent-color);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   animation: slideUp 0.4s ease-out;
+  /* The body scrolls when it has to, the button row below it is always visible */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.validation-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
 }
 
 .validation-modal-title {
   font-size: 1.3rem;
   font-weight: bold;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.5rem;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -691,8 +703,7 @@ body {
 .validation-modal-song {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 0.7rem 1rem;
   border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -715,11 +726,46 @@ body {
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* Explanation and source for the year, filled in by showYearInfo() in game-render.js */
+.validation-modal-song-info:empty {
+  display: none;
+}
+
+.validation-modal-song-explanation {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.validation-modal-song-source {
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.validation-modal-song-source a {
+  color: var(--accent-color);
+}
+
 .validation-modal-buttons {
   display: flex;
   gap: 0.8rem;
   justify-content: center;
   align-items: center;
+}
+
+/* In the validation modal the row is pinned under the scrolling body. The game over
+   screen uses the same row class and keeps its own spacing. */
+.validation-modal > .validation-modal-buttons {
+  flex: 0 0 auto;
+  margin-top: 0.8rem;
+}
+
+/* The general button rule in styles.css puts 1rem under every button, which here only
+   made the modal taller */
+.validation-modal > .validation-modal-buttons .validation-modal-btn {
+  margin-bottom: 0;
 }
 
 .validation-modal-btn {
@@ -756,6 +802,13 @@ body {
 .validation-modal-btn.next {
   background: var(--accent-color);
   color: white;
+}
+
+/* Small on purpose: it shares the row with the buttons that move the game on */
+.validation-modal-btn.report-btn {
+  background-color: #f44336;
+  padding: 5px 10px;
+  font-size: 12px;
 }
 
 .validation-modal-btn.next:hover:not(:disabled) {

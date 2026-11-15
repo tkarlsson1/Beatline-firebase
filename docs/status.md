@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.846 |
-| admin.html | 0.075 |
+| index.html (spelet) | 0.847 |
+| admin.html | 0.076 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
-| game-render.js (game.html) | 0.837 |
+| game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.836 |
-| game.css | v49 |
-| service-worker | v50 |
+| game.css | v50 |
+| service-worker | v51 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
@@ -64,6 +64,7 @@
 | 2026-11-15 | **Årtalen verkställda.** 1 945 olåsta låtar fick ny cachepost med härkomst, 300 av dem ett nytt år (101 med mer än två år), och 395 år skrevs i de 16 standardlistorna. Kontrollerat mot en kopia tagen precis före: de 278 låsta posterna och de 1 258 posterna utanför standardlistorna är identiska, inga låtar tillkom eller försvann, och bara årsfältet ändrades i listorna. Två cacheposter fick listans stavning av artisten i stället för sin tidigare (*SexyBack*, *Billionaire*), vilket inte syns i spelet. Kvar att avgöra för hand: 6 låtar som behöver granskas och 29 låsta där granskningen säger ett annat år. Kopian före ligger i `tools/year-eval/backups/` | – |
 | 2026-11-15 | Admin, Flaggat: nytt kort "Årtal att avgöra" med de låtar granskningen inte kunde avgöra och de låsta där granskningen säger ett annat år (35 vid start). Varje rad visar året idag, Spotifys år, Opus år ur minnet och sökningens år med källa, och har tre val: godta förslaget, behålla året eller skriva ett annat. Varje beslut låser låten (`manuallyVerified: true`), skriver året till alla listor och märker granskningen med `yearReviews/<id>/resolved`. Knappen "Lägg till källa och förklaring på låsta låtar" fyller på härkomst för låsta låtar där granskningen ger samma år, utan att röra år eller lås | 0.846 / 0.075 |
 | 2026-11-15 | 244 låsta låtar fick källa och förklaring från granskningen (221 från webbsökning, 223 med länk). Kontrollerat mot en kopia tagen precis före: exakt 244 poster ändrades, alla var låsta och saknade härkomst, och år, lås, titel och artist är oförändrade. Listorna är orörda. 2 190 av 2 225 låtar i standardlistorna har nu en förklaring – de 35 som saknar väntar i kön "Årtal att avgöra" | – |
+| 2026-11-15 | Spelet: när kortet vänds visas förklaringen till årtalet under låten, och "Källa: webbplats" som länk (ny flik) när låten har en kontrollerad källa. Varje enhet läser texten från `verifiedTracks/<id>` när låten börjar spelas, inte via spelnoden, och visar den bara om cachens år är samma som kortets. Låtar utan förklaring eller utanför cachen visas utan text. Rutans upplägg ändrat så att texten får plats i liggande mobil: "Fel årtal?" ligger på samma rad som +TOKEN och NÄSTA LÅT, knappraden ligger fast under en del som rullar vid behov, rutan blir aldrig högre än skärmen, och 16 px tom marginal under knapparna är borta. Mätt lokalt på 812×375 med riktiga låtar: den längsta texten med källa får plats utan rullning; vid utmaning rullar texten 12 px för den längsta texten, knapparna syns alltid. Inte provat i en riktig spelomgång, och inte om musiken påverkas när värden öppnar källänken | 0.847 / 0.076 |
 
 ---
 

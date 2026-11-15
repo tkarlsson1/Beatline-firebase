@@ -29,9 +29,15 @@ function updateGameView() {
   // Render challenge button (if Timer 2 is active)
   renderChallengeButton();
   
+  // Read the year explanation for the song in play ahead of time, so that it is already
+  // in memory when the card is turned and the validation modal opens
+  if (currentGameData.currentSong) {
+    loadYearInfo(currentGameData.currentSong.spotifyId);
+  }
+
   // Render validation modal (if active)
   renderValidationModal();
-  
+
   // Render game over modal (if phase is gameOver)
   renderGameOverModal();
   
@@ -658,6 +664,120 @@ function clearDynamicDropIndicator() {
 }
 
 // ============================================
+// YEAR INFO (explanation and source for the year on a turned card)
+// ============================================
+// The text is read from verifiedTracks on each device, not from the game node, so the
+// game state stays small. The helpers between the markers are run by an offline test.
+
+// <year-info>
+const YEAR_INFO_TRACK_ID = /^[A-Za-z0-9]{22}$/;
+
+// Returns what to show under the song for a cache record, or null when there is nothing
+// to show. A record whose year differs from the year on the card is not shown: its
+// explanation would argue for another year than the one the players see.
+function pickYearInfo(record, shownYear) {
+  if (!record || typeof record !== 'object') return null;
+  if (record.year == null || shownYear == null) return null;
+  if (Number(record.year) !== Number(shownYear)) return null;
+
+  const explanation = typeof record.explanation === 'string' ? record.explanation.trim() : '';
+
+  let sourceUrl = null;
+  let sourceHost = null;
+  if (typeof record.sourceUrl === 'string') {
+    try {
+      const url = new URL(record.sourceUrl);
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        sourceUrl = url.href;
+        sourceHost = url.hostname.replace(/^www\./, '');
+      }
+    } catch (error) {
+      // Not a usable address: show the explanation without a link
+    }
+  }
+
+  if (!explanation && !sourceUrl) return null;
+  return { explanation, sourceUrl, sourceHost };
+}
+
+// Fills the element with the explanation and the source link. The text is set as text
+// and the link through properties, so nothing from the database is parsed as HTML.
+function fillYearInfo(element, info, doc) {
+  element.textContent = '';
+  if (!info) return;
+
+  if (info.explanation) {
+    const text = doc.createElement('div');
+    text.className = 'validation-modal-song-explanation';
+    text.textContent = info.explanation;
+    element.appendChild(text);
+  }
+
+  if (info.sourceUrl) {
+    const source = doc.createElement('div');
+    source.className = 'validation-modal-song-source';
+    source.appendChild(doc.createTextNode('Källa: '));
+    const link = doc.createElement('a');
+    link.href = info.sourceUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = info.sourceHost;
+    source.appendChild(link);
+    element.appendChild(source);
+  }
+}
+// </year-info>
+
+const yearInfoRequests = new Map(); // spotifyId -> promise of the cache record (or null)
+const yearInfoRecords = new Map();  // spotifyId -> cache record (or null) once it is read
+
+function loadYearInfo(spotifyId) {
+  // Also keeps ids such as 'unknown' and characters Firebase forbids out of the path
+  if (typeof spotifyId !== 'string' || !YEAR_INFO_TRACK_ID.test(spotifyId)) {
+    return Promise.resolve(null);
+  }
+
+  if (!yearInfoRequests.has(spotifyId)) {
+    const recordRef = window.firebaseRef(window.firebaseDb, `verifiedTracks/${spotifyId}`);
+    const request = window.firebaseGet(recordRef)
+      .then((snapshot) => {
+        const record = snapshot.exists() ? snapshot.val() : null;
+        yearInfoRecords.set(spotifyId, record);
+        return record;
+      })
+      .catch((error) => {
+        // Without the record the modal looks as it did before. Forget the request so
+        // that the next render tries again.
+        console.warn('[Game] Could not read year info:', error);
+        yearInfoRequests.delete(spotifyId);
+        return null;
+      });
+    yearInfoRequests.set(spotifyId, request);
+  }
+
+  return yearInfoRequests.get(spotifyId);
+}
+
+function showYearInfo(song) {
+  const element = document.getElementById('validationYearInfo');
+  if (!element) return;
+
+  if (yearInfoRecords.has(song.spotifyId)) {
+    fillYearInfo(element, pickYearInfo(yearInfoRecords.get(song.spotifyId), song.year), document);
+    return;
+  }
+
+  loadYearInfo(song.spotifyId).then((record) => {
+    // The modal is rebuilt on every game update and may be closed or show another song by now
+    const shown = currentGameData && currentGameData.validationModal;
+    const current = document.getElementById('validationYearInfo');
+    if (!current || !shown || !shown.isVisible || !shown.song) return;
+    if (shown.song.spotifyId !== song.spotifyId) return;
+    fillYearInfo(current, pickYearInfo(record, shown.song.year), document);
+  });
+}
+
+// ============================================
 // VALIDATION MODAL RENDERING
 // ============================================
 function renderValidationModal() {
@@ -718,41 +838,40 @@ function renderValidationModal() {
     }
   }
   
-  // Build modal HTML
+  // Build modal HTML. The buttons sit outside the scrolling body, so they stay visible
+  // however long the text above them is.
   let modalHTML = `
     <div class="validation-modal-overlay">
       <div class="validation-modal">
-        <div class="validation-modal-title ${titleClass}">
-          ${titleText}
-        </div>
+        <div class="validation-modal-body">
+          <div class="validation-modal-title ${titleClass}">
+            ${titleText}
+          </div>
   `;
-  
+
   if (subtitleText) {
     modalHTML += `
-      <div class="validation-modal-subtitle">
-        ${subtitleText}
-      </div>
+          <div class="validation-modal-subtitle">
+            ${subtitleText}
+          </div>
     `;
   }
-  
+
+  // validationYearInfo is filled by showYearInfo() below; it must be written without
+  // whitespace inside so that it takes no room while it is empty
   modalHTML += `
-    <div class="validation-modal-song">
-      <div class="validation-modal-song-year">${escapeHtml(modal.song.year)}</div>
-      <div class="validation-modal-song-title">${escapeHtml(modal.song.title)}</div>
-      <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
-    </div>
-    
-    <div style="text-align: center; margin-bottom: 15px;">
-      <button
-        id="reportTrackBtn"
-        class="validation-modal-btn report-btn"
-        style="background-color: #f44336; padding: 5px 10px; font-size: 12px; width: auto; display: inline-block;"
-      >
-        🚩 Fel årtal?
-      </button>
-    </div>
-    
-    <div class="validation-modal-buttons">
+          <div class="validation-modal-song">
+            <div class="validation-modal-song-year">${escapeHtml(modal.song.year)}</div>
+            <div class="validation-modal-song-title">${escapeHtml(modal.song.title)}</div>
+            <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
+            <div class="validation-modal-song-info" id="validationYearInfo"></div>
+          </div>
+        </div>
+
+        <div class="validation-modal-buttons">
+          <button id="reportTrackBtn" class="validation-modal-btn report-btn">
+            🚩 Fel årtal?
+          </button>
   `;
   
   // Show +TOKEN button only if canGiveToken and not already given
@@ -780,12 +899,15 @@ function renderValidationModal() {
   `;
   
   modalHTML += `
-    </div>
+        </div>
       </div>
     </div>
   `;
-  
+
   container.innerHTML = modalHTML;
+
+  // Explanation and source for the year, under the song
+  showYearInfo(modal.song);
 
   // Song data comes from the database. Passing it through a listener instead of an inline
   // onclick means quotes or backticks in a title can neither break the button nor run as code.
