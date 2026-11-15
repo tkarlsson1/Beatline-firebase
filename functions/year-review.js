@@ -426,7 +426,8 @@ async function verifySongYearOnWeb(client, song) {
  *
  * Returns { year, source, status, reason, explanation, sourceUrl, sourceTitle }:
  *   source: "spotify" (Spotify's year stands), "web" (the search's year, with a verified source that
- *           clearly supports it) or "opus" (memory and search agree, but the source is weak)
+ *           clearly supports it) or "opus" (memory changed the year and the search agrees, but the
+ *           source is weak)
  *   status: "ok", or "needsReview" when the song has to be settled by hand. A song that needs
  *           review keeps Spotify's year meanwhile; reason says why.
  */
@@ -436,12 +437,15 @@ function decideYear(spotifyYear, review, webReview) {
   });
 
   if (!review) return keepSpotify("needsReview", "no_review", "");
-  if (!review.changed) return keepSpotify("ok", null, review.explanation);
 
-  // The review from memory changed the year. That is never accepted on its own: every gross error
-  // in the measurement was a year changed from memory.
-  if (!webReview) return keepSpotify("needsReview", "no_web_answer", "");
+  if (!webReview) {
+    // Without a web answer only a year that the review kept is accepted. A year changed from
+    // memory never is: every gross error in the measurement was a year changed from memory.
+    if (!review.changed) return keepSpotify("ok", null, review.explanation);
+    return keepSpotify("needsReview", "no_web_answer", "");
+  }
 
+  // A web answer decides whenever there is one, whether the review changed the year or kept it
   if (webReview.sourceVerified && webReview.support === "tydligt") {
     return {
       year: webReview.year, source: "web", status: "ok", reason: null,
@@ -449,11 +453,12 @@ function decideYear(spotifyYear, review, webReview) {
     };
   }
 
+  // review.year is the year from memory: Spotify's year when the review kept it
   if (webReview.year === review.year) {
     // Two independent answers agree, so the year is accepted although the source is weak.
     // The address is kept only if it really was one of the search results.
     return {
-      year: webReview.year, source: "opus", status: "ok", reason: null,
+      year: webReview.year, source: review.changed ? "opus" : "spotify", status: "ok", reason: null,
       explanation: webReview.explanation,
       sourceUrl: webReview.sourceVerified ? webReview.sourceUrl : null,
       sourceTitle: webReview.sourceVerified ? webReview.sourceTitle : null
@@ -467,22 +472,25 @@ function decideYear(spotifyYear, review, webReview) {
  * Runs the whole chain for one song: review from memory, a web search if the year was changed,
  * and the decision.
  *
- * client: an Anthropic client (the caller sets the API key, timeout and retries)
- * song:   { title, artist, spotifyYear, albumName?, albumType?, releaseDate? }
+ * client:  an Anthropic client (the caller sets the API key, timeout and retries)
+ * song:    { title, artist, spotifyYear, albumName?, albumType?, releaseDate? }
+ * options: { forceWeb?: boolean } forceWeb runs the web search even when the review keeps Spotify's
+ *          year. It is used for songs where the review was not certain.
  *
  * Returns { decision, review, reviewFailure, webReview, webFailure, usage }:
  *   decision: the result of decideYear
  *   usage:    { review, web } with the token usage of each step (web is null when it did not run)
  * API errors are thrown to the caller.
  */
-async function resolveSongYear(client, song) {
+async function resolveSongYear(client, song, options = {}) {
   const spotifyYear = parseInt(song.spotifyYear, 10);
   if (!Number.isInteger(spotifyYear)) {
     throw new Error("resolveSongYear needs a numeric spotifyYear.");
   }
 
   const memory = await reviewSongYear(client, song);
-  const web = memory.review && memory.review.changed ? await verifySongYearOnWeb(client, song) : null;
+  const runWeb = !!memory.review && (memory.review.changed || options.forceWeb === true);
+  const web = runWeb ? await verifySongYearOnWeb(client, song) : null;
 
   return {
     decision: decideYear(spotifyYear, memory.review, web ? web.review : null),

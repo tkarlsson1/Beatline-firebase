@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.843 |
-| admin.html | 0.072 |
+| index.html (spelet) | 0.844 |
+| admin.html | 0.073 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v47 |
+| service-worker | v48 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
@@ -57,6 +57,8 @@
 | 2026-11-14 | Ny funktion `resolveSongYear` (bara admin): servern hämtar låten från Spotify, Opus granskar Spotifys år, webbsökning körs när året ändras, och en beslutsregel avgör året. Returnerar år, källa, förklaring och länk men skriver inget i databasen. "AI-Sök" i spellistedetaljer använder den, visar förklaring och källa under låten och sparar härkomsten i `verifiedTracks` vid Spara (`source`, `explanation`, `sourceUrl`, `sourceTitle`, `spotifyYear`, `albumName`, `albumType`, `releaseDate`, `checkedAt`). `getSpotifyToken` delar tokenhämtningen med den nya funktionen. Övriga flöden använder fortfarande de gamla funktionerna | 0.841 / 0.070 / Functions |
 | 2026-11-14 | `resolveSongYear`: källsidans titel avkodas, så länken visar "Kung för en dag" och inte "Kung f%C3%B6r en dag". Hittat vid test live: 37 av 852 sökträffar i mätningen hade kodad titel, främst Wikipedia-sidor med å, ä, ö eller apostrof | 0.842 / 0.071 / Functions |
 | 2026-11-14 | Admin, Databas: nytt kort "Granska alla årtal". Kör `resolveSongYear` över låtarna i standardlistorna, 10 per anrop och två anrop samtidigt, med valfritt antal per körning. Servern sparar varje resultat i den nya noden `yearReviews` (bara admin får läsa och skriva), så körningen går att stoppa och fortsätta. Sammanställningen visar oförändrade, ändrade, till granskning, låsta där granskningen säger annat, och ej hittade hos Spotify. Inget skrivs till `verifiedTracks` eller `standardLists` – verkställandet är ett eget steg | 0.843 / 0.072 / Functions / Regler |
+| 2026-11-15 | Alla 2 225 låtar i standardlistorna granskade med `resolveSongYear` (cirka 64 dollar, 33 minuter, inga misslyckade anrop). Utfall mot spelets nuvarande år: 1 681 oförändrade, 265 ändras (98 med mer än två år), 3 behöver granskas, 276 låsta varav 39 där granskningen säger ett annat år. Resultaten ligger i `yearReviews`, inget i spelet är ändrat | – |
+| 2026-11-15 | `resolveSongYear` får valet `forceWeb`, som kör webbsökningen även när Opus behåller Spotifys år. Beslutsregeln låter då en äkta och tydlig källa avgöra även för behållna år. Admin-kortet får knappen "Sök på osäkra" för låtar utan webbsökning där Opus var osäker eller där resultatet skiljer sig från spelets år. Bakgrund: Opus behöll Spotifys år men var osäker för 227 låtar, och minst ett sådant år var fel | 0.844 / 0.073 / Functions |
 
 ---
 

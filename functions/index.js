@@ -367,7 +367,7 @@ const RESOLVE_CONCURRENCY = 3;
 
 // Runs the chain for one track. A failure for one track does not stop the others: it is logged
 // and returned as status "error". A configuration error stops the whole call.
-async function resolveTrack(client, trackId) {
+async function resolveTrack(client, trackId, options) {
   try {
     const track = await fetchSpotifyTrack(trackId);
     if (!track) return { id: trackId, status: "notFound" };
@@ -375,7 +375,7 @@ async function resolveTrack(client, trackId) {
       return { id: trackId, status: "noSpotifyYear", title: track.title, artist: track.artist };
     }
 
-    const resolved = await yearReview.resolveSongYear(client, track);
+    const resolved = await yearReview.resolveSongYear(client, track, options);
     const decision = resolved.decision;
     functions.logger.info(
       `[resolveSongYear] ${trackId} '${track.title}': Spotify ${track.spotifyYear} -> ${decision.year} (${decision.source}, ${decision.status})`,
@@ -429,14 +429,18 @@ async function resolveTrack(client, trackId) {
  * beside the data the game reads: verifiedTracks and standardLists are never touched here.
  * A track that fails (status "error") is not stored, so the next run tries it again.
  *
- * data:    { trackIds: [Spotify track id], store?: boolean }, at most 10 ids
+ * With forceWeb: true the web search also runs for tracks where Claude keeps Spotify's year. The
+ * admin page uses it for tracks where the review was not certain, or where the result differs
+ * from the year the game has.
+ *
+ * data:    { trackIds: [Spotify track id], store?: boolean, forceWeb?: boolean }, at most 10 ids
  * returns: { results: [{ id, status, ... }] } in the same order as trackIds (duplicates removed).
  *          status is "ok", "needsReview", "notFound", "noSpotifyYear" or "error".
  */
 exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
   requireAdmin(context);
 
-  const { trackIds, store } = data || {};
+  const { trackIds, store, forceWeb } = data || {};
   if (!Array.isArray(trackIds) || trackIds.length === 0 || trackIds.length > MAX_TRACKS_PER_RESOLVE) {
     throw new functions.https.HttpsError("invalid-argument", `Between 1 and ${MAX_TRACKS_PER_RESOLVE} track ids are required.`);
   }
@@ -445,6 +449,9 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
   }
   if (store !== undefined && typeof store !== "boolean") {
     throw new functions.https.HttpsError("invalid-argument", "store must be true or false.");
+  }
+  if (forceWeb !== undefined && typeof forceWeb !== "boolean") {
+    throw new functions.https.HttpsError("invalid-argument", "forceWeb must be true or false.");
   }
 
   const uniqueIds = [...new Set(trackIds)];
@@ -462,7 +469,7 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
   const worker = async () => {
     while (nextIndex < uniqueIds.length) {
       const index = nextIndex++;
-      let result = await resolveTrack(client, uniqueIds[index]);
+      let result = await resolveTrack(client, uniqueIds[index], { forceWeb: forceWeb === true });
       if (store === true && result.status !== "error") {
         try {
           await storeResult(result);

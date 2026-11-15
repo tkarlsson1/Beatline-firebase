@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.072</title>
+    <title>Notestream Admin v0.073</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -387,6 +387,10 @@
          *   lockedDiffers  locked songs where the review gives another year (never changed automatically)
          *   needsReview    songs the review could not settle
          *   notFound       songs Spotify does not know, or that have no release date
+         *   needsWeb       ids of songs that should get a web search before anything is applied:
+         *                  none has been run, and the review from memory was not certain or its
+         *                  year differs from the year the game has. A song is also in one of the
+         *                  groups above.
          */
         function classifyYearReviews(lists, verified, reviews) {
             const songs = new Map();
@@ -402,7 +406,7 @@
 
             const summary = {
                 total: songs.size, pending: [], unchanged: 0, lockedSame: 0,
-                changes: [], lockedDiffers: [], needsReview: [], notFound: []
+                changes: [], lockedDiffers: [], needsReview: [], notFound: [], needsWeb: []
             };
             for (const song of songs.values()) {
                 const review = reviews ? reviews[song.id] : null;
@@ -421,6 +425,9 @@
                 } else if (review.status === "needsReview") {
                     summary.needsReview.push(entry);
                 } else if (review.status === "ok") {
+                    const uncertain = !review.memory || review.memory.confidence !== "high";
+                    if (!review.web && (uncertain || review.year !== currentYear)) summary.needsWeb.push(song.id);
+
                     if (review.year === currentYear) {
                         if (locked) summary.lockedSame++; else summary.unchanged++;
                     } else if (locked) {
@@ -1349,6 +1356,7 @@
             const yearReviewStatusEl = document.getElementById("yearReviewStatus");
             const yearReviewSummaryEl = document.getElementById("yearReviewSummary");
             const yearReviewStartBtn = document.getElementById("yearReviewStartBtn");
+            const yearReviewWebBtn = document.getElementById("yearReviewWebBtn");
             const yearReviewStopBtn = document.getElementById("yearReviewStopBtn");
             const yearReviewSummaryBtn = document.getElementById("yearReviewSummaryBtn");
 
@@ -1373,6 +1381,7 @@
             function renderYearReviewSummary(summary) {
                 const reviewed = summary.total - summary.pending.length;
                 yearReviewCountsEl.textContent = `${summary.total} låtar i standardlistorna · ${reviewed} granskade · ${summary.pending.length} kvar`;
+                yearReviewWebBtn.textContent = `Sök på osäkra (${summary.needsWeb.length})`;
 
                 const songColumns = [
                     { title: "Artist", cell: entry => escapeHtml(entry.artist) },
@@ -1415,6 +1424,7 @@
                         <li>Låsta av dig, samma år som granskningen: <strong>${summary.lockedSame}</strong></li>
                         <li>Låsta av dig, granskningen säger ett annat år: <strong>${summary.lockedDiffers.length}</strong></li>
                         <li>Hittades inte hos Spotify: <strong>${summary.notFound.length}</strong></li>
+                        <li>Väntar på extra webbsökning (osäkra, eller annat år än spelets utan källa): <strong>${summary.needsWeb.length}</strong></li>
                     </ul>
                     ${yearReviewTable("Året ändras", summary.changes, changeColumns)}
                     ${yearReviewTable("Behöver granskas", summary.needsReview, reviewColumns)}
@@ -1442,7 +1452,13 @@
                 yearReviewStatusEl.textContent = "Stoppar när de pågående anropen är klara...";
             });
 
-            yearReviewStartBtn.addEventListener("click", async () => {
+            /**
+             * Runs resolveSongYear over a set of songs and stores the results.
+             * pickIds:         summary => ids of the songs to run, from the current state
+             * forceWeb:        true runs the web search for every song, also where Claude keeps the year
+             * nothingToDoText: shown when pickIds gives no songs
+             */
+            async function runYearReview(pickIds, forceWeb, nothingToDoText) {
                 if (yearReviewRunning) return;
                 const limit = parseInt(document.getElementById("yearReviewLimit").value, 10);
                 if (!Number.isInteger(limit) || limit < 1) {
@@ -1453,6 +1469,7 @@
                 yearReviewRunning = true;
                 yearReviewStopRequested = false;
                 yearReviewStartBtn.disabled = true;
+                yearReviewWebBtn.disabled = true;
                 yearReviewStopBtn.disabled = false;
 
                 try {
@@ -1460,9 +1477,9 @@
                     const before = await loadYearReviewSummary();
                     renderYearReviewSummary(before);
 
-                    const todo = before.pending.slice(0, limit);
+                    const todo = pickIds(before).slice(0, limit);
                     if (todo.length === 0) {
-                        yearReviewStatusEl.textContent = "Alla låtar är redan granskade.";
+                        yearReviewStatusEl.textContent = nothingToDoText;
                         return;
                     }
 
@@ -1483,7 +1500,8 @@
                     const runBatch = async (ids) => {
                         for (let attempt = 1; attempt <= 2; attempt++) {
                             try {
-                                const response = await resolveSongYear({ trackIds: ids, store: true });
+                                const request = forceWeb ? { trackIds: ids, store: true, forceWeb: true } : { trackIds: ids, store: true };
+                                const response = await resolveSongYear(request);
                                 const results = response && response.data && Array.isArray(response.data.results) ? response.data.results : null;
                                 if (!results) throw new Error("Svaret saknar resultat.");
                                 const failedHere = results.filter(result => result.status === "error").length;
@@ -1517,9 +1535,15 @@
                 } finally {
                     yearReviewRunning = false;
                     yearReviewStartBtn.disabled = false;
+                    yearReviewWebBtn.disabled = false;
                     yearReviewStopBtn.disabled = true;
                 }
-            });
+            }
+
+            yearReviewStartBtn.addEventListener("click", () =>
+                runYearReview(summary => summary.pending, false, "Alla låtar är redan granskade."));
+            yearReviewWebBtn.addEventListener("click", () =>
+                runYearReview(summary => summary.needsWeb, true, "Inga låtar väntar på extra webbsökning."));
 
             // --- DATABAS-STÄDNING ---
             document.getElementById("cleanDatabaseBtn").addEventListener("click", async () => {
@@ -2297,13 +2321,14 @@
                     <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 12px;">
                         Går igenom låtarna i standardlistorna: Opus granskar Spotifys år, och en webbsökning görs när året ändras.
                         Resultaten sparas vid sidan av och <strong>ändrar ingenting i spelet</strong>. Körningen går att stoppa och fortsätta.
-                        En låt kostar ungefär 4 cent i snitt.
+                        En låt kostar ungefär 3 cent i snitt. "Sök på osäkra" kör en webbsökning även för låtar där Opus behöll året men var osäker, och kostar ungefär 10 cent per låt.
                     </p>
                     <p id="yearReviewCounts" style="font-weight: 600; margin-bottom: 12px;">Tryck på "Visa sammanställning" för att läsa läget.</p>
                     <div class="flex-row" style="margin-bottom: 12px; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <label for="yearReviewLimit" style="white-space: nowrap;">Antal låtar den här gången:</label>
                         <input type="number" id="yearReviewLimit" value="50" min="1" style="width: 100px;">
                         <button id="yearReviewStartBtn" class="btn-primary" style="white-space: nowrap;">Starta / Fortsätt</button>
+                        <button id="yearReviewWebBtn" class="btn-primary" style="white-space: nowrap;" title="Kör en webbsökning för låtar där Opus var osäker, eller där resultatet skiljer sig från spelets år utan att ha en källa">Sök på osäkra</button>
                         <button id="yearReviewStopBtn" class="btn-danger" style="white-space: nowrap;" disabled>Stoppa</button>
                         <button id="yearReviewSummaryBtn" class="btn-info" style="white-space: nowrap;">Visa sammanställning</button>
                     </div>

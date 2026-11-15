@@ -1,6 +1,7 @@
 # Slutresultat med beslutsregeln – baseline
 
 Beslutsregeln i functions/year-review.js körd mot de sparade svaren för 186 låtar. Inga nya API-anrop.
+Webbsökning räknas för låtar där Opus ändrade året.
 
 | Utfall | Låtar |
 |---|---|

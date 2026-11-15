@@ -7,6 +7,9 @@
  *   node tools/year-eval/report.js --step web       grade the web step, writes web-resultat.md
  *   node tools/year-eval/report.js --step final     replay the decision rule (decideYear in functions/year-review.js)
  *                                                    over the saved answers, writes slutresultat.md
+ *   node tools/year-eval/report.js --step final --rule flagged
+ *                                                    the same, with a web search also for songs where the review
+ *                                                    kept the year without being certain; writes slutresultat-flagged.md
  *   node tools/year-eval/report.js --run <name>     grade another run
  *   node tools/year-eval/report.js --selftest       check the grading itself with made-up answers
  *
@@ -462,17 +465,19 @@ function renderWebMarkdown(summary, graded, runName, facit, errorCount) {
 // ─── Final outcome: the decision rule replayed over the saved answers ───────
 
 /**
- * Runs decideYear for every song that has a review row, with the web answer only where the rule
- * would have run a web search (the review changed the year). Makes no API calls.
+ * Runs decideYear for every song that has a review row, with the web answer only where a web
+ * search would have run. Makes no API calls.
+ * rule "changed": a web search where the review changed the year.
+ * rule "flagged": also where the review kept the year without being certain (confidence not high).
  */
-function replayDecisions(cases, reviewRows, webRows, grossErrorYears) {
+function replayDecisions(cases, reviewRows, webRows, grossErrorYears, rule) {
   const reviewById = new Map(reviewRows.map(row => [row.id, row.review]));
   const webById = new Map(webRows.map(row => [row.id, row.review]));
   const outcomes = [];
   for (const evalCase of cases) {
     if (!reviewById.has(evalCase.id)) continue;
     const review = reviewById.get(evalCase.id);
-    const needsWeb = !!review && review.changed;
+    const needsWeb = !!review && (review.changed || (rule === "flagged" && review.confidence !== "high"));
     // A song that should have had a web search but has no saved web row is left out of the count
     if (needsWeb && !webById.has(evalCase.id)) {
       outcomes.push({ evalCase, missingWeb: true });
@@ -483,6 +488,8 @@ function replayDecisions(cases, reviewRows, webRows, grossErrorYears) {
       evalCase,
       decision,
       needsWeb,
+      // Accepted although the source was weak, because the search and the memory step agree
+      acceptedOnAgreement: needsWeb && decision.status === "ok" && decision.source !== "web",
       distance: distanceToFacit(decision.year, evalCase.facitYears),
       gross: isGrossError(decision.year, evalCase.facitYears, grossErrorYears)
     });
@@ -490,23 +497,26 @@ function replayDecisions(cases, reviewRows, webRows, grossErrorYears) {
   return outcomes;
 }
 
-function renderFinalMarkdown(outcomes, runName, facit) {
+function renderFinalMarkdown(outcomes, runName, facit, rule) {
   const decided = outcomes.filter(outcome => !outcome.missingWeb);
   const missingWeb = outcomes.length - decided.length;
   const count = predicate => decided.filter(predicate).length;
   const gross = decided.filter(outcome => outcome.gross);
   const needsReview = decided.filter(outcome => outcome.decision.status === "needsReview");
-  const agreed = decided.filter(outcome => outcome.decision.source === "opus");
+  const agreed = decided.filter(outcome => outcome.acceptedOnAgreement);
 
   const lines = [];
   lines.push(`# Slutresultat med beslutsregeln – ${runName}`);
   lines.push("");
   lines.push(`Beslutsregeln i functions/year-review.js körd mot de sparade svaren för ${decided.length} låtar. Inga nya API-anrop.`);
+  lines.push(rule === "flagged"
+    ? "Webbsökning räknas för låtar där Opus ändrade året eller var osäker."
+    : "Webbsökning räknas för låtar där Opus ändrade året.");
   if (missingWeb > 0) lines.push(`${missingWeb} låtar saknar sparat svar från webbsteget och räknas inte.`);
   lines.push("");
   lines.push("| Utfall | Låtar |");
   lines.push("|---|---|");
-  lines.push(`| Spotifys år behålls | ${count(o => o.decision.source === "spotify" && o.decision.status === "ok")} |`);
+  lines.push(`| Spotifys år behålls | ${count(o => o.decision.source === "spotify" && o.decision.status === "ok" && !o.acceptedOnAgreement)} |`);
   lines.push(`| Sökningens år gäller, med källa | ${count(o => o.decision.source === "web")} |`);
   lines.push(`| Minnet och sökningen överens trots svagt stöd | ${agreed.length} |`);
   lines.push(`| Till granskning | ${needsReview.length} |`);
@@ -625,10 +635,14 @@ function main() {
   if (!["review", "web", "final"].includes(stepName)) throw new Error("--step must be review, web or final.");
 
   if (stepName === "final") {
+    const ruleIndex = argv.indexOf("--rule");
+    const rule = ruleIndex >= 0 ? argv[ruleIndex + 1] : "changed";
+    if (rule !== "changed" && rule !== "flagged") throw new Error("--rule must be changed or flagged.");
+
     const webRows = readJsonLines(path.join(runDir, "web-results.jsonl"));
-    const outcomes = replayDecisions(facit.cases, rows, webRows, facit.grossErrorYears);
-    const finalMarkdown = renderFinalMarkdown(outcomes, runName, facit);
-    const finalOutputFile = path.join(runDir, "slutresultat.md");
+    const outcomes = replayDecisions(facit.cases, rows, webRows, facit.grossErrorYears, rule);
+    const finalMarkdown = renderFinalMarkdown(outcomes, runName, facit, rule);
+    const finalOutputFile = path.join(runDir, rule === "flagged" ? "slutresultat-flagged.md" : "slutresultat.md");
     fs.writeFileSync(finalOutputFile, finalMarkdown);
     console.log(finalMarkdown);
     console.log(`Written to ${path.relative(REPO_ROOT, finalOutputFile)}`);
