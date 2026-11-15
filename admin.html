@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.079</title>
+    <title>Notestream Admin v0.080</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -598,26 +598,62 @@
          * The songs that have to be settled by hand, each with the year the review suggests.
          * Pure function.
          *
-         * Two kinds: "needsReview" (the review could not settle the year) and "lockedDiffers" (a
-         * song locked as manually verified, where the review gives another year).
-         * suggestion is { year, source, explanation, sourceUrl, sourceTitle }, or null when the
-         * review has nothing to suggest. For a locked song it is the review's year. For a song the
-         * review could not settle it is the web search's year, else the year from memory.
+         * Three kinds, in this order:
+         *   "reported"       a player reported the year from the game (reports is reportedTracks
+         *                    from the database). The report starts a new check on the server, so
+         *                    the review is normally newer than the report.
+         *   "needsReview"    the review could not settle the year
+         *   "lockedDiffers"  a song locked as manually verified, where the review gives another year
+         * A reported song is listed once, as reported, whatever else is true of it.
          *
-         * Songs the review could not settle are also taken from outside the standard lists. They
-         * come from playlists imported by users, which this page does not read, so the title and
-         * the artist are the review's own, lists is empty and a decision only writes the cache.
+         * suggestion is { year, source, explanation, sourceUrl, sourceTitle }, or null when the
+         * review has nothing to suggest. It is the review's own year when the review settled one
+         * (always so for a locked song), else the web search's year, else the year from memory.
+         *
+         * Songs outside the standard lists are included when they are reported or when the review
+         * could not settle them. They come from playlists imported by users, which this page does
+         * not read, so the title and the artist are the review's or the report's own, lists is
+         * empty and a decision only writes the cache.
          */
-        function buildYearQueue(lists, verified, reviews) {
+        function buildYearQueue(lists, verified, reviews, reports) {
             const summary = classifyYearReviews(lists, verified, reviews);
 
-            const inStandardLists = new Set();
-            for (const list of Object.values(lists || {})) {
-                for (const trackId of Object.keys((list && list.songs) || {})) inStandardLists.add(trackId);
+            // Every song in the standard lists, with the lists it is in
+            const listSongs = new Map();
+            for (const [listName, list] of Object.entries(lists || {})) {
+                for (const [trackId, song] of Object.entries((list && list.songs) || {})) {
+                    if (!song) continue;
+                    if (!listSongs.has(trackId)) {
+                        listSongs.set(trackId, { id: trackId, title: song.title, artist: song.artist, listYear: song.year, lists: [], listYears: {} });
+                    }
+                    listSongs.get(trackId).lists.push(listName);
+                    listSongs.get(trackId).listYears[listName] = song.year;
+                }
             }
+
+            const reported = [];
+            const reportedIds = new Set();
+            for (const [trackId, report] of Object.entries(reports || {})) {
+                if (!report) continue;
+                reportedIds.add(trackId);
+                const review = reviews ? (reviews[trackId] || null) : null;
+                const cached = verified ? verified[trackId] : null;
+                const song = listSongs.get(trackId) || {
+                    id: trackId, title: (review && review.title) || report.title, artist: (review && review.artist) || report.artist,
+                    listYear: null, lists: [], listYears: {}
+                };
+                // The year the game uses: the cache's, else the list's, else the year the players saw
+                const currentYear = parseInt(cached && cached.year ? cached.year : (song.listYear != null ? song.listYear : report.year), 10);
+                reported.push({
+                    ...song, currentYear, locked: !!(cached && cached.manuallyVerified === true), review,
+                    report: { year: report.year, reportedAt: report.reportedAt }
+                });
+            }
+
             const outsideLists = [];
             for (const [trackId, review] of Object.entries(reviews || {})) {
-                if (!review || review.status !== "needsReview" || review.resolved || inStandardLists.has(trackId)) continue;
+                if (!review || review.status !== "needsReview" || review.resolved) continue;
+                if (listSongs.has(trackId) || reportedIds.has(trackId)) continue;
                 const cached = verified ? verified[trackId] : null;
                 // A locked record means the year has already been settled by hand
                 if (cached && cached.manuallyVerified === true) continue;
@@ -631,27 +667,30 @@
 
             const withSuggestion = (entry, kind) => {
                 const review = entry.review;
+                const settled = !!review && review.status === "ok" && Number.isInteger(review.year);
                 let suggestion = null;
-                if (kind === "lockedDiffers") {
+                if (kind === "lockedDiffers" || (kind === "reported" && settled)) {
                     suggestion = {
                         year: review.year, source: review.source || "manual", explanation: review.explanation || "",
                         sourceUrl: review.sourceUrl || null, sourceTitle: review.sourceTitle || null
                     };
-                } else if (review.web && Number.isInteger(review.web.year)) {
+                } else if (review && review.web && Number.isInteger(review.web.year)) {
                     // The address is only kept when it really was one of the search results
                     suggestion = {
                         year: review.web.year, source: "web", explanation: review.web.explanation || "",
                         sourceUrl: review.web.sourceVerified ? (review.web.sourceUrl || null) : null, sourceTitle: null
                     };
-                } else if (review.memory && Number.isInteger(review.memory.year)) {
+                } else if (review && review.memory && Number.isInteger(review.memory.year)) {
                     suggestion = { year: review.memory.year, source: "opus", explanation: "", sourceUrl: null, sourceTitle: null };
                 }
                 return { ...entry, kind, suggestion, cached: verified ? (verified[entry.id] || null) : null };
             };
+            const notReported = entry => !reportedIds.has(entry.id);
             return [
-                ...summary.needsReview.map(entry => withSuggestion(entry, "needsReview")),
+                ...reported.map(entry => withSuggestion(entry, "reported")),
+                ...summary.needsReview.filter(notReported).map(entry => withSuggestion(entry, "needsReview")),
                 ...outsideLists.map(entry => withSuggestion(entry, "needsReview")),
-                ...summary.lockedDiffers.map(entry => withSuggestion(entry, "lockedDiffers"))
+                ...summary.lockedDiffers.filter(notReported).map(entry => withSuggestion(entry, "lockedDiffers"))
             ];
         }
 
@@ -812,10 +851,7 @@
                     // Ladda specifik data för fliken
                     if (targetId === 'tab-dashboard') loadDashboardStats();
                     if (targetId === 'tab-playlists') loadPlaylists();
-                    if (targetId === 'tab-reports') {
-                        loadReportedTracks();
-                        loadYearQueue();
-                    }
+                    if (targetId === 'tab-reports') loadYearQueue();
                     if (targetId === 'tab-users') loadUsers();
                 });
             });
@@ -1880,222 +1916,11 @@
                 }
             }
 
-            // ==========================================
-            // SPELARNAS RAPPORTER
-            // ==========================================
-            function showEmptyReportsMessageIfNeeded() {
-                const tbody = document.getElementById("reportsTableBody");
-                if (!tbody.querySelector("tr")) {
-                    tbody.innerHTML = "<tr><td colspan='5' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
-                }
-            }
-
-            // Deletes one report (and its flag) and removes only that row. Used by both unscanned and
-            // scanned rows, so deleting never reloads the list and other rows keep their AI results.
-            async function deleteReport(trackId, trElement) {
-                if (!confirm("Är du säker på att du vill kasta denna rapport? (Inget ändras i spelet)")) {
-                    return;
-                }
-                try {
-                    await set(ref(db, `reportedTracks/${trackId}`), null);
-                    await set(ref(db, `flaggedTracks/${trackId}`), null);
-                    trElement.remove();
-                    showEmptyReportsMessageIfNeeded();
-                } catch (err) {
-                    console.error("Fel vid radering av rapport:", err);
-                    alert("Fel: " + err.message);
-                }
-            }
-
-            async function loadReportedTracks() {
-                const reportsContainer = document.getElementById("reportsContainer");
-                const tbody = document.getElementById("reportsTableBody");
-                tbody.innerHTML = "<tr><td colspan='4'>Laddar rapporter...</td></tr>";
-                reportsContainer.style.display = "block";
-
-                try {
-                    const snapReports = await get(ref(db, "reportedTracks"));
-                    const snapFlagged = await get(ref(db, "flaggedTracks"));
-                    
-                    let reports = {};
-                    if (snapReports.exists()) {
-                        reports = { ...snapReports.val() };
-                    }
-                    if (snapFlagged.exists()) {
-                        const flagged = snapFlagged.val();
-                        for (const [id, data] of Object.entries(flagged)) {
-                            reports[id] = {
-                                title: data.title,
-                                artist: data.artist,
-                                year: data.oldYear,
-                                reportedAt: data.flaggedAt || new Date().toISOString(),
-                                isFlagged: true
-                            };
-                        }
-                    }
-
-                    if (Object.keys(reports).length === 0) {
-                        tbody.innerHTML = "<tr><td colspan='4' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
-                        return;
-                    }
-                    tbody.innerHTML = "";
-                    let hasReports = false;
-
-                    for (const [trackId, data] of Object.entries(reports)) {
-                        hasReports = true;
-                        const dateStr = new Date(data.reportedAt).toLocaleString("sv-SE");
-                        const isFlagged = data.isFlagged ? '<span style="background:var(--warning); color:black; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">Flaggad</span>' : '';
-                        
-                        const safeTitle = data.title || "Okänd titel";
-                        const safeArtist = data.artist || "Okänd artist";
-                        const safeYear = data.year || "?";
-
-                        const tr = document.createElement("tr");
-                        tr.innerHTML = `
-                            <td style="font-weight:bold; font-size: 1.2rem; text-align: center; color: var(--warning);">1</td>
-                            <td><strong>${escapeHtml(safeTitle)}</strong>${isFlagged}</td>
-                            <td>${escapeHtml(safeArtist)}</td>
-                            <td><span style="color: #ef4444; font-weight: bold;">${escapeHtml(safeYear)}</span><br><span style="font-size: 11px; color: var(--text-muted);">${escapeHtml(dateStr)}</span></td>
-                            <td>
-                                <button class="btn-info scan-report-btn" data-id="${escapeHtml(trackId)}" data-title="${escapeHtml(safeTitle)}" data-artist="${escapeHtml(safeArtist)}" data-year="${escapeHtml(safeYear)}" style="padding: 6px 10px; font-size: 13px;">🔍 Skanna med AI</button>
-                                <button class="btn-clean delete-report-btn" data-id="${escapeHtml(trackId)}" style="padding: 6px 10px; font-size: 13px; margin-left: 5px;" title="Ta bort rapport (ignorera)">🗑️</button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    }
-
-                    if (!hasReports) {
-                        tbody.innerHTML = "<tr><td colspan='4' style='color: var(--text-muted);'>Inga rapporter just nu. Bra jobbat! 🎉</td></tr>";
-                    }
-
-                    // Bind Delete Buttons
-                    document.querySelectorAll(".delete-report-btn").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            deleteReport(e.target.getAttribute("data-id"), e.target.closest("tr"));
-                        });
-                    });
-
-                    // Bind Scan Buttons
-                    document.querySelectorAll(".scan-report-btn").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const trackId = e.target.getAttribute("data-id");
-                            const title = e.target.getAttribute("data-title");
-                            const artist = e.target.getAttribute("data-artist");
-                            const oldYear = e.target.getAttribute("data-year");
-                            scanSingleReport(trackId, title, artist, oldYear, e.target.closest("tr"));
-                        });
-                    });
-
-                } catch (err) {
-                    console.error("Fel vid hämtning av rapporter:", err);
-                    tbody.innerHTML = `<tr><td colspan='4' style='color: red;'>Fel: ${err.message}</td></tr>`;
-                }
-            }
-
-
-
-            async function scanSingleReport(trackId, title, artist, oldYear, trElement) {
-                const btn = trElement.querySelector(".scan-report-btn");
-                const originalText = btn.innerHTML;
-                btn.innerHTML = "Skannar...";
-                btn.disabled = true;
-
-                try {
-                    let newYear = oldYear;
-                    let source = "";
-
-                    // Endast AI (Claude via getSongYearAi)
-                    btn.innerHTML = "Frågar AI...";
-                    const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
-                    const aiResult = await getSongYearAi({ title, artist });
-                    if (aiResult && aiResult.data && aiResult.data.year && aiResult.data.year !== "UNKNOWN") {
-                        newYear = String(aiResult.data.year);
-                        source = "AI";
-                    }
-
-                    const googleQuery = encodeURIComponent(`${artist} ${title} release year`);
-                    let yearHtml = `<div style="display:flex; align-items:center; gap:10px;">
-                        <del style="color: var(--text-muted); font-size:12px;">${escapeHtml(oldYear)}</del>
-                        <input type="number" class="manual-year-input-${escapeHtml(trackId)}" value="${escapeHtml(newYear)}" style="width: 70px; font-weight:bold; padding: 6px; text-align: center; border-radius:4px; border:1px solid #ccc; background:var(--bg-secondary); color:var(--text-main);">
-                        <span style="font-size: 11px; color: var(--text-muted);">(${source || 'Ingen ändring hittades'})</span>
-                    </div>`;
-
-                    trElement.innerHTML = `
-                        <td style="font-weight:bold; font-size: 1.2rem; text-align: center; color: var(--warning);">1</td>
-                        <td><strong>${escapeHtml(title)}</strong></td>
-                        <td>${escapeHtml(artist)}</td>
-                        <td>${yearHtml}</td>
-                        <td style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
-                            <button class="btn-success approve-report-btn" data-id="${escapeHtml(trackId)}" data-title="${escapeHtml(title)}" data-artist="${escapeHtml(artist)}" style="padding: 6px 10px; font-size: 13px; margin: 0;">✅ Spara</button>
-                            <button class="btn-clean delete-report-btn" data-id="${escapeHtml(trackId)}" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Radera rapport">🗑️</button>
-                        </td>
-                    `;
-
-                    // Bind Approve Button
-                    trElement.querySelector(".approve-report-btn").addEventListener("click", async (e) => {
-                        const inputField = trElement.querySelector(`.manual-year-input-${trackId}`);
-                        const finalYear = inputField.value;
-                        if (!finalYear) {
-                            alert("Ange ett giltigt årtal");
-                            return;
-                        }
-
-                        e.target.innerHTML = "Sparar...";
-                        e.target.disabled = true;
-                        
-                        try {
-                            // 1. Spara till verifiedTracks
-                            await set(ref(db, 'verifiedTracks/' + trackId), {
-                                title: title,
-                                artist: artist,
-                                year: finalYear,
-                                manuallyVerified: true
-                            });
-
-                            // 2. Vi uppdaterar standardLists också, för att vara säkra
-                            const listsSnap = await get(ref(db, "standardLists"));
-                            if (listsSnap.exists()) {
-                                const lists = listsSnap.val();
-                                for (const listName of Object.keys(lists)) {
-                                    if (lists[listName].songs && lists[listName].songs[trackId]) {
-                                        await set(ref(db, `standardLists/${listName}/songs/${trackId}/year`), finalYear);
-                                    }
-                                }
-                            }
-
-                            // 3. Ta bort rapporten och flaggan från Firebase + raden ur DOM
-                            await set(ref(db, `reportedTracks/${trackId}`), null);
-                            await set(ref(db, `flaggedTracks/${trackId}`), null);
-                            trElement.remove();
-                            showEmptyReportsMessageIfNeeded();
-                        } catch (err) {
-                            console.error("Fel vid sparande:", err);
-                            alert("Fel: " + err.message);
-                            e.target.innerHTML = "✅ Spara";
-                            e.target.disabled = false;
-                        }
-                    });
-
-                    // Bind Delete Button – same deletion as unscanned rows (previously it reloaded
-                    // the whole list, which deleted nothing and threw away every other row's scan)
-                    trElement.querySelector(".delete-report-btn").addEventListener("click", () => {
-                        deleteReport(trackId, trElement);
-                    });
-
-                } catch (err) {
-                    console.error("Skanning misslyckades:", err);
-                    btn.innerHTML = "Fel!";
-                    setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
-                }
-            }
-
-            document.getElementById("refreshReportsBtn").addEventListener("click", loadReportedTracks);
-
             // --- REVIEW QUEUE: years that have to be settled by hand ---
-            // Songs the year review could not settle, and locked songs where it gives another year.
-            // Every decision locks the song, writes the year to all its lists and marks the review
-            // as resolved, so the song leaves the queue for good.
+            // Songs reported from the game, songs the year review could not settle, and locked songs
+            // where it gives another year. Every decision locks the song, writes the year to all its
+            // lists and marks the review as resolved, so the song leaves the queue for good. A report
+            // is removed with the decision, or thrown away without changing anything.
             const yearQueueTitleEl = document.getElementById("yearQueueTitle");
             const yearQueueStatusEl = document.getElementById("yearQueueStatus");
             const yearQueueListEl = document.getElementById("yearQueueList");
@@ -2113,49 +1938,78 @@
 
             // One song in the queue. Everything from the database, from Claude or from a web page is escaped.
             function renderYearQueueEntry(entry) {
-                const review = entry.review;
+                // A reported song has no review when its check has not run
+                const review = entry.review || {};
                 const memory = review.memory;
                 const web = review.web;
+                const isReport = entry.kind === "reported";
                 const row = document.createElement("div");
                 row.className = "year-queue-row";
                 row.style.cssText = "border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px;";
 
-                const kindText = entry.kind === "needsReview"
-                    ? "Granskningen kunde inte avgöra året"
-                    : "Låst av dig, granskningen säger ett annat år";
+                let kindText = "Låst av dig, granskningen säger ett annat år";
+                if (entry.kind === "needsReview") kindText = "Granskningen kunde inte avgöra året";
+                if (isReport) {
+                    const reportedAt = Number.isFinite(entry.report.reportedAt) ? new Date(entry.report.reportedAt).toLocaleString("sv-SE") : "okänd tid";
+                    kindText = `Rapporterad i spelet som fel årtal (${escapeHtml(entry.report.year)}) · ${escapeHtml(reportedAt)}`;
+                }
                 let webText = "ingen sökning";
                 if (web) {
                     webText = `${escapeHtml(web.year)} (stöd: ${escapeHtml(web.support)})`;
                     if (web.explanation) webText += ` – ${escapeHtml(web.explanation)}`;
                     const link = web.sourceVerified ? yearSourceLink(web.sourceUrl, null) : "";
                     if (link) webText += ` ${link}`;
+                    // A report starts a new search, unless the song was searched in the last 30 days or
+                    // the day's limit is reached. Then the search shown here is older than the report.
+                    if (isReport && Number.isFinite(review.checkedAt) && Number.isFinite(entry.report.reportedAt) && review.checkedAt < entry.report.reportedAt) {
+                        webText += " (sökningen gjordes före rapporten)";
+                    }
                 }
-                const acceptButton = entry.suggestion
+                // When the check for a reported song gives the year the game already has, there is one
+                // button: it keeps the year and saves the check's source with it
+                const confirmsYear = isReport && !!entry.suggestion && entry.suggestion.year === entry.currentYear;
+                const acceptButton = entry.suggestion && !confirmsYear
                     ? `<button class="btn-success year-queue-accept" style="white-space: nowrap;">Godta ${escapeHtml(entry.suggestion.year)}</button>`
+                    : "";
+                const discardButton = isReport
+                    ? `<button class="btn-danger year-queue-discard" style="white-space: nowrap;" title="Tar bort rapporten utan att ändra något i spelet">Kasta rapporten</button>`
                     : "";
                 const whereText = entry.lists.length > 0
                     ? `Finns i: ${escapeHtml(entry.lists.join(", "))}`
                     : "Finns inte i någon standardlista (importerad av en användare)";
+                const spotifyText = review.spotifyYear != null
+                    ? `${escapeHtml(review.spotifyYear)} (${escapeHtml(review.albumName || "okänt album")}, ${escapeHtml(review.albumType || "okänd typ")})`
+                    : "ingen uppgift";
+                // A report can be written by anyone, so its year may be unreadable. Then there is no
+                // year to keep, only one to accept or to type in.
+                const hasCurrentYear = Number.isInteger(entry.currentYear);
+                const keepButton = hasCurrentYear
+                    ? `<button class="btn-secondary year-queue-keep" style="white-space: nowrap;">Behåll ${escapeHtml(entry.currentYear)}</button>`
+                    : "";
 
                 row.innerHTML = `
                     <div style="font-weight: 600;">${escapeHtml(entry.artist)} – ${escapeHtml(entry.title)}</div>
                     <div style="color: var(--text-muted); font-size: 13px; margin: 4px 0 8px;">${kindText} · ${whereText}</div>
                     <div style="font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
-                        <div><strong>Idag:</strong> ${escapeHtml(entry.currentYear)}${entry.locked ? " (låst)" : ""}</div>
-                        <div><strong>Spotify:</strong> ${escapeHtml(review.spotifyYear)} (${escapeHtml(review.albumName || "okänt album")}, ${escapeHtml(review.albumType || "okänd typ")})</div>
+                        <div><strong>Idag:</strong> ${hasCurrentYear ? escapeHtml(entry.currentYear) : "okänt"}${entry.locked ? " (låst)" : ""}</div>
+                        <div><strong>Spotify:</strong> ${spotifyText}</div>
                         <div><strong>Opus ur minnet:</strong> ${memory ? `${escapeHtml(memory.year)} (${escapeHtml(memory.confidence)})` : "inget svar"}</div>
                         <div><strong>Webbsökning:</strong> ${webText}</div>
                     </div>
                     <div class="flex-row" style="align-items: center; flex-wrap: wrap; gap: 8px;">
                         ${acceptButton}
-                        <button class="btn-secondary year-queue-keep" style="white-space: nowrap;">Behåll ${escapeHtml(entry.currentYear)}</button>
+                        ${keepButton}
                         <input type="number" class="year-queue-input" placeholder="Annat år" style="width: 110px;">
                         <button class="btn-info year-queue-custom" style="white-space: nowrap;">Spara annat år</button>
+                        ${discardButton}
                         <span class="year-queue-row-status" style="font-size: 13px; color: var(--warning);"></span>
                     </div>
                 `;
 
                 const rowStatusEl = row.querySelector(".year-queue-row-status");
+                const setButtonsDisabled = (disabled) => {
+                    row.querySelectorAll("button").forEach(button => { button.disabled = disabled; });
+                };
                 const decide = async (choice) => {
                     const customYear = parseInt(row.querySelector(".year-queue-input").value, 10);
                     const decision = buildYearDecision(entry, choice, customYear, Date.now());
@@ -2163,29 +2017,49 @@
                         rowStatusEl.textContent = "Ange ett giltigt årtal.";
                         return;
                     }
-                    const buttons = row.querySelectorAll("button");
-                    buttons.forEach(button => { button.disabled = true; });
+                    setButtonsDisabled(true);
                     rowStatusEl.textContent = "Sparar...";
                     try {
-                        // The resolved mark is written last: if anything before it fails, the song stays in the queue
+                        // The resolved mark is written after the year: if anything before it fails, the song stays in the queue
                         await set(ref(db, `verifiedTracks/${entry.id}`), decision.cacheRecord);
                         for (const [listName, updates] of Object.entries(decision.listUpdates)) {
                             await update(ref(db, `standardLists/${listName}/songs`), updates);
                         }
                         await set(ref(db, `yearReviews/${entry.id}/resolved`), decision.resolved);
+                        // The report is settled with the song, and is removed last for the same reason
+                        if (isReport) await set(ref(db, `reportedTracks/${entry.id}`), null);
                         row.remove();
                         updateYearQueueCount();
                     } catch (err) {
                         console.error("[Granskningskö] Kunde inte spara beslutet:", err);
                         rowStatusEl.textContent = "Kunde inte spara: " + err.message;
-                        buttons.forEach(button => { button.disabled = false; });
+                        setButtonsDisabled(false);
                     }
                 };
 
                 const acceptBtn = row.querySelector(".year-queue-accept");
                 if (acceptBtn) acceptBtn.addEventListener("click", () => decide("accept"));
-                row.querySelector(".year-queue-keep").addEventListener("click", () => decide("keep"));
+                const keepBtn = row.querySelector(".year-queue-keep");
+                if (keepBtn) keepBtn.addEventListener("click", () => decide(confirmsYear ? "accept" : "keep"));
                 row.querySelector(".year-queue-custom").addEventListener("click", () => decide("custom"));
+
+                // Removes the report and nothing else. The queue is read again afterwards, because the
+                // song may still belong in it for another reason.
+                const discardBtn = row.querySelector(".year-queue-discard");
+                if (discardBtn) {
+                    discardBtn.addEventListener("click", async () => {
+                        setButtonsDisabled(true);
+                        rowStatusEl.textContent = "Tar bort rapporten...";
+                        try {
+                            await set(ref(db, `reportedTracks/${entry.id}`), null);
+                            await loadYearQueue();
+                        } catch (err) {
+                            console.error("[Granskningskö] Kunde inte ta bort rapporten:", err);
+                            rowStatusEl.textContent = "Kunde inte ta bort rapporten: " + err.message;
+                            setButtonsDisabled(false);
+                        }
+                    });
+                }
                 return row;
             }
 
@@ -2194,8 +2068,8 @@
                 yearEnrichBox.style.display = "none";
                 pendingYearEnrich = null;
                 try {
-                    const data = await loadYearReviewData();
-                    const queue = buildYearQueue(data.lists, data.verified, data.reviews);
+                    const [data, reportsSnap] = await Promise.all([loadYearReviewData(), get(ref(db, "reportedTracks"))]);
+                    const queue = buildYearQueue(data.lists, data.verified, data.reviews, reportsSnap.val());
                     yearQueueListEl.innerHTML = "";
                     for (const entry of queue) yearQueueListEl.appendChild(renderYearQueueEntry(entry));
                     yearQueueStatusEl.textContent = "";
@@ -2270,39 +2144,9 @@
                 }
             }
 
-            document.getElementById("scanAllReportsBtn").addEventListener("click", async () => {
-                const rows = document.querySelectorAll("#reportsTableBody tr");
-                const toScan = [];
-                rows.forEach(tr => {
-                    const btn = tr.querySelector(".scan-report-btn");
-                    if (btn) toScan.push(tr); // Bara oskannade rader har scan-knappen
-                });
-                if (toScan.length === 0) return;
-                const scanAllBtn = document.getElementById("scanAllReportsBtn");
-                scanAllBtn.disabled = true;
-                scanAllBtn.textContent = `Skannar 0/${toScan.length}...`;
-                for (let i = 0; i < toScan.length; i++) {
-                    const tr = toScan[i];
-                    if (!tr.isConnected) continue; // Rapporten raderades medan skanningen pågick
-                    const btn = tr.querySelector(".scan-report-btn");
-                    if (!btn) continue; // Redan skannad
-                    const trackId = btn.getAttribute("data-id");
-                    const title   = btn.getAttribute("data-title");
-                    const artist  = btn.getAttribute("data-artist");
-                    const oldYear = btn.getAttribute("data-year");
-                    await scanSingleReport(trackId, title, artist, oldYear, tr);
-                    scanAllBtn.textContent = `Skannar ${i + 1}/${toScan.length}...`;
-                }
-                scanAllBtn.disabled = false;
-                scanAllBtn.innerHTML = "⚡ Skanna alla med AI";
-            });
-            
-            // Ladda rapporter vid inloggning
+            // The queue is loaded at sign-in, so the number in its heading is there at once
             onAuthStateChanged(auth, (user) => {
-                if (user && user.email === ADMIN_EMAIL) {
-                    loadReportedTracks();
-                    loadYearQueue();
-                }
+                if (user && user.email === ADMIN_EMAIL) loadYearQueue();
             });
 
         });
@@ -2456,7 +2300,8 @@
                         <button id="yearQueueRefreshBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
                     </div>
                     <p style="color: var(--text-muted); margin-bottom: 12px;">
-                        Låtar som årtalsgranskningen inte kunde avgöra, och låsta låtar där granskningen säger ett annat år än ditt.
+                        Låtar som spelare har rapporterat från spelet, låtar som årtalsgranskningen inte kunde avgöra, och låsta låtar där granskningen säger ett annat år än ditt.
+                        En rapport startar en ny webbsökning på servern, högst 20 per dygn; resultatet syns här när den är klar, oftast inom en minut.
                         Varje beslut låser låten, skriver året till alla listor där den finns och tar bort den ur kön.
                     </p>
                     <p id="yearQueueStatus" style="font-weight: 600; color: var(--primary); margin-bottom: 10px;"></p>
@@ -2465,31 +2310,6 @@
                         <button id="yearEnrichBtn" class="btn-secondary" style="white-space: nowrap;" disabled>Lägg till källa och förklaring på låsta låtar...</button>
                         <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">För låsta låtar där granskningen ger samma år som ditt. Året och låset ändras inte. Visar först hur många det gäller och ber dig bekräfta.</p>
                         <div id="yearEnrichBox" style="display: none; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-top: 10px;"></div>
-                    </div>
-                </div>
-
-                <div id="reportsContainer" class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h3 style="color: #ef4444; margin: 0;">Spelarnas Rapporter 🚩</h3>
-                        <div style="display: flex; gap: 8px;">
-                            <button id="scanAllReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px; background: #7c3aed;">⚡ Skanna alla med AI</button>
-                            <button id="refreshReportsBtn" class="btn-info" style="padding: 6px 12px; font-size: 13px;">🔄 Uppdatera</button>
-                        </div>
-                    </div>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">Låtar som spelarna har rapporterat inifrån spelet som felaktiga årtal.</p>
-                    <div style="overflow-x: auto;">
-                        <table id="reportsTable">
-                            <thead>
-                                <tr>
-                                    <th>Antal</th>
-                                    <th>Låt</th>
-                                    <th>Artist</th>
-                                    <th>Spelets År</th>
-                                    <th>Handlingar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reportsTableBody"></tbody>
-                        </table>
                     </div>
                 </div>
             </div>

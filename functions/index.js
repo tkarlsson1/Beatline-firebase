@@ -654,3 +654,91 @@ exports.reviewImportedTracks = functions.region("europe-west1").runWith({ timeou
 
   return { results };
 });
+
+// ─── A report from the game starts a new check ───────────────────────────────
+
+// The database the game uses. It is a named instance, not the project's default one, so the
+// trigger has to name it.
+const GAME_DATABASE_INSTANCE = "notestreamfire";
+
+// A report can be written by anyone, signed in or not, and a check with a web search costs about
+// 12 cents. So at most this many checks are run per calendar day in Sweden, and a song that had
+// a web search recently is not searched again.
+const REPORT_CHECKS_PER_DAY = 20;
+const REPORT_RECHECK_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
+
+// Reserves one report check in the day's limit. One transaction, so reports that arrive at the
+// same time cannot pass the limit together. reportUsage has no rule in database.rules.json, so
+// only the server can read or write it.
+async function reserveReportCheck(day) {
+  const outcome = await db.ref(`reportUsage/${day}`).transaction(count => {
+    const used = typeof count === "number" ? count : 0;
+    return used >= REPORT_CHECKS_PER_DAY ? undefined : used + 1;
+  });
+  return outcome.committed;
+}
+
+// Gives back a reservation that was not used, because the check failed
+async function releaseReportCheck(day) {
+  await db.ref(`reportUsage/${day}`).transaction(count => Math.max(0, (typeof count === "number" ? count : 0) - 1));
+}
+
+/**
+ * Runs a new check for a reported song, always with a web search, and stores it in yearReviews.
+ * Nothing the game reads is changed: the admin settles the report in the review queue, with
+ * this check in front of them. The stored review replaces the earlier one, also a decision made
+ * by hand, so that the song can be settled again.
+ *
+ * Returns what happened: "invalidId", "recentCheck" (searched within the last 30 days),
+ * "overLimit", "error" or "checked". The same report delivered twice is searched once, because
+ * the second run finds the recent check.
+ */
+async function checkReportedSong(trackId) {
+  if (typeof trackId !== "string" || !SPOTIFY_TRACK_ID.test(trackId)) return "invalidId";
+
+  const review = (await db.ref(`yearReviews/${trackId}`).once("value")).val();
+  const searchedAt = review && review.web && typeof review.checkedAt === "number" ? review.checkedAt : null;
+  if (searchedAt !== null && Date.now() - searchedAt < REPORT_RECHECK_AFTER_MS) return "recentCheck";
+
+  const day = swedishDay(new Date());
+  if (!(await reserveReportCheck(day))) return "overLimit";
+
+  let stored = false;
+  try {
+    const client = createAnthropicClient(REVIEW_REQUEST_TIMEOUT_MS);
+    const result = await resolveTrack(client, trackId, { forceWeb: true, webWhenUncertain: false });
+    if (result.status !== "error") {
+      await storeYearReview(result);
+      stored = true;
+    }
+  } finally {
+    if (!stored) {
+      try {
+        await releaseReportCheck(day);
+      } catch (error) {
+        functions.logger.error("[checkReportedTrack] could not give back the reservation:", error);
+      }
+    }
+  }
+  return stored ? "checked" : "error";
+}
+
+/**
+ * Database trigger: checkReportedTrack
+ * Runs when a player reports a year from the game, which creates reportedTracks/<track id>.
+ * A report that is written again while it exists does not start a new check.
+ */
+exports.checkReportedTrack = functions.region("europe-west1")
+  .runWith({ timeoutSeconds: 300, memory: "512MB", secrets: [AI_SECRET] })
+  .database.instance(GAME_DATABASE_INSTANCE).ref("/reportedTracks/{trackId}")
+  .onCreate(async (snapshot, context) => {
+    const trackId = context.params.trackId;
+    try {
+      const outcome = await checkReportedSong(trackId);
+      functions.logger.info(`[checkReportedTrack] ${trackId}: ${outcome}`);
+    } catch (error) {
+      // Nothing is thrown on: the report stays in the admin's queue either way
+      functions.logger.error(`[checkReportedTrack] ${trackId}: the check failed:`, error);
+    }
+    return null;
+  });
