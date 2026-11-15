@@ -364,6 +364,25 @@ exports.getSpotifyToken = functions.region('europe-west1').https.onCall(async (d
 
 const MAX_TRACKS_PER_RESOLVE = 10;
 const RESOLVE_CONCURRENCY = 3;
+// A web search answer can take a while, so each request gets more time than in the older functions
+const REVIEW_REQUEST_TIMEOUT_MS = 150000;
+
+// Throws unless trackIds is a list of 1 to 10 Spotify track ids
+function requireTrackIds(trackIds) {
+  if (!Array.isArray(trackIds) || trackIds.length === 0 || trackIds.length > MAX_TRACKS_PER_RESOLVE) {
+    throw new functions.https.HttpsError("invalid-argument", `Between 1 and ${MAX_TRACKS_PER_RESOLVE} track ids are required.`);
+  }
+  if (trackIds.some(id => typeof id !== "string" || !SPOTIFY_TRACK_ID.test(id))) {
+    throw new functions.https.HttpsError("invalid-argument", "Every track id must be a Spotify track id.");
+  }
+}
+
+// Writes one result from resolveTrack to yearReviews. The id is the key, so it is left out of
+// the stored value.
+async function storeYearReview(result) {
+  const { id, ...review } = result;
+  await db.ref(`yearReviews/${id}`).set({ ...review, checkedAt: admin.database.ServerValue.TIMESTAMP });
+}
 
 // Runs the chain for one track. A failure for one track does not stop the others: it is logged
 // and returned as status "error". A configuration error stops the whole call.
@@ -443,12 +462,7 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
   requireAdmin(context);
 
   const { trackIds, store, forceWeb, webWhenUncertain } = data || {};
-  if (!Array.isArray(trackIds) || trackIds.length === 0 || trackIds.length > MAX_TRACKS_PER_RESOLVE) {
-    throw new functions.https.HttpsError("invalid-argument", `Between 1 and ${MAX_TRACKS_PER_RESOLVE} track ids are required.`);
-  }
-  if (trackIds.some(id => typeof id !== "string" || !SPOTIFY_TRACK_ID.test(id))) {
-    throw new functions.https.HttpsError("invalid-argument", "Every track id must be a Spotify track id.");
-  }
+  requireTrackIds(trackIds);
   if (store !== undefined && typeof store !== "boolean") {
     throw new functions.https.HttpsError("invalid-argument", "store must be true or false.");
   }
@@ -462,13 +476,7 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
 
   const uniqueIds = [...new Set(trackIds)];
   // A web search answer can take a while, so each request gets more time than in the older functions
-  const client = createAnthropicClient(150000);
-
-  // Writes one result to yearReviews. The id is the key, so it is left out of the stored value.
-  const storeResult = async (result) => {
-    const { id, ...review } = result;
-    await db.ref(`yearReviews/${id}`).set({ ...review, checkedAt: admin.database.ServerValue.TIMESTAMP });
-  };
+  const client = createAnthropicClient(REVIEW_REQUEST_TIMEOUT_MS);
 
   const results = new Array(uniqueIds.length);
   let nextIndex = 0;
@@ -478,7 +486,7 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
       let result = await resolveTrack(client, uniqueIds[index], resolveOptions);
       if (store === true && result.status !== "error") {
         try {
-          await storeResult(result);
+          await storeYearReview(result);
         } catch (error) {
           // A result that could not be stored is reported as failed, so the caller runs it again
           functions.logger.error(`[resolveSongYear] ${result.id}: could not store the result:`, error);
@@ -489,6 +497,222 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
     }
   };
   await Promise.all(Array.from({ length: Math.min(RESOLVE_CONCURRENCY, uniqueIds.length) }, worker));
+
+  return { results };
+});
+
+// ─── Year review for playlists that signed-in users import ───────────────────
+
+// How many songs may get a paid review per calendar day in Sweden: for one user, and for all
+// users together. A review costs about 4 cents on average and about 12 cents when it needs a
+// web search, so the total limit caps a day at roughly 12 to 37 dollars. A song over a limit is
+// imported with Spotify's year and is reviewed the next time the playlist is imported.
+// The admin account is not limited.
+const IMPORT_DAILY_LIMIT_PER_USER = 150;
+const IMPORT_DAILY_LIMIT_TOTAL = 300;
+
+// The calendar day in Sweden as "2026-11-15", so the limits start over at Swedish midnight
+function swedishDay(now) {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm", year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(now);
+}
+
+/**
+ * How many of `wanted` reviews fit in what is left of the day's limits. Pure function.
+ * usage: { total, users: { uid: count } } for the day, or null when nothing is used yet
+ */
+function importReviewsThatFit(usage, uid, wanted) {
+  const total = (usage && usage.total) || 0;
+  const mine = (usage && usage.users && usage.users[uid]) || 0;
+  const room = Math.min(IMPORT_DAILY_LIMIT_TOTAL - total, IMPORT_DAILY_LIMIT_PER_USER - mine);
+  return Math.max(0, Math.min(wanted, room));
+}
+
+/**
+ * Reserves up to `wanted` reviews for the user in the day's limits and returns how many were
+ * reserved. It is one transaction on the day's node, so calls that run at the same time cannot
+ * pass a limit together. importUsage has no rule in database.rules.json, so only the server can
+ * read or write it.
+ */
+async function reserveImportReviews(uid, day, wanted) {
+  if (wanted <= 0) return 0;
+  let granted = 0;
+  const outcome = await db.ref(`importUsage/${day}`).transaction(usage => {
+    granted = importReviewsThatFit(usage, uid, wanted);
+    if (granted === 0) return undefined; // nothing to write: the transaction is aborted
+    const users = { ...((usage && usage.users) || {}) };
+    users[uid] = (users[uid] || 0) + granted;
+    return { total: ((usage && usage.total) || 0) + granted, users };
+  });
+  return outcome.committed ? granted : 0;
+}
+
+// Gives back reservations that were not used, because the review failed
+async function releaseImportReviews(uid, day, count) {
+  if (count <= 0) return;
+  await db.ref(`importUsage/${day}`).transaction(usage => {
+    const users = { ...((usage && usage.users) || {}) };
+    users[uid] = Math.max(0, (users[uid] || 0) - count);
+    return { total: Math.max(0, ((usage && usage.total) || 0) - count), users };
+  });
+}
+
+/**
+ * The cache record for a reviewed song, with the same fields the admin page writes when it
+ * applies a review. Pure function. review is a result from resolveTrack or a stored year review.
+ */
+function buildImportCacheRecord(review, checkedAt, appliedAt) {
+  return {
+    title: review.title,
+    artist: review.artist,
+    year: String(review.year),
+    manuallyVerified: false,
+    source: review.source || null,
+    explanation: review.explanation || null,
+    sourceUrl: review.sourceUrl || null,
+    sourceTitle: review.sourceTitle || null,
+    spotifyYear: Number.isInteger(review.spotifyYear) ? review.spotifyYear : null,
+    albumName: review.albumName || null,
+    albumType: review.albumType || null,
+    releaseDate: review.releaseDate || null,
+    checkedAt: checkedAt,
+    appliedAt: appliedAt
+  };
+}
+
+// Creates the cache record unless the song already has one. An existing record is never
+// replaced here: it may be locked by the admin, and an import by a user must not change a year
+// the game already uses.
+async function createCacheRecordIfAbsent(trackId, record) {
+  await db.ref(`verifiedTracks/${trackId}`).transaction(current => (current === null ? record : undefined));
+}
+
+// What an import gets back for one song: the status and the year, never the review's details
+function importResult(trackId, status, year) {
+  return Number.isInteger(year) ? { id: trackId, status, year } : { id: trackId, status };
+}
+
+/**
+ * Turns a year review into the import's answer. A review that settled the year also gives the
+ * song its cache record. Returns null for a review with a status this code does not know.
+ */
+async function useYearReview(trackId, review, checkedAt) {
+  if (review.status === "ok" && Number.isInteger(review.year)) {
+    await createCacheRecordIfAbsent(trackId, buildImportCacheRecord(review, checkedAt, Date.now()));
+    return importResult(trackId, "reviewed", review.year);
+  }
+  if (review.status === "needsReview" || review.status === "notFound" || review.status === "noSpotifyYear") {
+    return importResult(trackId, review.status);
+  }
+  return null;
+}
+
+/**
+ * Answers for a song the server already knows, which costs nothing: from the cache, or from a
+ * review stored earlier. Returns null when the song has to be reviewed.
+ */
+async function knownImportYear(trackId) {
+  const cached = (await db.ref(`verifiedTracks/${trackId}`).once("value")).val();
+  if (cached && cached.year !== undefined && cached.year !== null && cached.year !== "") {
+    return importResult(trackId, "cached", parseInt(cached.year, 10));
+  }
+  const review = (await db.ref(`yearReviews/${trackId}`).once("value")).val();
+  if (!review || typeof review.status !== "string") return null;
+  return useYearReview(trackId, review, typeof review.checkedAt === "number" ? review.checkedAt : null);
+}
+
+/**
+ * Reviews one song for an import. Returns { result, counted }. counted is false when the review
+ * failed, so that its place in the day's limits is given back.
+ */
+async function reviewImportedTrack(client, trackId) {
+  const result = await resolveTrack(client, trackId, { forceWeb: false, webWhenUncertain: true });
+  if (result.status === "error") return { result: importResult(trackId, "error"), counted: false };
+  try {
+    // Stored like the admin's reviews, so the song is never paid for twice and the admin page
+    // can settle a song the review could not
+    await storeYearReview(result);
+    const answer = await useYearReview(trackId, result, Date.now());
+    return { result: answer || importResult(trackId, "error"), counted: true };
+  } catch (error) {
+    functions.logger.error(`[reviewImportedTracks] ${trackId}: could not store the result:`, error);
+    return { result: importResult(trackId, "error"), counted: true };
+  }
+}
+
+/**
+ * Callable: reviewImportedTracks
+ * Finds the year for tracks in a playlist that a signed-in user imports.
+ *
+ * A track that is in the cache, or that was reviewed before, is answered from what is stored
+ * and costs nothing. Every other track is reviewed like in resolveSongYear, with a web search
+ * when the year changes or the review is not certain, as long as the day's limits have room.
+ * The server stores the review and creates the cache record itself, so no user can write a
+ * year to the cache, and a record that exists is never replaced.
+ *
+ * data:    { trackIds: [Spotify track id] }, at most 10 ids
+ * returns: { results: [{ id, status, year? }] } in the same order as trackIds (duplicates removed).
+ *          status is "cached" or "reviewed" (both with year), "needsReview", "overLimit",
+ *          "notFound", "noSpotifyYear" or "error". Without a year the caller keeps Spotify's.
+ */
+exports.reviewImportedTracks = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
+  requireAuth(context);
+  const { trackIds } = data || {};
+  requireTrackIds(trackIds);
+
+  const uid = context.auth.uid;
+  const uniqueIds = [...new Set(trackIds)];
+  const results = new Array(uniqueIds.length);
+
+  // What the server already knows is answered first, and never counts against the limits
+  const unknown = [];
+  await Promise.all(uniqueIds.map(async (trackId, index) => {
+    try {
+      const known = await knownImportYear(trackId);
+      if (known) results[index] = known; else unknown.push(index);
+    } catch (error) {
+      functions.logger.error(`[reviewImportedTracks] ${trackId}: could not read what is stored:`, error);
+      results[index] = importResult(trackId, "error");
+    }
+  }));
+  unknown.sort((a, b) => a - b);
+
+  const day = swedishDay(new Date());
+  const limited = uid !== ADMIN_UID;
+  const granted = limited ? await reserveImportReviews(uid, day, unknown.length) : unknown.length;
+  for (const index of unknown.slice(granted)) results[index] = importResult(uniqueIds[index], "overLimit");
+  const toReview = unknown.slice(0, granted);
+
+  let counted = 0;
+  try {
+    if (toReview.length > 0) {
+      const client = createAnthropicClient(REVIEW_REQUEST_TIMEOUT_MS);
+      let next = 0;
+      const worker = async () => {
+        while (next < toReview.length) {
+          const index = toReview[next++];
+          const outcome = await reviewImportedTrack(client, uniqueIds[index]);
+          if (outcome.counted) counted++;
+          results[index] = outcome.result;
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(RESOLVE_CONCURRENCY, toReview.length) }, worker));
+    }
+  } finally {
+    // Reservations that were not used are given back, also when the call fails as a whole
+    if (limited && granted > counted) {
+      try {
+        await releaseImportReviews(uid, day, granted - counted);
+      } catch (error) {
+        functions.logger.error(`[reviewImportedTracks] could not give back ${granted - counted} reservations:`, error);
+      }
+    }
+  }
+
+  const statusCounts = {};
+  for (const result of results) statusCounts[result.status] = (statusCounts[result.status] || 0) + 1;
+  functions.logger.info(`[reviewImportedTracks] ${uniqueIds.length} tracks for ${uid}`, { statusCounts, day, limited });
 
   return { results };
 });

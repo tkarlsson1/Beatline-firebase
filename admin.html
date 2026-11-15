@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.077</title>
+    <title>Notestream Admin v0.078</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -603,9 +603,32 @@
          * suggestion is { year, source, explanation, sourceUrl, sourceTitle }, or null when the
          * review has nothing to suggest. For a locked song it is the review's year. For a song the
          * review could not settle it is the web search's year, else the year from memory.
+         *
+         * Songs the review could not settle are also taken from outside the standard lists. They
+         * come from playlists imported by users, which this page does not read, so the title and
+         * the artist are the review's own, lists is empty and a decision only writes the cache.
          */
         function buildYearQueue(lists, verified, reviews) {
             const summary = classifyYearReviews(lists, verified, reviews);
+
+            const inStandardLists = new Set();
+            for (const list of Object.values(lists || {})) {
+                for (const trackId of Object.keys((list && list.songs) || {})) inStandardLists.add(trackId);
+            }
+            const outsideLists = [];
+            for (const [trackId, review] of Object.entries(reviews || {})) {
+                if (!review || review.status !== "needsReview" || review.resolved || inStandardLists.has(trackId)) continue;
+                const cached = verified ? verified[trackId] : null;
+                // A locked record means the year has already been settled by hand
+                if (cached && cached.manuallyVerified === true) continue;
+                outsideLists.push({
+                    id: trackId, title: review.title, artist: review.artist, listYear: null, lists: [], listYears: {},
+                    // Without a cache record the game uses the year in the user's playlist, which is Spotify's
+                    currentYear: parseInt(cached && cached.year ? cached.year : review.spotifyYear, 10),
+                    locked: false, review
+                });
+            }
+
             const withSuggestion = (entry, kind) => {
                 const review = entry.review;
                 let suggestion = null;
@@ -627,6 +650,7 @@
             };
             return [
                 ...summary.needsReview.map(entry => withSuggestion(entry, "needsReview")),
+                ...outsideLists.map(entry => withSuggestion(entry, "needsReview")),
                 ...summary.lockedDiffers.map(entry => withSuggestion(entry, "lockedDiffers"))
             ];
         }
@@ -2109,10 +2133,13 @@
                 const acceptButton = entry.suggestion
                     ? `<button class="btn-success year-queue-accept" style="white-space: nowrap;">Godta ${escapeHtml(entry.suggestion.year)}</button>`
                     : "";
+                const whereText = entry.lists.length > 0
+                    ? `Finns i: ${escapeHtml(entry.lists.join(", "))}`
+                    : "Finns inte i någon standardlista (importerad av en användare)";
 
                 row.innerHTML = `
                     <div style="font-weight: 600;">${escapeHtml(entry.artist)} – ${escapeHtml(entry.title)}</div>
-                    <div style="color: var(--text-muted); font-size: 13px; margin: 4px 0 8px;">${kindText} · Finns i: ${escapeHtml(entry.lists.join(", "))}</div>
+                    <div style="color: var(--text-muted); font-size: 13px; margin: 4px 0 8px;">${kindText} · ${whereText}</div>
                     <div style="font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
                         <div><strong>Idag:</strong> ${escapeHtml(entry.currentYear)}${entry.locked ? " (låst)" : ""}</div>
                         <div><strong>Spotify:</strong> ${escapeHtml(review.spotifyYear)} (${escapeHtml(review.albumName || "okänt album")}, ${escapeHtml(review.albumType || "okänd typ")})</div>

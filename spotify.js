@@ -143,30 +143,22 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     const trackKeys = Object.keys(tracks);
     const totalTracks = trackKeys.length;
     let verifiedCount = 0;
-    let aiCount = 0;
-    let aiErrors = 0;
-    
-    // Array to hold uncertain tracks for manual review
-    const uncertainTracks = [];
-    
-    // Separera spår som behöver AI från de som finns i cachen
-    const tracksToAi = [];
-    
-    for (let i = 0; i < totalTracks; i++) {
-      const trackId = trackKeys[i];
+
+    // Songs in the cache get the cache's year. The rest are sent to the server for review.
+    const idsToReview = [];
+    for (const trackId of trackKeys) {
       const track = tracks[trackId];
-      
       if (verifiedTracks[trackId] && verifiedTracks[trackId].year) {
         track.year = String(verifiedTracks[trackId].year);
         verifiedCount++;
       } else {
-        tracksToAi.push({ id: trackId, track: track, index: i });
+        idsToReview.push(trackId);
       }
     }
-    
+
     // Visa info-raden i 2 sekunder innan spinner startar
-    if (tracksToAi.length > 0) {
-      if (progressInfo) progressInfo.textContent = `${verifiedCount} av ${totalTracks} låtar finns redan i databasen. Kvalitetssäkrar de övriga ${tracksToAi.length}...`;
+    if (idsToReview.length > 0) {
+      if (progressInfo) progressInfo.textContent = `${verifiedCount} av ${totalTracks} låtar finns redan i databasen. Kvalitetssäkrar de övriga ${idsToReview.length}...`;
       if (progressText) progressText.textContent = '';
       await new Promise(r => setTimeout(r, 2000));
       if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
@@ -174,102 +166,21 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     }
 
     if (addBtn) addBtn.textContent = 'Importerar spellista...';
-    
-    // Kör AI-frågor i batchar
-    const BATCH_SIZE = 25;
-    let processedAi = 0;
-    
-    if (window.firebaseFunctions && window.httpsCallable) {
-      const getSongYearAi = window.httpsCallable(window.firebaseFunctions, 'getSongYearAi');
-      
-      for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
-        const batch = tracksToAi.slice(i, i + BATCH_SIZE);
 
-        // Skicka hela batchen till getSongYearsAiBatch med retry-logik
-        const getSongYearsAiBatch = window.httpsCallable(window.firebaseFunctions, 'getSongYearsAiBatch', { timeout: 540000 });
-        const batchPayload = batch.map(item => ({
-          id: item.id,
-          title: item.track.title,
-          artist: item.track.artist
-        }));
+    // The server reviews the songs: Spotify's year is checked, with a web search when it is
+    // needed. A song the server cannot review now keeps Spotify's year.
+    const reviewResults = await reviewImportedTracks(idsToReview, (handled, total) => {
+      if (progressText) progressText.textContent = `Kvalitetssäkrar årtalen... ${handled} / ${total}`;
+    });
+    const reviewCounts = applyImportReview(tracks, idsToReview, reviewResults);
+    console.log(`Validering klar: ${verifiedCount} från cache.`, reviewCounts);
 
-        let success = false;
-        let retries = 0;
-        const MAX_RETRIES = 3;
-        let result = null;
-
-        while (!success && retries < MAX_RETRIES) {
-          try {
-            result = await getSongYearsAiBatch({ songs: batchPayload });
-            success = true;
-          } catch (e) {
-            retries++;
-            const errMsg = e.message || String(e);
-            console.warn(`[AI Retry] Batch misslyckades (försök ${retries}/${MAX_RETRIES}): ${errMsg}`);
-            if (retries >= MAX_RETRIES) {
-              console.error(`[AI] Batch misslyckades permanent efter ${MAX_RETRIES} försök. Felmeddelande: ${errMsg}`);
-              aiErrors += batch.length;
-            } else {
-              await new Promise(r => setTimeout(r, 5000));
-            }
-          }
-        }
-
-        processedAi += batch.length;
-
-        if (success && result && result.data && Array.isArray(result.data.results)) {
-          if (progressText) progressText.textContent = 'Kvalitetssäkrar årtalen...';
-          const aiResults = result.data.results;
-          
-          for (const aiItem of aiResults) {
-            const originalItem = batch.find(b => b.id === aiItem.id);
-            if (!originalItem) continue;
-            
-            if (aiItem.year && aiItem.year !== "UNKNOWN") {
-              const aiYear = parseInt(aiItem.year, 10);
-              const spotifyYear = parseInt(originalItem.track.year, 10);
-              
-              if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
-                const diff = Math.abs(spotifyYear - aiYear);
-                if (diff <= 1) {
-                  // SÄKERT: Auto-godkänn
-                  originalItem.track.year = String(aiYear);
-                  aiCount++;
-                  
-                  // Spara till Cache i bakgrunden
-                  window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${originalItem.id}`), {
-                    title: originalItem.track.title,
-                    artist: originalItem.track.artist,
-                    year: originalItem.track.year,
-                    manuallyVerified: false
-                  }).catch(e => console.warn("Kunde inte spara till cache", e));
-                } else if (aiYear < spotifyYear) {
-                  // OSÄKERT: Lägg till i granskningslistan
-                  uncertainTracks.push({
-                    id: originalItem.id,
-                    title: originalItem.track.title,
-                    artist: originalItem.track.artist,
-                    spotifyYear: originalItem.track.year,
-                    aiYear: String(aiYear)
-                  });
-                }
-              }
-            }
-          }
-        }
-      }
-    } else {
-      console.warn("Firebase Functions är inte initierat.");
-    }
-    
-    console.log(`Validering klar: ${verifiedCount} från cache, ${aiCount} säkra från AI, ${uncertainTracks.length} osäkra.`);
-    
     if (progressText) {
       progressText.textContent = 'Sparar...';
       if (progressCount) progressCount.textContent = '';
       if (progressBar) progressBar.style.width = '100%';
     }
-    
+
     // Bug #7: Sanitera förbjudna Firebase-tecken i spellistenamnet
     const safePlaylistName = playlistName.replace(/[.#$\[\]/]/g, '_');
     if (safePlaylistName !== playlistName) {
@@ -288,15 +199,8 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     if (sp) sp.style.display = 'none';
     if (container) container.style.display = 'none';
     
-    // 4. Hantera resultat
-    if (aiErrors > 0) {
-      alert(`"${playlistName}" har lagts till med ${totalTracks} låtar.\n\nNågra låtar kunde inte kvalitetssäkras och har importerats med Spotifys ursprungliga årtal.`);
-    } else if (uncertainTracks.length > 0) {
-      openReviewPlaylistModal(uncertainTracks, playlistName);
-    } else {
-      alert(`"${playlistName}" har lagts till med ${totalTracks} låtar.`);
-    }
-    
+    alert(importResultMessage(playlistName, totalTracks, reviewCounts));
+
     // Rensa fälten
     document.getElementById('playlistLinkInput').value = '';
     document.getElementById('playlistNameInput').value = '';
@@ -317,143 +221,105 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
 }
 
 // ============================================
-// REVIEW PLAYLIST MODAL LOGIC
+// YEAR REVIEW OF IMPORTED SONGS
 // ============================================
-function openReviewPlaylistModal(uncertainTracks, playlistName) {
-  const modal = document.getElementById("reviewPlaylistModal");
-  const listContainer = document.getElementById("reviewPlaylistList");
-  
-  if (!modal || !listContainer) return;
-  
-  listContainer.innerHTML = "";
-  
-  uncertainTracks.forEach((t, i) => {
-    const row = document.createElement("div");
-    row.style.padding = "10px";
-    row.style.borderBottom = i < uncertainTracks.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none";
-    row.style.display = "flex";
-    row.style.justifyContent = "space-between";
-    row.style.alignItems = "center";
-    row.style.flexWrap = "wrap";
-    row.style.gap = "10px";
-    
-    const info = document.createElement("div");
-    info.style.flex = "1";
-    info.style.minWidth = "200px";
-    info.innerHTML = `
-      <strong style="font-size: 1.1rem; display: block;">${t.title}</strong>
-      <span style="font-size: 0.9rem; color: #aaa;">${t.artist}</span>
-    `;
-    
-    const years = document.createElement("div");
-    years.style.display = "flex";
-    years.style.alignItems = "center";
-    years.style.gap = "15px";
-    years.innerHTML = `
-      <div style="text-align: center;">
-        <span style="font-size: 0.75rem; color: #aaa; display: block;">Spotify</span>
-        <span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${t.spotifyYear}</span>
-      </div>
-      <div style="font-size: 1.2rem;">➡️</div>
-      <div style="text-align: center;">
-        <span style="font-size: 0.75rem; color: #10b981; display: block;">AI Föreslog</span>
-        <span style="color: #10b981; font-weight: bold;">${t.aiYear}</span>
-      </div>
-      <div style="font-size: 1.2rem;">➡️</div>
-      <div style="text-align: center;">
-        <span style="font-size: 0.75rem; color: #fff; display: block;">Ditt val</span>
-        <input type="text" class="review-year-input" data-id="${t.id}" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${t.artist.replace(/"/g, '&quot;')}" value="${t.aiYear}" style="width: 60px; text-align: center; padding: 5px; border-radius: 4px; border: 1px solid #fff; background: #222; color: #fff; font-weight: bold;">
-      </div>
-      <a href="https://www.google.com/search?q=${encodeURIComponent(t.artist + ' ' + t.title + ' release year')}" target="_blank" style="text-decoration: none; font-size: 1.2rem; margin-left: 10px; opacity: 0.8; hover: opacity: 1;" title="Sök på Google">🔍</a>
-    `;
-    
-    row.appendChild(info);
-    row.appendChild(years);
-    listContainer.appendChild(row);
-  });
-  
-  // Bind spara-knappen
-  const saveBtn = document.getElementById("saveReviewPlaylistBtn");
-  const newSaveBtn = saveBtn.cloneNode(true);
-  saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-  
-  const checkbox = document.getElementById("disableCooldownCheckbox");
-  checkbox.checked = false;
-  newSaveBtn.textContent = "Spara årtal";
-  
-  newSaveBtn.addEventListener("click", async () => {
-    newSaveBtn.disabled = true;
-    newSaveBtn.textContent = "Sparar...";
-    
-    const disableCooldown = checkbox.checked;
-    const inputs = document.querySelectorAll(".review-year-input");
-    const userId = window.auth.currentUser.uid;
-    
-    // Förbered sparning till Cache och Spellista
-    const cacheUpdates = {};
-    const playlistUpdates = {};
-    const cooldownIds = [];
-    
-    inputs.forEach(input => {
-      const trackId = input.getAttribute("data-id");
-      const title = input.getAttribute("data-title");
-      const artist = input.getAttribute("data-artist");
-      const chosenYear = input.value.trim();
-      
-      // Spara till Cache
-      cacheUpdates[trackId] = {
-        title: title,
-        artist: artist,
-        year: chosenYear,
-        manuallyVerified: true
-      };
-      
-      // Spara till användarens nyligen importerade spellista
-      playlistUpdates[`${trackId}/year`] = chosenYear;
-      
-      if (!disableCooldown) {
-        cooldownIds.push(trackId);
+const IMPORT_REVIEW_BATCH_SIZE = 10;      // the server accepts at most 10 songs per call
+const IMPORT_REVIEW_PARALLEL_CALLS = 2;
+
+/**
+ * Sends songs to the server function reviewImportedTracks, ten per call and two calls at a
+ * time. The server finds the year, stores the review and writes the cache itself.
+ *
+ * onProgress: called with (handled, total) at the start and after every call
+ * Returns { trackId: { id, status, year? } }. A song whose call failed twice has no entry.
+ */
+async function reviewImportedTracks(trackIds, onProgress) {
+  const results = {};
+  if (trackIds.length === 0) return results;
+  if (!window.firebaseFunctions || !window.httpsCallable) {
+    console.warn("Firebase Functions är inte initierat.");
+    return results;
+  }
+
+  // A call with web searches can take a few minutes, so the default limit of 70 s is raised
+  const callReview = window.httpsCallable(window.firebaseFunctions, 'reviewImportedTracks', { timeout: 540000 });
+  const batches = [];
+  for (let i = 0; i < trackIds.length; i += IMPORT_REVIEW_BATCH_SIZE) {
+    batches.push(trackIds.slice(i, i + IMPORT_REVIEW_BATCH_SIZE));
+  }
+
+  let handled = 0;
+  let nextBatch = 0;
+  // A call that fails is tried once more. What the first try managed to review is stored on
+  // the server, so the second try does not pay for it again.
+  const runBatch = async (ids) => {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const response = await callReview({ trackIds: ids });
+        const list = response && response.data && Array.isArray(response.data.results) ? response.data.results : null;
+        if (!list) throw new Error("The answer has no results.");
+        list.forEach(result => {
+          if (result && typeof result.id === 'string') results[result.id] = result;
+        });
+        return;
+      } catch (error) {
+        console.warn(`[Import] Granskningen misslyckades (försök ${attempt}/2):`, error);
+        if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 5000));
       }
-    });
-    
-    try {
-      // 1. Spara till Cache
-      for (const [tId, tData] of Object.entries(cacheUpdates)) {
-        await window.firebaseSet(window.firebaseRef(window.firebaseDb, `verifiedTracks/${tId}`), tData);
-      }
-      
-      // 2. Uppdatera spelarens spellista med de nya årtalen
-      const userListRef = window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}/songs`);
-      for (const [tId, newYear] of Object.entries(playlistUpdates)) {
-        await window.firebaseSet(window.firebaseRef(window.firebaseDb, `userPlaylists/${userId}/${playlistName}/songs/${tId}/year`), newYear);
-      }
-      
-      // 3. Lägg till Spoiler Cooldown
-      if (cooldownIds.length > 0) {
-        const expireTime = Date.now() + (12 * 60 * 60 * 1000); // 12 timmar
-        const cooldownUpdates = {};
-        cooldownIds.forEach(id => { cooldownUpdates[id] = expireTime; });
-        
-        await window.firebaseUpdate(window.firebaseRef(window.firebaseDb, `users/${userId}/cooldowns`), cooldownUpdates);
-      }
-      
-      modal.style.display = "none";
-      alert("Tack! Årtalen är sparade." + (!disableCooldown ? "\n\nDessa låtar kommer nu döljas från spelet i 12 timmar för att du inte ska kunna fuska! 😉" : ""));
-      
-    } catch (e) {
-      console.error("Fel vid sparande av review:", e);
-      alert("Något gick fel när vi sparade. Försök igen.");
-      newSaveBtn.disabled = false;
-      newSaveBtn.textContent = "Spara Årtal & Aktivera Spärr";
     }
-  });
-  
-  // Bind close-knapp
-  document.getElementById("closeReviewPlaylist").onclick = () => {
-    modal.style.display = "none";
   };
-  
-  modal.style.display = "block";
+  const worker = async () => {
+    while (nextBatch < batches.length) {
+      const ids = batches[nextBatch++];
+      await runBatch(ids);
+      handled += ids.length;
+      onProgress(handled, trackIds.length);
+    }
+  };
+  onProgress(0, trackIds.length);
+  await Promise.all(Array.from({ length: Math.min(IMPORT_REVIEW_PARALLEL_CALLS, batches.length) }, worker));
+  return results;
+}
+
+/**
+ * Puts the reviewed years into the songs and counts what happened. A song without a reviewed
+ * year keeps the year it has, which is Spotify's.
+ *
+ * tracks:      { trackId: { title, artist, year } }, changed in place
+ * reviewedIds: the ids that were sent for review
+ * results:     the answer from reviewImportedTracks
+ * Returns { reviewed, overLimit, failed, unsettled }.
+ */
+function applyImportReview(tracks, reviewedIds, results) {
+  const counts = { reviewed: 0, overLimit: 0, failed: 0, unsettled: 0 };
+  for (const trackId of reviewedIds) {
+    const result = results[trackId];
+    const status = result ? result.status : null;
+    if ((status === 'reviewed' || status === 'cached') && Number.isInteger(result.year)) {
+      tracks[trackId].year = String(result.year);
+      counts.reviewed++;
+    } else if (status === 'overLimit') {
+      counts.overLimit++;
+    } else if (status === 'needsReview' || status === 'notFound' || status === 'noSpotifyYear') {
+      // The review could not settle the year. The admin settles it; until then Spotify's year stands.
+      counts.unsettled++;
+    } else {
+      counts.failed++;
+    }
+  }
+  return counts;
+}
+
+// The message shown when an import is done
+function importResultMessage(playlistName, totalTracks, counts) {
+  let message = `"${playlistName}" har lagts till med ${totalTracks} låtar.`;
+  if (counts.overLimit > 0) {
+    message += `\n\n${counts.overLimit} låtar granskades inte eftersom dagens gräns för nya låtar är nådd. De har Spotifys årtal. Importera listan igen i morgon så granskas de.`;
+  }
+  if (counts.failed > 0) {
+    message += `\n\n${counts.failed} låtar kunde inte kvalitetssäkras just nu och har Spotifys årtal. Importera listan igen för att försöka på nytt.`;
+  }
+  return message;
 }
 
 // Initialize Spotify handlers

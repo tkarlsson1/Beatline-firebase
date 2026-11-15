@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.848 |
-| admin.html | 0.077 |
-| spotify.js | 0.807 |
+| index.html (spelet) | 0.849 |
+| admin.html | 0.078 |
+| spotify.js | 0.849 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v50 |
-| service-worker | v52 |
+| service-worker | v53 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
@@ -66,6 +66,7 @@
 | 2026-11-15 | 244 låsta låtar fick källa och förklaring från granskningen (221 från webbsökning, 223 med länk). Kontrollerat mot en kopia tagen precis före: exakt 244 poster ändrades, alla var låsta och saknade härkomst, och år, lås, titel och artist är oförändrade. Listorna är orörda. 2 190 av 2 225 låtar i standardlistorna har nu en förklaring – de 35 som saknar väntar i kön "Årtal att avgöra" | – |
 | 2026-11-15 | Spelet: när kortet vänds visas förklaringen till årtalet under låten, och "Källa: webbplats" som länk (ny flik) när låten har en kontrollerad källa. Varje enhet läser texten från `verifiedTracks/<id>` när låten börjar spelas, inte via spelnoden, och visar den bara om cachens år är samma som kortets. Låtar utan förklaring eller utanför cachen visas utan text. Rutans upplägg ändrat så att texten får plats i liggande mobil: "Fel årtal?" ligger på samma rad som +TOKEN och NÄSTA LÅT, knappraden ligger fast under en del som rullar vid behov, rutan blir aldrig högre än skärmen, och 16 px tom marginal under knapparna är borta. Mätt lokalt på 812×375 med riktiga låtar: den längsta texten med källa får plats utan rullning; vid utmaning rullar texten 12 px för den längsta texten, knapparna syns alltid. Inte provat i en riktig spelomgång, och inte om musiken påverkas när värden öppnar källänken | 0.847 / 0.076 |
 | 2026-11-15 | Adminimporten av standardlistor går genom `resolveSongYear`. Låtar utan granskning skickas tio per anrop, och det nya valet `webWhenUncertain` kör webbsökningen även när Opus behåller året utan att vara säker. Låtar med status ok får cachepost med källa och förklaring och året skrivs i listan; en olåst cachepost utan källa ersätts då av granskningens. Övriga får cachens eller Spotifys år: de som inte går att avgöra hamnar i "Årtal att avgöra", de som misslyckades tas av "Starta / Fortsätt". Låsta låtar rörs inte. Cachen skrivs först och listan sist. En avbruten import kostar inget extra vid nytt försök, eftersom granskningarna redan är sparade. Borttaget: granskningsrutan efter adminimport och kortet "Städa databasen" (cirka 800 rader). `getSongYearsAiBatch` används nu bara av användarimporten, `getSongYearAi` bara av rapportflödet. Inte provat med en riktig import | 0.848 / 0.077 / Functions |
+| 2026-11-15 | Användarimporten går genom den nya funktionen `reviewImportedTracks` (alla inloggade, högst tio låtar per anrop). Låtar i cachen eller med sparad granskning besvaras utan kostnad. Övriga granskas som i adminimporten, och servern skriver själv granskningen och cacheposten; en post som finns ersätts aldrig. Tak per svenskt kalenderdygn: 150 nya låtar per användare och 300 för alla tillsammans (cirka 12 dollar vid vanlig blandning, upp till cirka 37 om varje låt kräver webbsökning). Adminkontot är undantaget. Räknarna ligger i `importUsage/<datum>`, som saknar regel och därför bara nås av servern. Låtar över taket eller med misslyckad granskning får Spotifys år, och meddelandet efter importen säger hur många. Borttaget: användarnas ruta "AI-Granskning" och spärren på 12 timmar (koden som läser spärren ligger kvar). Kön "Årtal att avgöra" visar nu också låtar utanför standardlistorna som granskningen inte kunde avgöra; ett beslut där skriver bara cachen. Ingen sida anropar längre `getSongYearsAiBatch`. Inte provat med ett riktigt konto | 0.849 / 0.078 / Functions |
 
 ---
 
