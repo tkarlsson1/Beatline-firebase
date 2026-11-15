@@ -469,13 +469,27 @@ function decideYear(spotifyYear, review, webReview) {
 }
 
 /**
- * Runs the whole chain for one song: review from memory, a web search if the year was changed,
- * and the decision.
+ * Whether the web search should run after the review from memory. Pure function.
+ *
+ * It always runs when the review changes Spotify's year. webWhenUncertain also runs it when the
+ * review keeps the year without being certain (confidence other than "high"), and forceWeb runs
+ * it whatever the review says. Without a review there is nothing to check, so it does not run.
+ */
+function shouldSearchWeb(review, options = {}) {
+  if (!review) return false;
+  if (review.changed || options.forceWeb === true) return true;
+  return options.webWhenUncertain === true && review.confidence !== "high";
+}
+
+/**
+ * Runs the whole chain for one song: review from memory, a web search when shouldSearchWeb calls
+ * for one, and the decision.
  *
  * client:  an Anthropic client (the caller sets the API key, timeout and retries)
  * song:    { title, artist, spotifyYear, albumName?, albumType?, releaseDate? }
- * options: { forceWeb?: boolean } forceWeb runs the web search even when the review keeps Spotify's
- *          year. It is used for songs where the review was not certain.
+ * options: { forceWeb?: boolean, webWhenUncertain?: boolean }, see shouldSearchWeb. The imports
+ *          use webWhenUncertain, so a new song gets in one call what the review of all songs
+ *          did in two runs.
  *
  * Returns { decision, review, reviewFailure, webReview, webFailure, usage }:
  *   decision: the result of decideYear
@@ -489,8 +503,7 @@ async function resolveSongYear(client, song, options = {}) {
   }
 
   const memory = await reviewSongYear(client, song);
-  const runWeb = !!memory.review && (memory.review.changed || options.forceWeb === true);
-  const web = runWeb ? await verifySongYearOnWeb(client, song) : null;
+  const web = shouldSearchWeb(memory.review, options) ? await verifySongYearOnWeb(client, song) : null;
 
   return {
     decision: decideYear(spotifyYear, memory.review, web ? web.review : null),
@@ -518,5 +531,6 @@ module.exports = {
   buildWebReview,
   verifySongYearOnWeb,
   decideYear,
+  shouldSearchWeb,
   resolveSongYear
 };

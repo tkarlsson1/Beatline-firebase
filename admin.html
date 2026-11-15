@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.076</title>
+    <title>Notestream Admin v0.077</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -150,12 +150,6 @@
             transform: translateY(-1px);
         }
 
-        .reviewed-row {
-            opacity: 0.4;
-            background-color: rgba(16, 185, 129, 0.05) !important;
-            transition: all 0.2s;
-        }
-
         label {
             display: flex;
             align-items: center;
@@ -205,16 +199,6 @@
 
         tr:hover td {
             background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        #readmeContent {
-            background-color: var(--input-bg) !important;
-            border: 1px solid var(--border) !important;
-            color: var(--text-muted) !important;
-        }
-
-        #readmeContent h4 {
-            color: var(--text-main) !important;
         }
 
         #adminLoginForm {
@@ -531,6 +515,83 @@
                 }
             }
             return { cacheUpdates, listUpdates, counts };
+        }
+
+        /**
+         * What importing a playlist into the standard lists writes, once its songs have been
+         * reviewed. Pure function, built on the same rules as buildYearApplyPlan: a song whose
+         * review has status "ok" and that is not locked gets the review's year and a cache record.
+         * Every other song keeps the year the game would use today: the cache's year where
+         * there is one, else Spotify's.
+         *
+         * listName:  the name the list is saved under
+         * tracks:    { trackId: { title, artist, year } } as read from Spotify (year is Spotify's)
+         * appliedAt: the timestamp stored in the new cache records
+         *
+         * Returns { songs, cacheUpdates, counts }:
+         *   songs         the list's songs with the year to save
+         *   cacheUpdates  { trackId: record }, to be written under verifiedTracks
+         *   counts        total, applied (new cache records), differsFromSpotify (songs saved with
+         *                 another year than Spotify's), toSettle (songs for the review queue),
+         *                 notFound and pending (songs without a review)
+         */
+        function buildImportPlan(listName, tracks, verified, reviews, appliedAt) {
+            const songs = {};
+            for (const [trackId, track] of Object.entries(tracks || {})) {
+                if (!track) continue;
+                const cached = verified ? verified[trackId] : null;
+                songs[trackId] = { ...track, year: cached && cached.year ? String(cached.year) : track.year };
+            }
+
+            const lists = { [listName]: { songs } };
+            const summary = classifyYearReviews(lists, verified, reviews);
+            const plan = buildYearApplyPlan(lists, verified, reviews, appliedAt);
+            for (const [key, year] of Object.entries(plan.listUpdates[listName] || {})) {
+                // The keys are "<trackId>/year"
+                songs[key.slice(0, key.lastIndexOf("/"))].year = year;
+            }
+
+            let differsFromSpotify = 0;
+            for (const [trackId, song] of Object.entries(songs)) {
+                if (String(song.year) !== String(tracks[trackId].year)) differsFromSpotify++;
+            }
+            return {
+                songs,
+                cacheUpdates: plan.cacheUpdates,
+                counts: {
+                    total: summary.total,
+                    applied: plan.counts.applied,
+                    differsFromSpotify,
+                    toSettle: summary.needsReview.length + summary.lockedDiffers.length,
+                    notFound: summary.notFound.length,
+                    pending: summary.pending.length
+                }
+            };
+        }
+
+        /**
+         * The message shown when an import is done. Pure function.
+         *
+         * counts:      from buildImportPlan
+         * reviewedNow: how many of the songs were reviewed during this import
+         */
+        function importSummaryText(listName, counts, reviewedNow) {
+            const lines = [
+                `Spellistan "${listName}" har lagts till med ${counts.total} låtar.`,
+                "",
+                `${reviewedNow} granskades nu, ${counts.total - reviewedNow - counts.pending} var redan granskade.`,
+                `${counts.differsFromSpotify} har ett annat år än Spotifys.`
+            ];
+            if (counts.toSettle > 0) {
+                lines.push(`${counts.toSettle} måste avgöras för hand. De ligger i fliken Flaggat under "Årtal att avgöra".`);
+            }
+            if (counts.notFound > 0) {
+                lines.push(`${counts.notFound} saknar utgivningsdatum hos Spotify och har inget granskat år.`);
+            }
+            if (counts.pending > 0) {
+                lines.push(`${counts.pending} kunde inte granskas nu och har Spotifys år. Kör "Starta / Fortsätt" i kortet "Granska alla årtal" och sedan "Verkställ".`);
+            }
+            return lines.join("\n");
         }
 
         /**
@@ -1269,12 +1330,23 @@
                     alert("Fyll i både spellistans namn och länk!");
                     return;
                 }
+                // The import reviews songs with the same server function as the card "Granska alla
+                // årtal", so the two must not run at the same time
+                if (yearReviewRunning) {
+                    alert("En årtalsgranskning pågår redan. Vänta tills den är klar, eller stoppa den, och försök igen.");
+                    return;
+                }
 
                 const addBtn = document.getElementById("addStandardPlaylistButton");
                 const progressContainer = document.getElementById("importProgressContainer");
                 const progressText = document.getElementById("importProgressText");
                 const progressCount = document.getElementById("importProgressCount");
                 const progressBar = document.getElementById("importProgressBar");
+                const resetImportUi = () => {
+                    addBtn.disabled = false;
+                    addBtn.textContent = "Lägg till";
+                    progressContainer.style.display = 'none';
+                };
 
                 addBtn.disabled = true;
                 addBtn.textContent = 'Laddar låtar...';
@@ -1288,238 +1360,80 @@
                     tracks = await fetchSpotifyPlaylist(playlistLink);
                 } catch (e) {
                     alert("Misslyckades hämta spellistan: " + e.message);
-                    addBtn.disabled = false;
-                    addBtn.textContent = "Lägg till";
-                    progressContainer.style.display = 'none';
+                    resetImportUi();
                     return;
                 }
 
                 if (!tracks || Object.keys(tracks).length === 0) {
                     alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
-                    addBtn.disabled = false;
-                    addBtn.textContent = "Lägg till";
-                    progressContainer.style.display = 'none';
+                    resetImportUi();
                     return;
                 }
 
-                progressText.textContent = 'Laddar cache...';
-                let verifiedTracks = {};
+                yearReviewRunning = true;
+                yearReviewStartBtn.disabled = true;
+                yearReviewWebBtn.disabled = true;
+                yearReviewApplyBtn.disabled = true;
+
                 try {
-                    const snap = await get(ref(db, 'verifiedTracks'));
-                    if (snap.exists()) {
-                        verifiedTracks = snap.val();
-                    }
-                } catch (e) {
-                    console.warn("Kunde inte hämta verifiedTracks:", e);
-                }
+                    const readCacheAndReviews = async () => {
+                        const [verifiedSnap, reviewsSnap] = await Promise.all([
+                            get(ref(db, "verifiedTracks")),
+                            get(ref(db, "yearReviews"))
+                        ]);
+                        return { verified: verifiedSnap.val() || {}, reviews: reviewsSnap.val() || {} };
+                    };
 
-                const trackKeys = Object.keys(tracks);
-                const totalTracks = trackKeys.length;
-                let verifiedCount = 0;
-                let aiCount = 0;
-                let aiErrors = 0;
-                const uncertainTracks = [];
-                const tracksToAi = [];
+                    progressText.textContent = 'Läser cachen och tidigare granskningar...';
+                    let state = await readCacheAndReviews();
 
-                for (let i = 0; i < totalTracks; i++) {
-                    const trackId = trackKeys[i];
-                    const track = tracks[trackId];
-                    if (verifiedTracks[trackId] && verifiedTracks[trackId].year) {
-                        track.year = String(verifiedTracks[trackId].year);
-                        verifiedCount++;
-                    } else {
-                        tracksToAi.push({ id: trackId, track: track, index: i });
-                    }
-                }
-
-                if (tracksToAi.length > 0) {
-                    progressText.textContent = 'Kör AI-validering...';
-                    progressCount.textContent = `0 / ${tracksToAi.length}`;
-                }
-
-                addBtn.textContent = `AI granskar ${tracksToAi.length} låtar...`;
-                const BATCH_SIZE = 25;
-                let processedAi = 0;
-                const getSongYearsAiBatch = httpsCallable(functions, 'getSongYearsAiBatch', { timeout: 540000 });
-
-                for (let i = 0; i < tracksToAi.length; i += BATCH_SIZE) {
-                    const batch = tracksToAi.slice(i, i + BATCH_SIZE);
-                    processedAi += batch.length;
-                    progressCount.textContent = `${processedAi} / ${tracksToAi.length}`;
-                    progressBar.style.width = `${Math.round((processedAi / tracksToAi.length) * 100)}%`;
-
-                    const batchPayload = batch.map(item => ({
-                        id: item.id,
-                        title: item.track.title,
-                        artist: item.track.artist
-                    }));
-
-                    let success = false;
-                    let retries = 0;
-                    const MAX_RETRIES = 3;
-                    let result = null;
-
-                    while (!success && retries < MAX_RETRIES) {
-                        try {
-                            result = await getSongYearsAiBatch({ songs: batchPayload });
-                            success = true;
-                        } catch (e) {
-                            retries++;
-                            console.warn(`[AI Retry] Batch misslyckades (försök ${retries}/${MAX_RETRIES}):`, e.message);
-                            if (retries >= MAX_RETRIES) {
-                                console.error(`[AI] Batch misslyckades permanent efter ${MAX_RETRIES} försök.`);
-                                aiErrors += batch.length;
-                            } else {
-                                await new Promise(r => setTimeout(r, 5000));
-                            }
-                        }
-                    }
-
-                    if (success && result && result.data && Array.isArray(result.data.results)) {
-                        const aiResults = result.data.results;
-                        for (const aiItem of aiResults) {
-                            const originalItem = batch.find(b => b.id === aiItem.id);
-                            if (!originalItem) continue;
-                            if (aiItem.year && aiItem.year !== "UNKNOWN") {
-                                const aiYear = parseInt(aiItem.year, 10);
-                                const spotifyYear = parseInt(originalItem.track.year, 10);
-                                if (!isNaN(aiYear) && !isNaN(spotifyYear)) {
-                                    const diff = Math.abs(spotifyYear - aiYear);
-                                    if (diff <= 1) {
-                                        originalItem.track.year = String(aiYear);
-                                        aiCount++;
-                                        set(ref(db, `verifiedTracks/${originalItem.id}`), {
-                                            title: originalItem.track.title,
-                                            artist: originalItem.track.artist,
-                                            year: originalItem.track.year,
-                                            manuallyVerified: false
-                                        }).catch(e => console.warn("Kunde inte spara till cache", e));
-                                    } else if (aiYear < spotifyYear) {
-                                        uncertainTracks.push({
-                                            id: originalItem.id,
-                                            title: originalItem.track.title,
-                                            artist: originalItem.track.artist,
-                                            spotifyYear: originalItem.track.year,
-                                            aiYear: String(aiYear)
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                progressText.textContent = 'Sparar...';
-                progressCount.textContent = '';
-                progressBar.style.width = '100%';
-
-                const standardListsRef = ref(db, `standardLists/${playlistName}`);
-                await set(standardListsRef, { songs: tracks });
-
-                addBtn.disabled = false;
-                addBtn.textContent = "Lägg till";
-                progressContainer.style.display = 'none';
-
-                if (aiErrors > 0) {
-                    alert(`⚠️ AI-valideringen misslyckades för ${aiErrors} låtar. \nDe lades in med Spotifys original-år.`);
-                } else if (uncertainTracks.length > 0) {
-                    openAdminReviewPlaylistModal(uncertainTracks, playlistName);
-                } else {
-                    alert(`Spellistan "${playlistName}" har lagts till i StandardLists!\n\n(${verifiedCount} fanns i cache, ${aiCount} validerades av AI utan problem)`);
-                }
-                
-                document.getElementById("standardPlaylistName").value = '';
-                document.getElementById("standardPlaylistLink").value = '';
-            });
-
-            function openAdminReviewPlaylistModal(uncertainTracks, playlistName) {
-                const modal = document.getElementById("reviewPlaylistModal");
-                const listContainer = document.getElementById("reviewPlaylistList");
-                
-                if (!modal || !listContainer) return;
-                listContainer.innerHTML = "";
-                
-                uncertainTracks.forEach((t, i) => {
-                    const row = document.createElement("tr");
-                    const googleQuery = encodeURIComponent(`${t.artist} ${t.title} release year`);
-                    
-                    row.innerHTML = `
-                        <td style="font-weight: 500;">${t.title}</td>
-                        <td style="color: var(--text-muted);">${t.artist}</td>
-                        <td style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${t.spotifyYear}</td>
-                        <td style="color: #10b981; font-weight: bold;">${t.aiYear}</td>
-                        <td>
-                            <input type="number" class="review-year-input" data-id="${t.id}" data-title="${t.title.replace(/"/g, '&quot;')}" data-artist="${t.artist.replace(/"/g, '&quot;')}" value="${t.aiYear}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid #fff; background: #222; color: #10b981; font-weight: bold;">
-                        </td>
-                        <td style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
-                            <button class="btn-secondary reviewed-btn-playlist" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Markera visuellt som granskad">✔ Klar</button>
-                        </td>
-                    `;
-                    
-                    const reviewedBtn = row.querySelector(".reviewed-btn-playlist");
-                    reviewedBtn.addEventListener("click", (e) => {
-                        row.classList.toggle("reviewed-row");
-                        if (row.classList.contains("reviewed-row")) {
-                            e.target.innerHTML = "Ångra";
-                        } else {
-                            e.target.innerHTML = "✔ Klar";
-                        }
-                    });
-                    
-                    listContainer.appendChild(row);
-                });
-                
-                const saveBtn = document.getElementById("saveReviewPlaylistBtn");
-                const newSaveBtn = saveBtn.cloneNode(true);
-                saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-                
-                newSaveBtn.addEventListener("click", async () => {
-                    newSaveBtn.disabled = true;
-                    newSaveBtn.textContent = "Sparar...";
-                    
-                    const inputs = document.querySelectorAll(".review-year-input");
-                    const cacheUpdates = {};
-                    const playlistUpdates = {};
-                    
-                    inputs.forEach(input => {
-                        const trackId = input.getAttribute("data-id");
-                        const title = input.getAttribute("data-title");
-                        const artist = input.getAttribute("data-artist");
-                        const chosenYear = input.value.trim();
-                        
-                        cacheUpdates[trackId] = {
-                            title: title,
-                            artist: artist,
-                            year: chosenYear,
-                            manuallyVerified: true
+                    // Songs without a stored review are sent to the server. A song that was reviewed
+                    // before, for another list or in an import that was interrupted, is not paid for again.
+                    const toReview = classifyYearReviews({ [playlistName]: { songs: tracks } }, state.verified, state.reviews).pending;
+                    let reviewedNow = 0;
+                    if (toReview.length > 0) {
+                        progressText.textContent = 'Granskar årtalen...';
+                        addBtn.textContent = `Granskar ${toReview.length} låtar...`;
+                        const showProgress = (progress) => {
+                            const handled = progress.done + progress.failed;
+                            progressCount.textContent = `${handled} / ${progress.total}`;
+                            progressBar.style.width = `${Math.round((handled / progress.total) * 100)}%`;
                         };
-                        playlistUpdates[`${trackId}/year`] = chosenYear;
-                    });
-                    
-                    try {
-                        for (const [tId, tData] of Object.entries(cacheUpdates)) {
-                            await set(ref(db, `verifiedTracks/${tId}`), tData);
-                        }
-                        for (const [tId, newYear] of Object.entries(playlistUpdates)) {
-                            await set(ref(db, `standardLists/${playlistName}/songs/${tId}/year`), newYear);
-                        }
-                        modal.style.display = "none";
-                        alert("Tack! Årtalen är sparade för standardlistan.");
-                    } catch (e) {
-                        console.error("Fel vid sparande av review:", e);
-                        alert("Något gick fel när vi sparade. Försök igen.");
-                        newSaveBtn.disabled = false;
-                        newSaveBtn.textContent = "Spara Årtal";
+                        const run = await resolveYearsInBatches(toReview, { webWhenUncertain: true }, showProgress, () => false);
+                        reviewedNow = run.done;
+                        state = await readCacheAndReviews();
                     }
-                });
-                
-                document.getElementById("closeReviewPlaylist").onclick = () => {
-                    modal.style.display = "none";
-                };
-                
-                modal.style.display = "block";
-            }
+
+                    progressText.textContent = 'Sparar...';
+                    progressCount.textContent = '';
+                    progressBar.style.width = '100%';
+                    addBtn.textContent = 'Sparar...';
+
+                    const plan = buildImportPlan(playlistName, tracks, state.verified, state.reviews, Date.now());
+
+                    // The cache first, so the explanations are in place when the list shows up in the game
+                    const cacheIds = Object.keys(plan.cacheUpdates);
+                    for (let i = 0; i < cacheIds.length; i += APPLY_CHUNK_SIZE) {
+                        const chunk = {};
+                        for (const id of cacheIds.slice(i, i + APPLY_CHUNK_SIZE)) chunk[id] = plan.cacheUpdates[id];
+                        await update(ref(db, "verifiedTracks"), chunk);
+                    }
+                    await set(ref(db, `standardLists/${playlistName}`), { songs: plan.songs });
+
+                    alert(importSummaryText(playlistName, plan.counts, reviewedNow));
+                    document.getElementById("standardPlaylistName").value = '';
+                    document.getElementById("standardPlaylistLink").value = '';
+                } catch (e) {
+                    console.error("[Import] Importen avbröts:", e);
+                    alert("Importen avbröts: " + e.message + "\n\nListan är inte sparad. Granskningar som hann bli klara är sparade och körs inte om, så det går att importera listan igen.");
+                } finally {
+                    yearReviewRunning = false;
+                    yearReviewStartBtn.disabled = false;
+                    yearReviewWebBtn.disabled = false;
+                    yearReviewApplyBtn.disabled = !yearReviewAllReviewed;
+                    resetImportUi();
+                }
+            });
 
             async function fetchSpotifyPlaylist(playlistUrl) {
                 let input = playlistUrl.trim();
@@ -1709,6 +1623,60 @@
             });
 
             /**
+             * Sends track ids to resolveSongYear, ten per call and two calls at a time. The server
+             * stores every result in yearReviews. A call that fails is tried once more; songs that
+             * still fail are left without a review, so the next run takes them again.
+             *
+             * requestOptions: extra fields for the request, such as { forceWeb: true }
+             * onProgress:     called with { done, failed, total } at the start and after every call
+             * shouldStop:     () => true to stop before the next call
+             *
+             * Returns { done, failed, stopped }. stopped is true when songs were left because
+             * shouldStop said so.
+             */
+            async function resolveYearsInBatches(ids, requestOptions, onProgress, shouldStop) {
+                const batches = [];
+                for (let i = 0; i < ids.length; i += REVIEW_BATCH_SIZE) batches.push(ids.slice(i, i + REVIEW_BATCH_SIZE));
+
+                // A batch with web searches can take a few minutes, so the default limit of 70 s is raised
+                const resolveSongYear = httpsCallable(functions, 'resolveSongYear', { timeout: 540000 });
+                let done = 0;
+                let failed = 0;
+                let nextBatch = 0;
+                const reportProgress = () => onProgress({ done, failed, total: ids.length });
+
+                const runBatch = async (batchIds) => {
+                    for (let attempt = 1; attempt <= 2; attempt++) {
+                        try {
+                            const response = await resolveSongYear({ trackIds: batchIds, store: true, ...requestOptions });
+                            const results = response && response.data && Array.isArray(response.data.results) ? response.data.results : null;
+                            if (!results) throw new Error("Svaret saknar resultat.");
+                            const failedHere = results.filter(result => result.status === "error").length;
+                            failed += failedHere;
+                            done += batchIds.length - failedHere;
+                            return;
+                        } catch (err) {
+                            console.error(`[Årtalsgranskning] Anrop misslyckades (försök ${attempt}/2):`, err);
+                            if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 5000));
+                        }
+                    }
+                    failed += batchIds.length;
+                };
+
+                const worker = async () => {
+                    while (nextBatch < batches.length && !shouldStop()) {
+                        const batchIds = batches[nextBatch++];
+                        await runBatch(batchIds);
+                        reportProgress();
+                    }
+                };
+                reportProgress();
+                await Promise.all(Array.from({ length: Math.min(REVIEW_PARALLEL_CALLS, batches.length) }, worker));
+
+                return { done, failed, stopped: nextBatch < batches.length };
+            }
+
+            /**
              * Runs resolveSongYear over a set of songs and stores the results.
              * pickIds:         summary => ids of the songs to run, from the current state
              * forceWeb:        true runs the web search for every song, also where Claude keeps the year
@@ -1742,52 +1710,13 @@
                         return;
                     }
 
-                    const batches = [];
-                    for (let i = 0; i < todo.length; i += REVIEW_BATCH_SIZE) batches.push(todo.slice(i, i + REVIEW_BATCH_SIZE));
-
-                    // A batch with web searches can take a few minutes, so the default limit of 70 s is raised
-                    const resolveSongYear = httpsCallable(functions, 'resolveSongYear', { timeout: 540000 });
-                    let done = 0;
-                    let failed = 0;
-                    let nextBatch = 0;
-                    const showProgress = () => {
-                        yearReviewStatusEl.textContent = `Granskar... ${done + failed} / ${todo.length}` + (failed > 0 ? ` (${failed} misslyckade)` : "");
+                    const showProgress = (progress) => {
+                        yearReviewStatusEl.textContent = `Granskar... ${progress.done + progress.failed} / ${progress.total}` + (progress.failed > 0 ? ` (${progress.failed} misslyckade)` : "");
                     };
+                    const run = await resolveYearsInBatches(todo, forceWeb ? { forceWeb: true } : {}, showProgress, () => yearReviewStopRequested);
 
-                    // One call to the server. A call that fails is tried once more; songs that still
-                    // fail are left without a review, so the next run takes them again.
-                    const runBatch = async (ids) => {
-                        for (let attempt = 1; attempt <= 2; attempt++) {
-                            try {
-                                const request = forceWeb ? { trackIds: ids, store: true, forceWeb: true } : { trackIds: ids, store: true };
-                                const response = await resolveSongYear(request);
-                                const results = response && response.data && Array.isArray(response.data.results) ? response.data.results : null;
-                                if (!results) throw new Error("Svaret saknar resultat.");
-                                const failedHere = results.filter(result => result.status === "error").length;
-                                failed += failedHere;
-                                done += ids.length - failedHere;
-                                return;
-                            } catch (err) {
-                                console.error(`[Årtalsgranskning] Anrop misslyckades (försök ${attempt}/2):`, err);
-                                if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 5000));
-                            }
-                        }
-                        failed += ids.length;
-                    };
-
-                    const worker = async () => {
-                        while (nextBatch < batches.length && !yearReviewStopRequested) {
-                            const ids = batches[nextBatch++];
-                            await runBatch(ids);
-                            showProgress();
-                        }
-                    };
-                    showProgress();
-                    await Promise.all(Array.from({ length: Math.min(REVIEW_PARALLEL_CALLS, batches.length) }, worker));
-
-                    const stopped = yearReviewStopRequested && nextBatch < batches.length;
                     renderYearReviewSummary(await loadYearReviewSummary());
-                    yearReviewStatusEl.textContent = `${stopped ? "Stoppad" : "Klar"}: ${done} låtar granskade` + (failed > 0 ? `, ${failed} misslyckades och körs om nästa gång.` : ".");
+                    yearReviewStatusEl.textContent = `${run.stopped ? "Stoppad" : "Klar"}: ${run.done} låtar granskade` + (run.failed > 0 ? `, ${run.failed} misslyckades och körs om nästa gång.` : ".");
                 } catch (err) {
                     console.error("[Årtalsgranskning] Körningen avbröts:", err);
                     yearReviewStatusEl.textContent = "Körningen avbröts: " + err.message;
@@ -1926,418 +1855,6 @@
                     yearReviewApplyBtn.disabled = !yearReviewAllReviewed;
                 }
             }
-
-            // --- DATABAS-STÄDNING ---
-            document.getElementById("cleanDatabaseBtn").addEventListener("click", async () => {
-                const statusEl = document.getElementById("cleanStatus");
-                statusEl.innerHTML = "Laddar data...";
-                const btn = document.getElementById("cleanDatabaseBtn");
-                btn.disabled = true;
-
-                const logEl = document.getElementById("liveLog");
-                logEl.innerHTML = "";
-                logEl.style.display = "block"; // Visar loggen nu när den är renare!
-
-                const logToUI = (msg) => {
-                    const div = document.createElement("div");
-                    div.textContent = msg;
-                    logEl.appendChild(div);
-                    logEl.scrollTop = logEl.scrollHeight;
-                    console.log(msg); // Också till console för säkerhets skull
-                };
-
-                try {
-                    // 1. Hämta verifiedTracks
-                    statusEl.innerHTML = "Hämtar cache (verifiedTracks)...";
-                    const verifiedSnap = await get(ref(db, "verifiedTracks"));
-                    const verifiedTracks = verifiedSnap.exists() ? verifiedSnap.val() : {};
-
-                    // 2. Hämta hela standardLists
-                    statusEl.innerHTML = "Hämtar standardLists...";
-                    const listsSnap = await get(ref(db, "standardLists"));
-                    if (!listsSnap.exists()) {
-                        statusEl.innerHTML = "Hittade inga standardLists!";
-                        btn.disabled = false;
-                        return;
-                    }
-                    const standardLists = listsSnap.val();
-
-                    // Initiera callable funktion
-                    const getSongYearAi = httpsCallable(functions, 'getSongYearAi');
-                    let totalChecked = 0;
-                    let proposedChanges = [];
-                    let tracksToCache = {}; // Håller koll på ALLA låtar som ska in i cachen
-                    const forceRescan = document.getElementById("forceRescanCheckbox").checked;
-
-                    // Setup Live Review Table
-                    const reviewContainer = document.getElementById("reviewContainer");
-                    const tbody = document.getElementById("reviewTableBody");
-                    const saveBtn = document.getElementById("saveChangesBtn");
-                    reviewContainer.style.display = "block";
-                    tbody.innerHTML = "";
-                    saveBtn.disabled = true;
-                    saveBtn.innerHTML = "Skannar... Vänligen vänta";
-
-                    // 3. Hitta unika låtar att validera
-                    const BATCH_SIZE = parseInt(document.getElementById("batchSizeInput")?.value) || 25;
-                    const PAUSE_MS = parseInt(document.getElementById("batchPauseInput")?.value) || 2000;
-                    
-                    const uniqueSongsMap = new Map();
-                    const playlistNames = Object.keys(standardLists);
-                    for (const listName of playlistNames) {
-                        const playlist = standardLists[listName];
-                        if (!playlist || !playlist.songs) continue;
-                        const songIds = Object.keys(playlist.songs);
-                        for (const trackId of songIds) {
-                            if (!uniqueSongsMap.has(trackId)) {
-                                uniqueSongsMap.set(trackId, { listName, trackId, track: playlist.songs[trackId] });
-                            }
-                        }
-                    }
-
-                    const allUniqueTasks = Array.from(uniqueSongsMap.values());
-                    const tasksToAi = [];
-                    
-                    for (const task of allUniqueTasks) {
-                        const { trackId, track } = task;
-                        totalChecked++;
-                        let skipAi = false;
-
-                        // Respektera ALLTID manuellt låsta låtar, även vid Force Rescan!
-                        if (verifiedTracks[trackId] && verifiedTracks[trackId].manuallyVerified) {
-                            skipAi = true;
-                        }
-                        else if (!forceRescan && verifiedTracks[trackId]) {
-                            // Redan skannad och klar i cachen
-                            skipAi = true;
-                        }
-                        
-                        if (!skipAi) {
-                            tasksToAi.push(task);
-                        } else if (!verifiedTracks[trackId] || (verifiedTracks[trackId] && !verifiedTracks[trackId].manuallyVerified)) {
-                            // Om de fanns i cachen lägger vi in dem i tracksToCache för säkerhets skull
-                            tracksToCache[trackId] = {
-                                title: track.title,
-                                artist: track.artist,
-                                year: track.year,
-                                manuallyVerified: false
-                            };
-                        }
-                    }
-
-                    logToUI(`Hittade ${allUniqueTasks.length} unika låtar totalt. ${tasksToAi.length} behöver skickas till AI.`);
-
-                    const getSongYearsAiBatch = httpsCallable(functions, 'getSongYearsAiBatch', { timeout: 540000 });
-                    let completedTasks = 0;
-
-                    for (let i = 0; i < tasksToAi.length; i += BATCH_SIZE) {
-                        const batch = tasksToAi.slice(i, i + BATCH_SIZE);
-                        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-                        const totalBatches = Math.ceil(tasksToAi.length / BATCH_SIZE);
-                        
-                        statusEl.innerHTML = `Validerar batch ${batchNum} av ${totalBatches} (Totalt ${completedTasks} / ${tasksToAi.length} låtar)...`;
-                        logToUI(`\n[BATCH ${batchNum}/${totalBatches}] Skickar ${batch.length} låtar till Claude...`);
-                        
-                        const payload = batch.map(t => ({
-                            id: t.trackId,
-                            title: t.track.title,
-                            artist: t.track.artist
-                        }));
-
-                        let success = false;
-                        let retries = 0;
-                        const MAX_RETRIES = 3;
-                        let aiResults = [];
-
-                        while (!success && retries < MAX_RETRIES) {
-                            try {
-                                const result = await getSongYearsAiBatch({ songs: payload });
-                                if (result && result.data && Array.isArray(result.data.results)) {
-                                    aiResults = result.data.results;
-                                    success = true;
-                                } else {
-                                    throw new Error("Ogiltigt svar från AI (saknar results-array).");
-                                }
-                            } catch (e) {
-                                retries++;
-                                const errMsg = e.message || String(e);
-                                logToUI(`[FEL] Batch ${batchNum} misslyckades: ${errMsg}.`);
-                                if (retries < MAX_RETRIES) {
-                                    logToUI(`[RETRY] Väntar 5 sekunder och försöker igen (Försök ${retries}/${MAX_RETRIES})...`);
-                                    await new Promise(r => setTimeout(r, 5000));
-                                } else {
-                                    logToUI(`[GAV UPP] Batch ${batchNum} misslyckades permanent efter ${MAX_RETRIES} försök.`);
-                                }
-                            }
-                        }
-
-                        if (success) {
-                            // Behandla aiResults
-                            let batchAdjustments = 0;
-                            let batchUnknown = 0;
-                            for (const aiItem of aiResults) {
-                                const task = batch.find(b => b.trackId === aiItem.id);
-                                if (!task) continue;
-                                
-                                const { listName, trackId, track } = task;
-                                let oldYearStr = String(track.year);
-                                let newYearStr = oldYearStr;
-                                let fixedBy = null;
-                                
-                                if (aiItem.year && aiItem.year !== "UNKNOWN" && aiItem.year !== null) {
-                                    const aiYear = String(aiItem.year).trim();
-                                    if (aiYear !== oldYearStr) {
-                                        newYearStr = aiYear;
-                                        fixedBy = "AI";
-                                        batchAdjustments++;
-                                        logToUI(`[JUSTERING] 🔥 AI hittade nytt årtal för "${track.title}": ${oldYearStr} -> ${newYearStr}`);
-                                    } else {
-                                        tracksToCache[trackId] = {
-                                            title: track.title,
-                                            artist: track.artist,
-                                            year: oldYearStr,
-                                            manuallyVerified: false
-                                        };
-                                    }
-                                } else {
-                                    batchUnknown++;
-                                }
-                                
-                                // === SMARTA FILTER ===
-                                if (fixedBy) {
-                                    const newYearNum = parseInt(newYearStr);
-                                    const oldYearNum = parseInt(oldYearStr);
-
-                                    // Filter 1: Orimliga årtal (t.ex. 1900)
-                                    if (newYearNum < 1950) {
-                                        logToUI(`[FILTRERAD] ❌ Orimligt årtal ${newYearStr} för "${track.title}", ignorerar.`);
-                                        fixedBy = null;
-                                    }
-                                    // Filter 2: Förslag >5 år nyare än Spotify = troligen nyutgåva, inte original
-                                    else if (newYearNum > oldYearNum + 5) {
-                                        if (fixedBy !== "AI") {
-                                            logToUI(`[FILTRERAD] ❌ Förslaget ${newYearStr} är ${newYearNum - oldYearNum} år nyare än Spotify (${oldYearStr}), ignorerar.`);
-                                            fixedBy = null;
-                                        } else {
-                                            logToUI(`[OK] ✅ AI godkänner ett hopp framåt (${oldYearNum} -> ${newYearNum}).`);
-                                        }
-                                    }
-                                }
-
-                                if (fixedBy && fixedBy !== "Manuellt Låst (Cache)") {
-                                    // Filter 3 & 4: Flagga osäkra förslag
-                                    const titleLower = track.title.toLowerCase();
-                                    const isRemix = titleLower.includes('remix') || titleLower.includes('remaster') || titleLower.includes('version') || titleLower.includes('edit');
-                                    const oldYearNum = parseInt(oldYearStr);
-                                    const newYearNum = parseInt(newYearStr);
-                                    const isSuspiciouslyOld = (oldYearNum - newYearNum > 5);
-                                    const isSmallDiff = Math.abs(oldYearNum - newYearNum) <= 1;
-
-                                    const requiresManualReview = (isRemix && !isSmallDiff) || isSuspiciouslyOld;
-                                    const warningFlag = requiresManualReview ? '⚠️ ' : '';
-
-                                    const change = {
-                                        trackId: trackId,
-                                        listName: listName,
-                                        title: track.title,
-                                        artist: track.artist,
-                                        oldYear: oldYearStr,
-                                        newYear: newYearStr,
-                                        fixedBy: fixedBy,
-                                        requiresManualReview: requiresManualReview
-                                    };
-                                    const index = proposedChanges.length;
-                                    proposedChanges.push(change);
-
-                                    // LIVE UI UPDATE: Lägg till raden i tabellen direkt
-                                    const tr = document.createElement("tr");
-                                    if (change.requiresManualReview) tr.style.backgroundColor = "rgba(245, 158, 11, 0.15)";
-                                    const warningIcon = change.requiresManualReview ? '⚠️ ' : '';
-                                    const defaultChecked = change.requiresManualReview ? '' : 'checked';
-                                    const inputColor = change.requiresManualReview ? '#fbbf24' : '#10b981';
-                                    const googleQuery = encodeURIComponent(`${change.artist} ${change.title} release year`);
-
-                                    tr.innerHTML = `
-                                        <td><input type="checkbox" class="change-checkbox" data-index="${index}" ${defaultChecked}></td>
-                                        <td>${warningIcon}${change.title}</td>
-                                        <td>${change.artist}</td>
-                                        <td>${change.oldYear}</td>
-                                        <td><input type="number" class="manual-year-input" data-index="${index}" value="${change.newYear}" style="width: 70px; font-weight:bold; color:${inputColor}; padding: 6px; text-align: center;"></td>
-                                        <td style="color: var(--text-muted);">${change.fixedBy}</td>
-                                        <td style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                            <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
-                                            <button class="btn-danger flag-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Flagga för senare">🚩 Flagga</button>
-                                            <button class="btn-secondary reviewed-btn" style="padding: 6px 10px; font-size: 13px; margin: 0;" title="Markera visuellt som granskad">✔ Klar</button>
-                                        </td>
-                                    `;
-
-                                    // Bind Flag-knappen för denna rad direkt
-                                    const flagBtn = tr.querySelector(".flag-btn");
-                                    flagBtn.addEventListener("click", (e) => {
-                                        const isFlagged = tr.dataset.flagged === "true";
-                                        if (!isFlagged) {
-                                            tr.dataset.flagged = "true";
-                                            tr.style.opacity = "0.6";
-                                            tr.querySelector(".change-checkbox").checked = false; // Avbocka auto
-                                            e.target.innerHTML = "Avflagga";
-                                            e.target.classList.replace("btn-danger", "btn-primary");
-                                        } else {
-                                            tr.dataset.flagged = "false";
-                                            tr.style.opacity = "1";
-                                            e.target.innerHTML = "🚩 Flagga";
-                                            e.target.classList.replace("btn-primary", "btn-danger");
-                                        }
-                                    });
-
-                                    // Bind Klar-knappen (visuell markering)
-                                    const reviewedBtn = tr.querySelector(".reviewed-btn");
-                                    reviewedBtn.addEventListener("click", (e) => {
-                                        tr.classList.toggle("reviewed-row");
-                                        if (tr.classList.contains("reviewed-row")) {
-                                            e.target.innerHTML = "Ångra";
-                                        } else {
-                                            e.target.innerHTML = "✔ Klar";
-                                        }
-                                    });
-
-                                    tbody.appendChild(tr);
-                                }
-                            }
-                            logToUI(`[BATCH ${batchNum}/${totalBatches}] ✅ Klar – ${aiResults.length} låtar analyserade, ${batchAdjustments} justeringar${batchUnknown > 0 ? `, ${batchUnknown} okända` : ''}.`);
-                        }
-
-                        completedTasks += batch.length;
-                        
-                        // Pausa innan nästa batch om det inte är sista
-                        if (i + BATCH_SIZE < tasksToAi.length) {
-                            await new Promise(r => setTimeout(r, PAUSE_MS));
-                        }
-                    }
-
-                    // 4. Skanning klar - aktivera Spara-knappen
-                    if (proposedChanges.length > 0) {
-                        statusEl.innerHTML = `Hittade ${proposedChanges.length} ändringar av totalt ${totalChecked} låtar. Granska dem nedan.`;
-                        saveBtn.disabled = false;
-                        saveBtn.innerHTML = "Godkänn och Spara markerade";
-
-                        // Handle "Select All"
-                        const selectAllCb = document.getElementById("selectAllCheckbox");
-                        // Rensa tidigare listeners för att undvika dubbletter
-                        const newSelectAllCb = selectAllCb.cloneNode(true);
-                        selectAllCb.parentNode.replaceChild(newSelectAllCb, selectAllCb);
-
-                        newSelectAllCb.addEventListener("change", (e) => {
-                            document.querySelectorAll(".change-checkbox").forEach(cb => {
-                                // Om raden är flaggad, rör inte checkboxen
-                                const tr = cb.closest("tr");
-                                if (tr.dataset.flagged !== "true") {
-                                    cb.checked = e.target.checked;
-                                }
-                            });
-                        });
-
-                        // Spara-knappen
-                        saveBtn.onclick = async () => {
-                            saveBtn.disabled = true;
-                            saveBtn.innerHTML = "Sparar...";
-
-                            // Gruppera ändringar per lista (undviker root-level permission_denied)
-                            let updatesByList = {};
-                            let flaggedUpdates = {};
-                            let totalSaved = 0;
-
-                            // Hantera listan med ändringar
-                            const checkboxes = document.querySelectorAll(".change-checkbox");
-                            const inputs = document.querySelectorAll(".manual-year-input");
-
-                            checkboxes.forEach((cb, i) => {
-                                const change = proposedChanges[cb.getAttribute("data-index")];
-                                const finalYear = inputs[i].value.trim(); // Hämta värdet från input-fältet!
-                                const tr = cb.closest("tr");
-                                const isFlagged = tr.dataset.flagged === "true";
-
-                                if (isFlagged) {
-                                    // Spara till flaggedTracks för senare granskning
-                                    flaggedUpdates[change.trackId] = {
-                                        title: change.title,
-                                        artist: change.artist,
-                                        listName: change.listName,
-                                        oldYear: change.oldYear,
-                                        suggestedYear: finalYear,
-                                        fixedBy: change.fixedBy,
-                                        flaggedAt: new Date().toISOString()
-                                    };
-                                } else if (cb.checked) {
-                                    // Godkänd! Spara till databasen och cachen med 'manuallyVerified'
-                                    if (!updatesByList[change.listName]) updatesByList[change.listName] = {};
-                                    updatesByList[change.listName][`${change.trackId}/year`] = finalYear;
-
-                                    tracksToCache[change.trackId] = {
-                                        title: change.title,
-                                        artist: change.artist,
-                                        year: finalYear,
-                                        manuallyVerified: true // Skyddad mot Force Rescan!
-                                    };
-                                    totalSaved++;
-                                } else {
-                                    // Avvisad! Spara Spotify-året i cachen som 'manuallyVerified' för att låsa det.
-                                    tracksToCache[change.trackId] = {
-                                        title: change.title,
-                                        artist: change.artist,
-                                        year: change.oldYear, // Använd originalåret!
-                                        manuallyVerified: true // Skyddad mot framtida iTunes-gissningar
-                                    };
-                                }
-                            });
-
-                            if (Object.keys(flaggedUpdates).length > 0) {
-                                statusEl.innerHTML = "Sparar flaggade låtar...";
-                                await update(ref(db, "flaggedTracks"), flaggedUpdates);
-                            }
-
-                            if (totalSaved > 0 || Object.keys(tracksToCache).length > 0) {
-                                // Spara spellistor (bara de låtar som faktiskt ändrades)
-                                for (const [listName, listUpdates] of Object.entries(updatesByList)) {
-                                    statusEl.innerHTML = `Sparar lista "${listName}"...`;
-                                    await update(ref(db, `standardLists/${listName}/songs`), listUpdates);
-                                }
-                                // Spara cachen (ALLA låtar: de ändrade, de avvisade, och de felfria!)
-                                statusEl.innerHTML = "Uppdaterar cachen...";
-                                for (const [trackId, trackData] of Object.entries(tracksToCache)) {
-                                    await set(ref(db, `verifiedTracks/${trackId}`), trackData);
-                                }
-                                statusEl.innerHTML = `<span style="color:green">Sparade ${totalSaved} list-ändringar, och verifierade ${Object.keys(tracksToCache).length} låtar i cachen!</span>`;
-                                reviewContainer.style.display = "none";
-                            } else {
-                                statusEl.innerHTML = "Inga ändringar gjordes.";
-                            }
-                            btn.disabled = false;
-                        };
-                    } else {
-                        // Inga fel hittades alls, MEN vi vill ändå spara auto-verifierade låtar till cachen!
-                        reviewContainer.style.display = "none";
-                        if (Object.keys(tracksToCache).length > 0) {
-                            statusEl.innerHTML = "Sparar felfria låtar till cachen...";
-                            for (const [trackId, trackData] of Object.entries(tracksToCache)) {
-                                await set(ref(db, `verifiedTracks/${trackId}`), trackData);
-                            }
-                        }
-                        statusEl.innerHTML = `<strong>Klar!</strong> Inga felaktiga årtal hittades. Skannade ${totalChecked} låtar.`;
-                        btn.disabled = false;
-                    }
-
-                } catch (error) {
-                    console.error(error);
-                    statusEl.innerHTML = `<span style="color:red">Fel: ${error.message}</span>`;
-                    btn.disabled = false;
-                }
-            });
-
-            // Readme Toggle
-            document.getElementById("showReadmeBtn").addEventListener("click", () => {
-                const readme = document.getElementById("readmeContent");
-                readme.style.display = readme.style.display === "none" ? "block" : "none";
-            });
 
             // ==========================================
             // SPELARNAS RAPPORTER
@@ -2814,7 +2331,11 @@
             <div id="tab-playlists" class="tab-content">
                 <div class="card">
                     <h3>Lägg till spellista</h3>
-                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Klistra in en länk till en Spotify-spellista för att lägga till den i spelet.</p>
+                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">
+                        Klistra in en länk till en Spotify-spellista för att lägga till den i spelet.
+                        Låtar som inte är granskade tidigare granskas innan listan sparas: Opus granskar Spotifys år och söker på webben när året ändras eller är osäkert.
+                        Det kostar ungefär 4 cent per ny låt och tar ett par minuter per hundra låtar.
+                    </p>
                     <div class="flex-row">
                         <input type="text" id="standardPlaylistLink" placeholder="Spotify-länk">
                         <input type="text" id="standardPlaylistName" placeholder="Spellistans namn (t.ex. 'Sommarhits 2024')">
@@ -2898,78 +2419,6 @@
                     <p id="yearReviewStatus" style="font-weight: 600; color: var(--primary);"></p>
                     <div id="yearReviewSummary"></div>
                 </div>
-
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h3 style="margin: 0;">Städa Databasen (Rätta årtal)</h3>
-                        <button id="showReadmeBtn" class="btn-info">ℹ️ Hur funkar detta?</button>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 20px;">Går igenom alla låtar i StandardLists och rättar felaktiga årtal via Cache, iTunes och AI.</p>
-
-                    <div id="readmeContent" style="display: none; padding: 20px; border-radius: 8px; margin-bottom: 20px; font-size: 15px; line-height: 1.6;">
-                        <h4 style="margin-top: 0;">Så här fungerar städningen:</h4>
-                        <ul style="margin-bottom: 15px;">
-                            <li><strong>Standardkörning:</strong> Kollar igenom listorna. Om en låt inte finns i <code>verifiedTracks</code> (cachen), söker den via AI. Hittas ett nytt årtal föreslås det i tabellen.</li>
-                            <li><strong>Tvinga fullständig omskanning (Force Rescan):</strong> Ignorerar cachen och söker om alla låtar. <em>Undantag:</em> Låtar som du manuellt godkänt eller avvisat är skyddade ("Manuellt Låst") och skrivs aldrig över!</li>
-                        </ul>
-                        <h4>Smarta Filter (Automatiska neksanden):</h4>
-                        <ul style="margin-bottom: 15px;">
-                            <li>Årtal innan 1950 filtreras bort.</li>
-                            <li>Årtal som är mer än 5 år <em>nyare</em> än Spotifys årtal filtreras bort (ofta nyutgåvor).</li>
-                        </ul>
-                        <h4>När du sparar i tabellen:</h4>
-                        <ul style="margin-bottom: 0;">
-                            <li><strong>Ikryssad ruta:</strong> Sparar det nya årtalet (du kan även ändra det manuellt i rutan) till databasen, och låser det i cachen.</li>
-                            <li><strong>Urkryssad ruta (Avvisad):</strong> Ändrar inget i databasen, men sparar Spotifys original-år till cachen och låser det för framtiden.</li>
-                            <li><strong>Låtar som inte dök upp:</strong> (Spotify & AI är överens) sparas automatiskt i cachen som "felfria" så vi slipper söka dem nästa gång.</li>
-                        </ul>
-                    </div>
-
-                    <div style="background: rgba(0,0,0,0.15); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
-                        <label style="margin-bottom: 15px; display: block;">
-                            <input type="checkbox" id="forceRescanCheckbox">
-                            <span><span style="color: var(--danger);">Tvinga fullständig omskanning</span> <span style="color: var(--text-muted); font-size: 13px;">(Ignorera cache. Kostar API-anrop!)</span></span>
-                        </label>
-                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                            <label style="flex: 1; min-width: 150px;">
-                                <span style="display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Batchstorlek (antal låtar)</span>
-                                <input type="number" id="batchSizeInput" value="25" min="1" max="500" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border); background: #1a1a1a; color: #fff;">
-                            </label>
-                            <label style="flex: 1; min-width: 150px;">
-                                <span style="display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Paus mellan batchar (ms)</span>
-                                <input type="number" id="batchPauseInput" value="2000" min="0" max="10000" step="500" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border); background: #1a1a1a; color: #fff;">
-                            </label>
-                        </div>
-                    </div>
-
-                    <button id="cleanDatabaseBtn" class="btn-danger" style="margin-top: 20px; width: 100%; padding: 15px; font-size: 16px;">Städa Hela Databasen</button>
-                    <p id="cleanStatus" style="margin-top: 15px; font-weight: 600; text-align: center; color: var(--primary);"></p>
-                    <div id="liveLog" style="height: 200px; overflow-y: auto; background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 13px; margin-top: 15px; border-radius: 8px; display: none; line-height: 1.4;">
-                    </div>
-                </div>
-
-                <!-- Review UI för databas-rensaren -->
-                <div id="reviewContainer" class="card" style="display: none;">
-                    <h3 style="color: var(--success);">Granska ändringar</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">Markera de ändringar du vill spara till databasen. Du kan även redigera årtalet manuellt i tabellen.</p>
-                    <div style="overflow-x: auto;">
-                        <table id="reviewTable">
-                            <thead>
-                                <tr>
-                                    <th style="width: 40px;"><input type="checkbox" id="selectAllCheckbox" checked></th>
-                                    <th>Låt</th>
-                                    <th>Artist</th>
-                                    <th>Gammalt År</th>
-                                    <th>Nytt År</th>
-                                    <th>Källa</th>
-                                    <th>Handlingar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reviewTableBody"></tbody>
-                        </table>
-                    </div>
-                    <button id="saveChangesBtn" class="btn-success" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 10px;">Godkänn och Spara markerade</button>
-                </div>
             </div>
 
             <!-- TAB: RAPPORTER -->
@@ -3041,46 +2490,6 @@
                 </div>
             </div>
 
-        </div>
-    </div>
-
-    <!-- Review Playlist Modal for Standard Playlists -->
-    <div id="reviewPlaylistModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto;">
-        <div style="max-width: 800px; margin: 40px auto; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
-                <h3 style="margin: 0; font-size: 1.5rem; color: #fff;">Granska Årtal</h3>
-                <button id="closeReviewPlaylist" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 0 10px;">&times;</button>
-            </div>
-            
-            <div style="padding: 20px;">
-                <p style="color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
-                    AI hittade årtal som skiljer sig markant från Spotifys för dessa låtar. <br>
-                    <strong>Spotifys årtal (vänster) | AI-förslag (höger)</strong>. <br>
-                    Ändra årtalet i fältet längst till höger om du vill korrigera manuellt.
-                </p>
-                
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Låt</th>
-                                <th>Artist</th>
-                                <th>Spotify År</th>
-                                <th>AI Föreslog</th>
-                                <th>Ditt val</th>
-                                <th>Handlingar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reviewPlaylistList">
-                            <!-- Låtar laddas in här via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div style="padding: 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); display: flex; justify-content: flex-end;">
-                <button id="saveReviewPlaylistBtn" class="btn-primary" style="padding: 12px 24px; font-size: 1rem; font-weight: bold;">Spara Årtal</button>
-            </div>
         </div>
     </div>
 

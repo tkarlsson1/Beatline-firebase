@@ -10,8 +10,8 @@ admin.initializeApp({
 });
 const db = admin.database();
 
-// Limits for the paid AI functions. 500 songs matches the highest batch size the admin
-// cleanup allows (batchSizeInput max="500"); the imports send 25 at a time.
+// Limits for the older AI functions. 500 songs was the highest batch size of the admin cleanup,
+// which is removed; the user import still sends 25 at a time through getSongYearsAiBatch.
 const MAX_SONGS_PER_BATCH = 500;
 const MAX_TEXT_LENGTH = 300;
 const MAX_ID_LENGTH = 100;
@@ -431,16 +431,18 @@ async function resolveTrack(client, trackId, options) {
  *
  * With forceWeb: true the web search also runs for tracks where Claude keeps Spotify's year. The
  * admin page uses it for tracks where the review was not certain, or where the result differs
- * from the year the game has.
+ * from the year the game has. With webWhenUncertain: true it runs when Claude keeps the year
+ * without being certain; the playlist import uses that for new tracks.
  *
- * data:    { trackIds: [Spotify track id], store?: boolean, forceWeb?: boolean }, at most 10 ids
+ * data:    { trackIds: [Spotify track id], store?: boolean, forceWeb?: boolean,
+ *            webWhenUncertain?: boolean }, at most 10 ids
  * returns: { results: [{ id, status, ... }] } in the same order as trackIds (duplicates removed).
  *          status is "ok", "needsReview", "notFound", "noSpotifyYear" or "error".
  */
 exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeconds: 540, memory: "512MB", secrets: [AI_SECRET] }).https.onCall(async (data, context) => {
   requireAdmin(context);
 
-  const { trackIds, store, forceWeb } = data || {};
+  const { trackIds, store, forceWeb, webWhenUncertain } = data || {};
   if (!Array.isArray(trackIds) || trackIds.length === 0 || trackIds.length > MAX_TRACKS_PER_RESOLVE) {
     throw new functions.https.HttpsError("invalid-argument", `Between 1 and ${MAX_TRACKS_PER_RESOLVE} track ids are required.`);
   }
@@ -453,6 +455,10 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
   if (forceWeb !== undefined && typeof forceWeb !== "boolean") {
     throw new functions.https.HttpsError("invalid-argument", "forceWeb must be true or false.");
   }
+  if (webWhenUncertain !== undefined && typeof webWhenUncertain !== "boolean") {
+    throw new functions.https.HttpsError("invalid-argument", "webWhenUncertain must be true or false.");
+  }
+  const resolveOptions = { forceWeb: forceWeb === true, webWhenUncertain: webWhenUncertain === true };
 
   const uniqueIds = [...new Set(trackIds)];
   // A web search answer can take a while, so each request gets more time than in the older functions
@@ -469,7 +475,7 @@ exports.resolveSongYear = functions.region("europe-west1").runWith({ timeoutSeco
   const worker = async () => {
     while (nextIndex < uniqueIds.length) {
       const index = nextIndex++;
-      let result = await resolveTrack(client, uniqueIds[index], { forceWeb: forceWeb === true });
+      let result = await resolveTrack(client, uniqueIds[index], resolveOptions);
       if (store === true && result.status !== "error") {
         try {
           await storeResult(result);
