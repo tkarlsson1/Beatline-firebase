@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.844 |
-| admin.html | 0.073 |
+| index.html (spelet) | 0.845 |
+| admin.html | 0.074 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v48 |
+| service-worker | v49 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
@@ -59,6 +59,8 @@
 | 2026-11-14 | Admin, Databas: nytt kort "Granska alla årtal". Kör `resolveSongYear` över låtarna i standardlistorna, 10 per anrop och två anrop samtidigt, med valfritt antal per körning. Servern sparar varje resultat i den nya noden `yearReviews` (bara admin får läsa och skriva), så körningen går att stoppa och fortsätta. Sammanställningen visar oförändrade, ändrade, till granskning, låsta där granskningen säger annat, och ej hittade hos Spotify. Inget skrivs till `verifiedTracks` eller `standardLists` – verkställandet är ett eget steg | 0.843 / 0.072 / Functions / Regler |
 | 2026-11-15 | Alla 2 225 låtar i standardlistorna granskade med `resolveSongYear` (cirka 64 dollar, 33 minuter, inga misslyckade anrop). Utfall mot spelets nuvarande år: 1 681 oförändrade, 265 ändras (98 med mer än två år), 3 behöver granskas, 276 låsta varav 39 där granskningen säger ett annat år. Resultaten ligger i `yearReviews`, inget i spelet är ändrat | – |
 | 2026-11-15 | `resolveSongYear` får valet `forceWeb`, som kör webbsökningen även när Opus behåller Spotifys år. Beslutsregeln låter då en äkta och tydlig källa avgöra även för behållna år. Admin-kortet får knappen "Sök på osäkra" för låtar utan webbsökning där Opus var osäker eller där resultatet skiljer sig från spelets år. Bakgrund: Opus behöll Spotifys år men var osäker för 227 låtar, och minst ett sådant år var fel | 0.844 / 0.073 / Functions |
+| 2026-11-15 | Extra webbsökning körd på 245 låtar (cirka 27 dollar). Den fångade två grova fel som annars legat kvar (*Stationen* 2015→2010, *Var ska vi sova inatt* 1993→1982). Läget efteråt: 1 645 oförändrade, 300 ändras (101 med mer än två år), 6 behöver granskas, 274 låsta varav 29 där granskningen säger ett annat år | – |
+| 2026-11-15 | Admin-kortet "Granska alla årtal" får "Verkställ...": visar först vad som skulle skrivas och ber om bekräftelse, laddar ner en säkerhetskopia av `verifiedTracks` och `standardLists`, och skriver sedan de granskade åren. Olåsta låtar med status ok får en ny cachepost med härkomst, och året skrivs till varje lista där det skiljer sig. Låsta låtar, låtar som behöver granskas och låtar som saknas hos Spotify rörs inte. Går att köra om. Återställning från säkerhetskopian: dela filen i två JSON-filer och kör `firebase database:set /verifiedTracks <fil> --instance notestreamfire` och motsvarande för `/standardLists` | 0.845 / 0.074 |
 
 ---
 

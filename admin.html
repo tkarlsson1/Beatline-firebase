@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.073</title>
+    <title>Notestream Admin v0.074</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -446,6 +446,83 @@
             summary.changes.sort(largestChangeFirst);
             summary.lockedDiffers.sort(largestChangeFirst);
             return summary;
+        }
+
+        /**
+         * Works out what applying the stored year reviews would write. Pure function: it only
+         * reads its arguments, and nothing is written until the caller sends the result.
+         *
+         * A song is applied when its review has status "ok" and the song is not locked as manually
+         * verified. It gets a new cache record with the year and where the year came from, and
+         * the year is written to every standard list where the song has another year.
+         * Locked songs, songs that need review and songs Spotify does not know are never touched.
+         *
+         * appliedAt: the timestamp stored in the new cache records
+         *
+         * Returns { cacheUpdates, listUpdates, counts }:
+         *   cacheUpdates  { trackId: record }, to be written under verifiedTracks
+         *   listUpdates   { listName: { "<trackId>/year": "1982" } }, for standardLists/<list>/songs
+         *   counts        applied: songs that get a new cache record, changed: how many of them
+         *                 get another year than the game has, listWrites: years written in lists,
+         *                 and how many songs are left alone and why
+         */
+        function buildYearApplyPlan(lists, verified, reviews, appliedAt) {
+            const summary = classifyYearReviews(lists, verified, reviews);
+            const cacheUpdates = {};
+            const listUpdates = {};
+            const counts = {
+                total: summary.total, applied: 0, changed: 0, listWrites: 0, locked: 0,
+                needsReview: summary.needsReview.length, notFound: summary.notFound.length,
+                pending: summary.pending.length, needsWeb: summary.needsWeb.length
+            };
+
+            const seen = new Set();
+            for (const [listName, list] of Object.entries(lists || {})) {
+                for (const [trackId, song] of Object.entries((list && list.songs) || {})) {
+                    if (!song) continue;
+                    const review = reviews ? reviews[trackId] : null;
+                    if (!review || review.status !== "ok" || !Number.isInteger(review.year)) continue;
+
+                    const cached = verified ? verified[trackId] : null;
+                    const locked = !!(cached && cached.manuallyVerified === true);
+                    const firstTime = !seen.has(trackId);
+                    seen.add(trackId);
+                    if (locked) {
+                        if (firstTime) counts.locked++;
+                        continue;
+                    }
+
+                    const year = String(review.year);
+                    if (firstTime) {
+                        // The same current year as in classifyYearReviews: the cache's, else the first list's
+                        const currentYear = parseInt(cached && cached.year ? cached.year : song.year, 10);
+                        counts.applied++;
+                        if (review.year !== currentYear) counts.changed++;
+                        cacheUpdates[trackId] = {
+                            title: song.title,
+                            artist: song.artist,
+                            year: year,
+                            manuallyVerified: false,
+                            source: review.source || null,
+                            explanation: review.explanation || null,
+                            sourceUrl: review.sourceUrl || null,
+                            sourceTitle: review.sourceTitle || null,
+                            spotifyYear: Number.isInteger(review.spotifyYear) ? review.spotifyYear : null,
+                            albumName: review.albumName || null,
+                            albumType: review.albumType || null,
+                            releaseDate: review.releaseDate || null,
+                            checkedAt: review.checkedAt || null,
+                            appliedAt: appliedAt
+                        };
+                    }
+                    if (String(song.year) !== year) {
+                        if (!listUpdates[listName]) listUpdates[listName] = {};
+                        listUpdates[listName][`${trackId}/year`] = year;
+                        counts.listWrites++;
+                    }
+                }
+            }
+            return { cacheUpdates, listUpdates, counts };
         }
         // </year-review-summary>
 
@@ -1351,6 +1428,8 @@
             const REVIEW_PARALLEL_CALLS = 2;
             let yearReviewRunning = false;
             let yearReviewStopRequested = false;
+            // True when the latest summary showed that every song has a review
+            let yearReviewAllReviewed = false;
 
             const yearReviewCountsEl = document.getElementById("yearReviewCounts");
             const yearReviewStatusEl = document.getElementById("yearReviewStatus");
@@ -1359,14 +1438,21 @@
             const yearReviewWebBtn = document.getElementById("yearReviewWebBtn");
             const yearReviewStopBtn = document.getElementById("yearReviewStopBtn");
             const yearReviewSummaryBtn = document.getElementById("yearReviewSummaryBtn");
+            const yearReviewApplyBtn = document.getElementById("yearReviewApplyBtn");
+            const yearReviewApplyBox = document.getElementById("yearReviewApplyBox");
 
-            async function loadYearReviewSummary() {
+            async function loadYearReviewData() {
                 const [listsSnap, verifiedSnap, reviewsSnap] = await Promise.all([
                     get(ref(db, "standardLists")),
                     get(ref(db, "verifiedTracks")),
                     get(ref(db, "yearReviews"))
                 ]);
-                return classifyYearReviews(listsSnap.val(), verifiedSnap.val(), reviewsSnap.val());
+                return { lists: listsSnap.val(), verified: verifiedSnap.val(), reviews: reviewsSnap.val() };
+            }
+
+            async function loadYearReviewSummary() {
+                const data = await loadYearReviewData();
+                return classifyYearReviews(data.lists, data.verified, data.reviews);
             }
 
             // One table of songs. columns: [{ title, cell: entry => html }]. Every value is escaped by the cell functions.
@@ -1382,6 +1468,9 @@
                 const reviewed = summary.total - summary.pending.length;
                 yearReviewCountsEl.textContent = `${summary.total} låtar i standardlistorna · ${reviewed} granskade · ${summary.pending.length} kvar`;
                 yearReviewWebBtn.textContent = `Sök på osäkra (${summary.needsWeb.length})`;
+                // Applying is only offered when every song has been reviewed
+                yearReviewAllReviewed = summary.total > 0 && summary.pending.length === 0;
+                yearReviewApplyBtn.disabled = yearReviewRunning || !yearReviewAllReviewed;
 
                 const songColumns = [
                     { title: "Artist", cell: entry => escapeHtml(entry.artist) },
@@ -1470,6 +1559,9 @@
                 yearReviewStopRequested = false;
                 yearReviewStartBtn.disabled = true;
                 yearReviewWebBtn.disabled = true;
+                yearReviewApplyBtn.disabled = true;
+                yearReviewApplyBox.style.display = "none";
+                pendingYearApply = null;
                 yearReviewStopBtn.disabled = false;
 
                 try {
@@ -1536,6 +1628,7 @@
                     yearReviewRunning = false;
                     yearReviewStartBtn.disabled = false;
                     yearReviewWebBtn.disabled = false;
+                    yearReviewApplyBtn.disabled = !yearReviewAllReviewed;
                     yearReviewStopBtn.disabled = true;
                 }
             }
@@ -1544,6 +1637,128 @@
                 runYearReview(summary => summary.pending, false, "Alla låtar är redan granskade."));
             yearReviewWebBtn.addEventListener("click", () =>
                 runYearReview(summary => summary.needsWeb, true, "Inga låtar väntar på extra webbsökning."));
+
+            // --- APPLY THE REVIEWED YEARS ---
+            // The only part of the year review that changes what the game uses. It writes the reviewed
+            // years to verifiedTracks and standardLists, after a backup of both has been downloaded.
+            // Writing the same plan twice gives the same result, so an interrupted run can be repeated.
+            const APPLY_CHUNK_SIZE = 200;
+            // The data and the plan shown in the confirmation box, until the user confirms or cancels
+            let pendingYearApply = null;
+
+            // Saves verifiedTracks and standardLists, as they were read, to a file on this computer
+            function downloadYearBackup(data) {
+                const createdAt = new Date().toISOString();
+                const fileName = `notestream-sakerhetskopia-${createdAt.slice(0, 16).replace(/[:T]/g, "-")}.json`;
+                const backup = {
+                    createdAt: createdAt,
+                    note: "verifiedTracks and standardLists as they were before the reviewed years were applied",
+                    verifiedTracks: data.verified,
+                    standardLists: data.lists
+                };
+                const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: "application/json" }));
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+                return fileName;
+            }
+
+            function closeYearApplyBox() {
+                pendingYearApply = null;
+                yearReviewApplyBox.style.display = "none";
+                yearReviewApplyBox.innerHTML = "";
+            }
+
+            // First click: read the current state and show exactly what would be written
+            yearReviewApplyBtn.addEventListener("click", async () => {
+                if (yearReviewRunning) return;
+                yearReviewApplyBtn.disabled = true;
+                try {
+                    yearReviewStatusEl.textContent = "Läser läget...";
+                    const data = await loadYearReviewData();
+                    const plan = buildYearApplyPlan(data.lists, data.verified, data.reviews, Date.now());
+                    const counts = plan.counts;
+                    yearReviewStatusEl.textContent = "";
+
+                    if (counts.pending > 0) {
+                        yearReviewStatusEl.textContent = `${counts.pending} låtar är inte granskade än. Kör "Starta / Fortsätt" först.`;
+                        return;
+                    }
+
+                    pendingYearApply = { data, plan };
+                    const warning = counts.needsWeb > 0
+                        ? `<p style="color: var(--warning); margin: 8px 0;">${counts.needsWeb} låtar väntar på extra webbsökning. De verkställs ändå om du fortsätter.</p>`
+                        : "";
+                    // Only numbers and fixed text are put into this box
+                    yearReviewApplyBox.innerHTML = `
+                        <p style="font-weight: 600; margin-bottom: 8px;">Det här skrivs om du verkställer:</p>
+                        <ul style="margin: 0 0 8px 20px; line-height: 1.7;">
+                            <li><strong>${counts.applied}</strong> låtar får en ny post i cachen, med år, källa och förklaring</li>
+                            <li><strong>${counts.changed}</strong> av dem får ett annat år än spelet har idag</li>
+                            <li><strong>${counts.listWrites}</strong> år skrivs i ${Object.keys(plan.listUpdates).length} standardlistor</li>
+                        </ul>
+                        <p style="margin-bottom: 8px;">Rörs inte: ${counts.locked} låsta låtar, ${counts.needsReview} som behöver granskas och ${counts.notFound} som inte hittades hos Spotify.</p>
+                        ${warning}
+                        <p style="margin-bottom: 12px;">En säkerhetskopia av cachen och listorna laddas ner till den här datorn innan något skrivs.</p>
+                        <button id="yearReviewApplyConfirmBtn" class="btn-success" style="white-space: nowrap;">Ja, verkställ</button>
+                        <button id="yearReviewApplyCancelBtn" class="btn-secondary" style="white-space: nowrap;">Avbryt</button>
+                    `;
+                    yearReviewApplyBox.style.display = "block";
+                    document.getElementById("yearReviewApplyConfirmBtn").addEventListener("click", applyYearReviews);
+                    document.getElementById("yearReviewApplyCancelBtn").addEventListener("click", closeYearApplyBox);
+                } catch (err) {
+                    console.error("[Årtalsgranskning] Kunde inte ta fram vad som ska skrivas:", err);
+                    yearReviewStatusEl.textContent = "Kunde inte läsa läget: " + err.message;
+                } finally {
+                    yearReviewApplyBtn.disabled = yearReviewRunning;
+                }
+            });
+
+            // Second click: download the backup, then write the plan that was shown
+            async function applyYearReviews() {
+                if (!pendingYearApply || yearReviewRunning) return;
+                const { data, plan } = pendingYearApply;
+                closeYearApplyBox();
+
+                yearReviewRunning = true;
+                yearReviewStartBtn.disabled = true;
+                yearReviewWebBtn.disabled = true;
+                yearReviewApplyBtn.disabled = true;
+
+                try {
+                    const backupFile = downloadYearBackup(data);
+
+                    const ids = Object.keys(plan.cacheUpdates);
+                    let written = 0;
+                    for (let i = 0; i < ids.length; i += APPLY_CHUNK_SIZE) {
+                        const chunk = {};
+                        for (const id of ids.slice(i, i + APPLY_CHUNK_SIZE)) chunk[id] = plan.cacheUpdates[id];
+                        await update(ref(db, "verifiedTracks"), chunk);
+                        written += Object.keys(chunk).length;
+                        yearReviewStatusEl.textContent = `Skriver cachen... ${written} / ${ids.length}`;
+                    }
+
+                    for (const [listName, updates] of Object.entries(plan.listUpdates)) {
+                        yearReviewStatusEl.textContent = `Skriver listan "${listName}"...`;
+                        await update(ref(db, `standardLists/${listName}/songs`), updates);
+                    }
+
+                    renderYearReviewSummary(await loadYearReviewSummary());
+                    yearReviewStatusEl.textContent = `Klart: ${plan.counts.applied} låtar verkställda, ${plan.counts.changed} fick ett nytt år. Säkerhetskopia: ${backupFile}`;
+                } catch (err) {
+                    console.error("[Årtalsgranskning] Verkställandet avbröts:", err);
+                    yearReviewStatusEl.textContent = "Verkställandet avbröts: " + err.message + ". Tryck på Verkställ igen för att skriva resten.";
+                } finally {
+                    yearReviewRunning = false;
+                    yearReviewStartBtn.disabled = false;
+                    yearReviewWebBtn.disabled = false;
+                    yearReviewApplyBtn.disabled = !yearReviewAllReviewed;
+                }
+            }
 
             // --- DATABAS-STÄDNING ---
             document.getElementById("cleanDatabaseBtn").addEventListener("click", async () => {
@@ -2320,7 +2535,7 @@
                     <h3>Granska alla årtal</h3>
                     <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 12px;">
                         Går igenom låtarna i standardlistorna: Opus granskar Spotifys år, och en webbsökning görs när året ändras.
-                        Resultaten sparas vid sidan av och <strong>ändrar ingenting i spelet</strong>. Körningen går att stoppa och fortsätta.
+                        Resultaten sparas vid sidan av och <strong>ändrar ingenting i spelet förrän du verkställer</strong>. Körningen går att stoppa och fortsätta.
                         En låt kostar ungefär 3 cent i snitt. "Sök på osäkra" kör en webbsökning även för låtar där Opus behöll året men var osäker, och kostar ungefär 10 cent per låt.
                     </p>
                     <p id="yearReviewCounts" style="font-weight: 600; margin-bottom: 12px;">Tryck på "Visa sammanställning" för att läsa läget.</p>
@@ -2332,6 +2547,11 @@
                         <button id="yearReviewStopBtn" class="btn-danger" style="white-space: nowrap;" disabled>Stoppa</button>
                         <button id="yearReviewSummaryBtn" class="btn-info" style="white-space: nowrap;">Visa sammanställning</button>
                     </div>
+                    <div class="flex-row" style="margin-bottom: 12px; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <button id="yearReviewApplyBtn" class="btn-success" style="white-space: nowrap;" disabled>Verkställ...</button>
+                        <span style="color: var(--text-muted); font-size: 14px;">Skriver de granskade åren till cachen och listorna. Visar först vad som ändras och ber dig bekräfta.</span>
+                    </div>
+                    <div id="yearReviewApplyBox" style="display: none; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px;"></div>
                     <p id="yearReviewStatus" style="font-weight: 600; color: var(--primary);"></p>
                     <div id="yearReviewSummary"></div>
                 </div>
