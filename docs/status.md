@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.845 |
-| admin.html | 0.074 |
+| index.html (spelet) | 0.846 |
+| admin.html | 0.075 |
 | spotify.js | 0.807 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.837 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v49 |
-| service-worker | v49 |
+| service-worker | v50 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/prompts.js | Delad prompt, v1 (de gamla funktionerna) |
@@ -62,6 +62,7 @@
 | 2026-11-15 | Extra webbsökning körd på 245 låtar (cirka 27 dollar). Den fångade två grova fel som annars legat kvar (*Stationen* 2015→2010, *Var ska vi sova inatt* 1993→1982). Läget efteråt: 1 645 oförändrade, 300 ändras (101 med mer än två år), 6 behöver granskas, 274 låsta varav 29 där granskningen säger ett annat år | – |
 | 2026-11-15 | Admin-kortet "Granska alla årtal" får "Verkställ...": visar först vad som skulle skrivas och ber om bekräftelse, laddar ner en säkerhetskopia av `verifiedTracks` och `standardLists`, och skriver sedan de granskade åren. Olåsta låtar med status ok får en ny cachepost med härkomst, och året skrivs till varje lista där det skiljer sig. Låsta låtar, låtar som behöver granskas och låtar som saknas hos Spotify rörs inte. Går att köra om. Återställning från säkerhetskopian: dela filen i två JSON-filer och kör `firebase database:set /verifiedTracks <fil> --instance notestreamfire` och motsvarande för `/standardLists` | 0.845 / 0.074 |
 | 2026-11-15 | **Årtalen verkställda.** 1 945 olåsta låtar fick ny cachepost med härkomst, 300 av dem ett nytt år (101 med mer än två år), och 395 år skrevs i de 16 standardlistorna. Kontrollerat mot en kopia tagen precis före: de 278 låsta posterna och de 1 258 posterna utanför standardlistorna är identiska, inga låtar tillkom eller försvann, och bara årsfältet ändrades i listorna. Två cacheposter fick listans stavning av artisten i stället för sin tidigare (*SexyBack*, *Billionaire*), vilket inte syns i spelet. Kvar att avgöra för hand: 6 låtar som behöver granskas och 29 låsta där granskningen säger ett annat år. Kopian före ligger i `tools/year-eval/backups/` | – |
+| 2026-11-15 | Admin, Flaggat: nytt kort "Årtal att avgöra" med de låtar granskningen inte kunde avgöra och de låsta där granskningen säger ett annat år (35 vid start). Varje rad visar året idag, Spotifys år, Opus år ur minnet och sökningens år med källa, och har tre val: godta förslaget, behålla året eller skriva ett annat. Varje beslut låser låten (`manuallyVerified: true`), skriver året till alla listor och märker granskningen med `yearReviews/<id>/resolved`. Knappen "Lägg till källa och förklaring på låsta låtar" fyller på härkomst för låsta låtar där granskningen ger samma år, utan att röra år eller lås | 0.846 / 0.075 |
 
 ---
 
