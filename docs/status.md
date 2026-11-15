@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.852 |
-| admin.html | 0.081 |
+| index.html (spelet) | 0.853 |
+| admin.html | 0.082 |
 | spotify.js | 0.849 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v50 |
-| service-worker | v56 |
+| service-worker | v57 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -69,6 +69,8 @@
 | 2026-11-15 | `getSongYearsAiBatch` borttagen ur koden och raderad i Firebase, tillsammans med batch-prompten, batch-schemat och gränserna som bara den använde. Den kunde anropas av alla registrerade konton med 500 låtar åt gången, utan tak. `getSongYearAi` och `prompts.js` ligger kvar för rapportflödets "Skanna med AI" tills det byggs om. En startsida som stått öppen sedan före 0.849 får fel vid import tills den laddas om, och importerar då med Spotifys år | 0.850 / 0.079 / Functions |
 | 2026-11-15 | "Fel årtal?" i spelet startar en ny kontroll. Den nya databasutlösta funktionen `checkReportedTrack` körs när en rapport skapas i `reportedTracks` (databasen `notestreamfire`, europe-west1), kör hela kedjan med webbsökning och sparar resultatet i `yearReviews`. Ingen ny sökning om låten sökts de senaste 30 dagarna, och högst 20 kontroller per svenskt dygn (räknare i `reportUsage/<datum>`, som bara servern når). Inget i spelet ändras automatiskt. Admin: rapporterade låtar ligger först i "Årtal att avgöra" med kontrollens resultat och källa. Ett beslut låser låten och tar bort rapporten; "Kasta rapporten" tar bara bort rapporten. Kortet "Spelarnas rapporter" med "Skanna med AI" är borttaget, liksom hanteringen av `flaggedTracks`, som inget längre skriver. Ingen sida anropar längre `getSongYearAi`. Spelets kod är oförändrad. Provat live med en riktig rapport för *Africa* (TOTO): kontrollen var klar 11 sekunder efter rapporten, bekräftade 1982 med Wikipedia som källa och kostade cirka 10 cent; cachen och listorna var oförändrade, raden visades först i kön och "Kasta rapporten" tog bara bort rapporten. Inte provat live: ett beslut på en rapporterad rad, och en rapport skriven från själva spelet | 0.851 / 0.080 / Functions |
 | 2026-11-15 | `getSongYearAi` borttagen ur koden och raderad i Firebase, tillsammans med `functions/prompts.js` och hjälpkoden som bara den använde. Därmed finns bara den nya årtalsgranskningen kvar: `resolveSongYear`, `reviewImportedTracks` och `checkReportedTrack`, alla genom `functions/year-review.js`. I `year-review.js` ändrades bara kommentarer | 0.852 / 0.081 / Functions |
+| 2026-11-16 | De 35 låtarna i "Årtal att avgöra" avgjorda av admin, alla med "Godta". Kontrollerat mot databasen: varje låt har låst cachepost med beslutets år och samma år i alla listor. Alla 2 225 låtar i standardlistorna har därmed en förklaring | – |
+| 2026-11-16 | Admin, kortet "Granska alla årtal": nytt val "Användarnas listor" för låtar som bara finns i användarnas egna listor (2 683 vid start: 2 081 utan cachepost, 464 med olåst cachepost utan källa, 138 låsta). Låtar utan cachepost körs först. Webbsökningen görs i samma körning när året ändras eller är osäkert. "Verkställ" skriver där bara cachen, och går att köra innan alla låtar är granskade; användarnas listor ändras inte, eftersom startsidan och lobbyn tar cachens år före listans. Kön "Årtal att avgöra" visar nu också låsta låtar utanför standardlistorna där granskningen säger ett annat år | 0.853 / 0.082 |
 
 ---
 
