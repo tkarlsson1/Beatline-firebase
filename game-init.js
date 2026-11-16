@@ -340,8 +340,93 @@ window.checkAndApplyWinCondition = async function(updates, nextIndex) {
   const newRound = (currentGameData.currentRound || 0) + 1;
   updates[`games/${gameId}/currentRound`] = newRound;
   console.log('[Game] New round:', newRound);
-  
+
   return false;
+};
+
+// ============================================
+// THE SONGS HAVE RUN OUT
+// ============================================
+// <out-of-songs>
+/**
+ * Who has won when the game ends because there are no more songs: the team with the most
+ * revealed cards. A card that has not been turned has not been approved, so it is not counted.
+ * Pure function.
+ *
+ * teams: games/<id>/teams
+ * Returns { winner, tiedTeams }: winner is the team's id, or null when several teams share
+ * the lead, and tiedTeams then lists their ids.
+ */
+function outOfSongsResult(teams) {
+  let mostCards = -1;
+  let leaders = [];
+  Object.entries(teams || {}).forEach(([id, team]) => {
+    const timeline = team && team.timeline ? Object.values(team.timeline) : [];
+    const cards = timeline.filter(card => card && card.revealed === true).length;
+    if (cards > mostCards) {
+      mostCards = cards;
+      leaders = [id];
+    } else if (cards === mostCards) {
+      leaders.push(id);
+    }
+  });
+  return leaders.length === 1
+    ? { winner: leaders[0], tiedTeams: null }
+    : { winner: null, tiedTeams: leaders };
+}
+
+/**
+ * How far the songs that are left reach, for the buttons on the game over screen.
+ * Pure function. Continuing takes one more song; starting over takes a new starting card
+ * for every team and a first song.
+ */
+function songsLeftFor(gameData, teamCount) {
+  const nextSongIndex = ((gameData && gameData.currentSongIndex) || 0) + 1;
+  const songCount = ((gameData && gameData.songs) || []).length;
+  return {
+    canContinue: nextSongIndex < songCount,
+    canRestart: nextSongIndex + teamCount < songCount
+  };
+}
+// </out-of-songs>
+
+/**
+ * Ends the game because the deck is used up. Every place that would take the next song calls
+ * this when there is none, instead of giving up and leaving the game standing still.
+ *
+ * One update: the game over screen is shown on every phone, and the timer, the validation
+ * box, the challenge and the cards waiting to be placed are cleared, so nothing is left half
+ * done.
+ *
+ * Returns a promise for true ("the game is over"), the same answer checkAndApplyWinCondition
+ * gives, so a caller can use it in the same place.
+ */
+window.endGameOutOfSongs = async function() {
+  console.log('[Game] No more songs: ending the game');
+
+  // The latest teams, read the same way as in the win check
+  const snapshot = await window.firebaseGet(window.firebaseRef(window.firebaseDb, `games/${gameId}/teams`));
+  const teams = snapshot.exists() ? snapshot.val() : currentTeams;
+  const result = outOfSongsResult(teams);
+  console.log('[Game] Result when the songs ran out:', result);
+
+  const updates = {};
+  updates[`games/${gameId}/phase`] = 'gameOver';
+  updates[`games/${gameId}/gameOverReason`] = 'outOfSongs';
+  updates[`games/${gameId}/winner`] = result.winner;
+  updates[`games/${gameId}/tiedTeams`] = result.tiedTeams;
+  updates[`games/${gameId}/timerState`] = null;
+  updates[`games/${gameId}/timerStartTime`] = null;
+  updates[`games/${gameId}/timerDuration`] = null;
+  updates[`games/${gameId}/nextTeam`] = null;
+  updates[`games/${gameId}/validationModal`] = null;
+  updates[`games/${gameId}/challengeState`] = null;
+  Object.keys(teams || {}).forEach(id => {
+    updates[`games/${gameId}/teams/${id}/pendingCard`] = null;
+  });
+
+  await window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates);
+  return true;
 };
 
 console.log('[Game] Init module loaded');

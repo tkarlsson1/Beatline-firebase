@@ -525,7 +525,8 @@ function skipTurn() {
   const songs = currentGameData.songs || [];
   
   if (nextSongIndex >= songs.length) {
-    console.warn('[Timer] No more songs in deck!');
+    console.warn('[Timer] No more songs in deck - ending the game');
+    window.endGameOutOfSongs().catch(error => console.error('[Timer] Error ending the game:', error));
     return;
   }
   

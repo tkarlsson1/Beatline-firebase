@@ -544,7 +544,7 @@
     const question = supply.level === "short"
       ? {
           title: "Starta ändå?",
-          text: `${songWord(poolCount)} räcker inte till ${points} poäng med ${teamCount} lag. Låtarna tar slut innan någon vinner.`,
+          text: `${songWord(poolCount)} räcker inte till ${points} poäng med ${teamCount} lag. Spelet slutar när låtarna tar slut, och flest kort vinner.`,
           confirmLabel: "Starta ändå",
           danger: true
         }

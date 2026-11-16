@@ -1313,9 +1313,9 @@ function closeValidationModal() {
       const songs = currentGameData.songs || [];
       
       if (nextSongIndex >= songs.length) {
-        console.warn('[Game] No more songs in deck!');
-        showNotification('Inga fler låtar!', 'error');
-        return;
+        // The game ends here. The answer "the game is over" also keeps Timer 4 from starting.
+        console.warn('[Game] No more songs in deck - ending the game');
+        return window.endGameOutOfSongs();
       }
       
       const nextSong = songs[nextSongIndex];
@@ -1362,6 +1362,14 @@ function closeValidationModal() {
     .catch((error) => {
       console.error('[Game] ❌ Error closing validation modal:', error);
       showNotification('Ett fel uppstod', 'error');
+
+      // The box was marked as processing at the start. If it is still there, the mark is
+      // taken away again: otherwise its buttons stay disabled and nobody can try again.
+      if (currentGameData.validationModal) {
+        const unlock = {};
+        unlock[`games/${gameId}/validationModal/isProcessing`] = false;
+        window.firebaseUpdate(window.firebaseRef(window.firebaseDb), unlock).catch(() => {});
+      }
     });
 }
 
@@ -1513,7 +1521,8 @@ function transitionAfterChallenge() {
   const songs = currentGameData.songs || [];
   
   if (nextSongIndex >= songs.length) {
-    console.warn('[Game] No more songs in deck!');
+    console.warn('[Game] No more songs in deck - ending the game');
+    window.endGameOutOfSongs().catch(error => console.error('[Game] Error ending the game:', error));
     return;
   }
   
@@ -1571,8 +1580,8 @@ function nextTeam() {
   const songs = currentGameData.songs || [];
   
   if (nextSongIndex >= songs.length) {
-    console.warn('[Game] No more songs in deck! Game should end.');
-    // TODO: End game when out of songs
+    console.warn('[Game] No more songs in deck - ending the game');
+    window.endGameOutOfSongs().catch(error => console.error('[Game] Error ending the game:', error));
     return;
   }
   

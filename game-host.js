@@ -116,8 +116,11 @@ function forceNextTeam() {
   const songs = currentGameData.songs || [];
   
   if (nextSongIndex >= songs.length) {
-    console.warn('[Host] No more songs in deck!');
-    showNotification('Inga fler låtar!', 'error');
+    console.warn('[Host] No more songs in deck - ending the game');
+    window.endGameOutOfSongs().catch(error => {
+      console.error('[Host] Error ending the game:', error);
+      showNotification('Kunde inte avsluta spelet', 'error');
+    });
     return;
   }
   
@@ -184,6 +187,8 @@ function continuePlaying() {
   const updates = {};
   updates[`games/${gameId}/phase`] = 'playing';
   updates[`games/${gameId}/winner`] = null;
+  updates[`games/${gameId}/gameOverReason`] = null;
+  updates[`games/${gameId}/tiedTeams`] = null;
   updates[`games/${gameId}/settings/gameOverDisabled`] = true;
   updates[`games/${gameId}/currentTeam`] = nextTeamId;
   updates[`games/${gameId}/currentSongIndex`] = nextSongIndex;
@@ -233,6 +238,8 @@ function restartGame() {
   // Reset game state
   updates[`games/${gameId}/status`] = 'playing';
   updates[`games/${gameId}/winner`] = null;
+  updates[`games/${gameId}/gameOverReason`] = null;
+  updates[`games/${gameId}/tiedTeams`] = null;
   updates[`games/${gameId}/phase`] = null;
   updates[`games/${gameId}/currentRound`] = 1;
   updates[`games/${gameId}/currentTeam`] = newStartingTeamId;

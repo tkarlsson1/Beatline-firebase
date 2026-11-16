@@ -934,37 +934,66 @@ function renderGameOverModal() {
     return;
   }
   
-  const winnerId = currentGameData.winner;
-  const winnerTeam = currentTeams[winnerId];
-  const winnerName = winnerTeam ? winnerTeam.name : 'Okänt lag';
-  
+  const teamName = (id) => (currentTeams[id] ? currentTeams[id].name : 'Okänt lag');
+
+  // Who won. When the songs ran out several teams can share the lead; the database stores
+  // their ids as a list, which can come back as an object.
+  const tiedIds = currentGameData.tiedTeams ? Object.values(currentGameData.tiedTeams) : [];
+  let resultHTML;
+  if (!currentGameData.winner && tiedIds.length > 1) {
+    const names = tiedIds.map(id => escapeHtml(teamName(id)));
+    const nameList = names.slice(0, -1).join(', ') + ' och ' + names[names.length - 1];
+    resultHTML = `Oavgjort mellan <span style="color: #00ffff;">${nameList}</span>`;
+  } else {
+    resultHTML = `Vinnare: <span style="color: #00ffff;">${escapeHtml(teamName(currentGameData.winner))}</span>`;
+  }
+
+  // Why the game ended, when it was not by reaching the points to win
+  const reasonHTML = currentGameData.gameOverReason === 'outOfSongs'
+    ? `<p style="font-size: 1.1rem; color: #ccc; margin: 0 0 12px 0;">Låtarna tog slut – flest kort vinner</p>`
+    : '';
+
+  // Going on and starting over both take more songs than may be left
+  const songsLeft = songsLeftFor(currentGameData, Object.keys(currentTeams).length);
+
   let modalHTML = `
     <div class="validation-modal-overlay">
       <div class="validation-modal-content" style="text-align: center; border: 3px solid #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);">
         <h1 style="font-size: 3rem; color: #ff00ff; margin-bottom: 10px;">🏆 SPEL AVSLUTAT 🏆</h1>
-        <h2 style="font-size: 2rem; margin-bottom: 20px;">Vinnare: <span style="color: #00ffff;">${escapeHtml(winnerName)}</span></h2>
-        
+        ${reasonHTML}
+        <h2 style="font-size: 2rem; margin-bottom: 20px;">${resultHTML}</h2>
+
 
   `;
-  
+
   if (isHost) {
     modalHTML += `
       <div class="validation-modal-buttons" style="justify-content: center; flex-direction: column; gap: 12px; align-items: center;">
-        <button 
-          class="validation-modal-btn token" 
+    `;
+    if (songsLeft.canContinue) {
+      modalHTML += `
+        <button
+          class="validation-modal-btn token"
           onclick="continuePlaying()"
           style="width: 100%; max-width: 300px;"
         >
           🎮 FORTSÄTT SPELA
         </button>
-        <button 
-          class="validation-modal-btn" 
+      `;
+    }
+    if (songsLeft.canRestart) {
+      modalHTML += `
+        <button
+          class="validation-modal-btn"
           onclick="restartGame()"
           style="width: 100%; max-width: 300px; background: #1a1a2e; border: 2px solid #00ffff; color: #00ffff;"
         >
           🔄 STARTA OM (samma inställningar)
         </button>
-        <button 
+      `;
+    }
+    modalHTML += `
+        <button
           class="validation-modal-btn" 
           onclick="window.location.href='/'"
           style="width: 100%; max-width: 300px; background: #1a1a2e; border: 2px solid #666; color: #aaa;"
@@ -976,7 +1005,7 @@ function renderGameOverModal() {
   } else {
     modalHTML += `
       <p style="color: #666; font-style: italic;">
-        Väntar på att host ska välja nästa steg...
+        ${songsLeft.canContinue || songsLeft.canRestart ? 'Väntar på att host ska välja nästa steg...' : 'Spelet är slut.'}
       </p>
       <button 
         onclick="window.location.href='/'"
