@@ -34,6 +34,8 @@ let previousCurrentTeam = null; // Track previous team to detect team changes fo
 // Spotify state
 let spotifyInitialized = false;
 let currentPlayingTrackId = null;
+let previousTimerState = null; // Timer state at the last game update, to see when guessing time begins
+let hasSeenFirstGameState = false; // False until the host page has handled its first game state
 
 // NOTE: Timer durations should be set in Firebase by lobby.js when starting the game:
 // - currentGameData.guessingTime (in seconds, default: 90)
@@ -72,6 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof window !== 'undefined') {
   window.addEventListener('spotifyPlayerReady', (event) => {
     console.log('[Spotify] Player ready event received:', event.detail);
+
+    // A host page that is loaded in the middle of a turn has no player when its first game
+    // state arrives, so the song in play is started here instead (see updateGameView)
+    if (isHost && currentGameData && currentGameData.timerState === 'guessing') {
+      playCurrentSong();
+    }
     
     // Show Spotify status indicator for host
     const gameUrl = new URLSearchParams(window.location.search);

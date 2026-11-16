@@ -94,55 +94,79 @@ function updateGameView() {
   // Handle Spotify playback (host only)
   if (isHost && window.spotifyPlayer) {
     const currentTimerState = currentGameData.timerState;
-    
-    // Detect timer state change to 'guessing' - play new song
+
+    // Guessing time has begun - play the song
     if (currentTimerState === 'guessing' && previousTimerState !== 'guessing') {
-      console.log('[Spotify] Timer changed to guessing, playing song...');
-      
-      if (currentGameData.currentSong && currentGameData.currentSong.spotifyId) {
-        const spotifyId = currentGameData.currentSong.spotifyId;
-        
-        // Only play if it's a different song
-        if (spotifyId !== currentPlayingTrackId) {
-          console.log('[Spotify] Playing new track:', currentGameData.currentSong.title, 'by', currentGameData.currentSong.artist);
-          
-          window.spotifyPlayer.play(spotifyId)
-            .then(success => {
-              if (success) {
-                currentPlayingTrackId = spotifyId;
-                console.log('[Spotify] Track started successfully');
-              } else {
-                console.error('[Spotify] Failed to start track');
-              }
-            })
-            .catch(error => {
-              console.error('[Spotify] Error playing track:', error);
-            });
-        } else {
-          console.log('[Spotify] Same track already playing, continuing...');
-        }
+      // A page that is loaded in the middle of a turn gets its first game state before the
+      // player is ready. Then the song is started when the player reports that it is ready
+      // (spotifyPlayerReady in game-init.js) instead of failing here.
+      if (hasSeenFirstGameState || window.spotifyPlayer.getDeviceId()) {
+        playCurrentSong();
       } else {
-        console.warn('[Spotify] No currentSong or spotifyId available');
+        console.log('[Spotify] Page loaded during guessing time, the song starts when the player is ready');
       }
     }
-    
+
     // Update previous timer state
     previousTimerState = currentTimerState;
+    hasSeenFirstGameState = true;
   }
-  
-  // Start initial timer (Timer 4) when game first starts
+
+  // Start the pause before the first song (Timer 4), once per game.
+  // The game itself remembers that it has been done (startPauseStarted). The page's own
+  // memory is not enough: a host who reloads the page would start the pause again, on top
+  // of the timer that is running.
   if (!hasStartedInitialTimer && currentGameData.status === 'playing' && isHost) {
     hasStartedInitialTimer = true;
-    console.log('[Game] Starting initial pause timer (Timer 4)');
-    
-    // Find the starting team (should already be set in currentTeam)
-    const firstTeamId = currentGameData.currentTeam;
-    
-    // Start Timer 4 (10s between songs) showing the first team
-    setTimeout(() => {
-      startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, firstTeamId);
-    }, 500); // Small delay to ensure everything is loaded
+
+    if (!currentGameData.startPauseStarted) {
+      console.log('[Game] Starting initial pause timer (Timer 4)');
+
+      // Find the starting team (should already be set in currentTeam)
+      const firstTeamId = currentGameData.currentTeam;
+
+      // Start Timer 4 showing the first team, and mark the game in the same write
+      setTimeout(() => {
+        if (currentGameData.startPauseStarted) return;
+        startTimer('between_songs', (currentGameData.betweenSongsTime || 10) * 1000, firstTeamId, { startPauseStarted: true });
+      }, 500); // Small delay to ensure everything is loaded
+    }
   }
+}
+
+/**
+ * Starts the song in play on the host's Spotify player, unless it is already playing.
+ * Called when guessing time begins and when the player becomes ready.
+ */
+function playCurrentSong() {
+  const song = currentGameData && currentGameData.currentSong;
+  if (!song || !song.spotifyId) {
+    console.warn('[Spotify] No currentSong or spotifyId available');
+    return;
+  }
+
+  const spotifyId = song.spotifyId;
+
+  // Only play if it's a different song
+  if (spotifyId === currentPlayingTrackId) {
+    console.log('[Spotify] Same track already playing, continuing...');
+    return;
+  }
+
+  console.log('[Spotify] Playing new track:', song.title, 'by', song.artist);
+
+  window.spotifyPlayer.play(spotifyId)
+    .then(success => {
+      if (success) {
+        currentPlayingTrackId = spotifyId;
+        console.log('[Spotify] Track started successfully');
+      } else {
+        console.error('[Spotify] Failed to start track');
+      }
+    })
+    .catch(error => {
+      console.error('[Spotify] Error playing track:', error);
+    });
 }
 
 // ============================================

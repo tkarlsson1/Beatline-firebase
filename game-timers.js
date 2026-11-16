@@ -10,7 +10,9 @@
 // Counter for logging (to avoid spam with 100ms updates)
 let timerUpdateCounter = 0;
 
-function startTimer(type, duration, nextTeamId = null) {
+// extraFields: other fields of the game to write in the same write as the timer
+// (field name -> value)
+function startTimer(type, duration, nextTeamId = null, extraFields = null) {
   console.log('[Timer] Starting timer:', type, 'duration:', duration, 'nextTeam:', nextTeamId);
   
   const updates = {};
@@ -20,6 +22,12 @@ function startTimer(type, duration, nextTeamId = null) {
   
   if (nextTeamId) {
     updates[`games/${gameId}/nextTeam`] = nextTeamId;
+  }
+
+  if (extraFields) {
+    Object.entries(extraFields).forEach(([field, value]) => {
+      updates[`games/${gameId}/${field}`] = value;
+    });
   }
   
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
