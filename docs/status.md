@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.853 |
-| admin.html | 0.082 |
-| spotify.js | 0.849 |
+| index.html (spelet) | 0.854 |
+| admin.html | 0.083 |
+| spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v50 |
-| service-worker | v57 |
+| service-worker | v58 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -74,6 +74,7 @@
 | 2026-11-16 | Provkörning på 20 av användarnas låtar: 1,09 dollar (5,5 cent per låt), 36 sekunder. 10 av 20 fick webbsökning, mot 24 procent i standardlistorna. 16 oförändrade, 4 ändras (3 med mer än två år), ingen behöver granskas. 3 av de 10 källorna är `music.apple.com`. Resultaten ligger i `yearReviews` och är inte verkställda; 2 663 låtar återstår | – |
 | 2026-11-16 | Körning på användarnas låtar inom befintliga krediter: 1 100 låtar i tre omgångar (500, 400, 200) utan misslyckade anrop, 77,35 dollar enligt faktureringssidan (7 cent per låt; 60 procent behövde webbsökning, och en sökt låt kostar cirka 11 cent). Med provet är 1 120 av 2 683 granskade: 918 oförändrade, 182 ändras (108 med mer än två år), 20 behöver granskas och ligger i "Årtal att avgöra". Av de 182 ändrade har 162 en fristående källa, 18 en strömningstjänst eller butik och 2 bygger på att Opus och sökningen är överens. Kvar: 1 563 låtar (961 utan cachepost, 464 olåsta, 138 låsta), cirka 110 dollar. Inget är verkställt. Ultra-krediterna stod efteråt på 17,58 dollar (går ut 22 november 00:00 UTC), de köpta 13,32 är orörda och automatisk påfyllning är avstängd | – |
 | 2026-11-16 | **Användarnas granskade låtar verkställda.** 1 100 låtar fick en cachepost med år, källa och förklaring, 182 av dem ett annat år än Spotifys. Kontrollerat mot en kopia tagen precis före: cachen gick från 3 483 till 4 583 poster, ingen befintlig post ändrades eller försvann, ingen ny post är låst, och standardlistorna och användarnas listor är oförändrade. Kvar att granska: 1 563 av användarnas låtar. De 20 som granskningen inte kunde avgöra ligger i "Årtal att avgöra". Kopian före ligger i `tools/year-eval/backups/` | – |
+| 2026-11-16 | Låtar som Spotify dragit in: Spotify svarar då med ett tomt skal (ingen titel, ingen artist, datum "0000"), och servern tolkade det som en riktig låt med år 0, frågade Opus om en tom låt och sparade "behöver granskas". Tre sådana låg i "Årtal att avgöra" utan namn och gick inte att få bort. Rättat i `fetchSpotifyTrack`: en låt utan titel räknas som "finns inte hos Spotify", och ett år före 1900 eller efter nästa år räknas som att år saknas. Båda importerna hoppar över skalen och säger hur många låtar som inte längre finns hos Spotify | 0.854 / 0.083 / Functions |
 
 ---
 

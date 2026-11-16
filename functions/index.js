@@ -154,10 +154,15 @@ async function getSpotifyAppToken() {
 // A Spotify track id is 22 letters and digits. Checked before the id is put into an address.
 const SPOTIFY_TRACK_ID = /^[A-Za-z0-9]{22}$/;
 
+// The earliest year a release date from Spotify can mean. An earlier one is treated as no date.
+const MIN_RELEASE_YEAR = 1900;
+
 /**
  * Reads one track from Spotify.
  * Returns { title, artist, albumName, albumType, releaseDate, spotifyYear }, or null when Spotify
- * has no track with that id. spotifyYear is null when the album has no release date.
+ * has no track with that id. A track Spotify has withdrawn still answers, but as an empty shell:
+ * no name, no artist, no length and the date "0000". That counts as no track too.
+ * spotifyYear is null when the album has no release date, or one that cannot be a year.
  */
 async function fetchSpotifyTrack(trackId) {
   const token = await getSpotifyAppToken();
@@ -171,16 +176,19 @@ async function fetchSpotifyTrack(trackId) {
   if (!response.ok) throw new Error(`Spotify answered ${response.status} for track ${trackId}`);
 
   const track = await response.json();
+  if (!track || typeof track.name !== "string" || track.name.trim() === "") return null;
+
   const album = track.album || {};
   const releaseDate = album.release_date || null;
   const spotifyYear = releaseDate ? parseInt(releaseDate.substring(0, 4), 10) : NaN;
+  const isYear = Number.isInteger(spotifyYear) && spotifyYear >= MIN_RELEASE_YEAR && spotifyYear <= new Date().getFullYear() + 1;
   return {
     title: track.name,
     artist: (track.artists || []).map(artist => artist.name).join(", "),
     albumName: album.name || null,
     albumType: album.album_type || null,
     releaseDate,
-    spotifyYear: Number.isInteger(spotifyYear) ? spotifyYear : null
+    spotifyYear: isYear ? spotifyYear : null
   };
 }
 

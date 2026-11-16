@@ -62,6 +62,7 @@ async function fetchSpotifyPlaylist(playlistUrl) {
   console.log("fetchSpotifyPlaylist: Extraherat playlist-ID:", playlistId);
   const token = await getBackendSpotifyToken();
   let tracks = {};
+  let unavailable = 0;
   let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
   while (nextUrl) {
     const response = await fetch(nextUrl, {
@@ -79,6 +80,12 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     data.items.forEach(item => {
       // Bug #6: Skip null tracks (local files, deleted songs)
       if (!item.track || !item.track.id) return;
+      // A song Spotify has withdrawn comes back as an empty shell: no name, no artist and the
+      // date "0000". It cannot be played or reviewed, so it is left out and counted.
+      if (typeof item.track.name !== "string" || item.track.name.trim() === "") {
+        unavailable++;
+        return;
+      }
       const trackId = item.track.id;
       tracks[trackId] = {
         title: item.track.name,
@@ -88,7 +95,7 @@ async function fetchSpotifyPlaylist(playlistUrl) {
     });
     nextUrl = data.next;
   }
-  return tracks;
+  return { tracks, unavailable };
 }
 
 async function addPlaylistToFirebase(playlistName, playlistUrl) {
@@ -114,7 +121,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
       progressText.textContent = 'Hämtar spellista från Spotify...';
     }
     
-    const tracks = await fetchSpotifyPlaylist(playlistUrl);
+    const { tracks, unavailable } = await fetchSpotifyPlaylist(playlistUrl);
     
     if (!tracks || Object.keys(tracks).length === 0) {
       alert("Ingen data hämtades från spellistan. Kontrollera att länken är korrekt!");
@@ -199,7 +206,7 @@ async function addPlaylistToFirebase(playlistName, playlistUrl) {
     if (sp) sp.style.display = 'none';
     if (container) container.style.display = 'none';
     
-    alert(importResultMessage(playlistName, totalTracks, reviewCounts));
+    alert(importResultMessage(playlistName, totalTracks, reviewCounts, unavailable));
 
     // Rensa fälten
     document.getElementById('playlistLinkInput').value = '';
@@ -310,14 +317,18 @@ function applyImportReview(tracks, reviewedIds, results) {
   return counts;
 }
 
-// The message shown when an import is done
-function importResultMessage(playlistName, totalTracks, counts) {
+// The message shown when an import is done. unavailable is how many songs in the playlist
+// Spotify has withdrawn; they were left out.
+function importResultMessage(playlistName, totalTracks, counts, unavailable = 0) {
   let message = `"${playlistName}" har lagts till med ${totalTracks} låtar.`;
   if (counts.overLimit > 0) {
     message += `\n\n${counts.overLimit} låtar granskades inte eftersom dagens gräns för nya låtar är nådd. De har Spotifys årtal. Importera listan igen i morgon så granskas de.`;
   }
   if (counts.failed > 0) {
     message += `\n\n${counts.failed} låtar kunde inte kvalitetssäkras just nu och har Spotifys årtal. Importera listan igen för att försöka på nytt.`;
+  }
+  if (unavailable > 0) {
+    message += `\n\n${unavailable} låtar i spellistan finns inte längre hos Spotify och togs inte med.`;
   }
   return message;
 }

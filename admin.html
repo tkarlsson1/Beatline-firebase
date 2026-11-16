@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.082</title>
+    <title>Notestream Admin v0.083</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -574,8 +574,9 @@
          *
          * counts:      from buildImportPlan
          * reviewedNow: how many of the songs were reviewed during this import
+         * unavailable: how many songs in the playlist Spotify has withdrawn; they were left out
          */
-        function importSummaryText(listName, counts, reviewedNow) {
+        function importSummaryText(listName, counts, reviewedNow, unavailable = 0) {
             const lines = [
                 `Spellistan "${listName}" har lagts till med ${counts.total} låtar.`,
                 "",
@@ -590,6 +591,9 @@
             }
             if (counts.pending > 0) {
                 lines.push(`${counts.pending} kunde inte granskas nu och har Spotifys år. Kör "Starta / Fortsätt" i kortet "Granska alla årtal" och sedan "Verkställ".`);
+            }
+            if (unavailable > 0) {
+                lines.push(`${unavailable} låtar i spellistan finns inte längre hos Spotify och togs inte med.`);
             }
             return lines.join("\n");
         }
@@ -1460,8 +1464,9 @@
                 progressCount.textContent = '';
 
                 let tracks;
+                let unavailable = 0;
                 try {
-                    tracks = await fetchSpotifyPlaylist(playlistLink);
+                    ({ tracks, unavailable } = await fetchSpotifyPlaylist(playlistLink));
                 } catch (e) {
                     alert("Misslyckades hämta spellistan: " + e.message);
                     resetImportUi();
@@ -1524,7 +1529,7 @@
                     }
                     await set(ref(db, `standardLists/${playlistName}`), { songs: plan.songs });
 
-                    alert(importSummaryText(playlistName, plan.counts, reviewedNow));
+                    alert(importSummaryText(playlistName, plan.counts, reviewedNow, unavailable));
                     document.getElementById("standardPlaylistName").value = '';
                     document.getElementById("standardPlaylistLink").value = '';
                 } catch (e) {
@@ -1564,6 +1569,7 @@
 
                 const token = await getBackendSpotifyToken();
                 let tracks = {};
+                let unavailable = 0;
                 let nextUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
                 while (nextUrl) {
@@ -1582,6 +1588,12 @@
                     data.items.forEach(item => {
                         // Bug #6: Skip null tracks (local files, deleted songs)
                         if (!item.track || !item.track.id) return;
+                        // A song Spotify has withdrawn comes back as an empty shell: no name, no artist
+                        // and the date "0000". It cannot be played or reviewed, so it is left out and counted.
+                        if (typeof item.track.name !== "string" || item.track.name.trim() === "") {
+                            unavailable++;
+                            return;
+                        }
                         const trackId = item.track.id;
                         tracks[trackId] = {
                             title: item.track.name,
@@ -1591,7 +1603,7 @@
                     });
                     nextUrl = data.next;
                 }
-                return tracks;
+                return { tracks, unavailable };
             }
 
             async function getBackendSpotifyToken() {
