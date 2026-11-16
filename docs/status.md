@@ -3,15 +3,15 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.856 |
-| admin.html | 0.085 |
-| ny/ (ny väg in: index.html, lobby.html, join.html) | 0.856 |
+| index.html (spelet) | 0.857 |
+| admin.html | 0.086 |
+| ny/ (ny väg in: index.html, lobby.html, join.html) | 0.857 |
 | spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v50 |
-| service-worker | v60 |
+| service-worker | v61 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -87,6 +87,7 @@
 | 2026-11-16 | **Beslut: ny väg in i spelet byggs som egna sidor under `/ny/`, bredvid de nuvarande.** Målet är att alla spelval (listor, årtal, poäng, tider) görs i lobbyn medan lagen ansluter, att spelarna ser vad som ska spelas, och att startsidan blir en ingång med "Nytt spel" och "Mina spellistor". Dagens startsida, lobby och anslutningssida rörs inte under bygget och får bara kritiska rättningar; game.html är gemensam och ändras inte. Båda vägarna ligger på samma webbplats, så inloggning och Spotify-koppling delas. Att gå tillbaka kräver ingenting, eftersom det gamla ligger kvar. Läget före bygget är märkt i git som `v0.855-before-new-lobby`. Bugg #24 (slut på kortleken) och varningen för för få låtar är pausade tills den nya lobbyn finns | – |
 | 2026-11-16 | **Ny väg in i spelet under `/ny/`, bredvid den nuvarande.** `ny/index.html`: "Nytt spel" frågar efter lagnamn och öppnar lobbyn direkt, "Mina spellistor" visar egna listor med borttag och importen (samma `spotify.js` som dagens startsida), och sidan visar om Spotify är kopplat. `ny/lobby.html`, värden: QR-kod och länk, lag med Kicka, val av standardlistor och egna listor med antal låtar per lista, årtal, poäng, tider, en rad med hur många låtar valet ger, och Starta spel. Valen sparas i spelet direkt. `ny/lobby.html`, spelare: lagen och vad som ska spelas (listor, årtal, poäng, antal låtar), uppdaterat medan värden väljer. `ny/join.html`: lagnamn, läser lagen igen vid anslutning. Gemensam funktion `ny/song-pool.js` ger både antalet i lobbyn och kortleken, och starten skriver samma fält som dagens lobby. Skillnader mot dagens kortlek: en låt i flera valda listor tas en gång (med alla 16 standardlistor har dagens lek 2 795 låtar varav 570 dubbletter, #35), och 12-timmarsspärren läses inte. Startkorten dras som idag (#34 kvar). Game ID och PIN visas inte. Värdens omladdning efter start leder till spelet med rätt lag (#36 gäller inte här), och Spotify-tokenen förnyas vid start (mildrar #33). Dagens startsida, lobby, anslutningssida och game.html är oförändrade utom versionsnumret i `index.html`. Testat: låtfunktionen mot de riktiga listorna (33 kontroller, samma låtar som dagens lobby bortsett från dubbletterna, start identisk med dagens); lokalt i två flikar: välja listor och årtal, ansluta, upptaget lagnamn, spelarens vy följer värdens val, start in i game.html för båda, kick, omladdning efter start, borttaget spel. Inte provat: inloggat läge (Nytt spel, egna listor i lobbyn, Mina spellistor, import), Spotify-kopplingen och musik, telefoner. Känt: efter "Koppla Spotify" hamnar man på den vanliga startsidan, eftersom Spotifys återvändsadress är fast | 0.856 / 0.085 |
 | 2026-11-16 | Den nya vägen in testad av admin i ett riktigt spel: startsidan under `/ny/` med Spotify-kopplingen, "Nytt spel" med val av listor i lobbyn, anslutning med QR-koden, start och några spelade låtar – allt fungerade. Kvar: bytet så att det nya blir standard (steg 4), och de pausade frågorna om avslut när låtarna tar slut (#24) och raden om låtarna räcker | – |
+| 2026-11-16 | Egna rutor i den nya vägen in, i stället för webbläsarens `confirm` och `alert`. Ny `ny/dialog.js` med en fråga (två knappar) och ett meddelande (en knapp) i samma utseende som spelets valideringsruta; Escape och klick utanför räknas som Avbryt, och bara en ruta visas åt gången. Använd i nya lobbyn (Starta spelet, Kicka laget) och på nya startsidan (Ta bort spellistan, glömt lösenord, fel vid borttag). Importens och Spotify-kopplingens meddelanden visas i samma ruta på nya startsidan genom att sidan ersätter `alert`; `spotify.js` och `spotify-auth.js` är oförändrade. Frågor som tar bort något har fokus på Avbryt. Eftersom den egna rutan inte fryser sidan kontrolleras läget igen efter svaret (laget finns kvar, minst två lag). Kvar med webbläsarens rutor: spelet ("Byt låt", rapportera), Spotify-koden, de gamla sidorna och admin. Testat lokalt: start, avbryt, Escape, klick utanför, dubbelklick, kick, meddelanden i kö och ovanpå inloggningsrutan. Inte provat: borttag av spellista och importens meddelanden i inloggat läge | 0.857 / 0.086 |
 
 ---
 

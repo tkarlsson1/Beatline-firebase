@@ -43,6 +43,14 @@ window.auth = auth;
 window.firebaseFunctions = functions;
 window.httpsCallable = httpsCallable;
 
+// Questions and messages are shown in the page's own box (dialog.js)
+const dialog = window.NotestreamDialog;
+
+// ../spotify.js and ../spotify-auth.js report with alert(). They are shared with the current
+// start page and are not changed, so on this page alert() itself shows the page's own box.
+// Unlike the browser's alert it does not wait for the user: the code after it carries on.
+window.alert = message => { dialog.message({ text: String(message) }); };
+
 const byId = id => document.getElementById(id);
 const show = (id, display = "block") => { byId(id).style.display = display; };
 const hide = id => { byId(id).style.display = "none"; };
@@ -115,12 +123,12 @@ byId("forgotPasswordLink").addEventListener("click", event => {
   event.preventDefault();
   const email = byId("emailInput").value.trim();
   if (!email) {
-    alert("Ange din e-postadress för att återställa lösenordet.");
+    dialog.message({ text: "Ange din e-postadress för att återställa lösenordet." });
     return;
   }
   sendPasswordResetEmail(auth, email)
-    .then(() => alert("En återställningslänk har skickats till din e-post."))
-    .catch(error => alert("Fel: " + error.message));
+    .then(() => dialog.message({ text: "En återställningslänk har skickats till din e-post." }))
+    .catch(error => dialog.message({ title: "Det gick inte", text: error.message }));
 });
 
 byId("logoutLink").addEventListener("click", event => {
@@ -300,12 +308,18 @@ function renderPlaylists(userId, playlists) {
     remove.className = "kick-btn";
     remove.textContent = "Ta bort";
     remove.addEventListener("click", async () => {
-      if (!confirm(`Ta bort spellistan "${name}"? Detta går inte att ångra.`)) return;
+      const confirmed = await dialog.confirm({
+        title: "Ta bort spellistan?",
+        text: `"${name}" tas bort. Det går inte att ångra.`,
+        confirmLabel: "Ta bort",
+        danger: true
+      });
+      if (!confirmed) return;
       try {
         await set(ref(db, `userPlaylists/${userId}/${name}`), null);
       } catch (error) {
         console.error("[Start] Could not remove the playlist:", error);
-        alert("Kunde inte ta bort spellistan. Kontrollera uppkopplingen och försök igen.");
+        dialog.message({ text: "Kunde inte ta bort spellistan. Kontrollera uppkopplingen och försök igen." });
       }
     });
 

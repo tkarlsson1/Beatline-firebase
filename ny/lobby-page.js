@@ -3,7 +3,8 @@
 // The host chooses playlists, years, points and timers here while the teams join, and the
 // players see what has been chosen. Starting writes the same game data as the current
 // lobby, so game.html is the same for both.
-// Helpers (TEAM_COLORS, validateTimer, showNotification) come from ../lobby.js.
+// Helpers (TEAM_COLORS, validateTimer, showNotification) come from ../lobby.js, and the
+// question box from dialog.js.
 // ============================================
 
 (function () {
@@ -33,9 +34,12 @@
   let songDataFailed = false;
   let ownListsUnavailable = false;
   let poolCount = 0;
+  let askingToStart = false;
   let starting = false;
   let leaving = false;
 
+  // Questions are asked in the page's own box (dialog.js), not the browser's confirm()
+  const dialog = window.NotestreamDialog;
   const byId = id => document.getElementById(id);
   const dbRef = path => window.firebaseRef(window.firebaseDb, path);
 
@@ -178,10 +182,17 @@
     }
   }
 
-  function kickTeam(kickTeamId) {
+  async function kickTeam(kickTeamId) {
     const team = currentTeams[kickTeamId];
     if (!team) return;
-    if (!confirm(`Är du säker på att du vill kicka "${team.name}"?`)) return;
+    const confirmed = await dialog.confirm({
+      title: "Kicka laget?",
+      text: `"${team.name}" tas bort ur lobbyn.`,
+      confirmLabel: "Kicka",
+      danger: true
+    });
+    // The team can have left, or the game started, while the question was open
+    if (!confirmed || leaving || !currentTeams[kickTeamId]) return;
 
     window.firebaseSet(dbRef(`games/${gameId}/teams/${kickTeamId}`), null)
       .then(() => showNotification("Lag borttaget", "success"))
@@ -475,11 +486,24 @@
     button.disabled = !ready;
   }
 
+  function readyToStart() {
+    return Object.keys(currentTeams).length >= 2 && !!songData && poolCount > 0;
+  }
+
   async function startGame() {
-    if (starting) return;
+    if (starting || askingToStart || !readyToStart()) return;
+
+    askingToStart = true;
     const teamCount = Object.keys(currentTeams).length;
-    if (teamCount < 2 || !songData || poolCount === 0) return;
-    if (!confirm(`Starta spelet med ${teamCount} lag och ${poolCount} låtar?`)) return;
+    const confirmed = await dialog.confirm({
+      title: "Starta spelet?",
+      text: `${teamCount} lag och ${poolCount === 1 ? "1 låt" : poolCount + " låtar"}.`,
+      confirmLabel: "Starta"
+    });
+    askingToStart = false;
+    // Teams can have left while the question was open
+    if (!confirmed || leaving) return;
+    if (!readyToStart()) return updateStartButton();
 
     starting = true;
     const button = byId("startGameBtn");
