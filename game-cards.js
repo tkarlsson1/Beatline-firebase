@@ -360,7 +360,6 @@ async function changeCard() {
 
     await window.firebaseUpdate(window.firebaseRef(window.firebaseDb), swapUpdates);
     console.log('[Game] ✅ Card swapped successfully');
-    showNotification('Ny låt! Lyssna noga...', 'success');
     await wait(200);  // Firebase propagation
 
     // ============================================
@@ -466,8 +465,6 @@ function challengeCard() {
       console.log('[Game] ✅ Challenge registered successfully!');
       console.log('[Game] 🎬 Starting Timer 3 (challenge_placement)...');
       
-      showNotification('UTMANING! Placera ditt kort!', 'success');
-      
       // Start Timer 3 (challenge placement)
       const placeChallengeTime = (currentGameData.placeChallengeTime || 20) * 1000;
       console.log('[Game] Timer 3 duration:', placeChallengeTime, 'ms');
@@ -565,7 +562,6 @@ function lockInPlacement(targetTeamId = null) {
     window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
       .then(() => {
         console.log('[Game] Challenging card locked, timer stopped');
-        showNotification('Challenge-kort låst! Validerar...', 'success');
         placementPosition = null;
         isLockingInPlacement = false;
         
@@ -654,7 +650,6 @@ function lockInPlacement(targetTeamId = null) {
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
     .then(() => {
       console.log('[Game] Card locked in to timeline');
-      showNotification('Kort låst!', 'info');
       placementPosition = null;
       isLockingInPlacement = false;
       
@@ -823,20 +818,11 @@ function validateAndScoreCard(cardKey, card) {
         validationUpdates[`games/${gameId}/teams/${teamId}/score`] = newScore;
         
         console.log('[Game] Updating score to', newScore, '(revealed cards)');
-        
-        // Check for winner (11 cards)
-        if (newScore >= 11) {
-          console.log('[Game] Team reached 11 cards! Potential winner!');
-          showNotification('11 KORT! Du kan vinna!', 'success');
-        } else {
-          showNotification('✓ RÄTT! Kortet behålls!', 'success');
-        }
       } else {
         // Remove the card from timeline
         validationUpdates[`games/${gameId}/teams/${teamId}/timeline/${actualCardKey}`] = null;
         
         console.log('[Game] Removing incorrect card');
-        showNotification(`✗ FEL! ${reason}`, 'error');
       }
       
       console.log('[Game] Applying validation updates:', validationUpdates);
@@ -1026,8 +1012,6 @@ function validateChallenge() {
     
     console.log('[Game] Active team score:', (activeTeam.score || 0), '→', newScore);
     
-    showNotification(`✅ ${activeTeam.name} hade rätt!`, 'success');
-    
     // Challenging team loses their token (already deducted)
     // Challenging team's card disappears (do nothing, it's only in challengeState)
     
@@ -1052,8 +1036,6 @@ function validateChallenge() {
     });
     
     console.log('[Game] Recompacted active team timeline:', remainingCards.length, 'cards remain');
-    
-    showNotification(`❌ ${activeTeam.name} hade fel!`, 'error');
     
     // Check if challenging team placed a card
     const challengingCard = challengeState.challengingCard;
@@ -1160,16 +1142,11 @@ function validateChallenge() {
         
         console.log('[Game] Challenging team score:', (challengingTeam.score || 0), '→', newScore);
         console.log('[Game] Token is consumed (not returned even on win)');
-        
-        showNotification(`✅ ${challengingTeam.name} vann utmaningen!`, 'success');
-        
       } else {
         // ============================================
         // BOTH TEAMS WERE WRONG
         // ============================================
         console.log('[Game] ❌ Both teams were wrong');
-        
-        showNotification('❌ Båda lagen hade fel!', 'error');
         
         // Challenging team keeps their lost token (no token back)
       }
@@ -1415,7 +1392,6 @@ function giveTokenToActiveTeam() {
   window.firebaseUpdate(window.firebaseRef(window.firebaseDb), updates)
     .then(() => {
       console.log('[Game] ✅ Bonus token given!');
-      showNotification(`🎫 ${activeTeam.name} fick en bonus-token!`, 'success');
       console.log('[Game] ========== GIVE BONUS TOKEN END ==========');
     })
     .catch((error) => {
