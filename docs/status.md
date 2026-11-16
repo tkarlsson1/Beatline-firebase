@@ -82,6 +82,7 @@
 | 2026-11-16 | Ytterligare 75 av användarnas låtar granskade på kampanjkrediterna, i tre omgångar (40, 20, 15) med saldot avläst emellan, utan misslyckade anrop: 6,75 dollar (9 cent per låt). Första omgången kostade 10,5 cent per låt – en jullista med gamla låtar på samlingsskivor, där nästan varje låt krävde webbsökning – de två senare 7,5 och 7,1. 54 oförändrade, 20 ändras (14 med mer än två år, till exempel *White Christmas* 2012→1942 och *Merry Christmas Everyone* 1991→1985) och 1 behöver granskas (*Deck the Halls*, Vic Damone). Därmed är 1 345 av 2 683 granskade och 1 338 återstår; kostnaden per låt har legat mellan 5,8 och 10,5 cent beroende på lista, vilket ger cirka 80–140 dollar för resten. Inget av de 75 är verkställt. Kampanjkrediterna stod efteråt på 2,16 dollar (går ut 22 november 00:00 UTC), de köpta 13,32 är orörda | – |
 | 2026-11-16 | **De 75 låtarna verkställda.** Förhandsvisningen visade 74 nya poster och 1 248 redan verkställda. 74 låtar fick en cachepost med år, källa och förklaring, 20 av dem ett annat år än Spotifys (14 med mer än två år) och 60 med länk till källa. Kontrollerat mot en kopia tagen precis före: cachen gick från 4 748 till 4 822 poster, ingen befintlig post ändrades eller försvann, ingen ny post är låst och antalet låsta är 759 som förut. Användarnas listor skrivs inte av det här valet enligt koden och testerna; det är inte avläst i databasen. Kvar att granska: 1 338 av användarnas låtar. De 3 som granskningen inte kunde avgöra ligger i "Årtal att avgöra". Kopian före ligger i `tools/year-eval/backups/` | – |
 | 2026-11-16 | De 3 låtarna i "Årtal att avgöra" avgjorda av admin: *Deck the Halls* (Vic Damone) 1967, *Kärleksvisa #3* (Ensamhushåll) 2010 och *Get Up and Go* (Broadcast 2000) 2007, alla med sökningens år. Kontrollerat mot databasen: var och en har en låst cachepost med beslutets år och källa, cachen har 4 825 poster varav 762 låsta, inga andra poster är ändrade och kön är tom. Av användarnas 2 683 låtar är 1 345 därmed klara och 1 338 ogranskade | – |
+| 2026-11-16 | Problemlistan städad efter årtalsarbetet, varje rad kontrollerad mot koden. Buggarna #38 och #43 är märkta åtgärdade och #40 och #41 inaktuella, eftersom koden de gällde är borttagen eller ombyggd. #10 har ny text: granskningsrutan är borta, men årtalsfälten i spellistedetaljer och cachesökningen sparar fortfarande utan kontroll. #39 har ny text: `spotify.js` har `?v=`, men `styles.css` och `lobby.js` saknar det på flera sidor. Förslagen D (indikator för 12-timmarsspärren, som inget längre skriver), I (granska befintliga listor, finns som "Granska alla årtal") och J (gräns för automatiskt godkännande i den gamla AI-kontrollen) är borttagna. Q kompletterad med två rester i admin.html. Kontrollerade och fortfarande aktuella: #8, #11, A, K. Övriga rader är inte genomgångna | – |
 
 ---
 
@@ -102,7 +103,7 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 |---|---|---|---|
 | 5 | Race condition i `mergeSongs()` – UI-räknare kan visa fel antal | Låg | Öppen |
 | 8 | `year: null` – låtar utan `release_date` på Spotify hamnar med null | Medel | Öppen |
-| 10 | Ingen validering på år-input i review-modalen – kan spara "abc" till cachen | Medel | Öppen |
+| 10 | Årtalsfälten i admin sparar värdet utan kontroll: "Spara" i spellistedetaljer och i cachesökningen skriver fältets värde som det är, så ett tomt fält eller ett orimligt år (t.ex. 12) kan hamna i listan och cachen (admin.html; läst i koden, inte provat). Granskningsrutan som buggen först gällde är borttagen | Medel | Öppen |
 | 11 | Ingen överskrivningsvarning – lista med befintligt namn skrivs över utan fråga | Låg | Öppen |
 | 12 | Spotify-token kan gå ut vid import >60 min → 401-fel utan retry | Låg | Öppen |
 | 13 | Paus under Timer 2/3 – "Fortsätt" startar alltid Timer 1, `challengeState` ligger kvar → aktiva laget kan lägga ett andra kort och spelet stannar vid nästa Timer 2 | Medel | Öppen |
@@ -125,12 +126,12 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | 35 | Samma låt kan hamna två gånger i kortleken om den finns i två valda listor (lobby.html) | Medel | Öppen (ej verifierad) |
 | 36 | Host som laddar om lobbyn efter spelstart skickas till `game.html?teamId=null` ("Ditt lag finns inte i spelet") – hostens lobbyadress saknar teamId (lobby.html) | Medel | Öppen |
 | 37 | join.html läser lagen en gång vid sidladdning – om alla ansluter samtidigt kan alla få samma färg, och kontrollen av dubbla namn och max 8 lag går förbi | Medel | Öppen (ej verifierad) |
-| 38 | Granskningsrutan vid användarimport (spotify.js) fungerar bara för admin: steg 1 skriver till `verifiedTracks`, som bara admin får skriva till, så alla andra får "Något gick fel". Steg 2 skriver till fel sökväg, `songs/<id>/year/year` | Medel | Öppen |
-| 39 | Service workern (stale-while-revalidate) kan servera gammal JS: `spotify.js` ändrades i 0.832 och 0.833 utan att `?v=` höjdes, och `lobby.js` och `styles.css` saknar `?v=` | Medel | Öppen (ej verifierad) |
-| 40 | "Städa databasen": filtret ">5 år nyare än Spotify" slås aldrig på, eftersom `fixedBy` alltid är "AI" (admin.html) | Medel | Öppen |
-| 41 | "Städa databasen": avbockade rader hoppas inte över utan låses med Spotifys år och `manuallyVerified: true`. Fallet där AI säger mer än 5 år tidigare än Spotify (nyutgåvor, samlingsskivor) är avbockat från början – Spara utan genomgång låser Spotifys år permanent (admin.html) | Medel | Öppen |
+| 38 | Granskningsrutan vid användarimport (spotify.js) fungerar bara för admin: steg 1 skriver till `verifiedTracks`, som bara admin får skriva till, så alla andra får "Något gick fel". Steg 2 skriver till fel sökväg, `songs/<id>/year/year` | Medel | Åtgärdad (0.849) – granskningsrutan är borttagen; servern granskar låtarna och skriver själv cachen (`reviewImportedTracks`) |
+| 39 | Service workern (stale-while-revalidate) kan servera gammal JS och CSS: `styles.css` saknar `?v=` på alla sidor, och `lobby.js` saknar det i lobby.html och join.html. `spotify.js` har numera `?v=` som följer versionen | Medel | Öppen (ej verifierad) |
+| 40 | "Städa databasen": filtret ">5 år nyare än Spotify" slås aldrig på, eftersom `fixedBy` alltid är "AI" (admin.html) | Medel | Inaktuell (admin 0.077) – kortet "Städa databasen" är borttaget |
+| 41 | "Städa databasen": avbockade rader hoppas inte över utan låses med Spotifys år och `manuallyVerified: true`. Fallet där AI säger mer än 5 år tidigare än Spotify (nyutgåvor, samlingsskivor) är avbockat från början – Spara utan genomgång låser Spotifys år permanent (admin.html) | Medel | Inaktuell (admin 0.077) – kortet "Städa databasen" är borttaget |
 | 42 | "AI-Sök" i spellistedetaljer: funktionen svarar `null`, men koden letar efter "UNKNOWN", så "AI Hittade!" visas med tomt fält. Spara skriver "" och låten försvinner ur spelen (admin.html) | Medel | Åtgärdad (0.070) – "AI-Sök" använder `resolveSongYear`, som alltid svarar med ett år eller en status |
-| 43 | Import i admin: misslyckas en AI-batch visas inte granskningen av osäkra låtar från de andra batcharna. AI-svar som inte används (null, mer än 1 år senare än Spotify) försvinner tyst och räknas inte | Medel | Öppen |
+| 43 | Import i admin: misslyckas en AI-batch visas inte granskningen av osäkra låtar från de andra batcharna. AI-svar som inte används (null, mer än 1 år senare än Spotify) försvinner tyst och räknas inte | Medel | Åtgärdad (0.848 / admin 0.077) – importen går genom `resolveSongYear`; ett misslyckat anrop försöks två gånger, importen fortsätter, och meddelandet säger hur många låtar som inte kunde granskas |
 | 44 | manifest.json har `"orientation": "portrait-primary"` – en installerad hemskärmsapp bör låsas i stående läge, medan spelet kräver liggande | Låg | Öppen (ej testad på enhet) |
 
 ---
@@ -142,25 +143,18 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 |---|---|
 | G | Döp om spellistor utan att ta bort och lägga till igen |
 | H | Ta bort enskilda låtar ur en lista |
-| I | AI-scan på befintliga listor (re-validera utan re-import) |
-
-### Spelet
-| | Idé |
-|---|---|
-| D | Cooldown-indikator – spelaren vet inte vilka låtar som är spärrade (12h) |
 
 ### Tekniskt
 | | Idé |
 |---|---|
 | A | Stäng av `DEBUG = true` i `spotify-auth.js` (loggar i produktion, och skriver och tar bort 1 MB i localStorage vid varje sidladdning – det senare ej verifierat) |
-| J | Höj auto-accept-gränsen till ±2 år (8-regelspromten är pålitligare) |
 | K | Rensa `listor/`-katalogen – dead code från gamla verktyg. index.html laddar fortfarande `listor/itunes-api.js`, som inget anropar – ta bort den raden först |
 | L | Deduplera `verifiedTracks` mot `standardLists` |
 | M | Timerstapeln byggs om med innerHTML 20 gånger i sekunden på alla telefoner (game-timers.js `renderTimer`) – CSS-övergången och pulseringen körs därför aldrig |
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |
 | O | Hela spelnoden lyssnas på och hela vyn ritas om vid varje ändring. Valideringsrutan skapas om, så animationen spelas igen vid varje skrivning (ej verifierat) |
 | P | Stora bilder: `logga.png` på startsidan är 490 KB, `icon.png` 358 KB |
-| Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, och spärren på 12 timmar läses fortfarande i firebase-config.js och lobby.html fast inget skriver den längre |
+| Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, och spärren på 12 timmar läses fortfarande i firebase-config.js och lobby.html fast inget skriver den längre. I admin.html nollställer "Spara" i spellistedetaljer fortfarande `flaggedTracks/<id>`, som inget längre använder, och frågan vid borttag ur cachen nämner "nästa städning" fast kortet är borta |
 
 ---
 
