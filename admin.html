@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.083</title>
+    <title>Notestream Admin v0.084</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -440,6 +440,26 @@
             return summary;
         }
 
+        // The fields of a cache record that come from a year review: the year and what it rests
+        // on. title, artist and appliedAt are left out, because they do not come from the review.
+        const REVIEW_RECORD_FIELDS = ["year", "source", "explanation", "sourceUrl", "sourceTitle", "spotifyYear", "albumName", "albumType", "releaseDate", "checkedAt"];
+
+        /**
+         * Whether a cache record already holds what applying a review would write. Pure function.
+         *
+         * cached: the record in verifiedTracks, or null
+         * record: the record buildYearApplyPlan would write
+         */
+        function isReviewApplied(cached, record) {
+            if (!cached) return false;
+            return REVIEW_RECORD_FIELDS.every(field => {
+                // The database does not store null, so a missing field is the same as null
+                const stored = cached[field] === undefined ? null : cached[field];
+                // The year is a string in new records and can be a number in old ones
+                return field === "year" ? String(stored) === String(record[field]) : stored === record[field];
+            });
+        }
+
         /**
          * Works out what applying the stored year reviews would write. Pure function: it only
          * reads its arguments, and nothing is written until the caller sends the result.
@@ -448,6 +468,8 @@
          * verified. It gets a new cache record with the year and where the year came from, and
          * the year is written to every standard list where the song has another year.
          * Locked songs, songs that need review and songs Spotify does not know are never touched.
+         * A song whose cache record already holds the review's result gets no new record, so
+         * applying in parts or twice leaves the records written earlier as they are.
          *
          * appliedAt: the timestamp stored in the new cache records
          *
@@ -455,15 +477,16 @@
          *   cacheUpdates  { trackId: record }, to be written under verifiedTracks
          *   listUpdates   { listName: { "<trackId>/year": "1982" } }, for standardLists/<list>/songs
          *   counts        applied: songs that get a new cache record, changed: how many of them
-         *                 get another year than the game has, listWrites: years written in lists,
-         *                 and how many songs are left alone and why
+         *                 get another year than the game has, alreadyApplied: songs whose cache
+         *                 record already holds the review's result, listWrites: years written in
+         *                 lists, and how many songs are left alone and why
          */
         function buildYearApplyPlan(lists, verified, reviews, appliedAt) {
             const summary = classifyYearReviews(lists, verified, reviews);
             const cacheUpdates = {};
             const listUpdates = {};
             const counts = {
-                total: summary.total, applied: 0, changed: 0, listWrites: 0, locked: 0,
+                total: summary.total, applied: 0, changed: 0, alreadyApplied: 0, listWrites: 0, locked: 0,
                 needsReview: summary.needsReview.length, notFound: summary.notFound.length,
                 pending: summary.pending.length, needsWeb: summary.needsWeb.length
             };
@@ -486,11 +509,7 @@
 
                     const year = String(review.year);
                     if (firstTime) {
-                        // The same current year as in classifyYearReviews: the cache's, else the first list's
-                        const currentYear = parseInt(cached && cached.year ? cached.year : song.year, 10);
-                        counts.applied++;
-                        if (review.year !== currentYear) counts.changed++;
-                        cacheUpdates[trackId] = {
+                        const record = {
                             title: song.title,
                             artist: song.artist,
                             year: year,
@@ -506,6 +525,16 @@
                             checkedAt: review.checkedAt || null,
                             appliedAt: appliedAt
                         };
+                        if (isReviewApplied(cached, record)) {
+                            // Writing it again would only replace the time the year was applied
+                            counts.alreadyApplied++;
+                        } else {
+                            // The same current year as in classifyYearReviews: the cache's, else the first list's
+                            const currentYear = parseInt(cached && cached.year ? cached.year : song.year, 10);
+                            counts.applied++;
+                            if (review.year !== currentYear) counts.changed++;
+                            cacheUpdates[trackId] = record;
+                        }
                     }
                     if (String(song.year) !== year) {
                         if (!listUpdates[listName]) listUpdates[listName] = {};
@@ -1945,8 +1974,13 @@
                         yearReviewStatusEl.textContent = `${counts.pending} låtar är inte granskade än. Kör "Starta / Fortsätt" först.`;
                         return;
                     }
-                    if (scope === "users" && counts.applied === 0) {
-                        yearReviewStatusEl.textContent = "Det finns inga granskade låtar att verkställa än.";
+                    // The plan's list for the users' songs is made up on this page, so its list
+                    // writes do not count there
+                    const nothingToWrite = counts.applied === 0 && (scope === "users" || counts.listWrites === 0);
+                    if (nothingToWrite) {
+                        yearReviewStatusEl.textContent = counts.alreadyApplied > 0
+                            ? "Alla granskade låtar är redan verkställda."
+                            : "Det finns inga granskade låtar att verkställa än.";
                         return;
                     }
 
@@ -1958,8 +1992,14 @@
                     const listLine = scope === "users"
                         ? `<li>Användarnas egna listor ändras inte: spelet tar cachens år före listans</li>`
                         : `<li><strong>${counts.listWrites}</strong> år skrivs i ${Object.keys(plan.listUpdates).length} standardlistor</li>`;
-                    const untouched = `${counts.locked} låsta låtar, ${counts.needsReview} som behöver granskas och ${counts.notFound} som inte hittades hos Spotify`
-                        + (scope === "users" && counts.pending > 0 ? `, samt ${counts.pending} som inte är granskade än` : "");
+                    const untouchedParts = [
+                        `${counts.locked} låsta låtar`,
+                        `${counts.needsReview} som behöver granskas`,
+                        `${counts.notFound} som inte hittades hos Spotify`
+                    ];
+                    if (counts.alreadyApplied > 0) untouchedParts.push(`${counts.alreadyApplied} som redan är verkställda`);
+                    if (scope === "users" && counts.pending > 0) untouchedParts.push(`${counts.pending} som inte är granskade än`);
+                    const untouched = untouchedParts.slice(0, -1).join(", ") + " och " + untouchedParts[untouchedParts.length - 1];
                     const backupText = scope === "users" ? "cachen" : "cachen och listorna";
                     // Only numbers and fixed text are put into this box
                     yearReviewApplyBox.innerHTML = `

@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.854 |
-| admin.html | 0.083 |
+| index.html (spelet) | 0.855 |
+| admin.html | 0.084 |
 | spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.835 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.836 |
 | game.css | v50 |
-| service-worker | v58 |
+| service-worker | v59 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -77,6 +77,7 @@
 | 2026-11-16 | Låtar som Spotify dragit in: Spotify svarar då med ett tomt skal (ingen titel, ingen artist, datum "0000"), och servern tolkade det som en riktig låt med år 0, frågade Opus om en tom låt och sparade "behöver granskas". Tre sådana låg i "Årtal att avgöra" utan namn och gick inte att få bort. Rättat i `fetchSpotifyTrack`: en låt utan titel räknas som "finns inte hos Spotify", och ett år före 1900 eller efter nästa år räknas som att år saknas. Båda importerna hoppar över skalen och säger hur många låtar som inte längre finns hos Spotify | 0.854 / 0.083 / Functions |
 | 2026-11-16 | **Beslut: ingen spärr mot strömningstjänster som källa i webbsökningen, och ingen mätning av en sådan.** Underlag ur data som redan fanns. Mätningen mot facit: 7 av 84 sökta låtar lutar mot en strömningstjänst eller butik, 6 exakt rätt och 1 ett år fel, inget grovt fel. Cachen: 239 av 1 433 poster med källa har en sådan källa (16,7 procent). 210 av dem bekräftar Spotifys år – 198 är från 2010 eller senare och 162 är singlar, främst mindre artister och remixer utan sida på Wikipedia eller Discogs. 29 ändrar året, 28 av dem bakåt och 24 med högst två år, oftast till singelns första utgivning. En spärr hade tagit bort källänken för de 210 och tappat rättelser eller skickat dem till manuell granskning. Mätningen mot facit hade kostat cirka 9 dollar och bara berört 7 låtar med redan kända svar. Inte kontrollerat: åren i de 239 posterna ett och ett. `blocked_domains` finns dokumenterat för sökverktyget men är inte provat här | – |
 | 2026-11-16 | Ytterligare 150 av användarnas låtar granskade på kampanjkrediterna, utan misslyckade anrop: 8,67 dollar enligt faktureringssidan (5,8 cent per låt), cirka fyra minuter. 124 oförändrade, 24 ändras (16 med mer än två år, till exempel *Honky Tonk Women* 2019→1969 och *Running on Empty* 2010→1977) och 2 behöver granskas och ligger i "Årtal att avgöra". Därmed är 1 270 av 2 683 granskade och 1 413 återstår, cirka 85–100 dollar. Inget av de 150 är verkställt. Kampanjkrediterna stod efteråt på 8,91 dollar (går ut 22 november 00:00 UTC), de köpta 13,32 är orörda | – |
+| 2026-11-16 | "Verkställ" skriver inte om låtar som redan är verkställda. Förhandsvisningen för de 150 nya låtarna visade 1 248 poster: de 1 100 från förra gången skulle skrivas igen med samma innehåll och ny tid i `appliedAt`. Nu hoppar `buildYearApplyPlan` över en låt vars cachepost redan har granskningens år, källa, förklaring, albumuppgifter och `checkedAt`; titel, artist och `appliedAt` jämförs inte. En låt som granskats på nytt skrivs om, och en lista med annat år rättas fortfarande. Förhandsvisningen räknar bara det som skrivs och anger hur många som redan är verkställda; finns inget att skriva står det "Alla granskade låtar är redan verkställda" och ingen säkerhetskopia tas. Gäller båda valen i kortet och adminimporten | 0.855 / 0.084 |
 
 ---
 
