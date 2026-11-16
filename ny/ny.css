@@ -226,6 +226,23 @@ body {
   opacity: 0.7;
 }
 
+/* Shown when the songs are few for the points to win: yellow when they can run out, red
+   when the game cannot be won with them */
+.supply-line {
+  border-left: 4px solid #FBBC04;
+  border-radius: 0;
+  background: rgba(251, 188, 4, 0.12);
+  padding: 0.7rem 0.9rem;
+  margin: 0.9rem 0 0 0;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.supply-line.short {
+  border-left-color: #EA4335;
+  background: rgba(234, 67, 53, 0.15);
+}
+
 .year-row {
   display: flex;
   align-items: center;

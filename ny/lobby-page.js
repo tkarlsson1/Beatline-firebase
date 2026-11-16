@@ -104,7 +104,11 @@
       currentTeams = snapshot.exists() ? snapshot.val() : {};
       if (!isHost && !leaving && !currentTeams[teamId]) return showError("Ditt lag har tagits bort ur lobbyn.");
       renderTeams();
-      if (isHost) updateStartButton();
+      if (isHost) {
+        // How many songs are needed depends on how many teams there are
+        updateSongSupply();
+        updateStartButton();
+      }
     });
 
     window.firebaseOnValue(dbRef(`games/${gameId}/status`), snapshot => {
@@ -404,12 +408,51 @@
     if (chosenLists === 0) line.textContent = "Välj minst en lista";
     else line.textContent = poolCount === 1 ? "1 låt vald" : `${poolCount} låtar valda`;
 
+    updateSongSupply();
+
     // The players' view shows the number, and they have not read the lists. Saved after this
     // round of rendering, because saving makes the settings listener render again.
     const count = poolCount;
     setTimeout(() => {
       if (!leaving && count === poolCount && currentSettings.songCount !== count) saveSetting("songCount", count);
     }, 0);
+  }
+
+  // ---------- Are the songs enough ----------
+  const songWord = count => (count === 1 ? "1 låt" : `${count} låtar`);
+
+  function currentPointsToWin() {
+    return currentSettings.pointsToWin || DEFAULT_POINTS_TO_WIN;
+  }
+
+  // Whether the chosen songs are enough for the teams in the lobby to reach the points to win
+  function currentSongSupply() {
+    return songPool.songSupply(poolCount, Object.keys(currentTeams).length, currentPointsToWin());
+  }
+
+  // A line under the number of songs: red when the game cannot be won with them, yellow when
+  // they can run out. It informs and does not stop the start: a short game on a small list
+  // is the host's choice.
+  function updateSongSupply() {
+    const line = byId("songSupplyLine");
+    const supply = currentSongSupply();
+    if (!songData || poolCount === 0 || supply.level === "enough") {
+      line.style.display = "none";
+      line.textContent = "";
+      return;
+    }
+
+    const points = currentPointsToWin();
+    if (supply.level === "short") {
+      const advice = supply.maxPoints >= 2
+        ? ` Välj fler listor, eller sänk poängen till högst ${supply.maxPoints}.`
+        : " Välj fler listor.";
+      line.textContent = `${songWord(poolCount)} räcker inte till ${points} poäng med ${supply.teams} lag.${advice}`;
+    } else {
+      line.textContent = `${songWord(poolCount)} kan ta slut innan någon når ${points} poäng.`;
+    }
+    line.className = "supply-line" + (supply.level === "short" ? " short" : "");
+    line.style.display = "block";
   }
 
   // ---------- Points and timers ----------
@@ -495,11 +538,23 @@
 
     askingToStart = true;
     const teamCount = Object.keys(currentTeams).length;
-    const confirmed = await dialog.confirm({
-      title: "Starta spelet?",
-      text: `${teamCount} lag och ${poolCount === 1 ? "1 låt" : poolCount + " låtar"}.`,
-      confirmLabel: "Starta"
-    });
+    const supply = currentSongSupply();
+    const points = currentPointsToWin();
+    // The question is sharper when the game cannot be won with the songs
+    const question = supply.level === "short"
+      ? {
+          title: "Starta ändå?",
+          text: `${songWord(poolCount)} räcker inte till ${points} poäng med ${teamCount} lag. Låtarna tar slut innan någon vinner.`,
+          confirmLabel: "Starta ändå",
+          danger: true
+        }
+      : {
+          title: "Starta spelet?",
+          text: `${teamCount} lag och ${songWord(poolCount)}.` +
+            (supply.level === "tight" ? `\n\nLåtarna kan ta slut innan någon når ${points} poäng.` : ""),
+          confirmLabel: "Starta"
+        };
+    const confirmed = await dialog.confirm(question);
     askingToStart = false;
     // Teams can have left while the question was open
     if (!confirmed || leaving) return;

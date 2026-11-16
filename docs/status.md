@@ -3,17 +3,17 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (startsidan) | 0.859 |
+| index.html (startsidan) | 0.860 |
 | klassisk.html (gamla startsidan, reserv) | 0.858 |
-| admin.html | 0.088 |
-| ny/lobby.html (lobbyn) | 0.859 |
+| admin.html | 0.089 |
+| ny/lobby.html (lobbyn) | 0.860 |
 | ny/join.html (anslutningssidan) | 0.858 |
 | spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.858 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.858 |
 | game.css | v50 |
-| service-worker | v63 |
+| service-worker | v64 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -94,6 +94,8 @@
 | 2026-11-16 | Helskärmen, steg 1: två orsaker till att den tappas tas bort. Gäller spelet för båda vägarna in. **Skärmen hålls vaken** (Screen Wake Lock, game-init.js) medan spelet pågår och sidan visas; låset begärs igen när sidan visas på nytt, släpps vid spelets slut, och ett nej från webbläsaren (låg batterinivå, strömsparläge, inget stöd) är inget fel. Mildrar också #22. **Spelets webbläsarrutor är borta**: "Byt låt?" och "Rapportera fel årtal?" frågas i den egna rutan (`ny/dialog.js`, laddas nu av game.html; stilarna flyttade till `ny/dialog.css`). Eftersom rutan inte fryser sidan kontrolleras villkoren för byte igen efter svaret, och frågan tas bort av sig själv om turen tar slut medan den är öppen. Spotify-spelarens `alert` visas i samma ruta, och samma meddelande läggs inte på hög; texterna är oförändrade. Tvånget tillbaka till helskärm vid varje tryck är orört. Testat lokalt i två flikar: byte med ja och nej och dubbeltryck, turen tar slut medan frågan är öppen, rapport med nej och med ja mot en låtsad skrivning (ingen riktig rapport skickad), meddelanden i kö; vakenlåsets logik mot en låtsad webbläsarfunktion (begär, släpp när sidan göms, begär igen, släpp vid spelets slut, inget tjat efter nej). Inte provat: att skärmen faktiskt förblir tänd och att helskärmen tappas mer sällan – den inbyggda testwebbläsaren nekar vakenlås, så det syns först på en telefon | 0.858 / 0.087 |
 | 2026-11-16 | Helskärmen, steg 1 provat av admin på telefon i ett riktigt spel: skärmen förblir tänd, helskärmsrutan kom bara en gång i början, och ingen märkbar batteripåverkan. Steget att sluta tvinga tillbaka helskärmen behövs därmed inte nu. Hittat vid samma test: slutskärmens "Återgå till startsida" och gästens "Lämna spelet" leder till den gamla startsidan även för spel som startats från den nya vägen | – |
 | 2026-11-16 | **Bytet: den nya vägen in är standard.** Nya startsidan ligger på `index.html` (notestream.se) och den gamla heter `klassisk.html`, med oförändrat innehåll. Gamla lobbyn (`lobby.html`) och anslutningssidan (`join.html`) ligger kvar i roten och hör till den gamla vägen, som fungerar som förut från notestream.se/klassisk.html. Nya lobbyn och anslutningssidan ligger kvar under `ny/`, och `ny/index.html` skickar vidare till startsidan. Startsidan fick det en startsida behöver: ikon, appmanifest, beskrivning och registrering av service workern. `ny/start.js` hittar lobbyn utifrån var skriptet ligger, inte var sidan ligger. Följder: spelets tre knappar till `/` (slutskärmen för värd och gäst, felsidan) leder nu till nya startsidan, Spotify-kopplingen kommer tillbaka till nya startsidan (hjälptexten borttagen), och den installerade webbappen öppnar den. Borta från startsidan: "Läs först" och "Mörkt läge", som finns kvar på klassisk.html. Projektregeln om versionsnummer i `index.html` gäller nu nya startsidan. Att gå tillbaka: öppna klassisk.html, eller backa bytet med en push; läget före nya vägen är märkt `v0.855-before-new-lobby`. Testat lokalt: startsidan från roten med alla filer, `/ny/` skickar vidare, klassisk.html laddar utan fel och är identisk med gamla index.html, lobbyns felsida leder till startsidan. Inte provat: inloggat läge efter bytet | 0.859 / 0.088 |
+| 2026-11-16 | Bytet provat av admin i ett riktigt spel: fungerar. Önskemål vid testet: en varning före start när låtarna är för få (en lista med 7 låtar, två lag, först till 11) | – |
+| 2026-11-16 | Varning för för få låtar i lobbyn. En rad under antalet låtar visar om låtarna räcker till poänggränsen: röd när spelet inte går att vinna (färre låtar än lag × (poäng − 1), ren räkning) med rådet att välja fler listor eller sänka poängen till högst det antal låtarna räcker till, gul när låtarna kan ta slut (färre än det dubbla – ett antagande om att ungefär varannan placering blir rätt, inte mätt). Raden följer listval, årtal, poäng och antal lag; ett eller inget lag räknas som två. Startfrågan blir "Starta ändå?" med knappen "Starta ändå" och fokus på Avbryt när låtarna inte räcker, och får en extra rad när de kan ta slut. Varningen stoppar inte starten. Beräkningen ligger i `ny/song-pool.js` (`songSupply`). Kvar: spelet låser sig fortfarande när låtarna tar slut (#24), så "Starta ändå" leder till ett spel som fastnar efter sista låten. Testat: 8 nya kontroller av beräkningen (41 totalt), och lokalt i lobbyn: ingen rad vid 50 låtar, röd vid 10 låtar, gul vid lägre poäng, uppdatering när ett tredje lag ansluter och lämnar, och de tre startfrågorna | 0.860 / 0.089 |
 
 ---
 

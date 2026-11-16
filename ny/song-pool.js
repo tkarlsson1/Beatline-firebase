@@ -104,6 +104,35 @@
     return pool;
   }
 
+  /**
+   * Whether the songs are enough for somebody to reach the points needed to win.
+   *
+   * Every team starts with one card and gets at most one more per song, and the teams take
+   * turns, so nobody can win with fewer than teams x (points - 1) songs. That limit is plain
+   * arithmetic. With fewer than twice as many the songs can run out before anybody wins; that
+   * limit assumes that about every other placement is right, which has not been measured.
+   *
+   * A game needs two teams, so a lobby with fewer is counted as two.
+   *
+   * Returns { level, teams, needed, maxPoints }:
+   *   level      "short" (cannot be won), "tight" (can run out) or "enough"
+   *   teams      the number of teams counted with
+   *   needed     the smallest number of songs the game can be won with
+   *   maxPoints  the highest points to win that the songs are enough for
+   */
+  function songSupply(songCount, teamCount, pointsToWin) {
+    const teams = Math.max(parseInt(teamCount, 10) || 0, 2);
+    const points = Math.max(parseInt(pointsToWin, 10) || 0, 1);
+    const songs = Math.max(parseInt(songCount, 10) || 0, 0);
+    const needed = teams * (points - 1);
+
+    let level = "enough";
+    if (songs < needed) level = "short";
+    else if (songs < needed * 2) level = "tight";
+
+    return { level, teams, needed, maxPoints: Math.floor(songs / teams) + 1 };
+  }
+
   // Fisher-Yates. random is passed in so that tests can make the order predictable.
   function shuffleSongs(songs, random) {
     const next = random || Math.random;
@@ -170,6 +199,7 @@
     listNames,
     countSongsPerList,
     buildSongPool,
+    songSupply,
     shuffleSongs,
     buildGameStart
   };
