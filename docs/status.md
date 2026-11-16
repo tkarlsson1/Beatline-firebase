@@ -3,15 +3,17 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.858 |
-| admin.html | 0.087 |
-| ny/ (ny väg in: index.html, lobby.html, join.html) | 0.858 |
+| index.html (startsidan) | 0.859 |
+| klassisk.html (gamla startsidan, reserv) | 0.858 |
+| admin.html | 0.088 |
+| ny/lobby.html (lobbyn) | 0.859 |
+| ny/join.html (anslutningssidan) | 0.858 |
 | spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.858 |
 | game-render.js (game.html) | 0.847 |
 | game-init.js (game.html) | 0.858 |
 | game.css | v50 |
-| service-worker | v62 |
+| service-worker | v63 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -91,6 +93,7 @@
 | 2026-11-16 | **Beslut: ingen riktig app, webben är grunden.** Värdar är admin och några till. Skäl, kontrollerade mot källor samma dag: Spotifys utvecklingsläge tillåter högst fem Spotify-konton per app (gäller befintliga appar sedan 9 mars 2026) och utökad kvot kräver ett registrerat företag med minst 250 000 användare i månaden (developer.spotify.com, quota-modes och blogginlägget 2026-02-06); gäster ansluter med QR-kod och skulle behöva ladda ner en app först; Spotifys webbspelare har inget dokumenterat stöd inuti en app. Helskärm: `requestFullscreen` finns inte för vanliga element i Safari på iPhone, så dagens helskärm kan bara fungera på Android; på iPhone är en installerad webbapp enda sättet att slippa Safaris fält. Läst i koden: helskärm begärs vid varje `touchend` på spelsidan (game-init.js), inget håller skärmen vaken, och spelets höjd följer skärmens (100vh), så varje tapp och återgång flyttar hela spelet. Troliga orsaker till tappen, inte provade på en telefon: skärmen släcks eller appbyte, webbläsarens rutor vid "Byt låt" och rapport, svep från skärmkanten, källänken | – |
 | 2026-11-16 | Helskärmen, steg 1: två orsaker till att den tappas tas bort. Gäller spelet för båda vägarna in. **Skärmen hålls vaken** (Screen Wake Lock, game-init.js) medan spelet pågår och sidan visas; låset begärs igen när sidan visas på nytt, släpps vid spelets slut, och ett nej från webbläsaren (låg batterinivå, strömsparläge, inget stöd) är inget fel. Mildrar också #22. **Spelets webbläsarrutor är borta**: "Byt låt?" och "Rapportera fel årtal?" frågas i den egna rutan (`ny/dialog.js`, laddas nu av game.html; stilarna flyttade till `ny/dialog.css`). Eftersom rutan inte fryser sidan kontrolleras villkoren för byte igen efter svaret, och frågan tas bort av sig själv om turen tar slut medan den är öppen. Spotify-spelarens `alert` visas i samma ruta, och samma meddelande läggs inte på hög; texterna är oförändrade. Tvånget tillbaka till helskärm vid varje tryck är orört. Testat lokalt i två flikar: byte med ja och nej och dubbeltryck, turen tar slut medan frågan är öppen, rapport med nej och med ja mot en låtsad skrivning (ingen riktig rapport skickad), meddelanden i kö; vakenlåsets logik mot en låtsad webbläsarfunktion (begär, släpp när sidan göms, begär igen, släpp vid spelets slut, inget tjat efter nej). Inte provat: att skärmen faktiskt förblir tänd och att helskärmen tappas mer sällan – den inbyggda testwebbläsaren nekar vakenlås, så det syns först på en telefon | 0.858 / 0.087 |
 | 2026-11-16 | Helskärmen, steg 1 provat av admin på telefon i ett riktigt spel: skärmen förblir tänd, helskärmsrutan kom bara en gång i början, och ingen märkbar batteripåverkan. Steget att sluta tvinga tillbaka helskärmen behövs därmed inte nu. Hittat vid samma test: slutskärmens "Återgå till startsida" och gästens "Lämna spelet" leder till den gamla startsidan även för spel som startats från den nya vägen | – |
+| 2026-11-16 | **Bytet: den nya vägen in är standard.** Nya startsidan ligger på `index.html` (notestream.se) och den gamla heter `klassisk.html`, med oförändrat innehåll. Gamla lobbyn (`lobby.html`) och anslutningssidan (`join.html`) ligger kvar i roten och hör till den gamla vägen, som fungerar som förut från notestream.se/klassisk.html. Nya lobbyn och anslutningssidan ligger kvar under `ny/`, och `ny/index.html` skickar vidare till startsidan. Startsidan fick det en startsida behöver: ikon, appmanifest, beskrivning och registrering av service workern. `ny/start.js` hittar lobbyn utifrån var skriptet ligger, inte var sidan ligger. Följder: spelets tre knappar till `/` (slutskärmen för värd och gäst, felsidan) leder nu till nya startsidan, Spotify-kopplingen kommer tillbaka till nya startsidan (hjälptexten borttagen), och den installerade webbappen öppnar den. Borta från startsidan: "Läs först" och "Mörkt läge", som finns kvar på klassisk.html. Projektregeln om versionsnummer i `index.html` gäller nu nya startsidan. Att gå tillbaka: öppna klassisk.html, eller backa bytet med en push; läget före nya vägen är märkt `v0.855-before-new-lobby`. Testat lokalt: startsidan från roten med alla filer, `/ny/` skickar vidare, klassisk.html laddar utan fel och är identisk med gamla index.html, lobbyns felsida leder till startsidan. Inte provat: inloggat läge efter bytet | 0.859 / 0.088 |
 
 ---
 
@@ -156,7 +159,7 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | | Idé |
 |---|---|
 | A | Stäng av `DEBUG = true` i `spotify-auth.js` (loggar i produktion, och skriver och tar bort 1 MB i localStorage vid varje sidladdning – det senare ej verifierat) |
-| K | Rensa `listor/`-katalogen – dead code från gamla verktyg. index.html laddar fortfarande `listor/itunes-api.js`, som inget anropar – ta bort den raden först |
+| K | Rensa `listor/`-katalogen – dead code från gamla verktyg. klassisk.html (gamla startsidan) laddar fortfarande `listor/itunes-api.js`, som inget anropar – ta bort den raden först |
 | L | Deduplera `verifiedTracks` mot `standardLists` |
 | M | Timerstapeln byggs om med innerHTML 20 gånger i sekunden på alla telefoner (game-timers.js `renderTimer`) – CSS-övergången och pulseringen körs därför aldrig |
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |

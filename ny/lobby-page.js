@@ -47,7 +47,7 @@
   // START
   // ============================================
   document.addEventListener("DOMContentLoaded", () => {
-    byId("errorBackBtn").addEventListener("click", () => { window.location.href = "index.html"; });
+    byId("errorBackBtn").addEventListener("click", () => { window.location.href = "/"; });
 
     const params = new URLSearchParams(window.location.search);
     gameId = params.get("gameId");
