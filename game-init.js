@@ -119,6 +119,68 @@ function enterFullscreenOnTouch() {
 document.addEventListener('touchend', enterFullscreenOnTouch, { passive: true });
 
 // ============================================
+// KEEP THE SCREEN AWAKE
+// ============================================
+// A phone that goes to sleep during a game leaves fullscreen, and if it is the active team's
+// phone nothing handles the turn when the time runs out. So the screen is kept on while the
+// game is being played and the page is shown.
+// The browser releases the lock by itself when the page is hidden, and a released lock cannot
+// be used again, so a new one is requested when the page is shown again.
+// A refusal (low battery, power saving, no support) is not an error: the game goes on as before.
+const WAKE_LOCK_RETRY_MS = 60000;
+let screenWakeLock = null;
+let wakeLockRequestPending = false;
+let wakeLockRefusedAt = 0;
+
+function screenShouldStayAwake() {
+  return !!currentGameData &&
+    currentGameData.status === 'playing' &&
+    currentGameData.phase !== 'gameOver' &&
+    document.visibilityState === 'visible';
+}
+
+async function updateScreenWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+
+  if (!screenShouldStayAwake()) {
+    if (screenWakeLock) {
+      const lock = screenWakeLock;
+      screenWakeLock = null;
+      lock.release().catch(() => {});
+    }
+    return;
+  }
+
+  // Called on every change in the game, so a refusal is not asked about again at once
+  if (screenWakeLock || wakeLockRequestPending) return;
+  if (Date.now() - wakeLockRefusedAt < WAKE_LOCK_RETRY_MS) return;
+
+  wakeLockRequestPending = true;
+  try {
+    const lock = await navigator.wakeLock.request('screen');
+    lock.addEventListener('release', () => {
+      if (screenWakeLock === lock) screenWakeLock = null;
+    });
+    screenWakeLock = lock;
+    console.log('[Game] Screen wake lock held');
+  } catch (error) {
+    wakeLockRefusedAt = Date.now();
+    console.warn('[Game] Screen wake lock not granted:', error.name);
+  } finally {
+    wakeLockRequestPending = false;
+  }
+
+  // The game can have ended or the page been hidden while the request was waiting
+  if (screenWakeLock && !screenShouldStayAwake()) updateScreenWakeLock();
+}
+
+// Coming back to the page is a new chance, also after a refusal
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') wakeLockRefusedAt = 0;
+  updateScreenWakeLock();
+});
+
+// ============================================
 // GAME INITIALIZATION
 // ============================================
 function initializeGame() {
@@ -176,7 +238,8 @@ function initializeGame() {
     
     // Initial render
     updateGameView();
-    
+    updateScreenWakeLock();
+
   }, { onlyOnce: true });
   
   // Setup real-time listeners
@@ -207,8 +270,9 @@ function setupListeners() {
       myTeam = currentTeams[teamId];
       
       console.log('[Game] Game state updated');
-      
+
       updateGameView();
+      updateScreenWakeLock();
     }
   });
 }

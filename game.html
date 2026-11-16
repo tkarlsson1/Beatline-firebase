@@ -19,7 +19,9 @@
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="game.css?v=50">
-  
+  <!-- The game's own box for questions and messages, shared with the new lobby -->
+  <link rel="stylesheet" href="ny/dialog.css?v=0.858">
+
   <!-- Firebase SDK (Compat mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -128,11 +130,14 @@
   <script src="spotify-auth.js?v=0.799"></script>
   <script src="spotify-player.js?v=0.799"></script>
   
+  <!-- Questions and messages in the game's own box (used by game-utils.js) -->
+  <script src="ny/dialog.js?v=0.858"></script>
+
   <!-- Game modules (order matters!) -->
-  <script src="game-utils.js?v=0.801"></script>          <!-- 1. Utility functions (showError, escapeHtml) -->
-  <script src="game-init.js?v=0.836"></script>      <!-- 2. Global variables and initialization -->
+  <script src="game-utils.js?v=0.858"></script>          <!-- 1. Utility functions (showError, escapeHtml, askQuestion) -->
+  <script src="game-init.js?v=0.858"></script>      <!-- 2. Global variables and initialization -->
   <script src="game-render.js?v=0.847"></script>    <!-- 3. Rendering functions -->
-  <script src="game-cards.js?v=0.835"></script>          <!-- 4. Drag & drop and validation -->
+  <script src="game-cards.js?v=0.858"></script>          <!-- 4. Drag & drop and validation -->
   <script src="game-timers.js?v=0.801"></script>    <!-- 5. Timer system -->
   <script src="game-host.js?v=0.801"></script>      <!-- 6. Host controls -->
   

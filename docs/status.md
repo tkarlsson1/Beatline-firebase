@@ -3,15 +3,15 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (spelet) | 0.857 |
-| admin.html | 0.086 |
-| ny/ (ny väg in: index.html, lobby.html, join.html) | 0.857 |
+| index.html (spelet) | 0.858 |
+| admin.html | 0.087 |
+| ny/ (ny väg in: index.html, lobby.html, join.html) | 0.858 |
 | spotify.js | 0.854 |
-| game-cards.js (game.html) | 0.835 |
+| game-cards.js (game.html) | 0.858 |
 | game-render.js (game.html) | 0.847 |
-| game-init.js (game.html) | 0.836 |
+| game-init.js (game.html) | 0.858 |
 | game.css | v50 |
-| service-worker | v61 |
+| service-worker | v62 |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -89,6 +89,7 @@
 | 2026-11-16 | Den nya vägen in testad av admin i ett riktigt spel: startsidan under `/ny/` med Spotify-kopplingen, "Nytt spel" med val av listor i lobbyn, anslutning med QR-koden, start och några spelade låtar – allt fungerade. Kvar: bytet så att det nya blir standard (steg 4), och de pausade frågorna om avslut när låtarna tar slut (#24) och raden om låtarna räcker | – |
 | 2026-11-16 | Egna rutor i den nya vägen in, i stället för webbläsarens `confirm` och `alert`. Ny `ny/dialog.js` med en fråga (två knappar) och ett meddelande (en knapp) i samma utseende som spelets valideringsruta; Escape och klick utanför räknas som Avbryt, och bara en ruta visas åt gången. Använd i nya lobbyn (Starta spelet, Kicka laget) och på nya startsidan (Ta bort spellistan, glömt lösenord, fel vid borttag). Importens och Spotify-kopplingens meddelanden visas i samma ruta på nya startsidan genom att sidan ersätter `alert`; `spotify.js` och `spotify-auth.js` är oförändrade. Frågor som tar bort något har fokus på Avbryt. Eftersom den egna rutan inte fryser sidan kontrolleras läget igen efter svaret (laget finns kvar, minst två lag). Kvar med webbläsarens rutor: spelet ("Byt låt", rapportera), Spotify-koden, de gamla sidorna och admin. Testat lokalt: start, avbryt, Escape, klick utanför, dubbelklick, kick, meddelanden i kö och ovanpå inloggningsrutan. Inte provat: borttag av spellista och importens meddelanden i inloggat läge | 0.857 / 0.086 |
 | 2026-11-16 | **Beslut: ingen riktig app, webben är grunden.** Värdar är admin och några till. Skäl, kontrollerade mot källor samma dag: Spotifys utvecklingsläge tillåter högst fem Spotify-konton per app (gäller befintliga appar sedan 9 mars 2026) och utökad kvot kräver ett registrerat företag med minst 250 000 användare i månaden (developer.spotify.com, quota-modes och blogginlägget 2026-02-06); gäster ansluter med QR-kod och skulle behöva ladda ner en app först; Spotifys webbspelare har inget dokumenterat stöd inuti en app. Helskärm: `requestFullscreen` finns inte för vanliga element i Safari på iPhone, så dagens helskärm kan bara fungera på Android; på iPhone är en installerad webbapp enda sättet att slippa Safaris fält. Läst i koden: helskärm begärs vid varje `touchend` på spelsidan (game-init.js), inget håller skärmen vaken, och spelets höjd följer skärmens (100vh), så varje tapp och återgång flyttar hela spelet. Troliga orsaker till tappen, inte provade på en telefon: skärmen släcks eller appbyte, webbläsarens rutor vid "Byt låt" och rapport, svep från skärmkanten, källänken | – |
+| 2026-11-16 | Helskärmen, steg 1: två orsaker till att den tappas tas bort. Gäller spelet för båda vägarna in. **Skärmen hålls vaken** (Screen Wake Lock, game-init.js) medan spelet pågår och sidan visas; låset begärs igen när sidan visas på nytt, släpps vid spelets slut, och ett nej från webbläsaren (låg batterinivå, strömsparläge, inget stöd) är inget fel. Mildrar också #22. **Spelets webbläsarrutor är borta**: "Byt låt?" och "Rapportera fel årtal?" frågas i den egna rutan (`ny/dialog.js`, laddas nu av game.html; stilarna flyttade till `ny/dialog.css`). Eftersom rutan inte fryser sidan kontrolleras villkoren för byte igen efter svaret, och frågan tas bort av sig själv om turen tar slut medan den är öppen. Spotify-spelarens `alert` visas i samma ruta, och samma meddelande läggs inte på hög; texterna är oförändrade. Tvånget tillbaka till helskärm vid varje tryck är orört. Testat lokalt i två flikar: byte med ja och nej och dubbeltryck, turen tar slut medan frågan är öppen, rapport med nej och med ja mot en låtsad skrivning (ingen riktig rapport skickad), meddelanden i kö; vakenlåsets logik mot en låtsad webbläsarfunktion (begär, släpp när sidan göms, begär igen, släpp vid spelets slut, inget tjat efter nej). Inte provat: att skärmen faktiskt förblir tänd och att helskärmen tappas mer sällan – den inbyggda testwebbläsaren nekar vakenlås, så det syns först på en telefon | 0.858 / 0.087 |
 
 ---
 

@@ -1,13 +1,16 @@
 // ============================================
-// NOTESTREAM - DIALOG (new way into a game)
+// NOTESTREAM - DIALOG
 // A question or a message in the game's own look, in place of the browser's confirm()
-// and alert(). Styled by ny.css.
+// and alert(). Styled by dialog.css. Used by the new start page, the new lobby and the game.
 //
 //   NotestreamDialog.confirm({ title, text, confirmLabel, cancelLabel, danger })
 //     -> Promise<boolean>: true when the user confirms, false on cancel, Escape or a
 //        click outside the box
 //   NotestreamDialog.message({ title, text, buttonLabel })
 //     -> Promise that resolves when the box is closed
+//
+// Both promises have a dismiss() method that takes the box away as cancelled, for when
+// the question no longer applies.
 // ============================================
 
 (function (root) {
@@ -24,7 +27,8 @@
     return node;
   }
 
-  function open(options) {
+  // entry.close is set while the box is on screen, so that dismiss() can close it
+  function open(options, entry) {
     return new Promise(resolve => {
       const isQuestion = options.kind === "confirm";
       const previousFocus = document.activeElement;
@@ -56,6 +60,7 @@
       const close = answer => {
         if (closed) return;
         closed = true;
+        entry.close = null;
         document.removeEventListener("keydown", onKey, true);
         overlay.remove();
         document.body.style.overflow = previousOverflow;
@@ -99,6 +104,7 @@
       }
       document.addEventListener("keydown", onKey, true);
 
+      entry.close = close;
       document.body.style.overflow = "hidden";
       document.body.appendChild(overlay);
       // Enter on a question that removes something should not confirm it by accident
@@ -106,18 +112,31 @@
     });
   }
 
+  // Returns the answer and a way to take the box away from code: dismiss() closes it as
+  // cancelled if it is on screen, and keeps it from opening if it is still waiting its turn
   function enqueue(options) {
-    const result = queue.then(() => open(options));
-    queue = result.then(() => undefined, () => undefined);
-    return result;
+    const entry = { cancelled: false, close: null };
+    const answer = queue.then(() => (entry.cancelled ? false : open(options, entry)));
+    queue = answer.then(() => undefined, () => undefined);
+    const dismiss = () => {
+      entry.cancelled = true;
+      if (entry.close) entry.close(false);
+    };
+    return { answer, dismiss };
   }
 
   root.NotestreamDialog = {
     confirm(options) {
-      return enqueue({ ...options, kind: "confirm" }).then(answer => answer === true);
+      const { answer, dismiss } = enqueue({ ...options, kind: "confirm" });
+      const result = answer.then(value => value === true);
+      result.dismiss = dismiss;
+      return result;
     },
     message(options) {
-      return enqueue({ ...options, kind: "message" }).then(() => undefined);
+      const { answer, dismiss } = enqueue({ ...options, kind: "message" });
+      const result = answer.then(() => undefined);
+      result.dismiss = dismiss;
+      return result;
     }
   };
 })(window);
