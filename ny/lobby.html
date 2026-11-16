@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#032934">
+  <meta name="color-scheme" content="dark">
+
+  <title>Notestream – lobby (ny) 0.856</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="ny.css?v=0.856">
+
+  <!-- Firebase SDK (compat), the same versions as the current lobby and the game -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="../firebase-wrapper.js?v=0.806"></script>
+
+  <!-- QR code library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+  <div class="page">
+    <div id="loadingState" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Laddar lobby...</p>
+    </div>
+
+    <div id="errorState" class="error-state" style="display: none;">
+      <p id="errorMessage"></p>
+      <button class="big-btn secondary" id="errorBackBtn">Tillbaka till start</button>
+    </div>
+
+    <!-- ============ Host ============ -->
+    <div id="hostView" style="display: none;">
+      <div class="page-header">
+        <h1>Notestream lobby</h1>
+      </div>
+
+      <div class="qr-section">
+        <div id="qrCodeElement"></div>
+        <p style="margin: 0;">Skanna QR-koden för att gå med, eller dela länken:</p>
+        <div class="join-url" id="joinUrl"></div>
+        <button class="small-btn" id="copyLinkBtn">Kopiera länken</button>
+      </div>
+
+      <div class="section">
+        <h2>Lag i lobbyn (<span id="teamCountHost">0</span>)</h2>
+        <div id="teamListHost" class="team-list"></div>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="section">
+        <h2>Vad ska vi spela?</h2>
+        <div class="panel">
+          <div id="listPicker"><p class="hint">Läser in listor...</p></div>
+          <div class="year-row">
+            <label for="yearFrom">Från år</label>
+            <select id="yearFrom"></select>
+            <label for="yearTo">till</label>
+            <select id="yearTo"></select>
+          </div>
+          <p class="song-count-line" id="songCountLine"></p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Inställningar</h2>
+        <div class="panel">
+          <div class="setting-row">
+            <label for="pointsToWin">Poäng för att vinna</label>
+            <div class="setting-input">
+              <input type="number" id="pointsToWin" min="1" max="50" value="11">
+              <span class="setting-unit">kort</span>
+            </div>
+          </div>
+
+          <details class="times">
+            <summary>Tider</summary>
+            <div class="setting-row">
+              <label for="timerGuess">Gissning</label>
+              <div class="setting-input">
+                <input type="number" id="timerGuess" min="15" max="360" value="90">
+                <span class="setting-unit">sek</span>
+              </div>
+            </div>
+            <div class="setting-error" id="timerGuessError"></div>
+
+            <div class="setting-row">
+              <label for="timerChallenge">Utmaning</label>
+              <div class="setting-input">
+                <input type="number" id="timerChallenge" min="5" max="60" value="10">
+                <span class="setting-unit">sek</span>
+              </div>
+            </div>
+            <div class="setting-error" id="timerChallengeError"></div>
+
+            <div class="setting-row">
+              <label for="timerPlace">Placera utmaning</label>
+              <div class="setting-input">
+                <input type="number" id="timerPlace" min="5" max="60" value="20">
+                <span class="setting-unit">sek</span>
+              </div>
+            </div>
+            <div class="setting-error" id="timerPlaceError"></div>
+
+            <div class="setting-row">
+              <label for="timerPause">Paus mellan låtar</label>
+              <div class="setting-input">
+                <input type="number" id="timerPause" min="0" max="60" value="5">
+                <span class="setting-unit">sek</span>
+              </div>
+            </div>
+            <div class="setting-error" id="timerPauseError"></div>
+          </details>
+        </div>
+      </div>
+
+      <div class="warning-line" id="spotifyWarning" style="display: none;">
+        Spotify är inte kopplat på den här enheten, så ingen musik kommer att spelas. Koppla Spotify på startsidan.
+      </div>
+
+      <button class="big-btn" id="startGameBtn" disabled>LADDAR...</button>
+    </div>
+
+    <!-- ============ Player ============ -->
+    <div id="playerView" style="display: none;">
+      <div class="page-header">
+        <h1 id="playerTeamName">Väntar på start</h1>
+      </div>
+
+      <div class="section">
+        <h2>Lag i lobbyn (<span id="teamCountPlayer">0</span>)</h2>
+        <div id="teamListPlayer" class="team-list"></div>
+      </div>
+
+      <div class="section">
+        <h2>Det här spelas</h2>
+        <div class="panel" id="gameSummary"></div>
+      </div>
+
+      <div class="waiting-message">Väntar på att värden startar spelet...</div>
+    </div>
+  </div>
+
+  <!-- Helpers shared with the current lobby: team colours, timer limits, notifications -->
+  <script src="../lobby.js?v=0.799"></script>
+  <script src="song-pool.js?v=0.856"></script>
+  <script src="lobby-page.js?v=0.856"></script>
+</body>
+</html>
