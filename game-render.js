@@ -839,9 +839,9 @@ function renderValidationModal() {
   }
   const cardColors = cardTeam ? teamColors(cardTeam.color, '#FFFFFF') : { color: '#ffffff', ink: '#0b0b0b' };
 
-  // Build modal HTML: the card on the left, the result and the text about the year on the
-  // right. The buttons sit outside the scrolling body, so they stay visible however long
-  // the text above them is.
+  // Build modal HTML: the card lying across the top, the result and the text about the
+  // year below it (the layout is in game.css). The buttons sit outside the scrolling body,
+  // so they stay visible however long the text above them is.
   let modalHTML = `
     <div class="validation-modal-overlay">
       <div class="validation-modal">

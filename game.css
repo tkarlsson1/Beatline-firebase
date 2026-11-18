@@ -864,42 +864,70 @@ body {
   overflow: hidden;
 }
 
-/* The song as the card itself on the left, the result and the text about the year on the right */
+/* The song as a card lying across the top of the box, the result and the text about the
+   year below it */
 .validation-modal-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   display: flex;
-  gap: 18px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
 }
 
 /* The card takes the colour of the team that gets it and is white when nobody does
-   (--team and --ink are set in renderValidationModal). Its content uses the card classes. */
+   (--team and --ink are set in renderValidationModal). It lies down here, the year on the
+   left and the title and artist beside it, so that long titles and many artists can be
+   read: two lines each in larger text than on the cards in the timeline. Its content uses
+   the card classes, changed below for this card only. */
 .validation-modal-card {
   box-sizing: border-box;
-  width: 126px;
-  height: 140px;
+  min-height: 84px;
   flex-shrink: 0;
   background: var(--team, #fff);
   color: var(--ink, #0b0b0b);
   border-radius: 4px;
   display: flex;
-  flex-direction: column;
-  padding: 9px 10px 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+}
+
+.validation-modal-card .card-year {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.validation-modal-card .card-info {
+  flex: 1;
+  gap: 3px;
+  border-top: 0;
+  border-left: 2px solid currentColor;
+  padding: 2px 0 2px 14px;
+}
+
+.validation-modal-card .card-title {
+  font: 700 17px/19px 'Archivo Narrow', 'Arial Narrow', sans-serif;
+}
+
+.validation-modal-card .card-artist {
+  -webkit-line-clamp: 2;
+  font: 500 15px/17px 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
 .validation-modal-text {
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 0;
 }
 
 .validation-modal-title {
-  font: 400 26px/1.08 'Anton', Impact, sans-serif;
+  font: 400 24px/1.08 'Anton', Impact, sans-serif;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   overflow-wrap: anywhere;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: #fff;
 }
 
