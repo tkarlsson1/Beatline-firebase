@@ -22,6 +22,61 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// ============================================
+// ICONS AND TEAM COLOURS (look only)
+// ============================================
+// Flat icons in the colour of the text around them, used where the game showed emoji before:
+// the note beside a team's score and the ticket beside its tokens.
+const ICON_NOTE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3v10.6A3.5 3.5 0 1 0 11 17V7h7V3z"></path></svg>';
+const ICON_TICKET = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4z"></path></svg>';
+
+/**
+ * The colour of a team and the text colour that reads on it.
+ * colorName is the name stored on the team ('blue', 'red', ...), fallbackHex is used when
+ * the name is not one of TEAM_COLORS (lobby.js).
+ * Returns { color, ink }: ink is white on the dark colours (purple, pink) and near black
+ * on the others.
+ */
+function teamColors(colorName, fallbackHex) {
+  const known = TEAM_COLORS.find(c => c.name === colorName);
+  const color = known ? known.hex : fallbackHex;
+
+  // Relative luminance of the colour (WCAG), 0 for black and 1 for white
+  const channel = (start) => {
+    const value = parseInt(color.slice(start, start + 2), 16) / 255;
+    return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+  };
+  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
+
+  return { color: color, ink: luminance < 0.19 ? '#ffffff' : '#0b0b0b' };
+}
+
+/** Sets the team's colours on an element; game.css reads them as --team and --ink. */
+function applyTeamColors(element, colors) {
+  element.style.setProperty('--team', colors.color);
+  element.style.setProperty('--ink', colors.ink);
+}
+
+// ============================================
+// MESSAGES AT THE TOP OF THE SCREEN
+// ============================================
+// lobby.js has a showNotification() that sets its look in the code and is shared with the
+// lobby pages. The game uses this one instead, which only sets classes: the look is in
+// game.css. Same message, same types ('success', 'error', 'info') and the same time on
+// screen (3.3 seconds) as before.
+function showNotification(message, type = 'info') {
+  console.log(`[Game] Notification (${type}):`, message);
+
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    if (notification.parentNode) notification.parentNode.removeChild(notification);
+  }, 3300);
+}
+
 console.log('[Game] Utils module loaded');
 
 // ============================================
