@@ -181,30 +181,21 @@ function renderTeamHeader() {
   Object.entries(currentTeams).forEach(([teamIdKey, team]) => {
     const badge = document.createElement('div');
     badge.className = 'team-badge';
-    
-    // Get team color
-    const colorObj = TEAM_COLORS.find(c => c.name === team.color);
-    const colorHex = colorObj ? colorObj.hex : '#FFFFFF';
-    
-    // Set border based on active state
+
+    // The team's colour; game.css draws the box from it
+    applyTeamColors(badge, teamColors(team.color, '#FFFFFF'));
+
+    // The team in turn is a solid block in its colour, the others are outlines
     if (teamIdKey === currentTeamId) {
-      // Active team: thick border in team's own color
-      badge.style.border = `3px solid ${colorHex}`;
-      badge.style.background = `${colorHex}22`; // Light background (hex with alpha)
-      badge.style.boxShadow = `0 0 15px ${colorHex}80`;
-    } else {
-      // Inactive team: thin gray border
-      badge.style.border = '2px solid rgba(255, 255, 255, 0.2)';
-      badge.style.background = 'rgba(255, 255, 255, 0.05)';
-      badge.style.boxShadow = 'none';
+      badge.classList.add('active');
     }
-    
+
     badge.innerHTML = `
-      <div class="team-color-dot" style="background: ${colorHex};"></div>
+      <div class="team-color-dot"></div>
       <div class="team-name">${escapeHtml(team.name)}</div>
       <div class="team-stats">
-        <span class="team-score">🎵 ${escapeHtml(team.score || 0)}</span>
-        <span class="team-tokens">🎫 ${escapeHtml(team.tokens || 0)}</span>
+        <span class="team-score">${ICON_NOTE}${escapeHtml(team.score || 0)}</span>
+        <span class="team-tokens">${ICON_TICKET}${escapeHtml(team.tokens || 0)}</span>
       </div>
     `;
     
@@ -247,11 +238,11 @@ function renderTimeline() {
   
   console.log('[Game] Rendering timeline with', timelineCards.length, 'cards');
   
-  // Get team color for border
+  // The team's colour: the cards are filled with it
   const teamColor = displayTeam.color || 'blue'; // Fallback to blue
-  const colorObj = TEAM_COLORS.find(c => c.name === teamColor);
-  const teamColorHex = colorObj ? colorObj.hex : '#0B939C'; // Fallback to default accent
-  
+  const displayColors = teamColors(teamColor, '#0B939C'); // Fallback to default accent
+  const teamColorHex = displayColors.color;
+
   container.innerHTML = '';
   
   // Just render cards, no drop zones (they appear dynamically during drag)
@@ -270,23 +261,21 @@ function renderTimeline() {
     if (isMyCard) {
       cardDiv.classList.add('own-unrevealed-card');
     }
-    
-    // Different border styles for revealed vs preview cards
+
+    // The look comes from game.css, which reads the team's colour from the card
+    applyTeamColors(cardDiv, displayColors);
+
     if (card.revealed) {
-      // Revealed card - show year and info
-      cardDiv.style.border = `6px solid ${teamColorHex}`;
+      // Revealed card - show year and info, filled with the team's colour
       cardDiv.innerHTML = `
       <div class="card-year">${escapeHtml(card.year)}</div>
-      <div class="card-info">${escapeHtml(card.title)}<br>${escapeHtml(card.artist)}</div>
+      <div class="card-info"><span class="card-title">${escapeHtml(card.title)}</span><span class="card-artist">${escapeHtml(card.artist)}</span></div>
     `;
     } else {
-      // Unrevealed card (preview) - ALWAYS show as blank until validated
-      // Border style depends on whether it's my card or another team's
-      if (isMyCard) {
-        cardDiv.style.border = `4px dashed ${teamColorHex}`;
-      } else {
-        cardDiv.style.border = `4px dashed rgba(255, 255, 255, 0.3)`;
-      }
+      // Unrevealed card - ALWAYS show as blank until validated. The class only sets the
+      // look: an outline in the team's colour for my own card (own-unrevealed-card above),
+      // a white outline for another team's.
+      cardDiv.classList.add('unrevealed');
       cardDiv.innerHTML = `
       <div class="card-blank-text">?</div>
     `;
@@ -373,7 +362,8 @@ function renderPreviewCard(card, teamColorHex, ownerTeamId) {
   
   // IMPORTANT: Preview cards are ALWAYS blank until validated
   // Only show year/title/artist after lockInPlacement() -> validation -> revealed
-  previewCard.style.border = `4px dashed ${teamColorHex}`;
+  // game.css draws the outline in the owner's colour
+  previewCard.style.setProperty('--team', teamColorHex);
   previewCard.innerHTML = `
     <div class="card-blank-text">?</div>
   `;
@@ -456,12 +446,9 @@ function renderCurrentCard() {
   cardDiv.className = 'card blank-card';
   cardDiv.id = 'draggableCard';
   cardDiv.draggable = true;
-  cardDiv.style.width = '41px';
-  cardDiv.style.height = '48px';
-  cardDiv.style.fontSize = '1.5rem';
-  cardDiv.style.padding = '0.3rem';
+  // Size and look are set in game.css (.card.blank-card)
   cardDiv.innerHTML = `
-    <div class="card-blank-text" style="font-size: 1.5rem; margin: 0;">?</div>
+    <div class="card-blank-text">?</div>
   `;
   
   // Add drag event listeners
@@ -516,7 +503,9 @@ function updateActionButtons() {
     changeCardBtn.style.gridColumn = '1 / -1';  // Span all columns
     changeCardBtn.style.justifySelf = 'center'; // Center in grid
     changeCardBtn.style.height = '48px';  // Match card height to prevent container jump
-    changeCardBtn.textContent = 'UTMANA (1 🎫)';
+    // The label with what it costs: one token. The class only sets the look (game.css).
+    changeCardBtn.classList.add('utmana');
+    changeCardBtn.innerHTML = `UTMANA <span class="btn-cost">${ICON_TICKET}1</span>`;
     changeCardBtn.onclick = challengeCard;
     
     // Enable if team has tokens
@@ -534,6 +523,7 @@ function updateActionButtons() {
   changeCardBtn.style.gridColumn = '';  // Reset to default (1 column)
   changeCardBtn.style.justifySelf = '';  // Reset to CSS default
   changeCardBtn.style.height = '';  // Reset to CSS default height
+  changeCardBtn.classList.remove('utmana');
   changeCardBtn.textContent = 'BYT LÅT';
   changeCardBtn.onclick = changeCard;
   lockInBtn.style.display = 'inline-block';
@@ -636,34 +626,11 @@ function showDynamicDropIndicator(x, y) {
   const timeline = document.getElementById('timeline');
   const cards = timeline.querySelectorAll('.card:not(.preview-card):not(.dragging)');
   
+  // The marker's look is set in game.css (.dynamic-drop-indicator). It is as wide as it was
+  // before, margins included, so the cards move apart by the same distance.
   const indicator = document.createElement('div');
   indicator.className = 'dynamic-drop-indicator';
-  indicator.style.cssText = `
-    width: 4px;
-    height: 80%;
-    background: #4CAF50;
-    position: relative;
-    flex-shrink: 0;
-    margin: auto 0.5rem;
-    border-radius: 2px;
-    box-shadow: 0 0 10px #4CAF50;
-    animation: pulse 1s infinite;
-    pointer-events: none;
-  `;
-  
-  // Add arrow indicator
-  indicator.innerHTML = `
-    <div style="
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 2rem;
-      color: #4CAF50;
-      animation: pulse 1s infinite;
-    ">↓</div>
-  `;
-  
+
   // Insert at position based on actual index
   if (position === 0 || cards.length === 0) {
     // Insert before first card
@@ -836,65 +803,77 @@ function renderValidationModal() {
   if (modal.challengingTeamId) {
     // Challenge scenario
     if (modal.result === 'active_correct') {
-      titleText = `✅ ${escapeHtml(modal.activeTeamName)} HADE RÄTT!`;
+      titleText = `${escapeHtml(modal.activeTeamName)} HADE RÄTT!`;
       titleClass = 'correct';
       subtitleText = `${escapeHtml(modal.challengingTeamName)} förlorade utmaningen`;
     } else if (modal.result === 'challenging_won') {
-      titleText = `✅ ${escapeHtml(modal.challengingTeamName)} VANN UTMANINGEN!`;
+      titleText = `${escapeHtml(modal.challengingTeamName)} VANN UTMANINGEN!`;
       titleClass = 'correct';
       subtitleText = `${escapeHtml(modal.activeTeamName)} placerade fel`;
     } else {
       // both_wrong
-      titleText = `❌ BÅDA LAGEN HADE FEL`;
+      titleText = `BÅDA LAGEN HADE FEL`;
       titleClass = 'wrong';
       subtitleText = `${escapeHtml(modal.activeTeamName)} och ${escapeHtml(modal.challengingTeamName)}`;
     }
   } else {
     // Normal validation (no challenge)
     if (modal.result === 'active_correct') {
-      titleText = `✅ ${escapeHtml(modal.activeTeamName)} FICK KORTET!`;
+      titleText = `${escapeHtml(modal.activeTeamName)} FICK KORTET!`;
       titleClass = 'correct';
       subtitleText = '';
     } else {
-      titleText = `❌ ${escapeHtml(modal.activeTeamName)} PLACERADE FEL`;
+      titleText = `${escapeHtml(modal.activeTeamName)} PLACERADE FEL`;
       titleClass = 'wrong';
       subtitleText = '';
     }
   }
   
-  // Build modal HTML. The buttons sit outside the scrolling body, so they stay visible
-  // however long the text above them is.
+  // The song is shown as the card itself, in the colour of the team that gets it. When
+  // nobody gets it the card is white.
+  let cardTeam = null;
+  if (modal.result === 'active_correct') {
+    cardTeam = currentTeams[modal.activeTeamId];
+  } else if (modal.result === 'challenging_won') {
+    cardTeam = currentTeams[modal.challengingTeamId];
+  }
+  const cardColors = cardTeam ? teamColors(cardTeam.color, '#FFFFFF') : { color: '#ffffff', ink: '#0b0b0b' };
+
+  // Build modal HTML: the card on the left, the result and the text about the year on the
+  // right. The buttons sit outside the scrolling body, so they stay visible however long
+  // the text above them is.
   let modalHTML = `
     <div class="validation-modal-overlay">
       <div class="validation-modal">
         <div class="validation-modal-body">
-          <div class="validation-modal-title ${titleClass}">
-            ${titleText}
+          <div class="validation-modal-card" style="--team: ${cardColors.color}; --ink: ${cardColors.ink};">
+            <div class="card-year">${escapeHtml(modal.song.year)}</div>
+            <div class="card-info"><span class="card-title">${escapeHtml(modal.song.title)}</span><span class="card-artist">${escapeHtml(modal.song.artist)}</span></div>
           </div>
+          <div class="validation-modal-text">
+            <div class="validation-modal-title ${titleClass}">
+              ${titleText}
+            </div>
   `;
 
   if (subtitleText) {
     modalHTML += `
-          <div class="validation-modal-subtitle">
-            ${subtitleText}
-          </div>
+            <div class="validation-modal-subtitle">
+              ${subtitleText}
+            </div>
     `;
   }
 
   // validationYearInfo is filled by showYearInfo() below; it must be written without
   // whitespace inside so that it takes no room while it is empty
   modalHTML += `
-          <div class="validation-modal-song">
-            <div class="validation-modal-song-year">${escapeHtml(modal.song.year)}</div>
-            <div class="validation-modal-song-title">${escapeHtml(modal.song.title)}</div>
-            <div class="validation-modal-song-artist">${escapeHtml(modal.song.artist)}</div>
             <div class="validation-modal-song-info" id="validationYearInfo"></div>
           </div>
         </div>
 
         <div class="validation-modal-buttons">
           <button id="reportTrackBtn" class="validation-modal-btn report-btn">
-            🚩 Fel årtal?
+            Fel årtal?
           </button>
   `;
   
@@ -906,7 +885,7 @@ function renderValidationModal() {
         onclick="giveTokenToActiveTeam()"
         ${modal.isProcessing ? 'disabled' : ''}
       >
-        🎫 +TOKEN
+        ${ICON_TICKET}+ TOKEN
       </button>
     `;
   }
@@ -918,7 +897,7 @@ function renderValidationModal() {
       onclick="closeValidationModal()"
       ${modal.isProcessing ? 'disabled' : ''}
     >
-      NÄSTA LÅT →
+      NÄSTA LÅT
     </button>
   `;
   
@@ -961,20 +940,23 @@ function renderGameOverModal() {
   const teamName = (id) => (currentTeams[id] ? currentTeams[id].name : 'Okänt lag');
 
   // Who won. When the songs ran out several teams can share the lead; the database stores
-  // their ids as a list, which can come back as an object.
+  // their ids as a list, which can come back as an object. Each team is shown as a block in
+  // its own colour (a white block for a team that is no longer in the game).
+  const teamBlock = (id, label) => {
+    const team = currentTeams[id];
+    const colors = team ? teamColors(team.color, '#FFFFFF') : { color: '#ffffff', ink: '#0b0b0b' };
+    return `<div class="game-over-team" style="--team: ${colors.color}; --ink: ${colors.ink};"><span class="game-over-label">${label}</span><span class="game-over-name">${escapeHtml(teamName(id))}</span></div>`;
+  };
+
   const tiedIds = currentGameData.tiedTeams ? Object.values(currentGameData.tiedTeams) : [];
-  let resultHTML;
-  if (!currentGameData.winner && tiedIds.length > 1) {
-    const names = tiedIds.map(id => escapeHtml(teamName(id)));
-    const nameList = names.slice(0, -1).join(', ') + ' och ' + names[names.length - 1];
-    resultHTML = `Oavgjort mellan <span style="color: #00ffff;">${nameList}</span>`;
-  } else {
-    resultHTML = `Vinnare: <span style="color: #00ffff;">${escapeHtml(teamName(currentGameData.winner))}</span>`;
-  }
+  const isTie = !currentGameData.winner && tiedIds.length > 1;
+  const resultHTML = isTie
+    ? tiedIds.map(id => teamBlock(id, 'Oavgjort')).join('')
+    : teamBlock(currentGameData.winner, 'Vinnare');
 
   // Why the game ended, when it was not by reaching the points to win
   const reasonHTML = currentGameData.gameOverReason === 'outOfSongs'
-    ? `<p style="font-size: 1.1rem; color: #ccc; margin: 0 0 12px 0;">Låtarna tog slut – flest kort vinner</p>`
+    ? `<p class="game-over-reason">Låtarna tog slut – flest kort vinner</p>`
     : '';
 
   // Going on and starting over both take more songs than may be left
@@ -982,61 +964,60 @@ function renderGameOverModal() {
 
   let modalHTML = `
     <div class="validation-modal-overlay">
-      <div class="validation-modal-content" style="text-align: center; border: 3px solid #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);">
-        <h1 style="font-size: 3rem; color: #ff00ff; margin-bottom: 10px;">🏆 SPEL AVSLUTAT 🏆</h1>
+      <div class="game-over-modal">
+        <div class="game-over-kicker">Spel avslutat</div>
         ${reasonHTML}
-        <h2 style="font-size: 2rem; margin-bottom: 20px;">${resultHTML}</h2>
-
-
+        <div class="game-over-result${isTie ? ' tie' : ''}">${resultHTML}</div>
   `;
 
   if (isHost) {
+    // The choice that goes on with the game is solid white and stands last, the others
+    // are quieter
     modalHTML += `
-      <div class="validation-modal-buttons" style="justify-content: center; flex-direction: column; gap: 12px; align-items: center;">
-    `;
-    if (songsLeft.canContinue) {
-      modalHTML += `
+      <div class="game-over-buttons">
         <button
-          class="validation-modal-btn token"
-          onclick="continuePlaying()"
-          style="width: 100%; max-width: 300px;"
+          class="validation-modal-btn text-btn"
+          onclick="window.location.href='/'"
         >
-          🎮 FORTSÄTT SPELA
+          Återgå till startsida
         </button>
-      `;
-    }
+    `;
     if (songsLeft.canRestart) {
       modalHTML += `
         <button
-          class="validation-modal-btn"
+          class="validation-modal-btn outline two-line"
           onclick="restartGame()"
-          style="width: 100%; max-width: 300px; background: #1a1a2e; border: 2px solid #00ffff; color: #00ffff;"
         >
-          🔄 STARTA OM (samma inställningar)
+          STARTA OM<small>samma inställningar</small>
+        </button>
+      `;
+    }
+    if (songsLeft.canContinue) {
+      modalHTML += `
+        <button
+          class="validation-modal-btn solid"
+          onclick="continuePlaying()"
+        >
+          FORTSÄTT SPELA
         </button>
       `;
     }
     modalHTML += `
-        <button
-          class="validation-modal-btn" 
-          onclick="window.location.href='/'"
-          style="width: 100%; max-width: 300px; background: #1a1a2e; border: 2px solid #666; color: #aaa;"
-        >
-          🏠 ÅTERGÅ TILL STARTSIDA
-        </button>
       </div>
     `;
   } else {
     modalHTML += `
-      <p style="color: #666; font-style: italic;">
+      <p class="game-over-wait">
         ${songsLeft.canContinue || songsLeft.canRestart ? 'Väntar på att host ska välja nästa steg...' : 'Spelet är slut.'}
       </p>
-      <button 
-        onclick="window.location.href='/'"
-        style="margin-top: 16px; background: transparent; border: 1px solid #444; color: #666; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;"
-      >
-        🏠 Lämna spelet
-      </button>
+      <div class="game-over-buttons">
+        <button
+          class="validation-modal-btn outline"
+          onclick="window.location.href='/'"
+        >
+          Lämna spelet
+        </button>
+      </div>
     `;
   }
   

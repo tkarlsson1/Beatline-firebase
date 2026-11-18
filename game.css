@@ -21,6 +21,10 @@ body {
 }
 
 #gameContainer {
+  /* The whole width of the screen. Without it the page was only as wide as its content
+     (body in styles.css centres its children), so the header and the dark layer were a
+     narrow band while a team had few cards. */
+  width: 100%;
   height: 100vh;
   background: linear-gradient(to bottom, rgba(10, 10, 10, 0.8), rgba(26, 26, 26, 0.8));
   color: var(--text-color);
@@ -46,52 +50,88 @@ body {
   flex-shrink: 0;
 }
 
+/* The list takes the room that is left in the header and scrolls sideways when the boxes
+   need more. width: 0 keeps the boxes from making the whole page wider than the screen:
+   they no longer shrink and wrap onto two lines as the old ones did. */
 .team-list {
   display: flex;
   gap: 1rem;
-  flex: 1;
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 0.2rem 0;
 }
 
+/* Team boxes: flat and square like the cards. --team (the team's colour) and --ink (the
+   text colour that reads on it) are set on each box in renderTeamHeader(). */
 .team-badge {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.5rem 0.8rem;
-  border-radius: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s;
-}
-
-.team-color-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  gap: 8px;
+  height: 38px;
+  padding: 0 11px 0 9px;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
   flex-shrink: 0;
 }
 
+/* The team in turn is a solid block in its own colour */
+.team-badge.active {
+  background: var(--team, #fff);
+  border-color: var(--team, #fff);
+  color: var(--ink, #0b0b0b);
+}
+
+.team-color-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background: var(--team, #fff);
+}
+
+/* ...and has a play mark in the text colour where the others have their colour swatch.
+   The mark is a triangle made of borders and takes the same room as the swatch. */
+.team-badge.active .team-color-dot {
+  width: 0;
+  height: 0;
+  background: none;
+  border-radius: 0;
+  border-style: solid;
+  border-width: 6.5px 0 6.5px 11px;
+  border-color: transparent transparent transparent var(--ink, #0b0b0b);
+  margin-right: 2px;
+}
+
 .team-name {
-  font-weight: bold;
-  font-size: 0.9rem;
+  font: 700 15.5px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  white-space: nowrap;
 }
 
 .team-stats {
   display: flex;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  opacity: 0.9;
+  gap: 9px;
+  margin-left: 3px;
 }
 
-.team-score {
-  color: #4CAF50;
-}
-
+.team-score,
 .team-tokens {
-  color: #FFC107;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font: 400 18px/1 'Anton', Impact, sans-serif;
+}
+
+.team-stats svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.85;
 }
 
 /* Game area */
@@ -109,7 +149,9 @@ body {
   text-align: center;
 }
 
-/* Timer display - Horizontal bar */
+/* Timer: the message on the left, the time on the right, a flat bar below. The markup is
+   written by renderTimer() in game-timers.js. White while there is time, yellow at 40 %
+   and red at 20 %. */
 .timer-container {
   width: 100%;
   max-width: 600px;
@@ -117,85 +159,98 @@ body {
   min-height: 60px;
 }
 
-.timer-bar-wrapper {
-  position: relative;
-  width: 100%;
-  height: 25px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+.timer-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+
+.timer-label {
+  font: 700 14px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  text-align: left;
+  color: #fff;
+  padding-bottom: 3px;
+  min-width: 0;
+  white-space: nowrap;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  text-overflow: ellipsis;
+}
+
+.timer-bar-text {
+  font: 400 30px/0.86 'Anton', Impact, sans-serif;
+  letter-spacing: 0.5px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.timer-bar-wrapper {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.17);
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .timer-bar-progress {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50 0%, #66BB6A 100%);
-  transition: width 1s linear, background 0.3s;
-  border-radius: 20px;
+  background: #fff;
 }
 
 .timer-bar-progress.warning {
-  background: linear-gradient(90deg, #FFC107 0%, #FFD54F 100%);
+  background: #FBBC04;
 }
 
 .timer-bar-progress.danger {
-  background: linear-gradient(90deg, #EA4335 0%, #EF5350 100%);
-  animation: pulse-bar 1s infinite;
+  background: #EA4335;
 }
 
-@keyframes pulse-bar {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+.timer-head.warning .timer-bar-text {
+  color: #FBBC04;
 }
 
-.timer-bar-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-  z-index: 1;
+.timer-head.danger .timer-bar-text {
+  color: #EA4335;
 }
 
-.timer-label {
-  text-align: center;
-  font-size: 0.85rem;
-  opacity: 0.7;
-  margin-top: 0.3rem;
-}
-
-/* Debug controls (host only) */
-/* Host controls in header */
+/* Host controls in header. Pausa and Fortsätt are shown and hidden with an inline
+   display (inline-block) in updateGameView(), so the buttons are laid out as inline boxes. */
 .host-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
   margin-left: 1rem;
+  flex-shrink: 0;
 }
 
 .host-toggle-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 0.5rem 0.8rem;
+  box-sizing: border-box;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
   cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.host-toggle-btn:hover {
-  opacity: 0.7;
+.host-toggle-btn svg {
+  width: 22px;
+  height: 22px;
 }
 
 .host-buttons {
   display: none;
-  gap: 0.5rem;
+  gap: 6px;
   align-items: center;
 }
 
@@ -204,20 +259,33 @@ body {
 }
 
 .host-btn {
-  background: var(--accent-color);
-  border: none;
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+  box-sizing: border-box;
+  height: 38px;
+  margin: 0;
+  padding: 0 9px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
   cursor: pointer;
-  font-size: 0.8rem;
-  font-family: 'Manrope', sans-serif;
-  transition: background 0.3s;
+  font: 400 15px/34px 'Anton', Impact, sans-serif;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-.host-btn:hover {
-  background: var(--accent-hover);
+.host-btn svg {
+  width: 12px;
+  height: 12px;
+  vertical-align: -1px;
+}
+
+.host-btn svg:first-child {
+  margin-right: 6px;
+}
+
+.host-btn svg:last-child {
+  margin-left: 6px;
 }
 
 /* Loading state */
@@ -227,17 +295,53 @@ body {
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--accent-color);
+  box-sizing: border-box;
+  width: 46px;
+  height: 46px;
+  border: 4px solid rgba(255, 255, 255, 0.16);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 1.1rem auto;
+}
+
+.loading p {
+  margin: 0;
+  font: 400 20px/1.2 'Anton', Impact, sans-serif;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Error state (the game could not be shown). The button comes from styles.css, so its look
+   is set here with the id in front. */
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.error-state p {
+  margin: 0 0 1.1rem 0;
+  font: 700 21px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+}
+
+#errorState .start-button {
+  box-sizing: border-box;
+  height: 44px;
+  margin: 0 auto;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 4px;
+  background: #fff;
+  color: #0b0b0b;
+  font: 400 18px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  transition: none;
+  transform: none;
 }
 
 /* Current card container */
@@ -301,79 +405,140 @@ body {
   z-index: 0;
 }
 
-/* Cards */
+/* Cards. --team (the team's colour) and --ink (the text colour that reads on it) are set on
+   each card in game-render.js. The outer size is 126 x 140 px, the same as before, so the
+   timeline holds as many cards and the drop positions are measured as they were. */
 .card {
-  width: 82px;
-  height: 96px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  box-sizing: border-box;
+  width: 126px;
+  height: 140px;
+  background: var(--team, #4285F4);
+  color: var(--ink, #0b0b0b);
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 9px 10px 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
   flex-shrink: 0;
   position: relative;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  color: white;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;  /* Tillåt scrollning i alla riktningar */
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-}
-
-.card.blank-card {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-.card.preview-card {
-  opacity: 0.7;
-  transform: scale(0.95);
-  touch-action: none;  /* Blockera scroll för kortet som ska flyttas */
-}
-
-/* Active team's own placed card waiting for validation (not draggable) */
-.card.own-unrevealed-card {
-  opacity: 0.7;
-  transform: scale(0.95);
-}
-
-.card.dragging {
-  opacity: 0.5;
-  transform: rotate(5deg);
-}
-
 /* Card content */
 .card-year {
-  font-size: 2rem;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  margin-bottom: 0.5rem;
+  font: 400 58px/0.9 'Anton', Impact, sans-serif;
+  letter-spacing: -0.5px;
+  margin: 0 0 7px -1px;
 }
 
 .card-info {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-align: center;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  max-width: 100%;
+  border-top: 2px solid currentColor;
+  padding-top: 6px;
 }
 
+/* The title gets at most two lines and the artist always one of its own */
+.card-title,
+.card-artist {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.card-title {
+  -webkit-line-clamp: 2;
+  font: 700 13.5px/14.5px 'Archivo Narrow', 'Arial Narrow', sans-serif;
+}
+
+.card-artist {
+  -webkit-line-clamp: 1;
+  font: 500 12.5px/14px 'Archivo Narrow', 'Arial Narrow', sans-serif;
+}
+
+/* A card that is not turned yet is an outline with a question mark: both the card that is
+   being placed (preview-card) and one that is locked and waits to be turned (unrevealed). */
+.card.unrevealed,
+.card.preview-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 2.5px dashed rgba(255, 255, 255, 0.55);
+  color: #fff;
+  box-shadow: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* The outline takes the team's colour on the card being placed and on the owner's own
+   locked card. Other teams see a locked card with a white outline. */
+.card.preview-card,
+.card.own-unrevealed-card {
+  border-color: var(--team, #fff);
+}
+
+.card.preview-card {
+  touch-action: none;  /* Blockera scroll för kortet som ska flyttas */
+}
+
+.card.dragging {
+  opacity: 0.4;
+}
+
+/* The question mark is drawn as an outline. A browser without text-stroke shows it filled. */
 .card-blank-text {
-  font-size: 3rem;
-  color: white;
-  font-weight: bold;
+  font: 900 88px/1 'Archivo', Arial, sans-serif;
+  color: #fff;
+}
+
+/* The card you drag from the top of the screen (renderCurrentCard) */
+.card.blank-card {
+  width: 51px;
+  height: 58px;
+  background: #fff;
+  color: #0b0b0b;
+  border: 0;
+  border-radius: 3px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.card.blank-card .card-blank-text {
+  font-size: 40px;
+  color: #0b0b0b;
+}
+
+@supports (-webkit-text-stroke: 1px #fff) {
+  .card-blank-text {
+    color: transparent;
+    -webkit-text-stroke: 2.5px #fff;
+  }
+
+  .card.blank-card .card-blank-text {
+    color: transparent;
+    -webkit-text-stroke: 1.75px #0b0b0b;
+  }
+}
+
+/* The marker that shows where the card lands while it is dragged (showDynamicDropIndicator).
+   Width and margins are the same as before, so the cards move apart exactly as they did. */
+.dynamic-drop-indicator {
+  width: 4px;
+  height: 140px;
+  background: #fff;
+  position: relative;
+  flex-shrink: 0;
+  margin: auto 0.5rem;
+  border-radius: 2px;
+  pointer-events: none;
 }
 
 /* Drop zones */
@@ -413,50 +578,84 @@ body {
   content: '▶️';
 }
 
-/* Action buttons */
+/* Action buttons (BYT LÅT and LÅS SVAR). LÅS SVAR is solid white like the card you drag,
+   BYT LÅT is an outline. No team colour, so they work beside every team colour. */
 .action-btn {
-  background: var(--accent-color);
-  border: none;
-  color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  font-family: 'Manrope', sans-serif;
-  transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
   width: 100%;
   max-width: 120px;
-  white-space: nowrap;
-  align-self: start;
+  height: 44px;
   margin: 0;  /* Override styles.css global button margin-bottom */
+  padding: 0 8px;
+  border-radius: 4px;
+  font: 400 18px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  align-self: start;
   display: inline-block;  /* Prevent block behavior from global styles */
 }
 
-.action-btn:hover:not(:disabled) {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
 .action-btn:disabled {
-  background: #555;
   cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.action-btn.secondary {
-  background: #555;
-  justify-self: end;  /* Align right in grid cell for symmetry */
-}
-
-.action-btn.secondary:hover:not(:disabled) {
-  background: #666;
 }
 
 .action-btn.primary {
   justify-self: start;  /* Align left in grid cell for symmetry */
+  background: #fff;
+  color: #0b0b0b;
+  border: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.action-btn.primary:disabled {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+}
+
+.action-btn.secondary {
+  justify-self: end;  /* Align right in grid cell for symmetry */
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.action-btn.secondary:disabled {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* UTMANA is the same element as BYT LÅT (updateActionButtons). It is the main choice at
+   that moment, so it is solid white like LÅS SVAR. These rules come after the ones above
+   on purpose. */
+.action-btn.utmana {
+  width: auto;
+  max-width: none;
+  padding: 0 24px;
+  background: #fff;
+  color: #0b0b0b;
+  border: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.action-btn.utmana:disabled {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+}
+
+.action-btn .btn-cost {
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.action-btn .btn-cost svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: -2px;
+  margin-right: 3px;
 }
 
 /* Spotify status (host only) */
@@ -482,41 +681,40 @@ body {
   color: #EA4335;
 }
 
-/* Notifications */
+/* Messages (showNotification in game-utils.js): flat blocks at the top of the screen.
+   White for information, red for something that did not go through, green for done. */
 .notification {
   position: fixed;
-  top: 50%;
+  top: 9px;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.95);
-  color: white;
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
-  font-size: 1.2rem;
-  text-align: center;
+  transform: translateX(-50%);
   z-index: 10000;
-  animation: notificationFade 3s forwards;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
   max-width: 80%;
+  padding: 12px 18px;
+  border-radius: 4px;
+  background: #fff;
+  color: #0b0b0b;
+  font: 700 17px/1.25 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  animation: notificationFade 3.3s forwards;
 }
 
-.notification.success {
-  border: 2px solid #4CAF50;
+.notification-error {
+  background: #EA4335;
 }
 
-.notification.error {
-  border: 2px solid #EA4335;
-}
-
-.notification.info {
-  border: 2px solid #2196F3;
+.notification-success {
+  background: #4CAF50;
 }
 
 @keyframes notificationFade {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-  10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  0% { opacity: 0; }
+  6% { opacity: 1; }
+  91% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* Rotate message (portrait mode) */
@@ -571,24 +769,9 @@ body {
   .team-header {
     padding: 0.5rem;
   }
-  
-  .team-badge {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-  }
-  
+
   .game-area {
     padding: 1rem 0.5rem;
-  }
-  
-  .card {
-    width: 82px;
-    height: 96px;
-  }
-  
-  .drop-zone {
-    width: 60px;
-    height: 96px;
   }
 }
 
@@ -652,38 +835,70 @@ body {
   animation: fadeIn 0.3s ease-out;
 }
 
-.validation-modal {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border-radius: 16px;
-  padding: 1.5rem;
-  max-width: 500px;
-  max-height: 320px;
-  /* Never taller than the screen: 56px is the padding and border above and below, plus 1px of air on each side */
-  max-height: min(320px, calc(100vh - 56px));
-  max-height: min(320px, calc(100dvh - 56px));
-  width: 90%;
-  text-align: center;
-  border: 3px solid var(--accent-color);
+/* One flat panel for the validation box and the game over screen */
+.validation-modal,
+.game-over-modal {
+  box-sizing: border-box;
+  background: #111216;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 4px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   animation: slideUp 0.4s ease-out;
+}
+
+.validation-modal {
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  /* Never taller than the screen: the limit is the same outer height as before */
+  max-height: 374px;
+  max-height: min(374px, calc(100vh - 2px));
+  max-height: min(374px, calc(100dvh - 2px));
+  text-align: left;
   /* The body scrolls when it has to, the button row below it is always visible */
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
+/* The song as the card itself on the left, the result and the text about the year on the right */
 .validation-modal-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+/* The card takes the colour of the team that gets it and is white when nobody does
+   (--team and --ink are set in renderValidationModal). Its content uses the card classes. */
+.validation-modal-card {
+  box-sizing: border-box;
+  width: 126px;
+  height: 140px;
+  flex-shrink: 0;
+  background: var(--team, #fff);
+  color: var(--ink, #0b0b0b);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  padding: 9px 10px 8px;
+}
+
+.validation-modal-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .validation-modal-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font: 400 26px/1.08 'Anton', Impact, sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  margin-bottom: 8px;
+  color: #fff;
 }
 
 .validation-modal-title.correct {
@@ -695,35 +910,9 @@ body {
 }
 
 .validation-modal-subtitle {
-  font-size: 0.95rem;
-  margin-bottom: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.validation-modal-song {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 0.7rem 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.validation-modal-song-year {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--accent-color);
-  margin-bottom: 0.3rem;
-}
-
-.validation-modal-song-title {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 0.2rem;
-  color: white;
-}
-
-.validation-modal-song-artist {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.7);
+  font: 500 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.84);
 }
 
 /* Explanation and source for the year, filled in by showYearInfo() in game-render.js */
@@ -732,57 +921,47 @@ body {
 }
 
 .validation-modal-song-explanation {
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  color: rgba(255, 255, 255, 0.75);
+  font: 500 14px/1.36 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .validation-modal-song-source {
-  margin-top: 0.3rem;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+  margin-top: 6px;
+  font: 500 13px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .validation-modal-song-source a {
-  color: var(--accent-color);
+  color: #fff;
 }
 
 .validation-modal-buttons {
   display: flex;
-  gap: 0.8rem;
+  gap: 12px;
   justify-content: center;
   align-items: center;
 }
 
-/* In the validation modal the row is pinned under the scrolling body. The game over
-   screen uses the same row class and keeps its own spacing. */
+/* In the validation modal the row is pinned under the scrolling body, with the buttons
+   that move the game on to the right. */
 .validation-modal > .validation-modal-buttons {
   flex: 0 0 auto;
-  margin-top: 0.8rem;
-}
-
-/* The general button rule in styles.css puts 1rem under every button, which here only
-   made the modal taller */
-.validation-modal > .validation-modal-buttons .validation-modal-btn {
-  margin-bottom: 0;
+  margin-top: 14px;
+  justify-content: flex-end;
 }
 
 .validation-modal-btn {
-  padding: 0.7rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: bold;
-  font-family: 'Manrope', sans-serif;
+  box-sizing: border-box;
+  height: 44px;
+  margin: 0;  /* The general button rule in styles.css puts 1rem under every button */
+  padding: 0 16px;
+  border: 0;
+  border-radius: 4px;
+  font: 400 18px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.validation-modal-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .validation-modal-btn:disabled {
@@ -790,29 +969,136 @@ body {
   cursor: not-allowed;
 }
 
-.validation-modal-btn.token {
-  background: #FFC107;
-  color: #1a1a1a;
+.validation-modal-btn svg {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+  margin-right: 6px;
 }
 
-.validation-modal-btn.token:hover:not(:disabled) {
-  background: #FFD54F;
+/* Solid white: the button that moves the game on */
+.validation-modal-btn.next,
+.validation-modal-btn.solid {
+  background: #fff;
+  color: #0b0b0b;
 }
 
-.validation-modal-btn.next {
-  background: var(--accent-color);
-  color: white;
+/* Outline: the other choices */
+.validation-modal-btn.token,
+.validation-modal-btn.outline {
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  border: 2px solid #fff;
 }
 
-/* Small on purpose: it shares the row with the buttons that move the game on */
+/* A small text button: it shares the row with the buttons that move the game on */
+.validation-modal-btn.report-btn,
+.validation-modal-btn.text-btn {
+  padding: 0 4px;
+  background: none;
+  color: rgba(255, 255, 255, 0.8);
+  font: 500 14.5px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: underline;
+}
+
 .validation-modal-btn.report-btn {
-  background-color: #f44336;
-  padding: 5px 10px;
-  font-size: 12px;
+  margin-right: auto;
 }
 
-.validation-modal-btn.next:hover:not(:disabled) {
-  background: var(--accent-hover);
+/* A button with a small second line under its label */
+.validation-modal-btn.two-line {
+  height: 48px;
+}
+
+.validation-modal-btn.two-line small {
+  display: block;
+  margin-top: 3px;
+  font: 500 11.5px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 0.3px;
+  text-transform: none;
+}
+
+/* ============================================
+   GAME OVER SCREEN (renderGameOverModal)
+   ============================================ */
+
+.game-over-modal {
+  width: 92%;
+  max-width: 560px;
+  max-height: calc(100vh - 12px);
+  max-height: calc(100dvh - 12px);
+  overflow-y: auto;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.game-over-kicker {
+  font: 400 20px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.game-over-reason {
+  margin: -6px 0 0 0;
+  font: 500 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+/* The winner is a solid block in the team's colour; teams that share the lead stand side by side */
+.game-over-result {
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.game-over-team {
+  flex: 1 1 150px;
+  min-width: 0;
+  background: var(--team, #fff);
+  color: var(--ink, #0b0b0b);
+  border-radius: 4px;
+  padding: 13px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.game-over-label {
+  font: 700 13px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.game-over-name {
+  font: 400 46px/1.14 'Anton', Impact, sans-serif;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.game-over-result.tie .game-over-name {
+  font-size: 34px;
+}
+
+.game-over-wait {
+  margin: 0;
+  font: 500 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.game-over-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
 /* Animations */
@@ -849,4 +1135,69 @@ body {
 #gameContainer.modal-active #gameView {
   filter: blur(5px);
   pointer-events: none;
+}
+
+/* ============================================
+   QUESTIONS AND MESSAGES IN THE GAME (ny/dialog.js)
+   ============================================ */
+/* ny/dialog.css is shared with the start page and the lobby and is loaded after this file.
+   The game's own look is therefore set here with one step higher specificity (html in
+   front), and the other pages keep theirs. */
+html .ns-dialog {
+  background: #111216;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  padding: 22px;
+}
+
+html .ns-dialog-title {
+  font: 400 26px/1.08 'Anton', Impact, sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+html .ns-dialog-text {
+  font: 500 16px/1.4 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+html .ns-dialog-buttons {
+  gap: 12px;
+  margin-top: 18px;
+}
+
+html .ns-dialog-btn {
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font: 400 18px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+html .ns-dialog-btn.primary,
+html .ns-dialog-btn.primary:hover,
+html .ns-dialog-btn.primary:focus,
+html .ns-dialog-btn.primary:active {
+  background: #fff;
+  color: #0b0b0b;
+}
+
+html .ns-dialog-btn.secondary,
+html .ns-dialog-btn.secondary:hover,
+html .ns-dialog-btn.secondary:focus,
+html .ns-dialog-btn.secondary:active {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: #fff;
+  color: #fff;
+}
+
+html .ns-dialog-btn.danger,
+html .ns-dialog-btn.danger:hover,
+html .ns-dialog-btn.danger:focus,
+html .ns-dialog-btn.danger:active {
+  background: #EA4335;
+  color: #0b0b0b;
 }

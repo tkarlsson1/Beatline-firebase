@@ -318,13 +318,15 @@ function renderTimer(remainingMs, totalDurationMs, remainingSeconds) {
     labelText = 'SPELET ÄR PAUSAT';
   }
   
-  // Render timer UI as horizontal bar
+  // Render timer UI: the message and the time on one line, the bar below (look in game.css)
   timerContainer.innerHTML = `
-    <div class="timer-bar-wrapper">
-      <div class="timer-bar-progress ${colorClass}" style="width: ${progress}%"></div>
+    <div class="timer-head ${colorClass}">
+      <div class="timer-label">${labelText}</div>
       <span class="timer-bar-text">${timeDisplay}</span>
     </div>
-    <div class="timer-label">${labelText}</div>
+    <div class="timer-bar-wrapper">
+      <div class="timer-bar-progress ${colorClass}" style="width: ${progress}%"></div>
+    </div>
   `;
 }
 

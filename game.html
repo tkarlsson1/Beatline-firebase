@@ -14,11 +14,11 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@900&family=Archivo+Narrow:wght@500;700&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
   
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="game.css?v=50">
+  <link rel="stylesheet" href="game.css?v=51">
   <!-- The game's own box for questions and messages, shared with the new lobby -->
   <link rel="stylesheet" href="ny/dialog.css?v=0.858">
 
@@ -73,13 +73,13 @@
         
         <!-- Host controls (host only) -->
         <div class="host-controls" id="hostControls" style="display: none;">
-          <button class="host-toggle-btn" id="hostToggleBtn" onclick="toggleHostControls()">
-            ⚙️
+          <button class="host-toggle-btn" id="hostToggleBtn" onclick="toggleHostControls()" aria-label="Värdens knappar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="8.4" stroke-width="4" stroke-dasharray="3.3 3.3"></circle><circle cx="12" cy="12" r="5.2" stroke-width="2.6"></circle></svg>
           </button>
           <div class="host-buttons" id="hostButtons">
-            <button class="host-btn" id="pauseBtn" onclick="pauseGame()">⏸️ Pausa</button>
-            <button class="host-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;">▶️ Fortsätt</button>
-            <button class="host-btn" onclick="forceNextTeam()">Nästa →</button>
+            <button class="host-btn" id="pauseBtn" onclick="pauseGame()"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M1.5 1h3.2v10H1.5zM7.3 1h3.2v10H7.3z"></path></svg>Pausa</button>
+            <button class="host-btn" id="resumeBtn" onclick="resumeGame()" style="display: none;"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M2 1l9 5-9 5z"></path></svg>Fortsätt</button>
+            <button class="host-btn" onclick="forceNextTeam()">Nästa<svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M1 4.9h6.2L4.9 2.5 6.4 1l5 5-5 5-1.5-1.5 2.3-2.4H1z"></path></svg></button>
           </div>
         </div>
       </div>
@@ -134,11 +134,11 @@
   <script src="ny/dialog.js?v=0.858"></script>
 
   <!-- Game modules (order matters!) -->
-  <script src="game-utils.js?v=0.858"></script>          <!-- 1. Utility functions (showError, escapeHtml, askQuestion) -->
+  <script src="game-utils.js?v=0.864"></script>          <!-- 1. Utility functions (showError, escapeHtml, askQuestion) -->
   <script src="game-init.js?v=0.863"></script>      <!-- 2. Global variables and initialization -->
-  <script src="game-render.js?v=0.863"></script>    <!-- 3. Rendering functions -->
+  <script src="game-render.js?v=0.864"></script>    <!-- 3. Rendering functions -->
   <script src="game-cards.js?v=0.862"></script>          <!-- 4. Drag & drop and validation -->
-  <script src="game-timers.js?v=0.863"></script>    <!-- 5. Timer system -->
+  <script src="game-timers.js?v=0.864"></script>    <!-- 5. Timer system -->
   <script src="game-host.js?v=0.861"></script>      <!-- 6. Host controls -->
   
   <script>
