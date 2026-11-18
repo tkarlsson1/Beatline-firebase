@@ -1,8 +1,11 @@
 /* ============================================
    NOTESTREAM - DIALOG
-   The look of the questions and messages shown by dialog.js, in the style of the game's
-   own boxes. Loaded by the new start page, the new lobby and the game.
-   Colours and fonts come from ../styles.css.
+   The look of the questions and messages shown by dialog.js: a dark box with a white
+   frame, in the same look as the game, the start page and the lobby. Loaded by all three.
+   The fonts (Anton, Archivo Narrow) are loaded by the pages.
+
+   ../styles.css is loaded before this file and gives every button a colour under the
+   pointer and in focus, which is why those states are set here too.
    ============================================ */
 
 /* Above everything else on the pages: the login box (5000), the game's validation box
@@ -20,10 +23,10 @@
 }
 
 .ns-dialog {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border: 3px solid var(--accent-color);
-  border-radius: 16px;
-  padding: 1.5rem;
+  background: #111216;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  padding: 22px;
   width: 100%;
   max-width: 420px;
   max-height: calc(100vh - 2rem);
@@ -32,20 +35,20 @@
   box-sizing: border-box;
   text-align: center;
   color: #fff;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Archivo Narrow', 'Arial Narrow', sans-serif;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
 .ns-dialog-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-bottom: 0.6rem;
+  font: 400 26px/1.08 'Anton', Impact, sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
 .ns-dialog-text {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.85);
+  font: 500 16px/1.4 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.86);
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
@@ -53,20 +56,22 @@
 .ns-dialog-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
+  gap: 12px;
   justify-content: center;
-  margin-top: 1.3rem;
+  margin-top: 18px;
 }
 
 .ns-dialog-btn {
+  box-sizing: border-box;
+  height: 44px;
   margin: 0;
-  padding: 0.7rem 1.5rem;
+  padding: 0 16px;
   min-width: 120px;
   border: 2px solid transparent;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
-  font-family: 'Manrope', sans-serif;
+  border-radius: 4px;
+  font: 400 18px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
   color: #fff;
   cursor: pointer;
 }
@@ -76,33 +81,29 @@
   outline-offset: 2px;
 }
 
+/* Solid white is the main choice, a white outline the other one, red a choice that
+   removes something */
 .ns-dialog-btn.primary,
-.ns-dialog-btn.primary:active {
-  background: linear-gradient(to right, #fb1820, #ff6310);
-}
-
 .ns-dialog-btn.primary:hover,
-.ns-dialog-btn.primary:focus {
-  background: linear-gradient(to right, #e52e71, #ff8a00);
+.ns-dialog-btn.primary:focus,
+.ns-dialog-btn.primary:active {
+  background: #fff;
+  color: #0b0b0b;
 }
 
 .ns-dialog-btn.secondary,
-.ns-dialog-btn.secondary:active {
-  background: var(--primary-bg);
-  border-color: var(--accent-color);
-}
-
 .ns-dialog-btn.secondary:hover,
-.ns-dialog-btn.secondary:focus {
-  background: var(--accent-color);
+.ns-dialog-btn.secondary:focus,
+.ns-dialog-btn.secondary:active {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: #fff;
+  color: #fff;
 }
 
 .ns-dialog-btn.danger,
+.ns-dialog-btn.danger:hover,
+.ns-dialog-btn.danger:focus,
 .ns-dialog-btn.danger:active {
   background: #EA4335;
-}
-
-.ns-dialog-btn.danger:hover,
-.ns-dialog-btn.danger:focus {
-  background: #d33828;
+  color: #0b0b0b;
 }

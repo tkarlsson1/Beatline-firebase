@@ -3,8 +3,8 @@
 // The host chooses playlists, years, points and timers here while the teams join, and the
 // players see what has been chosen. Starting writes the same game data as the current
 // lobby, so game.html is the same for both.
-// Helpers (TEAM_COLORS, validateTimer, showNotification) come from ../lobby.js, and the
-// question box from dialog.js.
+// Helpers (TEAM_COLORS, validateTimer) come from ../lobby.js, and the question box from
+// dialog.js.
 // ============================================
 
 (function () {
@@ -84,6 +84,33 @@
     byId("errorState").style.display = "block";
   }
 
+  // A message at the top of the screen, in the same look as in the game (.notification in
+  // ny.css). It takes the place of showNotification in ../lobby.js on this page: that one
+  // sets its own colours and corners on the element.
+  function showNotification(message, type = "info") {
+    console.log(`[Lobby] Notification (${type}):`, message);
+    const notification = document.createElement("div");
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      if (notification.parentNode) notification.parentNode.removeChild(notification);
+    }, 3300);
+  }
+
+  // The text colour that reads on a team's colour: white on the dark ones, black on the
+  // rest. The same rule as teamColors() in ../game-utils.js, so a team's block looks the
+  // same here as its cards do in the game.
+  function inkOn(colorHex) {
+    // Relative luminance of the colour (WCAG), 0 for black and 1 for white
+    const channel = start => {
+      const value = parseInt(colorHex.slice(start, start + 2), 16) / 255;
+      return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+    };
+    const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
+    return luminance < 0.19 ? "#ffffff" : "#0b0b0b";
+  }
+
   function hostTeamId() {
     const entry = Object.entries(currentTeams).find(([, team]) => team && team.host === true);
     return entry ? entry[0] : null;
@@ -154,21 +181,22 @@
       const color = TEAM_COLORS.find(c => c.name === team.color);
       const colorHex = color ? color.hex : "#FFFFFF";
 
+      // The team is a solid block in its colour; ny.css reads --team and --ink
       const item = document.createElement("div");
       item.className = "team-item" + (isOwnTeam ? " own-team" : "");
-      item.style.borderLeftColor = colorHex;
+      item.style.setProperty("--team", colorHex);
+      item.style.setProperty("--ink", inkOn(colorHex));
 
-      const info = document.createElement("div");
-      info.className = "team-info";
-      const dot = document.createElement("div");
-      dot.className = "team-color-indicator";
-      dot.style.background = colorHex;
       const name = document.createElement("div");
       name.className = "team-name";
-      name.textContent = String(team.name) + (isOwnTeam ? " (Du)" : "");
-      info.appendChild(dot);
-      info.appendChild(name);
-      item.appendChild(info);
+      name.textContent = String(team.name);
+      if (isOwnTeam) {
+        const you = document.createElement("span");
+        you.className = "you";
+        you.textContent = "Du";
+        name.appendChild(you);
+      }
+      item.appendChild(name);
 
       if (isHost && !team.host) {
         const kick = document.createElement("button");

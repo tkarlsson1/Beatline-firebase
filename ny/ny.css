@@ -1,69 +1,242 @@
 /* ============================================
-   NOTESTREAM - NEW WAY INTO A GAME
-   Styles shared by ny/index.html, ny/lobby.html and ny/join.html.
-   Colours and fonts come from ../styles.css.
+   NOTESTREAM - START PAGE, LOBBY AND JOIN PAGE
+   Styles shared by ../index.html, lobby.html and join.html, in the same look as the game
+   (../game.css): flat surfaces, 4 px corners, Anton in capitals for headings, buttons and
+   numbers, Archivo Narrow for text. Solid white is the main choice and a white outline the
+   second one. Yellow warns, red says that something did not go through, green that it did.
+
+   ../styles.css is loaded before this file and is shared with the old pages. What it sets
+   for buttons, selects, lines and boxes is therefore set again here, hover and focus
+   included.
    ============================================ */
 
+/* The picture under a dark layer, as in the game */
 body {
-  background: url('../background.jpg') no-repeat center center fixed !important;
-  background-size: cover !important;
+  background:
+    linear-gradient(to bottom, rgba(10, 10, 10, 0.8), rgba(26, 26, 26, 0.8)) fixed,
+    url('../background.jpg') no-repeat center center fixed !important;
+  background-size: auto, cover !important;
+  color: #fff;
+  font: 500 16px/1.4 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
 .page {
-  max-width: 600px;
-  width: 100%;
-  margin: 2rem auto;
-  padding: 2rem;
-  color: var(--text-color);
   box-sizing: border-box;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 30px 20px 34px 20px;
+  color: #fff;
 }
 
+.page .logo {
+  display: block;
+  width: 330px;
+  max-width: 100%;
+  height: auto;
+  margin: 6px auto 30px auto;
+}
+
+/* ---------- Headings, sections and boxes ---------- */
 .page-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin: 2px 0 20px 0;
 }
 
 .page-header h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2rem;
+  margin: 0;
+  font: 400 30px/1.08 'Anton', Impact, sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .section {
-  margin: 2rem 0;
+  margin: 30px 0 0 0;
 }
 
 .section h2 {
-  text-align: center;
-  margin-bottom: 1.2rem;
-  font-size: 1.3rem;
+  margin: 0 0 12px 0;
+  font: 400 24px/1.1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
-.section-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 2rem 0;
+/* A second heading in the same section, and a heading under a dividing line */
+.section h2.section-next,
+.section-divider + h2 {
+  margin-top: 30px;
+}
+
+/* ../styles.css sets the width of every line with !important */
+.page .section-divider {
+  border: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.16);
+  border-top-width: 2px !important;
+  margin: 30px 0 0 0;
+}
+
+.section > .section-divider:first-child {
+  margin-top: 0;
 }
 
 .panel {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 1.2rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: 4px;
+  padding: 14px;
 }
 
 .hint {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  text-align: center;
-  margin: 0.6rem 0 0 0;
+  margin: 10px 0 0 0;
+  font: 500 14px/1.4 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.74);
+  text-align: left;
 }
 
+.hint:first-child {
+  margin-top: 0;
+}
+
+.page-header .hint {
+  margin-top: 10px;
+  font: 700 14px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* A yellow block, as the game's messages are blocks */
 .warning-line {
-  background: rgba(251, 188, 4, 0.12);
-  border-left: 4px solid #FBBC04;
+  margin: 26px 0 0 0;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #FBBC04;
+  color: #0b0b0b;
+  font: 700 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+}
+
+/* ---------- Buttons ---------- */
+.big-btn,
+.big-btn:hover,
+.big-btn:focus,
+.big-btn:active {
+  background: #fff;
+  color: #0b0b0b;
+}
+
+/* The height is a minimum: the text of the start button changes and can take two lines on
+   a narrow screen */
+.big-btn {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  min-height: 56px;
+  margin: 14px auto 0 auto;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 4px;
+  font: 400 24px/1.1 'Anton', Impact, sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.big-btn:disabled {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.big-btn.secondary,
+.big-btn.secondary:hover,
+.big-btn.secondary:focus,
+.big-btn.secondary:active {
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+
+.big-btn.secondary {
+  border: 2px solid #fff;
+  box-shadow: none;
+}
+
+.big-btn.secondary:disabled {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.panel .big-btn,
+.dialog .big-btn {
+  max-width: none;
+}
+
+.small-btn,
+.small-btn:hover,
+.small-btn:focus,
+.small-btn:active,
+.playlist-row .kick-btn,
+.playlist-row .kick-btn:hover,
+.playlist-row .kick-btn:focus,
+.playlist-row .kick-btn:active {
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+}
+
+.small-btn,
+.playlist-row .kick-btn {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 36px;
+  margin: 0;
+  padding: 0 12px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  font: 400 15px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* A button that reads as a link in running text */
+.link-btn,
+.link-btn:hover,
+.link-btn:focus,
+.link-btn:active {
+  background: none;
+  color: #fff;
+}
+
+.link-btn {
+  margin: 0;
+  padding: 0;
+  border: 0;
   border-radius: 0;
-  padding: 0.8rem 1rem;
-  font-size: 0.95rem;
-  margin: 1rem 0;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* What has the keyboard's focus is marked in white: the dark mark from ../styles.css does
+   not show on these pages */
+.page button:focus-visible,
+.page a:focus-visible,
+.page summary:focus-visible,
+.dialog button:focus-visible,
+.dialog a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.page button:focus:not(:focus-visible),
+.dialog button:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* ---------- Loading and errors ---------- */
@@ -73,13 +246,21 @@ body {
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--accent-color);
+  box-sizing: border-box;
+  width: 46px;
+  height: 46px;
+  border: 4px solid rgba(255, 255, 255, 0.16);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: ny-spin 1s linear infinite;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 1.1rem auto;
+}
+
+.loading p {
+  margin: 0;
+  font: 400 20px/1.2 'Anton', Impact, sans-serif;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
 }
 
 @keyframes ny-spin {
@@ -88,179 +269,268 @@ body {
 
 .error-state {
   text-align: center;
-  padding: 2rem;
-  color: #EA4335;
-  font-size: 1.1rem;
+  padding: 4rem 0;
+}
+
+.error-state p {
+  margin: 0 0 1.1rem 0;
+  font: 700 21px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
 /* ---------- Joining: QR code and link ---------- */
 .qr-section {
   text-align: center;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  padding: 16px 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: 4px;
 }
 
+/* The white frame is the quiet zone the code needs to be read against a dark page */
 #qrCodeElement {
   display: inline-block;
-  margin: 0.5rem auto 1rem auto;
+  margin: 0 auto 12px auto;
   padding: 10px;
-  background: white;
-  border-radius: 8px;
+  background: #fff;
+  color: #0b0b0b;
+  border-radius: 4px;
+}
+
+.qr-text {
+  margin: 0;
+  font: 500 15px/1.35 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .join-url {
-  font-size: 1rem;
-  margin: 0.5rem 0 1rem 0;
+  margin: 6px 0 12px 0;
+  font: 700 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
   word-break: break-all;
-}
-
-.small-btn {
-  background: var(--accent-color);
-  border: none;
-  color: white;
-  padding: 0.4rem 0.9rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.small-btn:hover,
-.small-btn:focus {
-  background: var(--accent-hover);
 }
 
 /* ---------- Teams ---------- */
 .team-list {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 8px;
 }
 
+/* Every team is a solid block in its colour, as the cards are in the game. --team and
+   --ink (the text colour that reads on it) are set on each block in renderTeams(). */
 .team-item {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.8rem 1rem;
-  border-radius: 0 8px 8px 0;
+  box-sizing: border-box;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  border-left: 4px solid;
-}
-
-.team-item.own-team {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.team-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-}
-
-.team-color-indicator {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  gap: 10px;
+  min-height: 48px;
+  padding: 6px 10px 6px 14px;
+  border-radius: 4px;
+  background: var(--team, #fff);
+  color: var(--ink, #0b0b0b);
 }
 
 .team-name {
-  font-weight: bold;
-  font-size: 1.05rem;
+  min-width: 0;
+  font: 700 18px/1.15 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  overflow-wrap: anywhere;
 }
 
-.kick-btn {
-  background: #EA4335;
-  border: none;
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
+.team-name .you {
+  margin-left: 8px;
+  font: 700 12px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.team-item .kick-btn,
+.team-item .kick-btn:hover,
+.team-item .kick-btn:focus,
+.team-item .kick-btn:active {
+  background: transparent;
+  color: inherit;
+}
+
+.team-item .kick-btn {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 32px;
   margin: 0;
+  padding: 0 10px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font: 400 14px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
-.kick-btn:hover,
-.kick-btn:focus {
-  background: #d33828;
+.team-item .kick-btn:focus-visible {
+  outline-color: currentColor;
 }
 
 /* ---------- What to play: lists and years ---------- */
 .list-group-title {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin: 1rem 0 0.4rem 0;
+  margin: 16px 0 2px 0;
+  font: 700 13px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .list-group-title:first-child {
-  margin-top: 0;
+  margin-top: 2px;
 }
 
+.list-group-title + .hint {
+  margin-top: 8px;
+}
+
+/* The whole row is the label of its checkbox, so the whole row can be pressed */
 .list-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem;
-  padding: 0.55rem 0.2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 12px;
+  min-height: 44px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
   cursor: pointer;
 }
 
+/* The checkbox is drawn here: the browser's own look is taken away and the box keeps
+   working as a checkbox. -webkit-appearance is for Safari before 15.4. */
 .list-row input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
   flex-shrink: 0;
-  accent-color: var(--accent-color);
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  background: transparent no-repeat center center;
+  background-size: 16px 16px;
   cursor: pointer;
+}
+
+.list-row input[type="checkbox"]:checked {
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b0b0b' stroke-width='3'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.8'/%3E%3C/svg%3E");
+}
+
+.list-row input[type="checkbox"]:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
 }
 
 .list-row .list-name {
   flex: 1;
-  font-size: 1rem;
+  min-width: 0;
+  padding: 6px 0;
+  font: 500 17px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  overflow-wrap: anywhere;
 }
 
 .list-row .list-count {
-  font-size: 0.9rem;
-  opacity: 0.7;
-}
-
-/* Shown when the songs are few for the points to win: yellow when they can run out, red
-   when the game cannot be won with them */
-.supply-line {
-  border-left: 4px solid #FBBC04;
-  border-radius: 0;
-  background: rgba(251, 188, 4, 0.12);
-  padding: 0.7rem 0.9rem;
-  margin: 0.9rem 0 0 0;
-  font-size: 0.95rem;
-  text-align: left;
-}
-
-.supply-line.short {
-  border-left-color: #EA4335;
-  background: rgba(234, 67, 53, 0.15);
+  flex-shrink: 0;
+  font: 400 16px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.82);
+  white-space: nowrap;
 }
 
 .year-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.8rem;
-  margin-top: 1.2rem;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.year-row label {
+  white-space: nowrap;
+  font: 700 13.5px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* The browser's arrow is taken away with the browser's look, so the wrapper draws one */
+.select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -6px;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* ../styles.css sets the colour of a select under the pointer with !important. The colour
+   is solid, because the open list takes it over. */
+.year-row select,
+.year-row select:hover,
+.year-row select:focus {
+  background-color: #15161a !important;
+  color: #fff;
 }
 
 .year-row select {
-  width: 90px;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 96px;
+  height: 44px;
   margin: 0;
+  padding: 0 28px 0 12px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 4px;
+  font: 400 20px/1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+}
+
+.year-row select:focus-visible {
+  outline: none;
+  border-color: #fff;
 }
 
 .song-count-line {
+  margin: 18px 0 0 0;
   text-align: center;
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin: 1.2rem 0 0 0;
+  font: 400 28px/1.1 'Anton', Impact, sans-serif;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.song-count-line:empty {
+  display: none;
+}
+
+/* Shown when the songs are few for the points to win: yellow when they can run out, red
+   when the game cannot be won with them */
+.supply-line {
+  margin: 12px 0 0 0;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #FBBC04;
+  color: #0b0b0b;
+  font: 700 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  text-align: left;
+}
+
+.supply-line.short {
+  background: #EA4335;
 }
 
 /* ---------- Settings ---------- */
@@ -268,213 +538,435 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.4rem 0;
+  gap: 12px;
+  min-height: 50px;
+}
+
+.setting-row label {
+  font: 500 17px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
 .setting-row .setting-input {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .setting-row input[type="number"] {
+  box-sizing: border-box;
   width: 70px;
-  padding: 0.5rem;
-  background: var(--input-bg);
-  color: var(--input-text);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 40px;
+  margin: 0;
+  padding: 0 4px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
   border-radius: 4px;
-  font-size: 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font: 400 20px/1 'Anton', Impact, sans-serif;
   text-align: center;
-  font-family: 'Manrope', sans-serif;
+}
+
+.setting-row input[type="number"]:focus {
+  outline: none;
+  border-color: #fff;
 }
 
 .setting-unit {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  min-width: 2.2rem;
+  min-width: 26px;
+  font: 500 14px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .setting-error {
+  margin: 0 0 6px 0;
   color: #EA4335;
-  font-size: 0.8rem;
+  font: 700 14px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
   text-align: right;
-  min-height: 1rem;
+}
+
+.setting-error:empty {
+  display: none;
+}
+
+details.times {
+  margin-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
 }
 
 details.times summary {
   cursor: pointer;
-  padding: 0.6rem 0;
-  font-size: 1rem;
+  padding: 14px 0 6px 0;
+  font: 700 13px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 /* ---------- Summary of the game for players ---------- */
 .summary-row {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.45rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.summary-row:first-child {
+  padding-top: 0;
+}
+
+.summary-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
 .summary-row .summary-label {
-  opacity: 0.8;
   flex-shrink: 0;
+  font: 500 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .summary-row .summary-value {
   text-align: right;
-  font-weight: bold;
-}
-
-/* ---------- Big buttons ---------- */
-.big-btn {
-  background: linear-gradient(to right, #fb1820, #ff6310);
-  border: none;
-  border-radius: 8px;
-  padding: 15px 30px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  display: block;
-  margin: 1.5rem auto 0 auto;
-  width: 100%;
-  max-width: 320px;
-  font-family: 'Manrope', sans-serif;
-}
-
-.big-btn:hover:not(:disabled),
-.big-btn:focus:not(:disabled) {
-  background: linear-gradient(to right, #e52e71, #ff8a00);
-}
-
-.big-btn:disabled {
-  background: #666;
-  cursor: not-allowed;
-}
-
-.big-btn.secondary {
-  background: var(--primary-bg);
-  border: 2px solid var(--accent-color);
-}
-
-.big-btn.secondary:hover:not(:disabled),
-.big-btn.secondary:focus:not(:disabled) {
-  background: var(--accent-color);
+  font: 700 16px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  overflow-wrap: anywhere;
 }
 
 .waiting-message {
+  margin: 26px 0 0 0;
   text-align: center;
-  padding: 1.5rem;
-  font-size: 1.1rem;
-  opacity: 0.8;
+  font: 700 14px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* ---------- Text fields on the join and start pages ---------- */
+/* ---------- Text fields ---------- */
 .field label {
   display: block;
-  font-size: 1.05rem;
-  margin-bottom: 0.5rem;
+  margin: 12px 0 6px 0;
+  font: 700 13.5px/1 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.86);
 }
 
-.field input[type="text"] {
-  width: 100%;
-  padding: 0.8rem;
-  font-size: 1.05rem;
-  background: var(--input-bg);
-  color: var(--input-text);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  font-family: 'Manrope', sans-serif;
+.field label:first-child {
+  margin-top: 2px;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"] {
   box-sizing: border-box;
-  margin-bottom: 0.6rem;
+  display: block;
+  width: 100%;
+  height: 46px;
+  margin: 0;
+  padding: 0 12px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font: 500 17px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
-.field input[type="text"]:focus {
+.field input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.field input[type="text"]:focus,
+.field input[type="email"]:focus,
+.field input[type="password"]:focus {
   outline: none;
-  border-color: var(--accent-color);
+  border-color: #fff;
 }
 
 .field-error {
+  min-height: 1.3rem;
+  margin: 6px 0 0 0;
   color: #EA4335;
-  font-size: 0.9rem;
-  min-height: 1.2rem;
+  font: 700 14px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
 /* ---------- Start page ---------- */
 .status-line {
+  margin: 24px auto 0 auto;
   text-align: center;
-  font-size: 0.95rem;
-  margin: 1.5rem 0 0 0;
+}
+
+.status-line:empty {
+  display: none;
 }
 
 .status-line.ok {
-  color: #1DB954;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: 700 14px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #4CAF50;
+}
+
+.status-line.ok::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #4CAF50;
+}
+
+/* Spotify is not connected: a yellow block as wide as the buttons */
+.status-line:not(.ok) {
+  box-sizing: border-box;
+  max-width: 320px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #FBBC04;
+  color: #0b0b0b;
+  font: 700 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  text-align: left;
 }
 
 .playlist-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 0.2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.playlist-row:first-child {
+  padding-top: 0;
+}
+
+.playlist-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.playlist-row > div {
+  min-width: 0;
+}
+
+.playlist-row strong {
+  display: block;
+  font: 700 17px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  overflow-wrap: anywhere;
 }
 
 .playlist-row .playlist-meta {
-  font-size: 0.9rem;
-  opacity: 0.8;
+  font: 500 14px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.72);
 }
 
-/* Shown by ../spotify.js while the years of an imported playlist are checked */
-.import-spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  border-top-color: var(--accent-color);
-  border-radius: 50%;
-  animation: ny-spin 1s linear infinite;
-  flex-shrink: 0;
-}
-
-.footer-links {
+/* Shown by ../spotify.js while a playlist is imported and its years are checked */
+.import-progress {
+  margin: 14px 0 0 0;
+  padding: 12px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
   text-align: center;
-  margin-top: 2.5rem;
-  font-size: 0.9rem;
+  font: 500 15px/1.35 'Archivo Narrow', 'Arial Narrow', sans-serif;
 }
 
-.footer-links a {
-  color: var(--text-color);
-  opacity: 0.8;
-  margin: 0 0.6rem;
+.import-progress-info {
+  color: rgba(255, 255, 255, 0.74);
 }
 
-/* The name dialog reuses .modal from ../styles.css */
-.dialog {
-  background: var(--modal-bg);
-  color: var(--text-color);
-  border: 1px solid var(--modal-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  width: min(92vw, 420px);
-  box-sizing: border-box;
-  text-align: center;
+.import-progress-info:empty {
+  display: none;
 }
 
-.dialog h2 {
+.import-progress-info + .import-progress-line {
+  margin-top: 8px;
+}
+
+.import-progress-info:empty + .import-progress-line {
   margin-top: 0;
 }
 
-@media (max-width: 600px) {
+.import-progress-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.import-spinner {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ny-spin 1s linear infinite;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin-top: 40px;
+  font: 500 15px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
+}
+
+.footer-links a {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ---------- Boxes over the page: team name, log in, create an account ----------
+   The boxes lie in .modal (and #loginModal, #registerModal) from ../styles.css. The log in
+   box gets its old look from a rule with its id there, which is why the id is in the
+   selector here too. */
+.modal {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.dialog,
+#loginModal > .dialog {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  margin: 0;
+  padding: 22px;
+  overflow-y: auto;
+  background: #111216;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  text-align: left;
+  font: 500 16px/1.4 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+#registerModal {
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.dialog h2 {
+  margin: 0 0 4px 0;
+  font: 400 26px/1.08 'Anton', Impact, sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* The fields of the log in boxes have no labels above them, only the text inside */
+.dialog.field input + input {
+  margin-top: 10px;
+}
+
+.dialog.field h2 + input {
+  margin-top: 14px;
+}
+
+/* The line for a fault keeps its height when it is empty, so less room is needed under it */
+.dialog .field-error + .big-btn {
+  margin-top: 6px;
+}
+
+.dialog .text-link {
+  display: inline-block;
+  margin: 12px 0 0 0;
+  color: #fff;
+  font: 500 15px/1.2 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  text-decoration: underline;
+}
+
+.dialog .dialog-note {
+  margin: 16px 0 0 0;
+  font: 500 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* Log in failed: a red block. ../styles.css hides .error until the script shows it. */
+.dialog .error {
+  margin: 12px 0 0 0;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #EA4335;
+  color: #0b0b0b;
+  font: 700 15px/1.3 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Messages at the top of the screen ----------
+   The same look as in the game (../game.css): white for information, red for something
+   that did not go through, green for done. Shown by showNotification() in lobby-page.js. */
+.notification {
+  position: fixed;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  box-sizing: border-box;
+  max-width: 80%;
+  padding: 12px 18px;
+  border-radius: 4px;
+  background: #fff;
+  color: #0b0b0b;
+  font: 700 17px/1.25 'Archivo Narrow', 'Arial Narrow', sans-serif;
+  text-align: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  animation: ny-notification-fade 3.3s forwards;
+}
+
+.notification-error {
+  background: #EA4335;
+}
+
+.notification-success {
+  background: #4CAF50;
+}
+
+@keyframes ny-notification-fade {
+  0% { opacity: 0; }
+  6% { opacity: 1; }
+  91% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* The narrowest phones: the row with the two years has to fit on one line */
+@media (max-width: 359px) {
   .page {
-    padding: 1rem;
-    margin: 1rem auto;
+    padding-left: 14px;
+    padding-right: 14px;
   }
 
-  .page-header h1 {
-    font-size: 1.5rem;
+  .big-btn {
+    font-size: 22px;
+  }
+
+  .panel {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .year-row {
+    gap: 6px;
+  }
+
+  .year-row select {
+    width: 80px;
+    padding: 0 24px 0 10px;
+  }
+
+  .select-wrap::after {
+    right: 9px;
   }
 }
