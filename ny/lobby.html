@@ -8,17 +8,17 @@
   <meta name="theme-color" content="#032934">
   <meta name="color-scheme" content="dark">
 
-  <title>Notestream – lobby 0.861</title>
+  <title>Notestream – lobby 0.867</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@500;700&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="ny.css?v=0.860">
-  <link rel="stylesheet" href="dialog.css?v=0.858">
+  <link rel="stylesheet" href="ny.css?v=0.867">
+  <link rel="stylesheet" href="dialog.css?v=0.867">
 
   <!-- Firebase SDK (compat), the same versions as the current lobby and the game -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -50,7 +50,7 @@
 
       <div class="qr-section">
         <div id="qrCodeElement"></div>
-        <p style="margin: 0;">Skanna QR-koden för att gå med, eller dela länken:</p>
+        <p class="qr-text">Skanna QR-koden för att gå med, eller dela länken:</p>
         <div class="join-url" id="joinUrl"></div>
         <button class="small-btn" id="copyLinkBtn">Kopiera länken</button>
       </div>
@@ -68,9 +68,9 @@
           <div id="listPicker"><p class="hint">Läser in listor...</p></div>
           <div class="year-row">
             <label for="yearFrom">Från år</label>
-            <select id="yearFrom"></select>
+            <span class="select-wrap"><select id="yearFrom"></select></span>
             <label for="yearTo">till</label>
-            <select id="yearTo"></select>
+            <span class="select-wrap"><select id="yearTo"></select></span>
           </div>
           <p class="song-count-line" id="songCountLine"></p>
           <p class="supply-line" id="songSupplyLine" style="display: none;"></p>
@@ -160,6 +160,6 @@
   <script src="../lobby.js?v=0.799"></script>
   <script src="song-pool.js?v=0.860"></script>
   <script src="dialog.js?v=0.858"></script>
-  <script src="lobby-page.js?v=0.861"></script>
+  <script src="lobby-page.js?v=0.867"></script>
 </body>
 </html>

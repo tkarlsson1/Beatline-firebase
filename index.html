@@ -13,7 +13,7 @@
   <meta property="og:description" content="Gissa vilket år låten släpptes.">
   <meta name="twitter:card" content="summary_large_image">
 
-  <title>Notestream 0.866</title>
+  <title>Notestream 0.867</title>
 
   <!-- Favicon and manifest -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -23,36 +23,36 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@500;700&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- Styles. The start page shares its look with the lobby and the join page under ny/ -->
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="ny/ny.css?v=0.860">
-  <link rel="stylesheet" href="ny/dialog.css?v=0.858">
+  <link rel="stylesheet" href="ny/ny.css?v=0.867">
+  <link rel="stylesheet" href="ny/dialog.css?v=0.867">
 </head>
 
 <body>
   <!-- ============ Log in ============ -->
   <div id="loginModal" style="display: none;" class="modal" role="dialog" aria-modal="true">
-    <div id="loginBox">
+    <div class="dialog field">
       <h2>Logga in</h2>
       <input type="email" id="emailInput" placeholder="Ange e-post" autocomplete="username" />
       <input type="password" id="passwordInput" placeholder="Ange lösenord" autocomplete="current-password" />
-      <a href="#" id="forgotPasswordLink" style="font-size: 0.85rem; text-decoration: underline; color: #0b939c; display: block; margin-bottom: 1rem;">Glömt lösenord?</a>
-      <button id="loginButton">Logga in</button>
+      <a href="#" id="forgotPasswordLink" class="text-link">Glömt lösenord?</a>
       <p id="loginError" class="error">Fel e-post eller lösenord!</p>
-      <button id="showRegister" style="margin-top: 1rem;">Skapa konto</button>
+      <button class="big-btn" id="loginButton">Logga in</button>
+      <button class="big-btn secondary" id="showRegister">Skapa konto</button>
     </div>
   </div>
 
   <div id="registerModal" style="display: none;" role="dialog" aria-modal="true">
-    <div id="registerBox">
+    <div class="dialog field">
       <h2>Registrera dig</h2>
       <input type="email" id="regEmail" placeholder="Ange din e-post" autocomplete="username" />
       <input type="password" id="regPassword" placeholder="Ange ditt lösenord" autocomplete="new-password" />
-      <button id="registerButton">Registrera</button>
       <p id="registerError" class="error">Registrering misslyckades!</p>
-      <p>Har du redan ett konto? <button id="showLogin">Logga in</button></p>
+      <button class="big-btn" id="registerButton">Registrera</button>
+      <p class="dialog-note">Har du redan ett konto? <button class="link-btn" id="showLogin">Logga in</button></p>
     </div>
   </div>
 
@@ -65,7 +65,7 @@
 
     <p class="status-line" id="spotifyStatus"></p>
     <div id="spotifyConnect" style="display: none;">
-      <button class="big-btn secondary" id="connectSpotifyBtn" style="margin-top: 0.8rem;">KOPPLA SPOTIFY</button>
+      <button class="big-btn secondary" id="connectSpotifyBtn">KOPPLA SPOTIFY</button>
     </div>
 
     <!-- ============ My playlists ============ -->
@@ -76,19 +76,19 @@
         <div id="myPlaylistsList"><p class="hint">Hämtar dina spellistor...</p></div>
       </div>
 
-      <h2 style="margin-top: 2rem;">Lägg till en Spotify-spellista</h2>
+      <h2 class="section-next">Lägg till en Spotify-spellista</h2>
       <div class="panel field">
         <label for="playlistLinkInput">Länk till spellistan</label>
         <input type="text" id="playlistLinkInput" placeholder="Klistra in Spotify-länken" autocomplete="off">
         <label for="playlistNameInput">Namn i Notestream</label>
         <input type="text" id="playlistNameInput" placeholder="Spellistans namn" autocomplete="off">
-        <button class="big-btn secondary" id="addPlaylistButton" style="margin-top: 0.6rem;">Lägg till</button>
+        <button class="big-btn secondary" id="addPlaylistButton">Lägg till</button>
 
-        <div id="importProgressContainer" style="display: none; margin-top: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px 14px;">
-          <div id="importProgressInfo" style="font-size: 0.85rem; color: #ccc; margin-bottom: 8px; text-align: center;"></div>
-          <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <div id="importProgressContainer" class="import-progress" style="display: none;">
+          <div id="importProgressInfo" class="import-progress-info"></div>
+          <div class="import-progress-line">
             <div id="importSpinner" class="import-spinner" style="display: none;"></div>
-            <span id="importProgressText" style="font-size: 0.85rem; color: #fff;">Förbereder...</span>
+            <span id="importProgressText">Förbereder...</span>
           </div>
         </div>
         <p class="hint">I Spotify: öppna spellistan, välj Dela och Kopiera länk till spellista. Listan måste vara offentlig.</p>
@@ -108,8 +108,8 @@
       <label for="hostTeamNameInput">Ditt lagnamn</label>
       <input type="text" id="hostTeamNameInput" maxlength="20" placeholder="Lagets namn" autocomplete="off">
       <div class="field-error" id="hostTeamNameError"></div>
-      <button class="big-btn" id="confirmNewGameBtn" style="margin-top: 0.4rem;">ÖPPNA LOBBYN</button>
-      <button class="big-btn secondary" id="cancelNewGameBtn" style="margin-top: 0.8rem;">Avbryt</button>
+      <button class="big-btn" id="confirmNewGameBtn">ÖPPNA LOBBYN</button>
+      <button class="big-btn secondary" id="cancelNewGameBtn">Avbryt</button>
     </div>
   </div>
 
