@@ -374,7 +374,9 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0;
-  margin: 0;
+  /* Centred: the box is at most 95vw wide, which is narrower than the game area, so
+     without this the cards stood a few pixels to the left of the card you drag from */
+  margin: 0 auto;
   -webkit-overflow-scrolling: touch;
 }
 
