@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const Anthropic = require("@anthropic-ai/sdk");
 const yearReview = require("./year-review");
+const gameCleanup = require("./game-cleanup");
 
 // Test-RTDB (NOTESTREAM): inte live
 admin.initializeApp({
@@ -47,52 +48,53 @@ function createAnthropicClient(timeoutMs) {
   return new Anthropic({ apiKey, timeout: timeoutMs, maxRetries: 1 });
 }
 
+// ─── Cleanup of old games ────────────────────────────────────────────────────
+
+/**
+ * The ids of all games, without their contents. The Admin SDK can only read a location with
+ * everything under it, so the keys are asked for over the database's REST API with
+ * shallow=true, signed in as this function's own service account.
+ */
+async function listGameIdsByKey() {
+  // The credential the Admin SDK itself uses for the database: initializeApp() puts the
+  // application default credential there when none is given
+  const { databaseURL: databaseUrl, credential } = admin.app().options;
+  const token = await credential.getAccessToken();
+  const response = await fetch(`${databaseUrl}/games.json?shallow=true`, {
+    headers: { Authorization: `Bearer ${token.access_token}` }
+  });
+  if (!response.ok) throw new Error(`The database answered ${response.status} to the list of games.`);
+  const keys = await response.json();
+  return keys && typeof keys === "object" ? Object.keys(keys) : [];
+}
+
+// The way the games were listed before: everything is read at once. Kept as the way out when
+// the keys cannot be listed on their own.
+async function listGameIdsByReadingAll() {
+  const games = (await db.ref("games").once("value")).val();
+  return games && typeof games === "object" ? Object.keys(games) : [];
+}
+
 /**
  * Scheduled: cleanupOldGames
- * Runs every 6 hours to delete games older than 6 hours
+ * Runs every 6 hours and removes games created more than 6 hours ago. A game without a
+ * createdAt, or dated more than a day into the future, is removed too: its age cannot be told,
+ * and no game the pages create looks like that. The rules are in game-cleanup.js.
  */
 exports.cleanupOldGames = functions.region("europe-west1").pubsub
   .schedule('every 6 hours')
   .timeZone('Europe/Stockholm')
   .onRun(async (context) => {
-    functions.logger.info('[Cleanup] Starting cleanup of old games...');
-    
-    const gamesRef = db.ref('games');
-    
-    // Hämta alla spel
-    const snapshot = await gamesRef.once('value');
-    const games = snapshot.val();
-    
-    if (!games) {
-      functions.logger.info('[Cleanup] No games found');
-      return null;
-    }
-    
-    // Hitta spel äldre än 6 timmar
-    const sixHoursAgo = Date.now() - (6 * 60 * 60 * 1000);
-    const updates = {};
-    let count = 0;
-    
-    Object.keys(games).forEach(gameId => {
-      const game = games[gameId];
-      
-      // Kolla om spelet har createdAt och är äldre än 6h
-      if (game.createdAt && game.createdAt < sixHoursAgo) {
-        updates[`games/${gameId}`] = null;
-        count++;
-        const ageHours = Math.round((Date.now() - game.createdAt) / 3600000);
-        functions.logger.info(`[Cleanup] Marking game ${gameId} for deletion (age: ${ageHours}h)`);
-      }
+    const logError = (message, error) => functions.logger.error(message, error);
+    const { ids, listedBy } = await gameCleanup.listGameIdsWithFallback(listGameIdsByKey, listGameIdsByReadingAll, logError);
+    const counts = await gameCleanup.removeOutdatedGames({
+      ids,
+      readCreatedAt: async id => (await db.ref(`games/${id}/createdAt`).once("value")).val(),
+      removeGame: id => db.ref(`games/${id}`).remove(),
+      now: Date.now(),
+      logError
     });
-    
-    // Radera gamla spel
-    if (count > 0) {
-      await db.ref().update(updates);
-      functions.logger.info(`[Cleanup] Successfully deleted ${count} old games`);
-    } else {
-      functions.logger.info('[Cleanup] No old games to delete');
-    }
-    
+    functions.logger.info(`[Cleanup] ${counts.games} games, listed by ${listedBy}`, counts);
     return null;
   });
 
