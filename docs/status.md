@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (startsidan) | 0.875 |
+| index.html (startsidan) | 0.876 |
 | klassisk.html | Borttagen i 0.874: skickar vidare till startsidan |
-| admin.html | 0.104 |
+| admin.html | 0.105 |
 | lobby.html (lobbyn, låg under `ny/` till 0.874) | 0.874 |
 | join.html (anslutningssidan, låg under `ny/` till 0.874) | 0.874 |
 | ny/lobby-page.js (lobbyn) | 0.874 |
 | ny/join-page.js (anslutningssidan) | 0.874 |
-| ny/start.js (startsidan) | 0.875 |
+| ny/start.js (startsidan) | 0.876 |
 | ny/ny.css (startsida, lobby, anslutning) | 0.874 |
 | ny/dialog.css (frågerutor på alla sidor) | 0.867 |
 | spotify.js | 0.854 |
@@ -21,7 +21,7 @@
 | game-init.js (game.html) | 0.863 |
 | game-host.js (game.html) | 0.861 |
 | game.css | v54 |
-| service-worker | v79 |
+| service-worker | v80 |
 | database.rules.json | Senast ändrad 2026-11-19 (0.871), deployad samma dag |
 | functions/game-cleanup.js | Ny 2026-11-19 (0.871), deployad samma dag: vilka spel `cleanupOldGames` tar bort |
 | Firebase Functions Node runtime | 22 (1st Gen) |
@@ -151,6 +151,7 @@ Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera p
 | 2026-11-19 | Reglerna och funktionerna från 0.871 deployade av admin (`firebase deploy --only database,functions`): reglernas syntax godkänd och alla fem funktionerna uppdaterade. Avsnittet "Läge" uppdaterat med vad som återstår att kontrollera | 0.873 / 0.102 / SW v77 |
 | 2026-11-19 | **Gamla vägen in är borttagen, och `/ny/` är borta ur adresserna.** Lobbyn ligger på `lobby.html` och anslutningssidan på `join.html` i roten, där de gamla sidorna låg. `ny/lobby.html` och `ny/join.html` skickar vidare till de nya adresserna med spel-id och lag kvar, så öppna flikar, sparade länkar och QR-koder som redan visas fungerar. `klassisk.html` (gamla startsidan) ledde in i den gamla lobbyn och skickar nu vidare till startsidan. De gamla sidorna finns i git-historiken och på återställningsgrenarna. Stilmallar och skript ligger kvar i mappen `ny/`; tre sökvägar i dem som utgick från `/ny/` är ändrade (spelsidan, Spotify-kontrollen i lobbyn, lobbyns adress från startsidan). **Installerad app:** `orientation` i `manifest.json` är `any` i stället för `portrait-primary`, så att den installerade appen kan rotera till liggande läge (#44). Testat i webbläsare mot låtsasdatabas: samma flöden som för 0.873 ger samma texter och skrivningar, med de nya adresserna; ingen fil som sidorna ber om saknas; och åtta gamla adresser skickar vidare rätt, även med `#` i adressen och utan spel-id. Inte testat: rotationen på riktig telefon | 0.874 / 0.103 / SW v78 |
 | 2026-11-19 | **Registreringen är stängd: konton skapas av admin.** Bara admin och några till ska ha konto, så ingen ska kunna skapa ett själv. **I Firebase** (ändrat i konsolen, inte i repot): inloggningssättet Anonymous är avstängt, och "Enable create (sign-up)" under Authentication, Settings, User actions är urkryssad. Nya konton skapas med "Add user" under Authentication, Users. Två överblivna databaser i projektet, som spelet inte använder, har dessutom fått stängda regler. **På startsidan:** rutan "Registrera dig" och knappen "Skapa konto" är borttagna (`index.html`), liksom koden bakom dem (`ny/start.js`). Kontrollerat mot Firebase: registrering nekas både med och utan e-postadress (`ADMIN_ONLY_OPERATION`), antalet konton är detsamma före och efter, de två databaserna nekar läsning och skrivning utan inloggning, och spelets databas svarar som förut. Testat i webbläsare lokalt: inloggningsrutan visas utan "Skapa konto", inga fel i konsolen, och "Glömt lösenord?" svarar. Inte testat: inloggning med ett befintligt konto efter ändringen, och att återställningsmejlet kommer fram | 0.875 / 0.104 / SW v79 |
+| 2026-11-19 | **Överblivna sidor och skript är borttagna ur repot.** GitHub Pages serverar hela repot, så testsidorna och det gamla listverktyget gick att öppna på notestream.se fast ingen sida använde dem. **Borttaget:** mappen `listor/` (22 filer, 6,8 MB), testsidorna `lobby-test.html`, `spotify-test.html` och `verify-config.html`, gamla startsidans skript `firebase-config.js`, `menu.js`, `manage-playlists.js`, `ui-events.js`, `init.js` och `utils.js`, och den tomma filen `manifest`. Allt finns kvar i git-historiken. **`callback.html`** har inte längre något testläge och går alltid tillbaka till startsidan; förut skickade fem grenar vidare till `spotify-test.html` när en testsida hade satt en flagga. Kontrollerat före borttagningen: ingen av sidorna som används laddar eller länkar till filerna. Testat i webbläsare lokalt: alla elva sidor och de 40 lokala filer de laddar svarar, de borttagna adresserna ger 404, och `callback.html` utan kod visar sitt meddelande och går till startsidan. Inte testat: en riktig Spotify-koppling genom `callback.html` | 0.876 / 0.105 / SW v80 |
 
 ---
 
@@ -221,13 +222,13 @@ Gamla lobbyn, gamla anslutningssidan och gamla startsidan togs bort i 0.874. Rad
 | | Idé |
 |---|---|
 | A | Stäng av `DEBUG = true` i `spotify-auth.js` (loggar i produktion, och skriver och tar bort 1 MB i localStorage vid varje sidladdning – det senare ej verifierat) |
-| K | Rensa det som blev över när gamla vägen in togs bort i 0.874: `firebase-config.js`, `menu.js`, `manage-playlists.js` och `ui-events.js` laddas inte längre av någon sida, och `listor/`-katalogen är dead code från gamla verktyg. Även testsidorna `lobby-test.html`, `spotify-test.html` och `verify-config.html` ligger kvar |
+| K | Gjort i 0.876: överblivna skript, testsidor och `listor/` är borttagna. Kvar: `OAUTH_DEBUGGING.md` och `SPOTIFY_INTEGRATION.md` beskriver de borttagna testsidorna, `walkthrough.md` är en statusfil från juni 2026 som den här filen har ersatt, och `redigeringsikon.svg` används inte av någon sida |
 | L | Deduplera `verifiedTracks` mot `standardLists` |
 | M | Timerstapeln byggs om med innerHTML 20 gånger i sekunden på alla telefoner (game-timers.js `renderTimer`) – CSS-övergången och pulseringen körs därför aldrig |
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |
 | O | Hela spelnoden lyssnas på och hela vyn ritas om vid varje ändring. Valideringsrutan skapas om, så animationen spelas igen vid varje skrivning (ej verifierat) |
 | P | Stora bilder: `logga-graffiti.png` på startsidan är 624 kB, `icon-graffiti.png` 337 kB och `icon-graffiti-maskable.png` 320 kB. De gamla `logga.png` (478 kB), `icon.png` och `icon-maskable.png` ligger kvar i repot med avsikt |
-| Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, och spärren på 12 timmar läses fortfarande i firebase-config.js och lobby.html fast inget skriver den längre. I admin.html nollställer "Spara" i spellistedetaljer fortfarande `flaggedTracks/<id>`, som inget längre använder, och frågan vid borttag ur cachen nämner "nästa städning" fast kortet är borta. I game.css ligger reglerna för `.drop-zone`, `.challenge-btn` och `.spotify-status` kvar fast inget i spelet skapar de elementen (sökt i koden 2026-11-18). Efter 0.875 ligger reglerna för `#registerModal`, `.dialog-note` och `.link-btn` kvar i `ny/ny.css`, och `#registerModal` i en väljare i `styles.css`, fast registreringsrutan är borta (sökt i koden 2026-11-19) |
+| Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs. (Den tomma filen `manifest` och `firebase-config.js`, som läste spärren på 12 timmar, togs bort i 0.876; ingen sida som används läser spärren, sökt i koden 2026-11-19.) I admin.html nollställer "Spara" i spellistedetaljer fortfarande `flaggedTracks/<id>`, som inget längre använder, och frågan vid borttag ur cachen nämner "nästa städning" fast kortet är borta. I game.css ligger reglerna för `.drop-zone`, `.challenge-btn` och `.spotify-status` kvar fast inget i spelet skapar de elementen (sökt i koden 2026-11-18). Efter 0.875 ligger reglerna för `#registerModal`, `.dialog-note` och `.link-btn` kvar i `ny/ny.css`, och `#registerModal` i en väljare i `styles.css`, fast registreringsrutan är borta (sökt i koden 2026-11-19) |
 
 ---
 

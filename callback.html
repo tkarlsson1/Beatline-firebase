@@ -98,10 +98,6 @@
       console.log('  error:', error || 'none');
       console.log('  state:', state || 'none');
 
-      // Check if coming from test page
-      const returnToTest = sessionStorage.getItem('spotifyTestMode') === 'true';
-      console.log('  returnToTest:', returnToTest);
-
       if (error) {
         console.error('\n❌ SPOTIFY AUTHORIZATION ERROR:', error);
         messageEl.textContent = 'Authorization failed: ' + error;
@@ -110,11 +106,7 @@
         // Redirect back after delay
         setTimeout(() => {
           console.log('Redirecting after error...');
-          if (returnToTest) {
-            window.location.href = 'spotify-test.html';
-          } else {
-            window.location.href = 'index.html';
-          }
+          window.location.href = 'index.html';
         }, 3000);
         return;
       }
@@ -130,11 +122,7 @@
 
         setTimeout(() => {
           console.log('Redirecting after missing code...');
-          if (returnToTest) {
-            window.location.href = 'spotify-test.html';
-          } else {
-            window.location.href = 'index.html';
-          }
+          window.location.href = 'index.html';
         }, 3000);
         return;
       }
@@ -178,14 +166,10 @@
             messageEl.className = 'error';
           }
 
-          // Redirect back to app or test page
+          // Redirect back to the app
           setTimeout(() => {
-            console.log('Redirecting to', returnToTest ? 'test page' : 'main app');
-            if (returnToTest) {
-              window.location.href = 'spotify-test.html?authorized=true';
-            } else {
-              window.location.href = 'index.html?spotify=connected';
-            }
+            console.log('Redirecting to main app');
+            window.location.href = 'index.html?spotify=connected';
           }, 2000);
         } else {
           console.error('❌ Token exchange FAILED - handleCallback() returned false');
@@ -196,11 +180,7 @@
 
           setTimeout(() => {
             console.log('Redirecting after failed exchange...');
-            if (returnToTest) {
-              window.location.href = 'spotify-test.html';
-            } else {
-              window.location.href = 'index.html';
-            }
+            window.location.href = 'index.html';
           }, 3000);
         }
       } catch (err) {
@@ -212,11 +192,7 @@
 
         setTimeout(() => {
           console.log('Redirecting after exception...');
-          if (returnToTest) {
-            window.location.href = 'spotify-test.html';
-          } else {
-            window.location.href = 'index.html';
-          }
+          window.location.href = 'index.html';
         }, 3000);
       }
     }

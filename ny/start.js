@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-functions.js";
 
-// The same public web configuration as ../firebase-config.js
+// The public web configuration, the same as in ../firebase-wrapper.js and ../admin.html
 const firebaseConfig = {
   apiKey: "AIzaSyAfv4yGrI7Vj5PaX0A_XFRn0P4U--S9tFA",
   authDomain: "beatlinefirebase.firebaseapp.com",
