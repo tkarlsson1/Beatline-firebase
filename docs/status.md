@@ -3,9 +3,9 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (startsidan) | 0.872 |
+| index.html (startsidan) | 0.873 |
 | klassisk.html (gamla startsidan, reserv) | 0.858 |
-| admin.html | 0.101 |
+| admin.html | 0.102 |
 | ny/lobby.html (lobbyn) | 0.867 |
 | ny/join.html (anslutningssidan) | 0.867 |
 | ny/lobby-page.js (lobbyn) | 0.867 |
@@ -19,9 +19,9 @@
 | game-init.js (game.html) | 0.863 |
 | game-host.js (game.html) | 0.861 |
 | game.css | v54 |
-| service-worker | v76 |
-| database.rules.json | Senast ändrad 2026-11-19 (0.871). Se "Läge" nedan för vad som är deployat |
-| functions/game-cleanup.js | Ny 2026-11-19 (0.871): vilka spel `cleanupOldGames` tar bort |
+| service-worker | v77 |
+| database.rules.json | Senast ändrad 2026-11-19 (0.871), deployad samma dag |
+| functions/game-cleanup.js | Ny 2026-11-19 (0.871), deployad samma dag: vilka spel `cleanupOldGames` tar bort |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
@@ -30,13 +30,13 @@
 
 Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera punkterna när de är gjorda.
 
-**Väntar på deploy.** Reglerna och funktionerna från 0.871 (nya spel kräver inloggning, rensningen omskriven) ligger i repot men var inte deployade när detta skrevs. I projektets rotmapp: `firebase deploy --only database,functions`. Kontroll efteråt:
+**Deployat 2026-11-19.** Reglerna och alla fem funktionerna från 0.871 (nya spel kräver inloggning, rensningen omskriven) är deployade av admin, och Firebase godkände reglernas syntax. Regeln för rapportnycklar från 0.870 deployades tidigare samma dag, och en äkta rapport från ett spel gick igenom.
+
+**Kvar att kontrollera efter deployen:**
 - Skapa ett nytt spel från startsidan och låt någon gå med via QR-koden. Nekas skapandet visas "Kunde inte öppna spelet. Försök igen."
 - Efter nästa körning av `cleanupOldGames` (var sjätte timme) visar `firebase functions:log --only cleanupOldGames` antingen "listed by keys" (den nya listningen fungerar) eller "listed by fallback" (alla spel lästes in som förut; rensningen görs ändå).
 
-Regeln för rapportnycklar från 0.870 är deployad 2026-11-19, och en äkta rapport från ett spel gick igenom.
-
-**Inte provkört.** Regeländringarna i 0.870 och 0.871 är inte körda i Firebase emulator, och `cleanupOldGames` är inte körd mot riktiga Firebase.
+**Inte provkört.** Regeländringarna i 0.870 och 0.871 är inte körda i Firebase emulator. Att en ogiltig rapportnyckel nekas, och att ett spel inte kan skapas utan inloggning, är inte provat mot den riktiga databasen.
 
 **Inte testat på riktig telefon.** Allt från 0.864 till 0.871 är byggt och testat i webbläsare mot en låtsasdatabas. Kvar att se på en telefon:
 - Spelvyn: frågetecknet som kontur på iPhone, att typsnitten laddas, känslan när man drar ett kort, drag med mus, riktig Spotify-uppspelning och ett helt spel.
@@ -141,6 +141,7 @@ Regeln för rapportnycklar från 0.870 är deployad 2026-11-19, och en äkta rap
 | 2026-11-19 | **Admin: allt från databasen escapas innan det läggs in i sidan.** Cachesökningen, låtarna i en standardlista och tabellen över standardlistor lade titel, artist, år, låt-id och listnamn direkt i innerHTML; de går nu genom `escapeHtml`, samma skydd som rapportlistan fick i v0.066. Även feltexten när listor eller användare inte kan hämtas escapas. Efter ändringen finns inget ställe kvar i admin.html där ett värde från databasen läggs in oskyddat. **Databasregler:** en rapport godtas bara om nyckeln har formen av ett Spotify-id (22 tecken, A–Z, a–z, 0–9). Admin kan fortfarande läsa och radera alla rapporter. Regeln är inte provkörd i emulator och gäller först när reglerna är deployade (`firebase deploy --only database`). Testat i webbläsare mot låtsasdatabas med markup i titel, artist, år, nyckel och listnamn: i v0.098 kördes alla åtta värdena som skript, i v0.099 inget, och texten visas som den är. Knapparna bär rätt namn och id även med citattecken i, och att ändra ett år i en lista och i cachen skriver samma sak som förut | 0.870 / 0.099 / SW v74 / Regler |
 | 2026-11-19 | **Spel: nya spel kräver inloggning, och rensningen är omskriven.** **Databasregler:** ett spel som redan finns läses och skrivs som förut, utan inloggning. Ett nytt spel får bara skapas av en inloggad användare, med det egna id:t som `host`, ett `createdAt` som är ett tal och ett spel-id i spelets eget format (6 tecken, A–Z och 0–9). Spel skapas på två ställen (`ny/start.js` och gamla startsidans `firebase-config.js`) och båda gör redan så. Ett spel som har rensats kan därmed inte återuppstå som ett tomt skal när någon som har sidan öppen skriver till det. **`cleanupOldGames`:** tar som förut bort spel som skapades för mer än sex timmar sedan, och nu även spel som saknar `createdAt`, har något annat än ett tal där, eller är daterade mer än ett dygn framåt (klockan på enheten som skapar spelet får alltså gå upp till ett dygn före). Spelen listas med enbart sina id (REST med `shallow=true`) i stället för att alla spel läses in i sin helhet, och varje spel läses och tas bort för sig, högst tio åt gången, så att ett som inte går att hantera inte stoppar de övriga. Går listningen med id inte att göra läses alla spel in som förut. Besluten ligger i `functions/game-cleanup.js`. Testat: rensningens beslut och genomgång mot en låtsasdatabas (9 test, bland annat gränsen vid exakt sex timmar, ogiltiga värden, ett spel som inte går att ta bort, och 237 spel med högst tio åt gången). Inte testat: regeln är inte provkörd i emulator, och funktionen är inte körd mot riktiga Firebase; om listningen med id fungerar där syns i funktionens logg ("listed by keys" eller "listed by fallback"). Gäller först efter deploy av regler och funktion | 0.871 / 0.100 / SW v75 / Regler / Functions |
 | 2026-11-19 | Dokumentationen genomgången inför byte till en lokal session. Nytt avsnitt "Läge" (vad som väntar på deploy, vad som inte är provkört eller testat på telefon, öppna beslut, var testskripten finns), fler filer i versionstabellen, hänvisningen till säkerhetsfynden uppdaterad, #50 och #51 tillagda, och raden om stora bilder rättad. `project-rules.md` har fått avsnitt om utseendet och om säkerhet | 0.872 / 0.101 / SW v76 |
+| 2026-11-19 | Reglerna och funktionerna från 0.871 deployade av admin (`firebase deploy --only database,functions`): reglernas syntax godkänd och alla fem funktionerna uppdaterade. Avsnittet "Läge" uppdaterat med vad som återstår att kontrollera | 0.873 / 0.102 / SW v77 |
 
 ---
 
