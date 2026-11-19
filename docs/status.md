@@ -3,22 +3,53 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (startsidan) | 0.871 |
+| index.html (startsidan) | 0.872 |
 | klassisk.html (gamla startsidan, reserv) | 0.858 |
-| admin.html | 0.100 |
+| admin.html | 0.101 |
 | ny/lobby.html (lobbyn) | 0.867 |
 | ny/join.html (anslutningssidan) | 0.867 |
+| ny/lobby-page.js (lobbyn) | 0.867 |
+| ny/ny.css (startsida, lobby, anslutning) | 0.867 |
+| ny/dialog.css (frågerutor på alla sidor) | 0.867 |
 | spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.862 |
 | game-render.js (game.html) | 0.866 |
 | game-timers.js (game.html) | 0.864 |
 | game-utils.js (game.html) | 0.864 |
 | game-init.js (game.html) | 0.863 |
+| game-host.js (game.html) | 0.861 |
 | game.css | v54 |
-| service-worker | v75 |
+| service-worker | v76 |
+| database.rules.json | Senast ändrad 2026-11-19 (0.871). Se "Läge" nedan för vad som är deployat |
+| functions/game-cleanup.js | Ny 2026-11-19 (0.871): vilka spel `cleanupOldGames` tar bort |
 | Firebase Functions Node runtime | 22 (1st Gen) |
 | AI-modell | Claude Opus 5.5 (`claude-opus-5-5`), nyckel i Secret Manager (`ANTHROPIC_API_KEY`) |
 | functions/year-review.js | Årtalsgranskningen: Opus ur minnet, webbsökning när året ändras eller är osäkert, beslutsregel |
+
+## Läge 2026-11-19
+
+Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera punkterna när de är gjorda.
+
+**Väntar på deploy.** Reglerna och funktionerna från 0.871 (nya spel kräver inloggning, rensningen omskriven) ligger i repot men var inte deployade när detta skrevs. I projektets rotmapp: `firebase deploy --only database,functions`. Kontroll efteråt:
+- Skapa ett nytt spel från startsidan och låt någon gå med via QR-koden. Nekas skapandet visas "Kunde inte öppna spelet. Försök igen."
+- Efter nästa körning av `cleanupOldGames` (var sjätte timme) visar `firebase functions:log --only cleanupOldGames` antingen "listed by keys" (den nya listningen fungerar) eller "listed by fallback" (alla spel lästes in som förut; rensningen görs ändå).
+
+Regeln för rapportnycklar från 0.870 är deployad 2026-11-19, och en äkta rapport från ett spel gick igenom.
+
+**Inte provkört.** Regeländringarna i 0.870 och 0.871 är inte körda i Firebase emulator, och `cleanupOldGames` är inte körd mot riktiga Firebase.
+
+**Inte testat på riktig telefon.** Allt från 0.864 till 0.871 är byggt och testat i webbläsare mot en låtsasdatabas. Kvar att se på en telefon:
+- Spelvyn: frågetecknet som kontur på iPhone, att typsnitten laddas, känslan när man drar ett kort, drag med mus, riktig Spotify-uppspelning och ett helt spel.
+- Startsidan, lobbyn och anslutningssidan: de ritade kryssrutorna och årtalsväljarna på iPhone, riktig inloggning och riktig Spotify-import.
+- Den nya loggan, och installation på hemskärmen (namnet Notestream och den nya ikonen). En app som redan är installerad byter inte namn och ikon av sig själv; installera om.
+
+**Öppna beslut för admin:** #50 (textfärg på rosa lag) och #51 (manifestets skärmbilder) i buggtabellen.
+
+**Pausad plan.** Arbetet som pågick före 2026-11-18 pausades av admin för designarbetet och är inte återupptaget. Det står kvar som det var i tabellerna under "Kända problem".
+
+**Återställningspunkter.** Grenarna `restore/v0.863-before-affisch` (före spelvyns nya utseende) och `restore/v0.866-before-start-lobby` (före startsidans och lobbyns) ligger på GitHub.
+
+**Testskript.** Testerna som nämns i ändringsloggen från 0.864 och framåt ligger inte i repot. De byggdes i en tillfällig arbetsyta: en testställning som kör sidorna i en webbläsare (Playwright) mot en låtsasdatabas och jämför två versioner med varandra, ett test av adminsidan med fientliga värden i databasen, och test av `functions/game-cleanup.js`. Admin har dem som zip-fil.
 
 ---
 
@@ -109,6 +140,7 @@
 | 2026-11-19 | **Installerat namn, nya ikoner och ny favicon; länken till gamla startsidan borta.** **Namnet** under ikonen när sidan installeras på telefonen var "NStream", från `short_name` i `manifest.json`; det är nu "Notestream". `index.html` har dessutom `apple-mobile-web-app-title` med samma namn, som iOS använder för namnet på hemskärmen. **Ikonerna** för installerad sida är den nya graffitiloggan på sajtens bakgrundsbild: `icon-graffiti.png` (512×512) och `icon-graffiti-maskable.png` (512×512, loggan mindre så att den ryms i mittcirkeln med radie 40 % av bredden; den når 37,6 %). De har nya filnamn med avsikt: Chrome räknar en ikon som oförändrad så länge manifestets ikonfält är detsamma, så ett byte av bilden på samma adress upptäcks inte. De gamla `icon.png` och `icon-maskable.png` ligger kvar orörda. Även `apple-touch-icon` och service workerns förladdade filer pekar på de nya. **Favicon:** bokstaven N ur den nya loggan, fri från färgstänk och med hel svart kontur (där nästa bokstäver låg över N:et är kanten avskuren för hand och konturen ritad dit). `favicon-graffiti.png` (64×64) länkas från startsidan, och `favicon.ico` (16, 32 och 48 px) är ersatt på sin adress eftersom övriga sidor hämtar den därifrån utan länk; den gamla `favicon.ico` finns i git-historiken. `favicon.png` ligger kvar och används av klassisk.html. **Länken** "Gamla startsidan" i startsidans fot är borttagen. Sidan klassisk.html finns kvar och nås på sin adress. Redan installerade appar: enligt Chromes dokumentation för version 144 och senare tillämpas namn- och ikonbyten inte av sig själva på Android utan erbjuds användaren att godkänna, och på dator byts ikoner inte alls; en ominstallation ger nytt namn och ny ikon direkt. Hur en redan tillagd ikon på iPhone beter sig är inte belagt. Kontrollerat i webbläsare: manifestet läses utan fel med namnet Notestream i båda fälten, alla ikoner som manifestet och sidhuvudet pekar på laddas i angiven storlek, alla filer i service workerns lista finns, den nya `favicon.ico` ritas av webbläsaren, foten har bara "Logga ut" och samma klick som i testet för 0.868 ger samma resultat. Inte testat: installation på riktig telefon (namn och ikon på hemskärmen), och manifestets skärmbilder `desktop.png` och `mobile.png` visar fortfarande det gamla utseendet | 0.869 / 0.098 / SW v73 |
 | 2026-11-19 | **Admin: allt från databasen escapas innan det läggs in i sidan.** Cachesökningen, låtarna i en standardlista och tabellen över standardlistor lade titel, artist, år, låt-id och listnamn direkt i innerHTML; de går nu genom `escapeHtml`, samma skydd som rapportlistan fick i v0.066. Även feltexten när listor eller användare inte kan hämtas escapas. Efter ändringen finns inget ställe kvar i admin.html där ett värde från databasen läggs in oskyddat. **Databasregler:** en rapport godtas bara om nyckeln har formen av ett Spotify-id (22 tecken, A–Z, a–z, 0–9). Admin kan fortfarande läsa och radera alla rapporter. Regeln är inte provkörd i emulator och gäller först när reglerna är deployade (`firebase deploy --only database`). Testat i webbläsare mot låtsasdatabas med markup i titel, artist, år, nyckel och listnamn: i v0.098 kördes alla åtta värdena som skript, i v0.099 inget, och texten visas som den är. Knapparna bär rätt namn och id även med citattecken i, och att ändra ett år i en lista och i cachen skriver samma sak som förut | 0.870 / 0.099 / SW v74 / Regler |
 | 2026-11-19 | **Spel: nya spel kräver inloggning, och rensningen är omskriven.** **Databasregler:** ett spel som redan finns läses och skrivs som förut, utan inloggning. Ett nytt spel får bara skapas av en inloggad användare, med det egna id:t som `host`, ett `createdAt` som är ett tal och ett spel-id i spelets eget format (6 tecken, A–Z och 0–9). Spel skapas på två ställen (`ny/start.js` och gamla startsidans `firebase-config.js`) och båda gör redan så. Ett spel som har rensats kan därmed inte återuppstå som ett tomt skal när någon som har sidan öppen skriver till det. **`cleanupOldGames`:** tar som förut bort spel som skapades för mer än sex timmar sedan, och nu även spel som saknar `createdAt`, har något annat än ett tal där, eller är daterade mer än ett dygn framåt (klockan på enheten som skapar spelet får alltså gå upp till ett dygn före). Spelen listas med enbart sina id (REST med `shallow=true`) i stället för att alla spel läses in i sin helhet, och varje spel läses och tas bort för sig, högst tio åt gången, så att ett som inte går att hantera inte stoppar de övriga. Går listningen med id inte att göra läses alla spel in som förut. Besluten ligger i `functions/game-cleanup.js`. Testat: rensningens beslut och genomgång mot en låtsasdatabas (9 test, bland annat gränsen vid exakt sex timmar, ogiltiga värden, ett spel som inte går att ta bort, och 237 spel med högst tio åt gången). Inte testat: regeln är inte provkörd i emulator, och funktionen är inte körd mot riktiga Firebase; om listningen med id fungerar där syns i funktionens logg ("listed by keys" eller "listed by fallback"). Gäller först efter deploy av regler och funktion | 0.871 / 0.100 / SW v75 / Regler / Functions |
+| 2026-11-19 | Dokumentationen genomgången inför byte till en lokal session. Nytt avsnitt "Läge" (vad som väntar på deploy, vad som inte är provkört eller testat på telefon, öppna beslut, var testskripten finns), fler filer i versionstabellen, hänvisningen till säkerhetsfynden uppdaterad, #50 och #51 tillagda, och raden om stora bilder rättad. `project-rules.md` har fått avsnitt om utseendet och om säkerhet | 0.872 / 0.101 / SW v76 |
 
 ---
 
@@ -122,7 +154,7 @@
 | 3 | **functions.config() deprecated** – nya deployer med det misslyckas efter mars 2027 och API:t finns inte i SDK v7. Spotify-hemligheten ligger där idag (AI-nyckeln ligger redan i Secret Manager) – migrera till Secret Manager (`firebase functions:config:export`, `defineJsonSecret`) | Mars 2027 |
 
 ### Säkerhet
-Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och inte pushas.
+Säkerhetsfynd #17–21 och #46–49 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och inte pushas. Öppna fynd beskrivs bara där tills de är åtgärdade. Den filen har också ett åtgärdat fynd med nummer 45, som inte är samma sak som bugg #45 nedan. Nästa lediga nummer är 52.
 
 ### Buggar
 | # | Bug | Prio | Status |
@@ -160,6 +192,8 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | 43 | Import i admin: misslyckas en AI-batch visas inte granskningen av osäkra låtar från de andra batcharna. AI-svar som inte används (null, mer än 1 år senare än Spotify) försvinner tyst och räknas inte | Medel | Åtgärdad (0.848 / admin 0.077) – importen går genom `resolveSongYear`; ett misslyckat anrop försöks två gånger, importen fortsätter, och meddelandet säger hur många låtar som inte kunde granskas |
 | 44 | manifest.json har `"orientation": "portrait-primary"` – en installerad hemskärmsapp bör låsas i stående läge, medan spelet kräver liggande | Låg | Öppen (ej testad på enhet) |
 | 45 | Laddas det aktiva lagets sida om mellan LÅS SVAR och valideringsrutan (Timer 2) valideras kortet aldrig: `window.pendingValidationCard` finns bara i sidans minne (game-cards.js `lockInPlacement`, game-timers.js `onTimerExpired`). Timer 2 stoppas, konsolen säger "No pending validation card found!", ingen valideringsruta kommer och kortet ligger kvar ovänt. Gäller alla lags telefoner. Hör ihop med #22 och ger spökkort enligt #23 om hosten går vidare med "Nästa →". Reproducerat lokalt 2026-11-16 | Medel | Öppen |
+| 50 | Lagfärgen rosa får svart text på kort och lagblock, medan ritningarna som godkändes visade vit. Textfärgen väljs efter färgens ljushet (`teamColors` i game-utils.js och `inkOn` i ny/lobby-page.js, gräns 0,19; rosa ligger på 0,1915). Kontrasten är nästan lika: svart 4,5:1, vit 4,35:1 | Låg | Öppen – admin avgör. Ändras i så fall på båda ställena |
+| 51 | Manifestets skärmbilder `desktop.png` och `mobile.png` visar utseendet före 0.864 (hur och var de visas vid installation är inte kontrollerat) | Låg | Öppen |
 
 ---
 
@@ -180,7 +214,7 @@ Fynd #17–21 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och int
 | M | Timerstapeln byggs om med innerHTML 20 gånger i sekunden på alla telefoner (game-timers.js `renderTimer`) – CSS-övergången och pulseringen körs därför aldrig |
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |
 | O | Hela spelnoden lyssnas på och hela vyn ritas om vid varje ändring. Valideringsrutan skapas om, så animationen spelas igen vid varje skrivning (ej verifierat) |
-| P | Stora bilder: `logga.png` på startsidan är 490 KB, `icon.png` 358 KB |
+| P | Stora bilder: `logga-graffiti.png` på startsidan är 624 kB, `icon-graffiti.png` 337 kB och `icon-graffiti-maskable.png` 320 kB. De gamla `logga.png` (478 kB), `icon.png` och `icon-maskable.png` ligger kvar i repot med avsikt |
 | Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, och spärren på 12 timmar läses fortfarande i firebase-config.js och lobby.html fast inget skriver den längre. I admin.html nollställer "Spara" i spellistedetaljer fortfarande `flaggedTracks/<id>`, som inget längre använder, och frågan vid borttag ur cachen nämner "nästa städning" fast kortet är borta. I game.css ligger reglerna för `.drop-zone`, `.challenge-btn` och `.spotify-status` kvar fast inget i spelet skapar de elementen (sökt i koden 2026-11-18) |
 
 ---

@@ -17,3 +17,15 @@ Denna fil innehåller kritiska systemregler och kontext för AI-assistenter som 
 
 ## 4. Kodningsfilosofi & Felsökning
 - **Helhetssyn:** Innan du fixar ett `ReferenceError` (t.ex. en saknad funktion), stanna upp och kontrollera om funktionen faktiskt *ska* finnas, eller om felet beror på att gammal kod ligger kvar efter en ombyggnation. Skriv inte blind kod för att lappa krascher utan att förstå kontexten.
+
+## 5. Utseende ("Affisch")
+- **Ett formspråk:** Spelvyn, startsidan, lobbyn och anslutningssidan ser likadana ut sedan v0.864–0.867. Nya eller ändrade delar ska följa samma formspråk: platta ytor, 4 px-hörn, Anton i versaler för rubriker, knappar och siffror, Archivo Narrow för text.
+- **Knappar och rutor:** Helvit knapp är huvudvalet och vit kontur andravalet. Rutor över sidan är mörka (`#111216`) med 2 px vit ram.
+- **Färger:** Lagfärgen används som fyllning (kort i spelet, lagblock i lobbyn), med textfärg från `teamColors` i `game-utils.js` och `inkOn` i `ny/lobby-page.js` (samma regel på båda ställena). Signalfärger: grön `#4CAF50` för klart, gul `#FBBC04` för varning, röd `#EA4335` för fel.
+- **Var stilarna ligger:** `game.css` (spelet), `ny/ny.css` (startsida, lobby och anslutning) och `ny/dialog.css` (frågerutor på alla sidor). `styles.css` delas med de gamla sidorna och ändras inte för de nya.
+- **Bildfiler:** När en bild byts ligger den gamla filen kvar i repot (`logga.png`, `icon.png`, `icon-maskable.png`, `favicon.png`). App-ikoner får nytt filnamn när de byts, eftersom Chrome räknar en ikon som oförändrad så länge manifestets ikonfält är detsamma.
+
+## 6. Säkerhet
+- **Publikt repo:** Repot är publikt och `docs/status.md` går att läsa på notestream.se. Öppna säkerhetsfynd beskrivs därför bara i `docs/sakerhet-lokal.md` (lokal fil, står i `.gitignore`), aldrig i `status.md`, commit-meddelanden eller PR-texter förrän de är åtgärdade.
+- **Aldrig rå HTML från data:** Värden från databasen, från Spotify eller från sidans adress läggs aldrig in som rå HTML. Använd `textContent`, eller `escapeHtml` i `admin.html`. Spelets `escapeHtml` (`game-utils.js`) skyddar inte citattecken och får bara användas som elementtext, inte inuti ett attribut.
+- **Spel utan inloggning:** Spelare loggar inte in. Allt under ett spel i databasen kan därför skrivas av den som har spel-id:t och ska behandlas som opålitligt.
