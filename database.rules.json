@@ -12,7 +12,7 @@
       ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       "$trackId": {
-        ".write": "newData.exists() && $trackId.length == 22 && $trackId.matches(/^[A-Za-z0-9]+$/)",
+        ".write": "newData.exists() && $trackId.length == 22 && $trackId.matches(/^[A-Za-z0-9]+$/) && newData.child('gameId').isString() && newData.child('gameId').val().length == 6 && newData.child('gameId').val().matches(/^[A-Z0-9]+$/) && root.child('games').child(newData.child('gameId').val()).exists()",
         ".validate": "newData.hasChildren(['spotifyId', 'title', 'artist', 'year', 'reportedAt'])",
         "spotifyId": { ".validate": "newData.isString() && newData.val().length <= 64" },
         "title": { ".validate": "newData.isString() && newData.val().length <= 300" },
@@ -20,6 +20,7 @@
         "year": { ".validate": "(newData.isString() && newData.val().length <= 10) || newData.isNumber()" },
         "reportedAt": { ".validate": "newData.isNumber()" },
         "reportedByTeam": { ".validate": "newData.isString() && newData.val().length <= 100" },
+        "gameId": { ".validate": "newData.isString() && newData.val().length == 6" },
         "$other": { ".validate": false }
       }
     },

@@ -132,7 +132,9 @@ async function reportTrack(spotifyId, title, artist, year) {
     artist: artist,
     year: year,
     reportedAt: Date.now(),
-    reportedByTeam: window.teamId || "Unknown"
+    reportedByTeam: window.teamId || "Unknown",
+    // The database rules only accept a report that names a game that exists
+    gameId: gameId
   };
   
   window.firebaseSet(reportRef, reportData)
