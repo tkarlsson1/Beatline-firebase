@@ -2,59 +2,15 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#032934">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
-
-  <title>Notestream – gå med i spel 0.867</title>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@500;700&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="ny.css?v=0.867">
-
-  <!-- Firebase SDK (compat), the same versions as the current join page -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="../firebase-wrapper.js?v=0.806"></script>
+  <!-- The join page was built here and moved to the root of the site in 0.874. Links and QR codes
+       with this address are sent on, with the game they point at. -->
+  <title>Notestream</title>
+  <script>window.location.replace("/join.html" + window.location.search + window.location.hash);</script>
 </head>
-
-<body>
-  <div class="page">
-    <div id="loadingState" class="loading">
-      <div class="loading-spinner"></div>
-      <p>Kontrollerar spel...</p>
-    </div>
-
-    <div id="errorState" class="error-state" style="display: none;">
-      <p id="errorMessage"></p>
-    </div>
-
-    <div id="joinForm" style="display: none;">
-      <div class="page-header">
-        <h1>Gå med i spelet</h1>
-        <p class="hint" id="teamCountDisplay"></p>
-      </div>
-
-      <div class="field">
-        <label for="teamNameInput">Välj lagnamn</label>
-        <input type="text" id="teamNameInput" maxlength="20" placeholder="Lagets namn" autocomplete="off" autofocus>
-        <div class="field-error" id="teamNameError"></div>
-      </div>
-
-      <button class="big-btn" id="joinButton" disabled>GÅ MED I SPEL</button>
-    </div>
-  </div>
-
-  <!-- Helpers shared with the current join page: team colours, name rules, notifications -->
-  <script src="../lobby.js?v=0.799"></script>
-  <script src="join-page.js?v=0.858"></script>
+<body style="background: #0a0a0a; color: #fff; font-family: sans-serif; text-align: center; padding: 2rem;">
+  <p><a href="/join.html" id="onward" style="color: #fff;">Gå med i spelet</a></p>
+  <script>document.getElementById("onward").href = "/join.html" + window.location.search + window.location.hash;</script>
 </body>
 </html>
