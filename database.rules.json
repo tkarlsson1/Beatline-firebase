@@ -37,7 +37,10 @@
     },
     "verifiedTracks": {
       ".read": true,
-      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'"
+      ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
+      "$trackId": {
+        ".validate": "$trackId.length == 22 && $trackId.matches(/^[A-Za-z0-9]+$/)"
+      }
     },
     "yearReviews": {
       ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
