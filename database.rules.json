@@ -5,7 +5,7 @@
     "games": {
       "$gameId": {
         ".read": true,
-        ".write": true
+        ".write": "data.exists() || (auth != null && newData.child('host').val() === auth.uid && newData.child('createdAt').isNumber() && $gameId.length == 6 && $gameId.matches(/^[A-Z0-9]+$/))"
       }
     },
     "reportedTracks": {
