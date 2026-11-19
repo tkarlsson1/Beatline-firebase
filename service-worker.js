@@ -1,10 +1,10 @@
 // service-worker.js (consolidated)
 // Notestream PWA — unified cache & offline fallback
-const NS_CACHE = 'ns-appshell-v1-2026-11-19-v72';
+const NS_CACHE = 'ns-appshell-v1-2026-11-19-v73';
 const NS_ASSETS = [
   '/', '/index.html', '/manifest.json',
   '/offline.html',
-  '/icon.png', '/icon-maskable.png', '/favicon.png'
+  '/icon-graffiti.png', '/icon-graffiti-maskable.png', '/favicon-graffiti.png'
 ];
 
 self.addEventListener('install', event => {
