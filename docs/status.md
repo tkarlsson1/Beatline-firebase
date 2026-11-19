@@ -3,14 +3,14 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (startsidan) | 0.874 |
+| index.html (startsidan) | 0.875 |
 | klassisk.html | Borttagen i 0.874: skickar vidare till startsidan |
-| admin.html | 0.103 |
+| admin.html | 0.104 |
 | lobby.html (lobbyn, låg under `ny/` till 0.874) | 0.874 |
 | join.html (anslutningssidan, låg under `ny/` till 0.874) | 0.874 |
 | ny/lobby-page.js (lobbyn) | 0.874 |
 | ny/join-page.js (anslutningssidan) | 0.874 |
-| ny/start.js (startsidan) | 0.874 |
+| ny/start.js (startsidan) | 0.875 |
 | ny/ny.css (startsida, lobby, anslutning) | 0.874 |
 | ny/dialog.css (frågerutor på alla sidor) | 0.867 |
 | spotify.js | 0.854 |
@@ -21,7 +21,7 @@
 | game-init.js (game.html) | 0.863 |
 | game-host.js (game.html) | 0.861 |
 | game.css | v54 |
-| service-worker | v78 |
+| service-worker | v79 |
 | database.rules.json | Senast ändrad 2026-11-19 (0.871), deployad samma dag |
 | functions/game-cleanup.js | Ny 2026-11-19 (0.871), deployad samma dag: vilka spel `cleanupOldGames` tar bort |
 | Firebase Functions Node runtime | 22 (1st Gen) |
@@ -33,6 +33,8 @@
 Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera punkterna när de är gjorda.
 
 **Deployat 2026-11-19.** Reglerna och alla fem funktionerna från 0.871 (nya spel kräver inloggning, rensningen omskriven) är deployade av admin, och Firebase godkände reglernas syntax. Regeln för rapportnycklar från 0.870 deployades tidigare samma dag, och en äkta rapport från ett spel gick igenom.
+
+**Konton skapas av admin (0.875).** Registreringen är stängd i Firebase och formuläret "Skapa konto" är borttaget från startsidan. Ett nytt konto skapas i Firebase-konsolen under Authentication, Users, "Add user", och personen sätter sedan eget lösenord med "Glömt lösenord?" på startsidan. Inte provat efter ändringen: inloggning med ett befintligt konto, och lösenordsåterställningen.
 
 **Kvar att kontrollera efter deployen:**
 - Skapa ett nytt spel från startsidan och låt någon gå med via QR-koden. Nekas skapandet visas "Kunde inte öppna spelet. Försök igen."
@@ -148,6 +150,7 @@ Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera p
 | 2026-11-19 | Dokumentationen genomgången inför byte till en lokal session. Nytt avsnitt "Läge" (vad som väntar på deploy, vad som inte är provkört eller testat på telefon, öppna beslut, var testskripten finns), fler filer i versionstabellen, hänvisningen till säkerhetsfynden uppdaterad, #50 och #51 tillagda, och raden om stora bilder rättad. `project-rules.md` har fått avsnitt om utseendet och om säkerhet | 0.872 / 0.101 / SW v76 |
 | 2026-11-19 | Reglerna och funktionerna från 0.871 deployade av admin (`firebase deploy --only database,functions`): reglernas syntax godkänd och alla fem funktionerna uppdaterade. Avsnittet "Läge" uppdaterat med vad som återstår att kontrollera | 0.873 / 0.102 / SW v77 |
 | 2026-11-19 | **Gamla vägen in är borttagen, och `/ny/` är borta ur adresserna.** Lobbyn ligger på `lobby.html` och anslutningssidan på `join.html` i roten, där de gamla sidorna låg. `ny/lobby.html` och `ny/join.html` skickar vidare till de nya adresserna med spel-id och lag kvar, så öppna flikar, sparade länkar och QR-koder som redan visas fungerar. `klassisk.html` (gamla startsidan) ledde in i den gamla lobbyn och skickar nu vidare till startsidan. De gamla sidorna finns i git-historiken och på återställningsgrenarna. Stilmallar och skript ligger kvar i mappen `ny/`; tre sökvägar i dem som utgick från `/ny/` är ändrade (spelsidan, Spotify-kontrollen i lobbyn, lobbyns adress från startsidan). **Installerad app:** `orientation` i `manifest.json` är `any` i stället för `portrait-primary`, så att den installerade appen kan rotera till liggande läge (#44). Testat i webbläsare mot låtsasdatabas: samma flöden som för 0.873 ger samma texter och skrivningar, med de nya adresserna; ingen fil som sidorna ber om saknas; och åtta gamla adresser skickar vidare rätt, även med `#` i adressen och utan spel-id. Inte testat: rotationen på riktig telefon | 0.874 / 0.103 / SW v78 |
+| 2026-11-19 | **Registreringen är stängd: konton skapas av admin.** Bara admin och några till ska ha konto, så ingen ska kunna skapa ett själv. **I Firebase** (ändrat i konsolen, inte i repot): inloggningssättet Anonymous är avstängt, och "Enable create (sign-up)" under Authentication, Settings, User actions är urkryssad. Nya konton skapas med "Add user" under Authentication, Users. Två överblivna databaser i projektet, som spelet inte använder, har dessutom fått stängda regler. **På startsidan:** rutan "Registrera dig" och knappen "Skapa konto" är borttagna (`index.html`), liksom koden bakom dem (`ny/start.js`). Kontrollerat mot Firebase: registrering nekas både med och utan e-postadress (`ADMIN_ONLY_OPERATION`), antalet konton är detsamma före och efter, de två databaserna nekar läsning och skrivning utan inloggning, och spelets databas svarar som förut. Testat i webbläsare lokalt: inloggningsrutan visas utan "Skapa konto", inga fel i konsolen, och "Glömt lösenord?" svarar. Inte testat: inloggning med ett befintligt konto efter ändringen, och att återställningsmejlet kommer fram | 0.875 / 0.104 / SW v79 |
 
 ---
 
@@ -161,7 +164,7 @@ Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera p
 | 3 | **functions.config() deprecated** – nya deployer med det misslyckas efter mars 2027 och API:t finns inte i SDK v7. Spotify-hemligheten ligger där idag (AI-nyckeln ligger redan i Secret Manager) – migrera till Secret Manager (`firebase functions:config:export`, `defineJsonSecret`) | Mars 2027 |
 
 ### Säkerhet
-Säkerhetsfynd #17–21 och #46–49 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och inte pushas. Öppna fynd beskrivs bara där tills de är åtgärdade. Den filen har också ett åtgärdat fynd med nummer 45, som inte är samma sak som bugg #45 nedan. Nästa lediga nummer är 52.
+Säkerhetsfynd #17–21, #46–49 och #52–57 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och inte pushas. Öppna fynd beskrivs bara där tills de är åtgärdade. Den filen har också ett åtgärdat fynd med nummer 45, som inte är samma sak som bugg #45 nedan. Nästa lediga nummer är 58.
 
 ### Buggar
 Gamla lobbyn, gamla anslutningssidan och gamla startsidan togs bort i 0.874. Rader nedan som nämner `lobby.html` eller `join.html` skrevs om de gamla sidorna. Om samma fel finns i den nya lobbyn (`ny/lobby-page.js`, `ny/song-pool.js`) är inte genomgånget rad för rad, utom där det står.
@@ -224,7 +227,7 @@ Gamla lobbyn, gamla anslutningssidan och gamla startsidan togs bort i 0.874. Rad
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |
 | O | Hela spelnoden lyssnas på och hela vyn ritas om vid varje ändring. Valideringsrutan skapas om, så animationen spelas igen vid varje skrivning (ej verifierat) |
 | P | Stora bilder: `logga-graffiti.png` på startsidan är 624 kB, `icon-graffiti.png` 337 kB och `icon-graffiti-maskable.png` 320 kB. De gamla `logga.png` (478 kB), `icon.png` och `icon-maskable.png` ligger kvar i repot med avsikt |
-| Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, och spärren på 12 timmar läses fortfarande i firebase-config.js och lobby.html fast inget skriver den längre. I admin.html nollställer "Spara" i spellistedetaljer fortfarande `flaggedTracks/<id>`, som inget längre använder, och frågan vid borttag ur cachen nämner "nästa städning" fast kortet är borta. I game.css ligger reglerna för `.drop-zone`, `.challenge-btn` och `.spotify-status` kvar fast inget i spelet skapar de elementen (sökt i koden 2026-11-18) |
+| Q | Död kod: game-init.js läser `hostTeam` som aldrig skrivs, tom fil `manifest` i roten, och spärren på 12 timmar läses fortfarande i firebase-config.js och lobby.html fast inget skriver den längre. I admin.html nollställer "Spara" i spellistedetaljer fortfarande `flaggedTracks/<id>`, som inget längre använder, och frågan vid borttag ur cachen nämner "nästa städning" fast kortet är borta. I game.css ligger reglerna för `.drop-zone`, `.challenge-btn` och `.spotify-status` kvar fast inget i spelet skapar de elementen (sökt i koden 2026-11-18). Efter 0.875 ligger reglerna för `#registerModal`, `.dialog-note` och `.link-btn` kvar i `ny/ny.css`, och `#registerModal` i en väljare i `styles.css`, fast registreringsrutan är borta (sökt i koden 2026-11-19) |
 
 ---
 

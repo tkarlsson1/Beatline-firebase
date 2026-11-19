@@ -10,7 +10,6 @@ import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/
 import {
   getAuth,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
   sendPasswordResetEmail
@@ -65,7 +64,6 @@ onAuthStateChanged(auth, user => {
   if (!user) {
     stopListeningToPlaylists();
     hide("mainContent");
-    hide("registerModal");
     show("loginModal", "flex");
     return;
   }
@@ -80,7 +78,6 @@ onAuthStateChanged(auth, user => {
   }
 
   hide("loginModal");
-  hide("registerModal");
   show("mainContent");
   listenToPlaylists(user.uid);
   showSpotifyStatus();
@@ -95,28 +92,6 @@ byId("loginButton").addEventListener("click", () => {
       console.error("[Start] Login failed:", error.code);
       show("loginError");
     });
-});
-
-byId("registerButton").addEventListener("click", () => {
-  const email = byId("regEmail").value.trim();
-  const password = byId("regPassword").value;
-  createUserWithEmailAndPassword(auth, email, password)
-    .then(() => hide("registerError"))
-    .catch(error => {
-      console.error("[Start] Registration failed:", error.code);
-      byId("registerError").textContent = error.message;
-      show("registerError");
-    });
-});
-
-byId("showRegister").addEventListener("click", () => {
-  hide("loginModal");
-  show("registerModal", "flex");
-});
-
-byId("showLogin").addEventListener("click", () => {
-  hide("registerModal");
-  show("loginModal", "flex");
 });
 
 byId("forgotPasswordLink").addEventListener("click", event => {
