@@ -12,7 +12,7 @@
       ".read": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       ".write": "auth != null && auth.uid == 'rtEO2DAFwfM4KdujZrFblspbwpu1'",
       "$trackId": {
-        ".write": "newData.exists()",
+        ".write": "newData.exists() && $trackId.length == 22 && $trackId.matches(/^[A-Za-z0-9]+$/)",
         ".validate": "newData.hasChildren(['spotifyId', 'title', 'artist', 'year', 'reportedAt'])",
         "spotifyId": { ".validate": "newData.isString() && newData.val().length <= 64" },
         "title": { ".validate": "newData.isString() && newData.val().length <= 300" },

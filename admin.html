@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.098</title>
+    <title>Notestream Admin v0.099</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -978,12 +978,12 @@
                         const tr = document.createElement("tr");
 
                         tr.innerHTML = `
-                            <td style="font-weight: 500;">${listName}</td>
+                            <td style="font-weight: 500;">${escapeHtml(listName)}</td>
                             <td>${songCount} låtar</td>
                             <td style="display: flex; gap: 8px;">
-                                <button class="btn-info view-btn" data-id="${listName}" style="padding: 6px 12px; font-size: 13px;">🔍 Visa Låtar</button>
-                                <button class="btn-secondary rename-btn" data-id="${listName}" style="padding: 6px 12px; font-size: 13px;">✏️ Döp om</button>
-                                <button class="btn-danger delete-btn" data-id="${listName}" style="padding: 6px 12px; font-size: 13px;">🗑️ Ta bort</button>
+                                <button class="btn-info view-btn" data-id="${escapeHtml(listName)}" style="padding: 6px 12px; font-size: 13px;">🔍 Visa Låtar</button>
+                                <button class="btn-secondary rename-btn" data-id="${escapeHtml(listName)}" style="padding: 6px 12px; font-size: 13px;">✏️ Döp om</button>
+                                <button class="btn-danger delete-btn" data-id="${escapeHtml(listName)}" style="padding: 6px 12px; font-size: 13px;">🗑️ Ta bort</button>
                             </td>
                         `;
                         
@@ -1028,7 +1028,7 @@
                         tbody.appendChild(tr);
                     }
                 }).catch(err => {
-                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">Kunde inte hämta listor: ${err.message}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">Kunde inte hämta listor: ${escapeHtml(err.message)}</td></tr>`;
                 });
             }
             
@@ -1107,17 +1107,19 @@
                         return record;
                     };
 
+                    // The titles and artists come from Spotify, and a song can also have been put
+                    // in by a script, so nothing from the list is inserted as raw HTML
                     tr.innerHTML = `
-                        <td style="font-weight: 500;">${track.title}</td>
-                        <td style="color: var(--text-muted);">${track.artist}</td>
+                        <td style="font-weight: 500;">${escapeHtml(track.title)}</td>
+                        <td style="color: var(--text-muted);">${escapeHtml(track.artist)}</td>
                         <td>
-                            <input type="number" class="edit-year-input" data-track="${trackId}" value="${track.year}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-weight: bold;">
+                            <input type="number" class="edit-year-input" data-track="${escapeHtml(trackId)}" value="${escapeHtml(track.year)}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-weight: bold;">
                         </td>
                         <td style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="btn-success save-year-btn" style="padding: 6px 10px; font-size: 13px; display: none;">Spara</button>
-                            <button class="btn-primary ai-scan-btn" data-track="${trackId}" style="padding: 6px 10px; font-size: 13px;">🤖 AI-Sök</button>
+                            <button class="btn-primary ai-scan-btn" data-track="${escapeHtml(trackId)}" style="padding: 6px 10px; font-size: 13px;">🤖 AI-Sök</button>
                             <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="btn-info" style="text-decoration: none; padding: 6px 10px; font-size: 13px; border-radius: 8px;">🔍 Google</a>
-                            <button class="btn-danger del-track-btn" data-track="${trackId}" style="padding: 6px 10px; font-size: 13px;">🗑️ Ta bort</button>
+                            <button class="btn-danger del-track-btn" data-track="${escapeHtml(trackId)}" style="padding: 6px 10px; font-size: 13px;">🗑️ Ta bort</button>
                         </td>
                     `;
 
@@ -1280,7 +1282,7 @@
                         tbody.appendChild(tr);
                     }
                 }).catch(err => {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Kunde inte hämta användare: ${err.message}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Kunde inte hämta användare: ${escapeHtml(err.message)}</td></tr>`;
                 });
             }
 
@@ -1354,16 +1356,18 @@
                             '<span style="background:var(--success); padding:2px 6px; border-radius:4px; font-size:10px; color:#fff;">Låst</span>' : 
                             '<span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-size:10px; color:#ccc;">Auto</span>';
                         
+                        // A cache record can hold what a player reported from the game: the title,
+                        // the artist and the record's own key. None of it is inserted as raw HTML.
                         tr.innerHTML = `
-                            <td style="font-weight: 500;">${track.title || "Okänd"}</td>
-                            <td style="color: var(--text-muted);">${track.artist || "Okänd"}</td>
+                            <td style="font-weight: 500;">${escapeHtml(track.title || "Okänd")}</td>
+                            <td style="color: var(--text-muted);">${escapeHtml(track.artist || "Okänd")}</td>
                             <td>
-                                <input type="number" class="cache-year-input" data-track="${track.id}" value="${track.year || ""}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-weight: bold;">
+                                <input type="number" class="cache-year-input" data-track="${escapeHtml(track.id)}" value="${escapeHtml(track.year || "")}" style="width: 70px; text-align: center; padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-weight: bold;">
                             </td>
                             <td>${statusTag}</td>
                             <td style="display: flex; gap: 8px;">
                                 <button class="btn-success cache-save-btn" style="padding: 6px 10px; font-size: 13px; display: none;">Spara</button>
-                                <button class="btn-danger cache-del-btn" data-track="${track.id}" style="padding: 6px 10px; font-size: 13px;">🗑️ Ta bort</button>
+                                <button class="btn-danger cache-del-btn" data-track="${escapeHtml(track.id)}" style="padding: 6px 10px; font-size: 13px;">🗑️ Ta bort</button>
                             </td>
                         `;
 
