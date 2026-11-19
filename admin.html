@@ -3,7 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Notestream Admin v0.108</title>
+    <!-- Limits what this page may load and connect to. Scripts come only from this site and from the
+         Firebase 10.11.0 folder, so a new Firebase version or a new address the page calls must be
+         added here too. The database address covers every server in the region, because Firebase
+         moves the connection to another one of them after the first page load. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://www.gstatic.com/firebasejs/10.11.0/; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src wss://*.europe-west1.firebasedatabase.app https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://europe-west1-beatlinefirebase.cloudfunctions.net https://api.spotify.com; base-uri 'none'; form-action 'none'">
+    <title>Notestream Admin v0.109</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
