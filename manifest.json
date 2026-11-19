@@ -1,6 +1,6 @@
 {
   "name": "Notestream",
-  "short_name": "NStream",
+  "short_name": "Notestream",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -11,13 +11,13 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/icon-graffiti.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-maskable.png",
+      "src": "/icon-graffiti-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
