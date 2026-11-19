@@ -3,13 +3,15 @@
 ## Versioner just nu
 | Fil | Version |
 |---|---|
-| index.html (startsidan) | 0.873 |
-| klassisk.html (gamla startsidan, reserv) | 0.858 |
-| admin.html | 0.102 |
-| ny/lobby.html (lobbyn) | 0.867 |
-| ny/join.html (anslutningssidan) | 0.867 |
-| ny/lobby-page.js (lobbyn) | 0.867 |
-| ny/ny.css (startsida, lobby, anslutning) | 0.867 |
+| index.html (startsidan) | 0.874 |
+| klassisk.html | Borttagen i 0.874: skickar vidare till startsidan |
+| admin.html | 0.103 |
+| lobby.html (lobbyn, låg under `ny/` till 0.874) | 0.874 |
+| join.html (anslutningssidan, låg under `ny/` till 0.874) | 0.874 |
+| ny/lobby-page.js (lobbyn) | 0.874 |
+| ny/join-page.js (anslutningssidan) | 0.874 |
+| ny/start.js (startsidan) | 0.874 |
+| ny/ny.css (startsida, lobby, anslutning) | 0.874 |
 | ny/dialog.css (frågerutor på alla sidor) | 0.867 |
 | spotify.js | 0.854 |
 | game-cards.js (game.html) | 0.862 |
@@ -19,7 +21,7 @@
 | game-init.js (game.html) | 0.863 |
 | game-host.js (game.html) | 0.861 |
 | game.css | v54 |
-| service-worker | v77 |
+| service-worker | v78 |
 | database.rules.json | Senast ändrad 2026-11-19 (0.871), deployad samma dag |
 | functions/game-cleanup.js | Ny 2026-11-19 (0.871), deployad samma dag: vilka spel `cleanupOldGames` tar bort |
 | Firebase Functions Node runtime | 22 (1st Gen) |
@@ -42,10 +44,13 @@ Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera p
 - Spelvyn: frågetecknet som kontur på iPhone, att typsnitten laddas, känslan när man drar ett kort, drag med mus, riktig Spotify-uppspelning och ett helt spel.
 - Startsidan, lobbyn och anslutningssidan: de ritade kryssrutorna och årtalsväljarna på iPhone, riktig inloggning och riktig Spotify-import.
 - Den nya loggan, och installation på hemskärmen (namnet Notestream och den nya ikonen). En app som redan är installerad byter inte namn och ikon av sig själv; installera om.
+- Att den installerade appen på Android roterar till liggande läge efter 0.874 (`orientation` är `any`). Avinstallera och installera om först.
 
 **Öppna beslut för admin:** #50 (textfärg på rosa lag) och #51 (manifestets skärmbilder) i buggtabellen.
 
 **Pausad plan.** Arbetet som pågick före 2026-11-18 pausades av admin för designarbetet och är inte återupptaget. Det står kvar som det var i tabellerna under "Kända problem".
+
+**Gamla vägen in är borttagen (0.874).** Lobbyn och anslutningssidan ligger på `lobby.html` och `join.html` i roten. Adresserna under `/ny/` och `klassisk.html` skickar vidare. Stilmallar och skript ligger kvar i mappen `ny/`.
 
 **Återställningspunkter.** Grenarna `restore/v0.863-before-affisch` (före spelvyns nya utseende) och `restore/v0.866-before-start-lobby` (före startsidans och lobbyns) ligger på GitHub.
 
@@ -142,6 +147,7 @@ Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera p
 | 2026-11-19 | **Spel: nya spel kräver inloggning, och rensningen är omskriven.** **Databasregler:** ett spel som redan finns läses och skrivs som förut, utan inloggning. Ett nytt spel får bara skapas av en inloggad användare, med det egna id:t som `host`, ett `createdAt` som är ett tal och ett spel-id i spelets eget format (6 tecken, A–Z och 0–9). Spel skapas på två ställen (`ny/start.js` och gamla startsidans `firebase-config.js`) och båda gör redan så. Ett spel som har rensats kan därmed inte återuppstå som ett tomt skal när någon som har sidan öppen skriver till det. **`cleanupOldGames`:** tar som förut bort spel som skapades för mer än sex timmar sedan, och nu även spel som saknar `createdAt`, har något annat än ett tal där, eller är daterade mer än ett dygn framåt (klockan på enheten som skapar spelet får alltså gå upp till ett dygn före). Spelen listas med enbart sina id (REST med `shallow=true`) i stället för att alla spel läses in i sin helhet, och varje spel läses och tas bort för sig, högst tio åt gången, så att ett som inte går att hantera inte stoppar de övriga. Går listningen med id inte att göra läses alla spel in som förut. Besluten ligger i `functions/game-cleanup.js`. Testat: rensningens beslut och genomgång mot en låtsasdatabas (9 test, bland annat gränsen vid exakt sex timmar, ogiltiga värden, ett spel som inte går att ta bort, och 237 spel med högst tio åt gången). Inte testat: regeln är inte provkörd i emulator, och funktionen är inte körd mot riktiga Firebase; om listningen med id fungerar där syns i funktionens logg ("listed by keys" eller "listed by fallback"). Gäller först efter deploy av regler och funktion | 0.871 / 0.100 / SW v75 / Regler / Functions |
 | 2026-11-19 | Dokumentationen genomgången inför byte till en lokal session. Nytt avsnitt "Läge" (vad som väntar på deploy, vad som inte är provkört eller testat på telefon, öppna beslut, var testskripten finns), fler filer i versionstabellen, hänvisningen till säkerhetsfynden uppdaterad, #50 och #51 tillagda, och raden om stora bilder rättad. `project-rules.md` har fått avsnitt om utseendet och om säkerhet | 0.872 / 0.101 / SW v76 |
 | 2026-11-19 | Reglerna och funktionerna från 0.871 deployade av admin (`firebase deploy --only database,functions`): reglernas syntax godkänd och alla fem funktionerna uppdaterade. Avsnittet "Läge" uppdaterat med vad som återstår att kontrollera | 0.873 / 0.102 / SW v77 |
+| 2026-11-19 | **Gamla vägen in är borttagen, och `/ny/` är borta ur adresserna.** Lobbyn ligger på `lobby.html` och anslutningssidan på `join.html` i roten, där de gamla sidorna låg. `ny/lobby.html` och `ny/join.html` skickar vidare till de nya adresserna med spel-id och lag kvar, så öppna flikar, sparade länkar och QR-koder som redan visas fungerar. `klassisk.html` (gamla startsidan) ledde in i den gamla lobbyn och skickar nu vidare till startsidan. De gamla sidorna finns i git-historiken och på återställningsgrenarna. Stilmallar och skript ligger kvar i mappen `ny/`; tre sökvägar i dem som utgick från `/ny/` är ändrade (spelsidan, Spotify-kontrollen i lobbyn, lobbyns adress från startsidan). **Installerad app:** `orientation` i `manifest.json` är `any` i stället för `portrait-primary`, så att den installerade appen kan rotera till liggande läge (#44). Testat i webbläsare mot låtsasdatabas: samma flöden som för 0.873 ger samma texter och skrivningar, med de nya adresserna; ingen fil som sidorna ber om saknas; och åtta gamla adresser skickar vidare rätt, även med `#` i adressen och utan spel-id. Inte testat: rotationen på riktig telefon | 0.874 / 0.103 / SW v78 |
 
 ---
 
@@ -158,6 +164,8 @@ Skrivet när arbetet lämnades över till en ny session. Stryk eller uppdatera p
 Säkerhetsfynd #17–21 och #46–49 finns i `docs/sakerhet-lokal.md`, som står i `.gitignore` och inte pushas. Öppna fynd beskrivs bara där tills de är åtgärdade. Den filen har också ett åtgärdat fynd med nummer 45, som inte är samma sak som bugg #45 nedan. Nästa lediga nummer är 52.
 
 ### Buggar
+Gamla lobbyn, gamla anslutningssidan och gamla startsidan togs bort i 0.874. Rader nedan som nämner `lobby.html` eller `join.html` skrevs om de gamla sidorna. Om samma fel finns i den nya lobbyn (`ny/lobby-page.js`, `ny/song-pool.js`) är inte genomgånget rad för rad, utom där det står.
+
 | # | Bug | Prio | Status |
 |---|---|---|---|
 | 5 | Race condition i `mergeSongs()` – UI-räknare kan visa fel antal | Låg | Öppen |
@@ -183,15 +191,15 @@ Säkerhetsfynd #17–21 och #46–49 finns i `docs/sakerhet-lokal.md`, som står
 | 33 | Spotify-spelaren startar bara om access-tokenen gäller (spotify-player.js), refresh-tokenen används aldrig vid sidladdning. Öppnas spelet mer än en timme efter senaste förnyelsen blir det ingen musik och inget felmeddelande | Medel | Öppen |
 | 34 | Startkort dras med återläggning och tas inte bort ur kortleken (lobby.html). Två lag kan få samma startkort, och ett startkort kan komma igen som låt att placera | Medel | Öppen |
 | 35 | Samma låt kan hamna två gånger i kortleken om den finns i två valda listor (lobby.html) | Medel | Öppen (ej verifierad) |
-| 36 | Host som laddar om lobbyn efter spelstart skickas till `game.html?teamId=null` ("Ditt lag finns inte i spelet") – hostens lobbyadress saknar teamId (lobby.html) | Medel | Öppen |
-| 37 | join.html läser lagen en gång vid sidladdning – om alla ansluter samtidigt kan alla få samma färg, och kontrollen av dubbla namn och max 8 lag går förbi | Medel | Öppen (ej verifierad) |
+| 36 | Host som laddar om lobbyn efter spelstart skickas till `game.html?teamId=null` ("Ditt lag finns inte i spelet") – hostens lobbyadress saknar teamId (lobby.html) | Medel | Inaktuell (0.874) – gällde gamla lobbyn, som är borttagen. Nya lobbyn slår upp värdens lag i spelet |
+| 37 | join.html läser lagen en gång vid sidladdning – om alla ansluter samtidigt kan alla få samma färg, och kontrollen av dubbla namn och max 8 lag går förbi | Medel | Gällde gamla sidan, som är borttagen (0.874). Nya anslutningssidan läser om lagen när man går med; om samtidiga anslutningar ändå kan krocka är inte kontrollerat |
 | 38 | Granskningsrutan vid användarimport (spotify.js) fungerar bara för admin: steg 1 skriver till `verifiedTracks`, som bara admin får skriva till, så alla andra får "Något gick fel". Steg 2 skriver till fel sökväg, `songs/<id>/year/year` | Medel | Åtgärdad (0.849) – granskningsrutan är borttagen; servern granskar låtarna och skriver själv cachen (`reviewImportedTracks`) |
 | 39 | Service workern (stale-while-revalidate) kan servera gammal JS och CSS: `styles.css` saknar `?v=` på alla sidor, och `lobby.js` saknar det i lobby.html och join.html. `spotify.js` har numera `?v=` som följer versionen | Medel | Öppen (ej verifierad) |
 | 40 | "Städa databasen": filtret ">5 år nyare än Spotify" slås aldrig på, eftersom `fixedBy` alltid är "AI" (admin.html) | Medel | Inaktuell (admin 0.077) – kortet "Städa databasen" är borttaget |
 | 41 | "Städa databasen": avbockade rader hoppas inte över utan låses med Spotifys år och `manuallyVerified: true`. Fallet där AI säger mer än 5 år tidigare än Spotify (nyutgåvor, samlingsskivor) är avbockat från början – Spara utan genomgång låser Spotifys år permanent (admin.html) | Medel | Inaktuell (admin 0.077) – kortet "Städa databasen" är borttaget |
 | 42 | "AI-Sök" i spellistedetaljer: funktionen svarar `null`, men koden letar efter "UNKNOWN", så "AI Hittade!" visas med tomt fält. Spara skriver "" och låten försvinner ur spelen (admin.html) | Medel | Åtgärdad (0.070) – "AI-Sök" använder `resolveSongYear`, som alltid svarar med ett år eller en status |
 | 43 | Import i admin: misslyckas en AI-batch visas inte granskningen av osäkra låtar från de andra batcharna. AI-svar som inte används (null, mer än 1 år senare än Spotify) försvinner tyst och räknas inte | Medel | Åtgärdad (0.848 / admin 0.077) – importen går genom `resolveSongYear`; ett misslyckat anrop försöks två gånger, importen fortsätter, och meddelandet säger hur många låtar som inte kunde granskas |
-| 44 | manifest.json har `"orientation": "portrait-primary"` – en installerad hemskärmsapp bör låsas i stående läge, medan spelet kräver liggande | Låg | Öppen (ej testad på enhet) |
+| 44 | manifest.json har `"orientation": "portrait-primary"` – en installerad hemskärmsapp bör låsas i stående läge, medan spelet kräver liggande | Låg | Åtgärdad i 0.874: värdet är `any`. Admin såg felet på Android (installerad app roterade inte). Inte testat efter ändringen; kräver troligen ominstallation |
 | 45 | Laddas det aktiva lagets sida om mellan LÅS SVAR och valideringsrutan (Timer 2) valideras kortet aldrig: `window.pendingValidationCard` finns bara i sidans minne (game-cards.js `lockInPlacement`, game-timers.js `onTimerExpired`). Timer 2 stoppas, konsolen säger "No pending validation card found!", ingen valideringsruta kommer och kortet ligger kvar ovänt. Gäller alla lags telefoner. Hör ihop med #22 och ger spökkort enligt #23 om hosten går vidare med "Nästa →". Reproducerat lokalt 2026-11-16 | Medel | Öppen |
 | 50 | Lagfärgen rosa får svart text på kort och lagblock, medan ritningarna som godkändes visade vit. Textfärgen väljs efter färgens ljushet (`teamColors` i game-utils.js och `inkOn` i ny/lobby-page.js, gräns 0,19; rosa ligger på 0,1915). Kontrasten är nästan lika: svart 4,5:1, vit 4,35:1 | Låg | Öppen – admin avgör. Ändras i så fall på båda ställena |
 | 51 | Manifestets skärmbilder `desktop.png` och `mobile.png` visar utseendet före 0.864 (hur och var de visas vid installation är inte kontrollerat) | Låg | Öppen |
@@ -210,7 +218,7 @@ Säkerhetsfynd #17–21 och #46–49 finns i `docs/sakerhet-lokal.md`, som står
 | | Idé |
 |---|---|
 | A | Stäng av `DEBUG = true` i `spotify-auth.js` (loggar i produktion, och skriver och tar bort 1 MB i localStorage vid varje sidladdning – det senare ej verifierat) |
-| K | Rensa `listor/`-katalogen – dead code från gamla verktyg. klassisk.html (gamla startsidan) laddar fortfarande `listor/itunes-api.js`, som inget anropar – ta bort den raden först |
+| K | Rensa det som blev över när gamla vägen in togs bort i 0.874: `firebase-config.js`, `menu.js`, `manage-playlists.js` och `ui-events.js` laddas inte längre av någon sida, och `listor/`-katalogen är dead code från gamla verktyg. Även testsidorna `lobby-test.html`, `spotify-test.html` och `verify-config.html` ligger kvar |
 | L | Deduplera `verifiedTracks` mot `standardLists` |
 | M | Timerstapeln byggs om med innerHTML 20 gånger i sekunden på alla telefoner (game-timers.js `renderTimer`) – CSS-övergången och pulseringen körs därför aldrig |
 | N | Hosten startar en ny 2 s-`setTimeout` var 50:e ms så länge Timer 1 står på 0 (game-timers.js `updateTimer`) |

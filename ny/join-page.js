@@ -1,7 +1,7 @@
 // ============================================
-// NOTESTREAM - JOIN A GAME (new lobby)
-// A player scans the QR code in the new lobby, chooses a team name and lands in the new
-// lobby's waiting view. The team is stored exactly as the current join page stores it.
+// NOTESTREAM - JOIN A GAME (join.html at the root of the site)
+// A player scans the QR code in the lobby, chooses a team name and lands in the lobby's
+// waiting view.
 // Helpers (validateTeamName, getNextAvailableColor, ...) come from ../lobby.js.
 // ============================================
 

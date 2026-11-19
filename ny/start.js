@@ -1,9 +1,8 @@
 // ============================================
 // NOTESTREAM - START PAGE (index.html at the root of the site)
 // Log in, open a new game (the choices are made in the lobby), and look after your own
-// playlists. The playlist import itself is ../spotify.js, shared with the old start page
-// (klassisk.html). Helpers (generateGameId, TEAM_COLORS, validateTeamName, ...) come from
-// ../lobby.js.
+// playlists. The playlist import itself is ../spotify.js. Helpers (generateGameId,
+// TEAM_COLORS, validateTeamName, ...) come from ../lobby.js.
 // ============================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -47,7 +46,7 @@ window.httpsCallable = httpsCallable;
 // Questions and messages are shown in the page's own box (dialog.js)
 const dialog = window.NotestreamDialog;
 
-// ../spotify.js and ../spotify-auth.js report with alert(). They are shared with the old
+// ../spotify.js and ../spotify-auth.js report with alert(). They were written for the old
 // start page and are not changed, so on this page alert() itself shows the page's own box.
 // Unlike the browser's alert it does not wait for the user: the code after it carries on.
 window.alert = message => { dialog.message({ text: String(message) }); };
@@ -209,8 +208,8 @@ async function createGame() {
     const gameId = generateGameId();
     const game = buildNewGame(auth.currentUser.uid, teamName, generateTeamId(), Date.now());
     await set(ref(db, `games/${gameId}`), game);
-    // The lobby lies beside this script, wherever the page that loaded the script lies
-    const lobbyUrl = new URL("lobby.html", import.meta.url);
+    // The lobby lies beside the start page
+    const lobbyUrl = new URL("lobby.html", window.location.href);
     lobbyUrl.search = `?gameId=${encodeURIComponent(gameId)}&host=true`;
     window.location.href = lobbyUrl.href;
   } catch (error) {

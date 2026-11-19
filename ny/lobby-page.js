@@ -1,8 +1,7 @@
 // ============================================
-// NOTESTREAM - NEW LOBBY
+// NOTESTREAM - LOBBY (lobby.html at the root of the site)
 // The host chooses playlists, years, points and timers here while the teams join, and the
-// players see what has been chosen. Starting writes the same game data as the current
-// lobby, so game.html is the same for both.
+// players see what has been chosen. Starting writes the game data that game.html plays.
 // Helpers (TEAM_COLORS, validateTimer) come from ../lobby.js, and the question box from
 // dialog.js.
 // ============================================
@@ -116,14 +115,14 @@
     return entry ? entry[0] : null;
   }
 
-  // The game page is shared with the current lobby and lies one level up
+  // The game page lies beside the lobby page
   function goToGame() {
     if (leaving) return;
     if (!isHost && !currentTeams[teamId]) return;
     const id = isHost ? hostTeamId() : teamId;
     if (!id) return showError("Hittar inte värdens lag i spelet.");
     leaving = true;
-    window.location.href = `../game.html?gameId=${encodeURIComponent(gameId)}&teamId=${encodeURIComponent(id)}`;
+    window.location.href = `game.html?gameId=${encodeURIComponent(gameId)}&teamId=${encodeURIComponent(id)}`;
   }
 
   function setupListeners() {
@@ -622,7 +621,7 @@
   // The music is played by the host's device. The script is only loaded for the host.
   function checkSpotify() {
     const script = document.createElement("script");
-    script.src = "../spotify-auth.js?v=0.799";
+    script.src = "spotify-auth.js?v=0.799";
     script.onload = async () => {
       let token = null;
       try {

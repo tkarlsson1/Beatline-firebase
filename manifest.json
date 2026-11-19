@@ -7,7 +7,7 @@
   "theme_color": "#000000",
   "id": "/",
   "description": "En progressiv webbapp för hantering av innehåll.",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "scope": "/",
   "icons": [
     {
